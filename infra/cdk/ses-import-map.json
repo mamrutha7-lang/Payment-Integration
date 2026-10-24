@@ -1,0 +1,21 @@
+{
+  "SesIdentity": {
+    "EmailIdentity": "sast-skills.com"
+  },
+  "SesConfigurationSet": {
+    "Name": "reep-transactional"
+  },
+  "SesEventDestination": {
+    "ConfigurationSetName": "reep-transactional",
+    "Id": "sns-bounces-complaints"
+  },
+  "SesNotifications99E4B098": {
+    "TopicArn": "arn:aws:sns:ap-south-1:445363794125:reep-ses-notifications"
+  },
+  "SesBounceRateAlarm40102DD9": {
+    "AlarmName": "reep-ses-bounce-rate"
+  },
+  "SesComplaintRateAlarmB5474BD1": {
+    "AlarmName": "reep-ses-complaint-rate"
+  }
+}

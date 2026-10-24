@@ -1,0 +1,69 @@
+# Issue-template chooser configuration.
+#
+# BLANK ISSUES ARE OFF, AND THAT IS A CHOSEN RISK. Two risks were on the table and
+# only one of them is recoverable.
+#
+#   Risk taken:    a report that fits neither template is one click harder to file.
+#   Risk refused:  a reporter never sees the security steer below and pastes a live
+#                  AUTH_SECRET or a production DATABASE_URL into a
+#                  public issue on a public repository.
+#
+# The second is unrecoverable. AUTH_SECRET signs the reep_session cookie, so its
+# disclosure is one forged {"role":"DIRECTOR"} cookie away from every student's marks,
+# attendance and USN, and the only remedy is rotation — which signs every live session
+# out. The first costs a click: `blank_issues_enabled: true` puts an "Open a blank
+# issue" link on the chooser that skips straight past the first entry below, and the
+# first entry below is the only place anyone is told not to do that.
+#
+# The taken risk is smaller than it looks, because both templates are `.md`, not YAML
+# forms: GitHub prefills the body and the reporter may delete every word of it. A
+# report that fits neither template is filed by picking either one and typing over it.
+# Nothing here makes a report inadmissible; the chooser only makes the reporter walk
+# past the warning on the way in.
+#
+# WHAT THIS FILE IS NOT. It is prose, and GitHub validates none of it on submit. A
+# reporter who reads the warning and posts the secret anyway is not stopped by
+# anything in this repository — see docs/deployment-process.md §10.1 for what to do
+# in the first ten minutes when that happens, and the same file's appendix for the
+# one server-side control that would act on the *push* path (secret-scanning
+# non-provider patterns), which is an admin setting and is not on.
+blank_issues_enabled: false
+
+contact_links:
+  - name: Report a security vulnerability privately
+    url: https://github.com/darshani8/reep-/security/advisories/new
+    about: >-
+      Do NOT open a public issue for anything touching AUTH_SECRET, the reep_session
+      cookie, a database URL, or a way to read another student's
+      marks, attendance or USN. This repository is public: an issue naming a live
+      secret IS the disclosure, and the only remedy left is rotation, which signs
+      every live session out.
+
+  - name: Voice or the interview says it is unavailable - read this first
+    url: https://github.com/darshani8/reep-/blob/main/AGENTS.md
+    about: >-
+      The voice worker is an OPTIONAL FOURTH PROCESS, in its own venv on Python 3.12,
+      and nothing in the UI says it exists. Without it, GET /api/voice/status reports
+      worker_healthy false and POST /api/voice/token answers 409 — voice, and only
+      voice, is unavailable. The interview relay is different: it runs INSIDE the API
+      and needs OPENAI_API_KEY, or the socket closes 4001. AGENTS.md "Running it"
+      step 4 is the whole answer to most of these reports.
+
+  - name: Google sign-in refuses my account
+    url: https://github.com/darshani8/reep-/blob/main/docs/google-sign-in.md
+    about: >-
+      A verified Google account with no row in `users` is refused ON PURPOSE —
+      302 /login?error=sso_not_enrolled. Nothing self-provisions and no role is ever
+      guessed; students arrive through `python -m app.seed_roster`. That doc has the
+      exact authorised redirect URI and a troubleshooting section.
+
+  - name: Deploying, or a deploy that went wrong
+    url: https://github.com/darshani8/reep-/blob/main/docs/deployment-process.md
+    about: >-
+      "May I deploy, and what then" is docs/deployment-process.md — the release gate,
+      the pre-deploy checklist, post-deploy verification and rollback. The AWS
+      mechanics are docs/aws-deployment.md and docs/deployment-env.md. Read the
+      process file's §9.1 before trusting the ECS circuit breaker to roll a bad
+      image back: with a mutable `:latest` tag it re-resolves to the image that just
+      broke. A wrong WEB_ORIGIN drops the session cookie and every login then
+      silently behaves as logged-out, which is worth ruling out before filing.

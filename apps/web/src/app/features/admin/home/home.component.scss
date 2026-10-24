@@ -1,0 +1,179 @@
+/* The Main Admin's front door. Every colour, radius and shadow is a token from
+   src/styles/reep-v2.scss; what is here is the two shapes this screen alone
+   draws — a count that is a button, and a task that is a button — and both are
+   deliberately BIG. A 10th-class student's first click should land on a target
+   the size of a card, not a 13px link. */
+
+:host {
+  display: block;
+}
+
+.home-find {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 280px;
+  max-width: 100%;
+  padding: 0 12px;
+  height: 38px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-btn);
+  box-shadow: var(--sh-well);
+
+  .icon {
+    font-size: 18px;
+    color: var(--faint);
+  }
+
+  input {
+    flex: 1;
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    font: inherit;
+    font-size: 13.5px;
+    color: var(--ink);
+    outline: none;
+  }
+  input::placeholder {
+    color: var(--faint);
+  }
+  &:focus-within {
+    border-color: var(--purple-mid);
+    box-shadow: var(--focus-ring);
+  }
+}
+
+.home-section {
+  margin-bottom: 22px;
+}
+
+/* --- Waiting for you ----------------------------------------------------- */
+
+.home-queues {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.home-queue {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 72px;
+  padding: 12px 14px;
+  background: var(--card-gradient);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-card);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--purple-mid);
+    transform: translateY(-1px);
+    outline: none;
+  }
+  &:focus-visible {
+    box-shadow: var(--focus-ring);
+  }
+}
+.home-queue__num {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  min-width: 2ch;
+  text-align: center;
+  color: var(--brand-purple);
+}
+.home-queue__label {
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.home-queue__go {
+  font-size: 20px;
+  color: var(--faint);
+}
+/* Nothing waiting: the same button, quieter. Still a button — the office may
+   want the screen anyway. */
+.home-queue--none .home-queue__num {
+  color: var(--faint);
+}
+.home-queue--none .home-queue__label {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* --- Tasks ---------------------------------------------------------------- */
+
+.home-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.home-tile {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 64px;
+  padding: 10px 12px 10px 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-ctrl);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    transform 0.12s ease,
+    border-color 0.12s ease,
+    background 0.12s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--purple-mid);
+    background: var(--tint-3);
+    transform: translateY(-1px);
+    outline: none;
+  }
+  &:focus-visible {
+    box-shadow: var(--focus-ring);
+  }
+}
+.home-tile__icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-icon);
+  background: var(--tint-1);
+  color: var(--brand-purple);
+
+  .icon {
+    font-size: 22px;
+  }
+}
+.home-tile__label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.home-tile__go {
+  font-size: 20px;
+  color: var(--faint);
+}
+.home-tile:hover .home-tile__go,
+.home-tile:hover .home-queue__go {
+  color: var(--brand-purple);
+}

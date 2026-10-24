@@ -1,0 +1,569 @@
+# Does AWS still look like this repository?
+#
+# WHY THIS EXISTS. On 2026-09-08 commit ecdb37b removed the OpenSearch
+# Serverless collection from reep_voice_platform/stack.py — $361/month for two
+# indexes nothing read, proven dead before anything was deleted. It was
+# reviewed and merged the same day. It was never deployed. Seven days later the
+# collection was still ACTIVE, still burning $11.87/day, and every signal a
+# human might have looked at said the work was done: CI green, PR merged, the
+# file gone from the repository.
+#
+# TWO DIFFERENT QUESTIONS, AND ONLY ONE OF THEM WAS EVER ASKED. `docs/cdk-cutover.md`
+# step 5 runs `detect-stack-drift`, which asks "does AWS match the template
+# CloudFormation last deployed?" — and on 2026-09-15 the honest answer was YES.
+# The deployed template still declared the collection, and AWS still had it;
+# nothing had drifted. The question nobody asked is the one this workflow asks:
+# **does the deployed template still match `main`?** That is `cdk diff`, and it
+# would have gone red on 2026-09-09, the morning after the merge.
+#
+# So both run here, and they are reported separately because they fail for
+# opposite reasons and have opposite fixes:
+#
+#   cdk diff   repo -> AWS   something was merged and not deployed.  Fix: deploy.
+#   detect-drift  AWS -> template  somebody changed AWS by hand.     Fix: reconcile.
+#
+# A CHECK THAT COULD NOT RUN IS NOT A CHECK THAT PASSED, and this workflow spent
+# its first real run proving how badly that goes. Run 35048106130 (2026-09-16)
+# reported "No drift." while `cdk diff` was reading its own exit code wrong (see
+# the diff step), `detect-stack-drift` was answering AccessDenied on both stacks
+# and `ce:GetCostAndUsage` was denied outright. All three said so with
+# `::warning::`, and a warning on a green run is invisible: nobody reads the log
+# of a check that passed. So every check here now has THREE outcomes — passed,
+# failed, and COULD NOT RUN — and the third one is reported through the same
+# channel as the second (an issue, and the run summary), never folded into the
+# first. Whatever is blocked is named there together with the IAM action that
+# would unblock it. It does not turn the run red, because a missing grant is
+# permanent until somebody adds it and a permanently red workflow is a workflow
+# that gets ignored or deleted — but it does stop this run claiming "clean",
+# which is the only claim that would actually cost something.
+#
+# READ-ONLY. Nothing here deploys. `cdk diff` renders a changeset and throws it
+# away; `detect-stack-drift` is an inspection. The workflow reports and stops —
+# deploying is a human decision and keeps its confirmation box in cdk-deploy.yml.
+# The reason is not timidity: `core-9b`'s precondition cannot be read from this
+# repository at all (see cdk-deploy.yml), so an auto-deploy here could run the
+# one update the cutover split exists to prevent.
+
+name: Infra drift
+
+on:
+  schedule:
+    # 02:30 UTC = 08:00 IST, so a disagreement is on somebody's screen at the
+    # start of the working day rather than discovered a week later. Deliberately
+    # NOT in the 01:00 IST dump window or the 03:00 IST retention sweep.
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+
+concurrency:
+  # Shares no group with cdk-deploy.yml: a diff during a deploy is a confusing
+  # report, not a broken stack, and blocking a deploy behind a read-only check
+  # would be the worse trade.
+  group: infra-drift
+  cancel-in-progress: true
+
+permissions:
+  id-token: write
+  contents: read
+  issues: write
+
+jobs:
+  drift:
+    name: Deployed infrastructure vs main
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: infra/cdk/requirements-dev.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the CDK library and CLI
+        working-directory: infra/cdk
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          npm install -g aws-cdk
+          cdk --version
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN || 'arn:aws:iam::445363794125:role/reep-github-deploy' }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+          role-session-name: reep-drift-${{ github.run_id }}
+
+      # THE EXIT CODE IS THE ANSWER ONLY WITH `--fail`, AND THIS STEP LEARNED IT
+      # THE EXPENSIVE WAY. The comment that stood here asserted "cdk diff exits 1
+      # when a stack differs and 0 when it does not, so the exit code IS the
+      # answer and `|| true` would throw it away". That was true of the CLI it
+      # was written against; it is not true of the modern one. Without `--fail`,
+      # `cdk diff` renders the changeset, prints it in full, and exits 0 whether
+      # or not there is anything in it. Run 35048106130 (2026-09-16) diffed five
+      # forms; THREE of them differed — reep-edge-waf, reep-core-9a and
+      # reep-core, all visible in that run's own log — and this step concluded
+      # "no difference" five times, set differs=0, posted "No drift." and went
+      # green. A check that answers "clean" by construction is worse than no
+      # check at all: it is the same green tick the OpenSearch collection hid
+      # behind for a week, this time with a watchdog's name on it.
+      #
+      # So the exit code is ASKED FOR with `--fail`, and it is CROSS-CHECKED
+      # against the CLI's own summary line ("Number of stacks with differences:
+      # N"), and a verdict is only trusted when the two agree. Anything else is
+      # UNREADABLE — never "same". That is what makes this particular bug
+      # uncatchable a second time: drop `--fail` again and every stack comes back
+      # exit 0 with "differences: 1" in its text, which is a disagreement, which
+      # is reported as a check that could not be read rather than as a clean run.
+      # The same net catches an expired credential, a synth error, a stack name
+      # that no longer exists and a future CLI that renames the summary line. If
+      # this step cannot READ an answer it must not INVENT one.
+      #
+      # Each stack is diffed separately: one stack differing must not hide the
+      # others, which is exactly how a $361/month collection stays invisible
+      # behind a noisy core diff.
+      - name: cdk diff every stack against main
+        id: diff
+        working-directory: infra/cdk
+        run: |
+          set -uo pipefail
+          : > /tmp/drift.md
+          : > /tmp/expected.md
+          : > /tmp/blocked.md
+          differs=0
+          unhardened=0
+          verdict=""
+          last_rc=0
+
+          # same | differs | unreadable. The two sources must agree; see above.
+          classify() {
+            local rc="$1" out="$2" n
+            n=$(sed -n 's/.*Number of stacks with differences: \([0-9][0-9]*\).*/\1/p' "$out" | tail -1)
+            if   [ -z "$n" ];                       then echo unreadable
+            elif [ "$rc" -eq 0 ] && [ "$n" -eq 0 ]; then echo same
+            elif [ "$rc" -ne 0 ] && [ "$n" -ne 0 ]; then echo differs
+            else                                         echo unreadable
+            fi
+          }
+
+          run_diff() {
+            local label="$1"; shift
+            local out="/tmp/diff-$label.txt"
+            last_rc=0
+            echo "::group::cdk diff $label"
+            cdk diff --fail "$@" --no-color > "$out" 2>&1 || last_rc=$?
+            cat "$out"
+            verdict=$(classify "$last_rc" "$out")
+            echo "  -> $verdict (exit $last_rc)"
+            echo "::endgroup::"
+          }
+
+          excerpt() {
+            echo '```'
+            # 200 lines is enough to see what moved without pasting a whole
+            # template into an issue body GitHub will then truncate.
+            head -c 60000 "/tmp/diff-$1.txt" | head -200
+            echo '```'
+          }
+
+          blocked_diff() {
+            local label="$1"
+            {
+              echo "- \`cdk diff $label\` returned no readable verdict (exit $last_rc), so this stack was NOT compared this run — blank, not clean."
+              echo "  The role needs \`sts:AssumeRole\` on the account's \`cdk-hnb659fds-lookup-role-*\` plus \`cloudformation:DescribeStacks\` and \`cloudformation:GetTemplate\`;"
+              echo "  a synth error, an expired credential or a renamed \`Number of stacks with differences:\` line lands here too. Read the \`cdk diff $label\` group in the run log."
+            } >> /tmp/blocked.md
+          }
+
+          # The ordinary direction: a difference means something was merged and
+          # never deployed, and that is a finding.
+          check() {
+            local label="$1"; shift
+            run_diff "$label" "$@"
+            case "$verdict" in
+              same) ;;
+              differs)
+                differs=1
+                {
+                  echo "### \`$label\` — deployed template differs from \`main\`"
+                  echo
+                  excerpt "$label"
+                  echo
+                } >> /tmp/drift.md ;;
+              *) blocked_diff "$label" ;;
+            esac
+          }
+
+          check reep-voice-platform reep-voice-platform
+          check reep-edge-waf       reep-edge-waf
+          check reep-dr-vault       reep-dr-vault
+          check reep-core           reep-core
+
+          # reep-core IS DIFFED IN BOTH FORMS AND ONLY ONE OF THEM MAY SET
+          # `differs` ANY MORE.
+          #
+          # The bare form above is the real question: does the deployed
+          # reep-core template still match `main`?
+          #
+          # The `-c hardenEcs=false` form is step 9a of docs/cdk-cutover.md, and
+          # it was added here while 9a was the last thing deployed. The comment
+          # that justified it said the two forms render different task
+          # definitions, so diffing only the bare form would report the whole ECS
+          # half as drift on every run — a check that cries wolf daily is a check
+          # nobody reads. That was correct then and 9b HAS SINCE BEEN DEPLOYED,
+          # which turns it exactly around. The deployed stack now carries the
+          # hardened ECS form, so the 9a form differs from it BY DEFINITION, on
+          # every run, for as long as 9b stays deployed. Run 35048106130's 9a
+          # diff is the shape of it: the target group reverting ManagedBy
+          # cdk->terraform and the deregistration delay 600->30, and the three
+          # schedules (IdentityLedger, DbDump, DocumentArchive) dropping to
+          # `orphan`. None of that is a finding — it is the deploy that already
+          # happened, read backwards. Letting it set `differs` would file an
+          # issue every morning telling the office to deploy a stack that is
+          # already deployed, which is the wolf-cry this file exists to avoid,
+          # aimed at itself.
+          #
+          # IT IS STILL WORTH RUNNING, BECAUSE THE INTERESTING ANSWER IS NOW THE
+          # INVERTED ONE, and that is the signal that makes this check mean
+          # something again. 9a coming back CLEAN would mean the deployed
+          # template no longer carries the hardened ECS form: a circuit-breaker
+          # rollback, or a `core-9a` run after 9b, which silently takes
+          # SES_FROM_ADDRESS, IDENTITY_LEDGER_BUCKET, DB_DUMP_BUCKET,
+          # DOCUMENT_ARCHIVE_BUCKET and the 600 s deregistration delay off the
+          # api task and orphans the three schedules — password resets logging
+          # instead of mailing, and an interview socket cut at 30 s of drain
+          # instead of 600. Nothing else here would name it: the bare-core diff
+          # would show it as "main has things AWS does not", indistinguishable
+          # from an ordinary undeployed merge. So the verdicts are read the other
+          # way round for this form alone — `differs` is expected and reported as
+          # such, `same` is the finding.
+          #
+          # WHEN `hardenEcs` IS RETIRED FROM reep_core/stack.py, DELETE THIS
+          # CHECK IN THE SAME COMMIT. With the flag gone the two forms render
+          # identically, 9a comes back clean every morning, and this inversion
+          # becomes precisely the daily false alarm it was written to prevent.
+          run_diff reep-core-9a reep-core -c hardenEcs=false
+          case "$verdict" in
+            differs)
+              {
+                echo "### \`reep-core-9a\` — differs, and that is the expected state"
+                echo
+                echo "\`cdk diff reep-core -c hardenEcs=false\` describes step 9a, which was superseded by 9b."
+                echo "It will differ on every run for as long as the hardened ECS form is deployed. Not a finding."
+                echo
+                excerpt reep-core-9a
+                echo
+              } >> /tmp/expected.md ;;
+            same)
+              unhardened=1
+              {
+                echo "### \`reep-core-9a\` — came back CLEAN, and it must not"
+                echo
+                echo "The deployed \`reep-core\` template matches the step-9a form, so the hardened ECS half is no longer in it:"
+                echo "the api task definition has lost \`SES_FROM_ADDRESS\`, the three archive bucket names and the 600 s"
+                echo "deregistration delay, and the IdentityLedger / DbDump / DocumentArchive schedules are orphaned."
+                echo "Re-run **CDK deploy** with stack \`core-9b\`."
+                echo
+              } >> /tmp/drift.md ;;
+            *) blocked_diff reep-core-9a ;;
+          esac
+
+          echo "differs=$differs" >> "$GITHUB_OUTPUT"
+          echo "unhardened=$unhardened" >> "$GITHUB_OUTPUT"
+
+      # GROSS spend, and gross is the whole point. This account's promotional
+      # credits were absorbing ~75% of the bill, so the OpenSearch collection
+      # cost $0.00 net for its entire life and appeared in no net-cost view at
+      # all. RECORD_TYPE=Usage is what makes a credited resource visible before
+      # the credits run out rather than after.
+      #
+      # This step already said "BLANK, not clean" when the grant was missing, and
+      # said it into a log nobody opens on a green run. It now says it in the
+      # report as well, which is the only place the sentence can do any work.
+      - name: Gross spend by service (credits excluded)
+        id: cost
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          end=$(date -u +%F)
+          start=$(date -u -d '14 days ago' +%F)
+          if ! aws ce get-cost-and-usage --region us-east-1 \
+                --time-period Start="$start",End="$end" \
+                --granularity MONTHLY --metrics UnblendedCost \
+                --filter '{"Dimensions":{"Key":"RECORD_TYPE","Values":["Usage"]}}' \
+                --group-by Type=DIMENSION,Key=SERVICE \
+                --query 'ResultsByTime[].Groups[].[Keys[0],Metrics.UnblendedCost.Amount]' \
+                --output text > /tmp/cost.txt 2>/tmp/cost.err; then
+            echo "::warning::no ce:GetCostAndUsage grant on this role — gross-spend check skipped."
+            echo "::warning::To enable it, add ce:GetCostAndUsage to reep-github-deploy. Until then this section is BLANK, not clean."
+            sed -n '1,3p' /tmp/cost.err || true
+            {
+              echo "- Gross spend was NOT measured this run — blank, not clean. A resource this repository has stopped declaring can still be billing, and nothing here would say so."
+              echo "  Grant \`ce:GetCostAndUsage\` to \`reep-github-deploy\` (Cost Explorer is a us-east-1 global endpoint; the role needs no other Cost Explorer action)."
+            } >> /tmp/blocked.md
+            exit 0
+          fi
+          # The CLI's text output is TAB-separated and service names contain
+          # spaces ("Amazon Elastic Compute Cloud - Compute"). Splitting on
+          # whitespace printed every one of them as "Amazon 0.00" (#118).
+          sort -t "$(printf '\t')" -k2,2 -gr /tmp/cost.txt | head -20 | awk -F '\t' '{printf "  %-56s %10.2f\n", $1, $2}'
+          {
+            echo "### Gross spend, last 14 days (credits excluded)"
+            echo
+            echo '```'
+            sort -t "$(printf '\t')" -k2,2 -gr /tmp/cost.txt | head -20 | awk -F '\t' '{printf "%-56s %10.2f\n", $1, $2}'
+            echo '```'
+          } >> /tmp/cost.md
+
+      # AWS vs its own template. Separate question, separate section, and
+      # NOT_CHECKED rows are dropped because they are resource types
+      # CloudFormation cannot drift-check, not findings (cdk-cutover.md §5).
+      #
+      # EVERY WAY OUT OF THIS LOOP THAT IS NOT AN ANSWER IS RECORDED AS BLOCKED.
+      # On 2026-09-16 both stacks answered AccessDenied on the very first call,
+      # the loop `continue`d, `drifted` stayed 0 and the run reported clean: the
+      # check was not merely useless, it was contributing a confident "no" to a
+      # question it had never asked. The four exits are the grant missing, the
+      # detection ending as anything but DETECTION_COMPLETE (DETECTION_FAILED
+      # means CloudFormation could not read some resources, which is not the same
+      # as finding no drift), the detection still running after five minutes, and
+      # a count that comes back empty because the third call was denied.
+      #
+      # ITS OWN ROLE, `reep-github-drift`, AND ONLY FOR THIS STEP (#117).
+      # CloudFormation reads each live resource with THESE credentials, so the
+      # check needs read access to every resource type in both stacks. That was
+      # refused on the deploy role on purpose: the role that ships code must not
+      # also be able to read the account. `GithubDriftRole` in
+      # infra/cdk/reep_core/stack.py holds the five drift calls on these two
+      # stacks, each type's read-handler permissions from its CloudFormation
+      # schema (reep_core/drift_reader.py), and an explicit Deny on every read
+      # of object bodies, table items, secrets and log lines. It is assumed
+      # AFTER the spend step, which stays on the deploy role, and nothing runs
+      # after this step with its credentials but the report.
+      #
+      # Until reep-core is deployed with it the assume fails, which is a check
+      # that could not run, not a red run: the step below reports it as blocked.
+      - name: Assume the drift-reading role
+        id: drift-creds
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DRIFT_ROLE_ARN || 'arn:aws:iam::445363794125:role/reep-github-drift' }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+          role-session-name: reep-drift-detect-${{ github.run_id }}
+
+      - name: CloudFormation drift detection
+        id: cfn
+        continue-on-error: true
+        env:
+          DRIFT_CREDS: ${{ steps.drift-creds.outcome }}
+        run: |
+          set -uo pipefail
+          drifted=0
+          blocked_cfn() {
+            {
+              echo "- \`detect-stack-drift $1\` did not answer ($2), so **$1** was NOT drift-checked this run — blank, not clean."
+              echo "  It runs as \`reep-github-drift\` (\`GithubDriftRole\` in infra/cdk/reep_core/stack.py). If that role could not be assumed,"
+              echo "  reep-core has not been deployed with it yet: run **CDK deploy** with a \`core-*\` option. If the detection ended as"
+              echo "  DETECTION_FAILED, the reason in brackets names the resource it could not read: add that type's read permissions to"
+              echo "  \`READ_PERMISSIONS\` in infra/cdk/reep_core/drift_reader.py."
+            } >> /tmp/blocked.md
+          }
+          # The deploy role's credentials may still be in the environment when
+          # the assume failed. Running the detection with them would be the
+          # 2026-09-16 AccessDenied again, so it does not run at all.
+          if [ "${DRIFT_CREDS:-}" != success ]; then
+            echo "::warning::could not assume reep-github-drift — drift detection skipped"
+            for stack in reep-core reep-voice-platform; do
+              blocked_cfn "$stack" "could not assume reep-github-drift"
+            done
+            echo "drifted=0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          for stack in reep-core reep-voice-platform; do
+            id=$(aws cloudformation detect-stack-drift --stack-name "$stack" \
+                   --query StackDriftDetectionId --output text 2>/tmp/cfn.err) || {
+              echo "::warning::could not start drift detection on $stack (missing cloudformation:DetectStackDrift?)"
+              sed -n '1,3p' /tmp/cfn.err || true
+              blocked_cfn "$stack" "could not start — missing cloudformation:DetectStackDrift?"
+              continue; }
+            status=""
+            for _ in $(seq 1 60); do
+              status=$(aws cloudformation describe-stack-drift-detection-status \
+                         --stack-drift-detection-id "$id" \
+                         --query DetectionStatus --output text 2>/dev/null) || status=""
+              [ "$status" != DETECTION_IN_PROGRESS ] && break
+              sleep 5
+            done
+            if [ "$status" != DETECTION_COMPLETE ]; then
+              # DETECTION_FAILED names what it could not read; without the
+              # reason the remedy is a guess.
+              reason=$(aws cloudformation describe-stack-drift-detection-status \
+                         --stack-drift-detection-id "$id" \
+                         --query DetectionStatusReason --output text 2>/dev/null | tr '\n' ' ' | sed 's/ *$//' | cut -c1-400) || reason=""
+              echo "::warning::drift detection on $stack ended as '${status:-unreadable}', not DETECTION_COMPLETE: ${reason}"
+              blocked_cfn "$stack" "ended as '${status:-unreadable}', not DETECTION_COMPLETE${reason:+: $reason}"
+              continue
+            fi
+            # An empty or `None` count is the third call failing, not a stack with
+            # nothing wrong with it: `length()` over the drift list always yields
+            # an integer when the call succeeds.
+            n=$(aws cloudformation describe-stack-resource-drifts --stack-name "$stack" \
+                  --stack-resource-drift-status-filters MODIFIED DELETED \
+                  --query 'length(StackResourceDrifts)' --output text 2>/dev/null) || n=""
+            if [ -z "$n" ] || [ "$n" = "None" ]; then
+              echo "::warning::could not read the drift results for $stack (missing cloudformation:DescribeStackResourceDrifts?)"
+              blocked_cfn "$stack" "results unreadable — missing cloudformation:DescribeStackResourceDrifts?"
+              continue
+            fi
+            echo "$stack: $n drifted resource(s)"
+            if [ "$n" != "0" ]; then
+              drifted=1
+              {
+                echo "### \`$stack\` — AWS differs from its deployed template"
+                echo
+                echo '```'
+                aws cloudformation describe-stack-resource-drifts --stack-name "$stack" \
+                  --stack-resource-drift-status-filters MODIFIED DELETED \
+                  --query 'StackResourceDrifts[].{Id:LogicalResourceId,Status:StackResourceDriftStatus,Diffs:PropertyDifferences[].PropertyPath}' \
+                  --output table
+                echo '```'
+                echo
+              } >> /tmp/drift.md
+            fi
+          done
+          echo "drifted=$drifted" >> "$GITHUB_OUTPUT"
+
+      - name: Report
+        uses: actions/github-script@v7
+        env:
+          DIFFERS: ${{ steps.diff.outputs.differs }}
+          UNHARDENED: ${{ steps.diff.outputs.unhardened }}
+          DRIFTED: ${{ steps.cfn.outputs.drifted }}
+        with:
+          script: |
+            const fs = require('fs');
+            const read = p => { try { return fs.readFileSync(p, 'utf8'); } catch { return ''; } };
+            const differs = process.env.DIFFERS === '1';
+            const unhardened = process.env.UNHARDENED === '1';
+            const drifted = process.env.DRIFTED === '1';
+            // Anything a step could not answer wrote a line here. Empty means
+            // every check actually ran, which is a different fact from every
+            // check passing and is the one this workflow kept confusing.
+            const blockedText = read('/tmp/blocked.md').trim();
+            const blocked = blockedText !== '';
+            const bad = differs || drifted || unhardened;
+
+            const TITLE = 'Infra drift: deployed AWS does not match `main`';
+            // A SECOND ISSUE, AND NOT A SECOND SECTION OF THE FIRST. These two
+            // close on different days for different reasons: the drift issue
+            // closes when somebody deploys or reconciles, the blocked issue
+            // closes when somebody adds an IAM action. Folding them together
+            // would mean a granted role cannot close an issue that is still
+            // reporting a real difference, and a deploy would close an issue
+            // that is still reporting a check nobody can run.
+            const BLOCKED_TITLE = 'Infra drift: a check could not run';
+
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: 'open', labels: 'infra-drift', per_page: 20,
+            });
+            const existing = open.find(i => i.title === TITLE);
+            const existingBlocked = open.find(i => i.title === BLOCKED_TITLE);
+
+            const runLink = `<sub>Run: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}</sub>`;
+            const post = async (issue, title, body, labels) => {
+              if (issue) {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner, repo: context.repo.repo,
+                  issue_number: issue.number, body,
+                });
+              } else {
+                await github.rest.issues.create({
+                  owner: context.repo.owner, repo: context.repo.repo, title, body, labels,
+                });
+              }
+            };
+            const close = async (issue, body) => {
+              if (!issue) return;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, body,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner, repo: context.repo.repo,
+                issue_number: issue.number, state: 'closed',
+              });
+            };
+
+            // The run page says all three facts before anything else does. A
+            // blocked check leaves the run GREEN on purpose (a missing grant is
+            // permanent until somebody adds it, and a permanently red workflow
+            // is one that gets muted), so the summary is where a green run has
+            // to stop looking like a clean one.
+            const summary = [
+              `**Stacks vs \`main\`:** ${differs ? 'a stack DIFFERS' : 'no difference'}`,
+              `**AWS vs its templates:** ${drifted ? 'a resource has DRIFTED' : 'no drift'}`,
+              `**Step 9a form:** ${unhardened ? 'CLEAN — the hardened ECS half is not deployed' : 'differs, as expected after 9b'}`,
+              '',
+              blocked
+                ? `### Checks that could not run\n\nThese were not measured at all, so their part of this report is **blank, not clean**:\n\n${blockedText}`
+                : 'Every check ran.',
+            ].join('\n');
+            await core.summary.addRaw(summary).write();
+
+            if (blocked) {
+              core.warning('A check could not run — this report is NOT a clean bill of health. See the run summary.');
+              await post(existingBlocked, BLOCKED_TITLE, [
+                'One or more of this workflow\'s checks did not run, so their part of the question is unanswered rather than answered "no".',
+                '',
+                blockedText,
+                '',
+                'A blocked check does not turn the run red by itself: a missing IAM action stays missing until somebody grants it, and a workflow that is red every morning stops being read. What it does do is stop this workflow reporting clean — the drift issue is not closed while this one is open, and this one closes itself on the first run where every check completes.',
+                '',
+                runLink,
+              ].join('\n'), ['infra-drift']);
+            } else {
+              await close(existingBlocked, `Every check ran as of ${new Date().toISOString()}. Closing.`);
+            }
+
+            if (!bad) {
+              if (blocked) {
+                // NOT CLOSED. The drift issue says "AWS does not match main";
+                // closing it is a statement that it now does, and a run that
+                // could not compare every stack has not earned that sentence.
+                if (existing) {
+                  await github.rest.issues.createComment({
+                    owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number,
+                    body: `Nothing new found as of ${new Date().toISOString()}, but a check could not run this morning, so this is not being closed — see "${BLOCKED_TITLE}".`,
+                  });
+                }
+                core.info('Nothing found, but a check could not run.');
+                return;
+              }
+              await close(existing, `Clean as of ${new Date().toISOString()} — every stack matches \`main\`, no resource has drifted, and every check ran. Closing.`);
+              core.info('No drift.');
+              return;
+            }
+
+            const body = [
+              'Something in AWS does not match this repository.',
+              '',
+              differs ? '**A stack differs from `main`** — most likely something was merged and never deployed. Deploy it from the **CDK deploy** workflow.' : '',
+              drifted ? '**A resource differs from its deployed template** — something was changed in AWS by hand. Reconcile it.' : '',
+              unhardened ? '**The deployed `reep-core` matches the step-9a form** — the hardened ECS half has left the stack. Re-run **CDK deploy** with stack `core-9b`.' : '',
+              '',
+              read('/tmp/drift.md'),
+              blocked ? `### Checks that could not run\n\n${blockedText}\n` : '',
+              read('/tmp/expected.md'),
+              read('/tmp/cost.md'),
+              '',
+              runLink,
+            ].filter(Boolean).join('\n');
+
+            await post(existing, TITLE, body, ['infra-drift']);
+            // Red, so it shows up beside CI rather than only in an issue.
+            core.setFailed('Deployed infrastructure does not match main.');

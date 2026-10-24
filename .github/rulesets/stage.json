@@ -1,0 +1,41 @@
+{
+  "name": "stage: PR from dev (or a main back-merge) only, merge commits, six checks, no force push",
+  "target": "branch",
+  "enforcement": "active",
+  "bypass_actors": [],
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/heads/stage"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false,
+        "allowed_merge_methods": ["merge"]
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "required_status_checks": [
+          { "context": "API (FastAPI + Postgres)" },
+          { "context": "Rule 1 (every model call declares its cargo)" },
+          { "context": "API (dependency completeness)" },
+          { "context": "Web (Angular)" },
+          { "context": "Infra (CDK synth guards)" },
+          { "context": "Branch policy (promotion path)" }
+        ]
+      }
+    },
+    { "type": "non_fast_forward" },
+    { "type": "deletion" }
+  ]
+}

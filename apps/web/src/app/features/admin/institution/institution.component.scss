@@ -1,0 +1,311 @@
+/* College structure — this screen's LAYOUT only.
+   panel / card / card-head / card-title / card-sub / chip / btn / ctrl / field /
+   notice / empty / dt-frame / dt-table / reg-grid / footbar / crumb / icon are
+   global (styles/reep-v2.scss). The one rule below that names a global class is
+   the `.card-title` override, and it carries only the declaration that differs;
+   every other class here is named for a box on this screen. */
+:host {
+  display: block;
+}
+
+/* One column, one college at a time: the picker, then its five sections. */
+.structure {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 1100px;
+}
+
+/* --- which college, and the finder ------------------------------------- */
+.pick-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.pick-bar .field.grow {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.find {
+  position: relative;
+}
+.find .icon {
+  position: absolute;
+  left: 10px;
+  bottom: 9px;
+  font-size: 16px;
+  color: var(--faint);
+  pointer-events: none;
+}
+.find .ctrl {
+  padding-left: 32px;
+}
+
+/* --- pick rows: departments and courses ---------------------------------
+   A bordered row per item, the setup screen's shape, with the code leading,
+   the count trailing and a chevron saying it opens. Selected is tint-1 with a
+   brand-purple border, never a filled pill: these lists sit above the view's
+   one primary action. */
+.pick-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pick-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-btn);
+  background: var(--surface);
+  font: inherit;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+}
+.pick-row:hover {
+  background: var(--tint-2);
+}
+.pick-row.selected {
+  background: var(--tint-1);
+  border-color: var(--brand-purple);
+}
+.pick-row:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+.pick-code {
+  flex: 0 0 auto;
+  min-width: 64px;
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 800;
+}
+.pick-row.selected .pick-code {
+  color: var(--brand-purple);
+}
+.pick-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 12.8px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pick-sub {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--faint);
+}
+.pick-count {
+  flex: none;
+  font-size: 11.5px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.pick-row .icon {
+  flex: none;
+  font-size: 18px;
+  color: var(--faint);
+}
+.pick-row.selected .icon {
+  color: var(--brand-purple);
+}
+.empty-row {
+  margin: 0;
+  padding: 10px 2px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* --- card heads ---------------------------------------------------------
+   Two titles carry a faint inline `.dt-sub` after the name ("Students in
+   MBA-2026-B"), which wants a baseline-aligned flex line rather than the
+   global's plain block. That difference, and nothing else. */
+.card-title {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+}
+
+/* --- the inline add forms: one row of fields ---------------------------- */
+.add-form {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--tint-1);
+  border: 1px solid var(--hairline);
+}
+.form-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+.form-row .field.grow {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+.form-row .field.narrow {
+  flex: 0 1 140px;
+}
+.add-form .footbar {
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+/* --- the picked course, edited in place --------------------------------- */
+.edit-block {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline-26);
+}
+.edit-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.edit-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.course-form {
+  margin: 0;
+}
+
+/* --- the college's email domains ---------------------------------------- */
+.domains {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12.5px;
+}
+.domain-key {
+  color: var(--muted);
+  font-weight: 600;
+}
+/* B1.1. "Deployment list" is a real setting, stated in the same words as the
+   Colleges card, never a dash. */
+.domain-summary {
+  color: var(--ink);
+  font-weight: 600;
+}
+.domain-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.domain-list .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+/* Not a `.btn`: it sits inside a chip and must not take the chip's height. */
+.domain-drop {
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+}
+.domain-drop:hover:not(:disabled) {
+  opacity: 1;
+}
+.domain-drop:disabled {
+  cursor: default;
+  opacity: 0.4;
+}
+.domain-drop .icon {
+  font-size: 14px;
+}
+.domain-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+.domain-add .ctrl {
+  width: 220px;
+  max-width: 100%;
+}
+
+/* --- tables ------------------------------------------------------------- */
+.b-code {
+  font-weight: 800;
+  color: var(--ink);
+}
+.row-actions {
+  white-space: nowrap;
+}
+
+/* --- the batch form ----------------------------------------------------- */
+.batch-form {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hairline-26);
+}
+.batch-form h4 {
+  margin: 0 0 12px;
+}
+.batch-form .field.wide {
+  grid-column: 1 / -1;
+}
+.batch-form .field .chip {
+  align-self: flex-start;
+}
+
+/* --- notices and inboxes ------------------------------------------------ */
+.inbox {
+  margin-bottom: 12px;
+}
+.card .notice {
+  margin-top: 10px;
+}
+.link-btn {
+  background: none;
+  border: 0;
+  padding: 0 2px;
+  font: inherit;
+  font-weight: 700;
+  color: var(--brand-purple);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.link-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* --- seating ------------------------------------------------------------ */
+.seating {
+  margin-top: 14px;
+}
+.seating .seat-add {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.seating .seat-add .field {
+  flex: 1;
+  min-width: 0;
+}

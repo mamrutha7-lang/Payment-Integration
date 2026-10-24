@@ -1,0 +1,134 @@
+@if (open()) {
+  <section
+    #panel
+    class="dock"
+    [class.dock--room]="mode() === 'interview' && canInterview()"
+    role="dialog"
+    aria-label="REEP assistant"
+    (keydown.escape)="requestClose()"
+  >
+    <header class="dock__bar">
+      <div class="dock__tabs" role="tablist" aria-label="Assistant">
+        <button
+          type="button"
+          role="tab"
+          class="dock__tab"
+          [class.dock__tab--on]="mode() === 'ask'"
+          [attr.aria-selected]="mode() === 'ask'"
+          aria-controls="dock-panel-ask"
+          (click)="show('ask')"
+        >
+          <span class="icon" aria-hidden="true">chat_bubble</span>Ask REEP
+        </button>
+        @if (canInterview()) {
+          <button
+            type="button"
+            role="tab"
+            class="dock__tab"
+            [class.dock__tab--on]="mode() === 'interview'"
+            [attr.aria-selected]="mode() === 'interview'"
+            aria-controls="dock-panel-room"
+            (click)="show('interview')"
+          >
+            <span class="icon" aria-hidden="true">mic</span>Mock interview
+            @if (live()) {
+              <span class="dock__live">Live</span>
+            }
+          </button>
+        }
+      </div>
+      <div class="dock__actions">
+        @if (pageRoute(); as route) {
+          <a
+            class="dock__iconbtn"
+            [routerLink]="route"
+            aria-label="Open as a page"
+            title="Open as a page"
+            (click)="requestClose()"
+          >
+            <span class="icon" aria-hidden="true">open_in_new</span>
+          </a>
+        }
+        <button
+          type="button"
+          class="dock__iconbtn"
+          aria-label="Close"
+          title="Close"
+          (click)="requestClose()"
+        >
+          <span class="icon" aria-hidden="true">close</span>
+        </button>
+      </div>
+    </header>
+
+    @if (confirmClose()) {
+      <div class="dock__confirm" role="alertdialog" aria-label="An interview is running">
+        <span class="dock__confirm-text">An interview is running. Closing ends it.</span>
+        <button type="button" class="dock__confirm-btn dock__confirm-btn--end" (click)="closeNow()">
+          End and close
+        </button>
+        <button type="button" class="dock__confirm-btn" (click)="keepGoing()">Keep going</button>
+      </div>
+    }
+
+    <div class="dock__body">
+      <div id="dock-panel-ask" class="dock__panel" role="tabpanel" [hidden]="mode() !== 'ask'">
+        @defer (when askSeen()) {
+          <app-agent-chat variant="dock" />
+        } @placeholder {
+          <p class="dock__loading">Loading…</p>
+        } @loading (minimum 200ms) {
+          <p class="dock__loading">Loading…</p>
+        } @error {
+          <!-- See the room's @error below for why this block exists at all. -->
+          <div class="dock__failed" role="alert">
+            <span class="icon dock__failed-icon" aria-hidden="true">refresh</span>
+            <p class="dock__failed-text">
+              Ask REEP didn’t load. REEP was probably updated while this tab was open.
+            </p>
+            <button type="button" class="btn primary sm" (click)="reload()">Reload REEP</button>
+          </div>
+        }
+      </div>
+      @if (canInterview()) {
+        <div
+          id="dock-panel-room"
+          class="dock__panel dock__panel--room"
+          role="tabpanel"
+          [hidden]="mode() !== 'interview'"
+        >
+          @defer (when roomSeen()) {
+            <app-interview-room variant="dock" />
+          } @placeholder {
+            <p class="dock__loading">Loading…</p>
+          } @loading (minimum 200ms) {
+            <p class="dock__loading">Loading the interview room…</p>
+          } @error {
+            <!-- NG0750 (Sentry REEP-WEB-1, 2026-09-17, /admin/registrations).
+                 These two are the app's ONLY `@defer` blocks and neither had an
+                 `@error` template, so Angular's own code took the other branch:
+                 `if (errorTmplIndex === null) throw new RuntimeError(-750)`. A
+                 chunk that fails to fetch is not an exceptional state here — it
+                 is the NORMAL state of a tab that was open across a deploy,
+                 because `outputHashing: "all"` renames every chunk and the old
+                 names 404 from that moment. So the dock threw an unhandled
+                 error into the ErrorHandler, which reported it to Sentry and
+                 left the panel blank, on a deploy cadence.
+
+                 main.ts filters the three engines' dynamic-import messages out
+                 of Sentry with a note that "the real fix is a reload handler,
+                 not silence". This is that handler: a reload re-fetches
+                 index.html and with it the current chunk names. -->
+            <div class="dock__failed" role="alert">
+              <span class="icon dock__failed-icon" aria-hidden="true">refresh</span>
+              <p class="dock__failed-text">
+                The interview room didn’t load. REEP was probably updated while this tab was open.
+              </p>
+              <button type="button" class="btn primary sm" (click)="reload()">Reload REEP</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </section>
+}

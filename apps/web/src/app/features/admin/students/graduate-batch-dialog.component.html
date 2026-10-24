@@ -1,0 +1,205 @@
+<div class="dialog-backdrop" (click)="close()">
+  <div class="dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="titleId" (click)="$event.stopPropagation()">
+    <header class="dialog-head">
+      <div>
+        <h2 class="dialog-title" [id]="titleId">{{ headline() }}</h2>
+        <p class="dialog-sub">{{ subLine() }}</p>
+      </div>
+      <button type="button" class="btn ghost sm" aria-label="Close this dialog" (click)="close()">
+        <span class="icon" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <div class="dialog-body">
+      @if (error()) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span><span>{{ error() }}</span>
+        </div>
+      }
+
+      @if (outcome(); as done) {
+        <div class="notice good" role="status">
+          <span class="icon" aria-hidden="true">check_circle</span>
+          <span>
+            {{ done.batch }} has graduated · {{ done.affected }} students are now alumni ·
+            {{ done.skipped }} skipped (already graduated). The batch reads
+            {{ done.cohort_status }}.
+          </span>
+        </div>
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">info</span>
+          <span>
+            Every one of those accounts was signed out of every device and signs back in as an
+            alumnus. No alumni profile was created for them: the first-login create-profile form is
+            what they meet, and it is the only thing that can ask them where they now work. Nothing
+            was deleted — marks, badges, interviews and mentor notes all stay attached to the
+            student record. This can be reversed for 30 days, from this same dialog. The roster and
+            the promotion history behind are being re-read now, so the screen matches this result
+            once you close it.
+          </span>
+        </div>
+      } @else if (reversed(); as undone) {
+        <div class="notice good" role="status">
+          <span class="icon" aria-hidden="true">undo</span>
+          <span>
+            {{ undone.batch }} is active again · {{ undone.affected }} accounts are back to STUDENT ·
+            the batch reads {{ undone.cohort_status }}.
+          </span>
+        </div>
+        @if (undone.alumni_profiles_kept > 0) {
+          <div class="notice warn" role="status">
+            <span class="icon" aria-hidden="true">warning</span>
+            <span>
+              {{ undone.alumni_profiles_kept }} of them had already filled in an alumni profile.
+              Those rows are KEPT — they are theirs and they typed them — but the alumni screens
+              refuse a student, so what they wrote is out of reach until they graduate again.
+            </span>
+          </div>
+        }
+      } @else {
+        @if (checking()) {
+          <p class="preflight-loading" role="status">
+            <span class="icon" aria-hidden="true">hourglass_top</span>
+            Running the preflight — this asks the graduate endpoint itself, with nothing written.
+          </p>
+        }
+
+        @for (check of checks(); track check.key) {
+          <div class="preflight {{ toneFor(check) }}">
+            <span class="icon" aria-hidden="true">{{ iconFor(check) }}</span>
+            <div>
+              <div class="preflight-headline">
+                {{ check.label }}
+                @if (check.status === 'blocked') {
+                  <span class="chip risk">Blocked</span>
+                }
+                @if (check.status === 'unavailable') {
+                  <span class="chip neutral">Cannot be checked</span>
+                }
+              </div>
+              <div class="preflight-detail">{{ check.detail }}</div>
+            </div>
+          </div>
+        }
+
+        @if (isReversing()) {
+          <!-- The whole batch has already graduated, so the act on offer is the
+               reversal the preflight's own "Reversible" check promises. -->
+          @if (reversalRefusal(); as why) {
+            <div class="notice warn" role="status">
+              <span class="icon" aria-hidden="true">block</span>
+              <span>{{ why }}</span>
+            </div>
+          } @else if (reversal(); as undo) {
+            <div class="notice accent">
+              <span class="icon" aria-hidden="true">undo</span>
+              <span>
+                This batch has already graduated. Reversing it puts
+                {{ undo.affected }} accounts back to STUDENT, signs every device out again and sets
+                the batch back to active.
+                @if (undo.alumni_profiles_kept > 0) {
+                  {{ undo.alumni_profiles_kept }} of these graduates have since filled in an alumni
+                  profile — those rows are kept, and become unreachable to them until they graduate
+                  again.
+                }
+              </span>
+            </div>
+          }
+        } @else {
+          <div class="preflight good">
+            <span class="icon" aria-hidden="true">school</span>
+            <div>
+              <div class="preflight-headline">No alumni profile is created</div>
+              <div class="preflight-detail">
+                Role STUDENT → ALUMNI · the student record, USN, marks, badges and interviews are
+                kept exactly as they are. The graduate meets the first-login create-profile form,
+                which is the only thing that can ask them where they now work.
+              </div>
+            </div>
+          </div>
+        }
+
+        <div class="dialog-fields">
+          @if (!isReversing()) {
+            <label class="field dated">
+              <span>Graduation date</span>
+              <input
+                class="ctrl"
+                type="date"
+                [value]="effectiveOn()"
+                (change)="onEffectiveOn(valueOf($event))"
+              />
+            </label>
+          }
+          <label class="field">
+            <span>Reason</span>
+            <input
+              class="ctrl"
+              type="text"
+              [value]="reason()"
+              placeholder="e.g. Results declared; convocation date set"
+              (input)="onReason(valueOf($event))"
+            />
+          </label>
+        </div>
+        <p class="field-note">
+          The reason is optional and is written onto every history row this act creates. The
+          30-day reversal window is measured from when the button is pressed, never from the
+          graduation date, so backdating the date does not shorten it.
+        </p>
+
+        @if (rows().length > 0) {
+          <div class="roster-scroll">
+            <table class="dt-table">
+              <caption class="sr-only">Students in this batch and what this act does to each</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Student</th>
+                  <th scope="col">Semester</th>
+                  <th scope="col">Account</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of rows(); track row.student_id) {
+                  <tr>
+                    <td>
+                      {{ row.name }}
+                      <span class="usn">{{ row.usn ?? 'no USN' }}</span>
+                    </td>
+                    <td>{{ row.semester }}</td>
+                    <td>
+                      @if (row.blocked_reason !== null) {
+                        <span class="chip risk">Blocked</span>
+                        <span class="blocked-why">{{ row.blocked_reason }}</span>
+                      } @else {
+                        <span class="chip neutral">{{ row.role_before }} → {{ row.role_after }}</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    </div>
+
+    <footer class="dialog-foot">
+      @if (settled()) {
+        <button type="button" class="btn primary" (click)="close()">Close</button>
+      } @else {
+        <button type="button" class="btn secondary" (click)="close()">Cancel</button>
+        <button
+          type="button"
+          class="btn primary"
+          [disabled]="busy() || refusal() !== null"
+          [attr.title]="refusal()"
+          (click)="confirm()"
+        >
+          <span class="icon" aria-hidden="true">{{ isReversing() ? 'undo' : 'school' }}</span>
+          {{ confirmLabel() }}
+        </button>
+      }
+    </footer>
+  </div>
+</div>

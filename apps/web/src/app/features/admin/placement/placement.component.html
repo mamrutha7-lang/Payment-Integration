@@ -1,0 +1,406 @@
+<div class="panel" data-p="placement">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <span>Every day</span><span class="sep">/</span><span>Placement &amp; offers</span>
+      </div>
+      <h1 class="dt-title">Placement &amp; offers</h1>
+      <div class="dt-sub">
+        @if (figures(); as placement) {
+          Who got placed, and the offers waiting for a decision.
+          @if (placement.semester !== null) {
+            · Semester {{ placement.semester }}
+          }
+          @if (narrowingSentence(); as narrowed) {
+            · <b>{{ narrowed }}</b>
+          }
+        } @else {
+          {{ figuresPlaceholderNote() }}
+        }
+      </div>
+    </div>
+    <div class="dt-toolbar">
+      <!-- B12.3's batch-scoped offers extract IS this file: the existing
+           `/admin/exports/placement.csv` already carries B14's scope filter,
+           its personal-column gate and its receipt, and takes `?cohort_id=`.
+           A real link, so the browser streams it straight to disk. -->
+      <a class="btn secondary" [href]="offersCsvUrl()" download="reep-placement-summary.csv">
+        <span class="icon" aria-hidden="true">download</span>
+        {{ cohortFilter() === '' ? 'Export offers' : 'Export this batch' }}
+      </a>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>{{ error() }}
+    </div>
+  }
+  @if (flash()) {
+    <div class="notice good" role="status">
+      <span class="icon" aria-hidden="true">check_circle</span>{{ flash() }}
+    </div>
+  }
+
+  <div class="tabs placement-tabs">
+    <a class="tab" routerLink="/admin/jobs">Jobs</a>
+    <span class="tab active" aria-current="page">Placement</span>
+    <button type="button" class="tab" (click)="showOffers()">
+      Offers · {{ offersAwaitingLabel() }} pending
+    </button>
+  </div>
+
+  <!-- BATCH and PERIOD are parameters on `GET /api/admin/placement`, so both
+       re-read the whole payload: every count, the split and the recent list
+       move together, and the funnel's columns keep adding up. TRACK is not a
+       parameter and is not coming — see its title. -->
+  <div class="filters">
+    <div class="select" [class.filter-pending]="cohortFilterDisabledReason() !== null">
+      <span class="lbl">Batch</span>
+      <span class="val">{{ cohortFilterLabel() }}</span>
+      <select
+        aria-label="Batch — narrows every figure on this screen"
+        [disabled]="cohortFilterDisabledReason() !== null"
+        [attr.title]="cohortFilterDisabledReason()"
+        (change)="setCohortFilter(selectValue($event))"
+      >
+        <option value="" [selected]="cohortFilter() === ''">All batches</option>
+        @for (cohort of cohortOptions(); track cohort.id) {
+          <option [value]="cohort.id" [selected]="cohort.id === cohortFilter()">
+            {{ cohort.display_label }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="select" [class.filter-pending]="yearFilterDisabledReason() !== null">
+      <span class="lbl">Period</span>
+      <span class="val">{{ yearFilterLabel() }}</span>
+      <select
+        aria-label="Period — narrows the offer figures to one calendar year, over the students on the roll today"
+        [disabled]="yearFilterDisabledReason() !== null"
+        [attr.title]="yearFilterDisabledReason()"
+        (change)="setYearFilter(selectValue($event))"
+      >
+        <option value="" [selected]="yearFilter() === ''">Whole record</option>
+        @for (year of yearOptions(); track year) {
+          <option [value]="year" [selected]="year.toString() === yearFilter()">{{ year }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="board-columns">
+    <section class="card funnel-card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-heading">Placement funnel</h2>
+          <p class="card-sub">
+            Counts are distinct students · one approved offer counts a student once
+          </p>
+        </div>
+      </div>
+
+      @if (funnelStages().length > 0) {
+        <div
+          #funnelChart
+          class="funnel-chart"
+          role="img"
+          [attr.aria-label]="funnelSummary()"
+        ></div>
+        <div class="funnel-rates">
+          @for (rate of funnelRates(); track rate.label) {
+            <span>{{ rate.label }} <b>{{ rate.value }}</b></span>
+          }
+          <span>Distinct students · one approved offer counts once</span>
+        </div>
+      } @else if (!error()) {
+        <p class="state-note" role="status">
+          <span class="icon" aria-hidden="true">hourglass_empty</span>Loading the placement figures…
+        </p>
+      }
+
+      <!-- THE SERVER SAYS WHICH STAGE IT CANNOT COUNT AND WHY, and this
+           renders that list rather than a sentence of its own — one written
+           here would go on being displayed after somebody built the thing that
+           fills the gap. Nothing is drawn when the list is empty. -->
+      @for (gap of funnelGaps(); track gap.stage) {
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">insights</span>
+          <span><b>{{ gapTitle(gap) }} — not counted.</b> {{ gap.reason }}</span>
+        </div>
+      }
+
+      <div class="dropoff">
+        <div class="eyebrow">Where students drop off</div>
+        @if (knowsEligibleWhoNeverApplied()) {
+          <div class="dropoff-row">
+            <span class="chip warn">{{ eligibleWhoNeverApplied() }}</span>
+            <!-- The chip beside this already prints the count, so the noun and its
+                 verb cannot go through the pipe as well; they agree on their own. -->
+            <span class="dropoff-text">
+              eligible
+              {{ eligibleWhoNeverApplied() === 1 ? 'student has' : 'students have' }}
+              not applied to a job yet
+            </span>
+            <a class="dropoff-link" routerLink="/admin/students">
+              Students <span class="icon" aria-hidden="true">arrow_forward</span>
+            </a>
+          </div>
+        }
+        <div class="dropoff-row">
+          <span class="chip accent">{{ offersAwaitingLabel() }}</span>
+          <span class="dropoff-text">
+            {{ exactlyOneOfferWaiting() ? 'offer' : 'offers' }} waiting for approval
+            @if (oldestWaitingOfferDate(); as oldest) {
+              (oldest {{ oldest }})
+            }
+            @if (!waitingCountIsExact()) {
+              — at least this many; the waiting list did not answer on this account
+            }
+          </span>
+          <button type="button" class="dropoff-link as-button" (click)="showOffers()">
+            Offers <span class="icon" aria-hidden="true">arrow_forward</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="side-column">
+      <section class="card side-card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-heading">{{ kpiCardHeading() }}</h2>
+            <p class="card-sub">{{ kpiCardPeriod() }}</p>
+          </div>
+        </div>
+        <div class="kpi-grid">
+          <div>
+            <div class="eyebrow">Placement rate</div>
+            @if (figures(); as placement) {
+              <div class="kpi">{{ placementRateLabel() }}</div>
+              <div class="kpi-sub">
+                {{ placement.approved_students }} of {{ placement.eligible }} eligible
+              </div>
+            } @else {
+              <div class="kpi">—</div>
+              <div class="kpi-sub">{{ figuresPlaceholderNote() }}</div>
+            }
+          </div>
+          <div>
+            <div class="eyebrow">Median CTC</div>
+            <div class="kpi">{{ medianCtcLabel() }}</div>
+            <div class="kpi-sub">{{ ctcCountedLabel() }}</div>
+          </div>
+          <div>
+            <div class="eyebrow">Highest</div>
+            <div class="kpi">{{ highestCtcLabel() }}</div>
+            <div class="kpi-sub">{{ ctcCountedLabel() }}</div>
+          </div>
+          <div>
+            <div class="eyebrow">Multiple offers</div>
+            <div class="kpi">{{ multipleOffersLabel() }}</div>
+            <div class="kpi-sub">students holding more than one</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card side-card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-heading">Offers by status</h2>
+            <p class="card-sub">every submitted offer, approved · waiting · not approved</p>
+          </div>
+        </div>
+        @if (offerStatusSplit().length > 0) {
+          <div
+            #statusChart
+            class="status-chart"
+            role="img"
+            [attr.aria-label]="offerStatusSummary()"
+          ></div>
+        } @else if (offerSplitUnavailable()) {
+          <div class="notice accent">
+            <span class="icon" aria-hidden="true">info</span>
+            <div>
+              The waiting-offer count could not be read on this account, so the split is not shown.
+            </div>
+          </div>
+        } @else if (noOffersYet()) {
+          <div class="notice accent">
+            <span class="icon" aria-hidden="true">info</span>
+            No offers recorded yet. Offers a student submits appear here for approval.
+          </div>
+        }
+      </section>
+
+      <section class="card side-card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-heading">By track</h2>
+            <p class="card-sub">placed / eligible</p>
+          </div>
+        </div>
+        @if (noTrackSplitYet()) {
+          <div class="notice accent">
+            <span class="icon" aria-hidden="true">info</span>
+            No student is on the roll for this batch and period, so there is no track to split.
+          </div>
+        } @else {
+          <table class="dt-table track-split">
+            <thead>
+              <tr>
+                <th scope="col">Track</th>
+                <th scope="col" class="num">Placed</th>
+                <th scope="col" class="num">Eligible</th>
+                <th scope="col">Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of trackSplit(); track row.code ?? row.name) {
+                <tr>
+                  <td>{{ row.name }}</td>
+                  <td class="num">{{ row.placed }}</td>
+                  <td class="num">{{ row.eligible }}</td>
+                  <td>
+                    <span class="chip {{ trackTone(row) }}">{{ trackRateLabel(row) }}</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+          <p class="card-note">
+            A track is the student’s own batch specialization, not the posting’s — an off-campus
+            offer has no posting behind it, and a posting for two tracks would count one placement
+            twice. “Not filed” is the students whose batch names no specialization; the row is kept
+            so the column adds up to the funnel.
+          </p>
+        }
+      </section>
+
+      <section class="card side-card">
+        <div class="card-head">
+          <div>
+            <h2 class="card-heading">Top recruiters</h2>
+            <p class="card-sub">by approved offers</p>
+          </div>
+        </div>
+        @if (noRecruitersYet()) {
+          <div class="notice accent">
+            <span class="icon" aria-hidden="true">info</span>
+            No approved offers yet, so no recruiter has a count.
+          </div>
+        } @else {
+          <div class="recruiters">
+            @for (recruiter of topRecruiters(); track recruiter.organisation) {
+              <span class="chip neutral">{{ recruiter.organisation }} · {{ recruiter.count }}</span>
+            }
+          </div>
+        }
+      </section>
+    </div>
+  </div>
+
+  <section #offersCard class="card offers-card" tabindex="-1">
+    <div class="card-head">
+      <div>
+        <h2 class="card-heading">Offers</h2>
+        <p class="card-sub">Tick offers, then approve or reject them; the student is told either way.</p>
+      </div>
+      <div class="card-actions">
+        <button
+          type="button"
+          class="btn danger sm"
+          [disabled]="!canDecideSelection()"
+          (click)="openRejection()"
+        >
+          Reject
+        </button>
+        <button
+          type="button"
+          class="btn primary sm"
+          [disabled]="!canDecideSelection()"
+          (click)="approveSelectedOffers()"
+        >
+          <span class="icon" aria-hidden="true">check</span> Approve offer
+        </button>
+      </div>
+    </div>
+
+    @if (rejectionOpen()) {
+      <div class="rejection">
+        <div class="field rejection-field">
+          <label for="rejection-remarks">
+            Remarks — why this offer is not approved (required, shown to the student)
+          </label>
+          <input
+            id="rejection-remarks"
+            type="text"
+            [value]="rejectionReason()"
+            (input)="setRejectionReason($event)"
+          />
+        </div>
+        <button
+          type="button"
+          class="btn danger sm"
+          [disabled]="!canDecideSelection()"
+          (click)="confirmRejection()"
+        >
+          Confirm reject
+        </button>
+        <button type="button" class="btn secondary sm" (click)="cancelRejection()">Cancel</button>
+      </div>
+      @if (rejectionReasonMissing()) {
+        <p class="rejection-error" role="alert">
+          <span class="icon" aria-hidden="true">error</span>Remarks are required.
+        </p>
+      }
+    }
+
+    @if (offersAreEmpty()) {
+      <div class="notice accent">
+        <span class="icon" aria-hidden="true">info</span>
+        No offers recorded yet. Offers a student submits appear here for approval.
+      </div>
+    } @else if (figures()) {
+      <div class="grid-toolbar">
+        <input
+          class="dt-quickfilter"
+          type="search"
+          placeholder="Search offers…"
+          aria-label="Search the offers table"
+          (input)="setQuickFilter($event)"
+        />
+        <span class="grid-count">
+          {{ selectedOfferCount() }} selected · only an offer awaiting approval can be ticked
+        </span>
+      </div>
+      <ag-grid-angular
+        class="offers-grid"
+        [theme]="gridTheme"
+        [rowData]="offerRows()"
+        [columnDefs]="offerColumns"
+        [defaultColDef]="defaultOfferColumn"
+        [rowSelection]="offerSelection"
+        [selectionColumnDef]="selectionColumn"
+        [quickFilterText]="quickFilter()"
+        [pagination]="true"
+        [paginationPageSize]="offersPerPage"
+        [paginationPageSizeSelector]="pageSizes"
+        [domLayout]="'autoHeight'"
+        [suppressCellFocus]="true"
+        (gridReady)="onGridReady($event)"
+        (selectionChanged)="onOfferSelectionChanged($event)"
+      />
+      <div class="dt-statusbar">
+        <span>{{ offerRows().length | plural: 'offer' }} on screen</span>
+        <span>{{ offersAwaitingLabel() }} awaiting approval</span>
+        <span class="statusbar-note">newest 25 submitted, plus every offer still waiting</span>
+      </div>
+    } @else if (!error()) {
+      <p class="state-note" role="status">
+        <span class="icon" aria-hidden="true">hourglass_empty</span>Loading offers…
+      </p>
+    }
+  </section>
+</div>

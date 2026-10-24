@@ -1,0 +1,157 @@
+<div class="dialog-backdrop" (click)="dismissed.emit()">
+  <div
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="titleId"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="dialog-head">
+      <div>
+        <h2 class="dialog-title" [id]="titleId">Academic calendar</h2>
+        <p class="dialog-sub">The days the college is shut; only these are subtracted from a leave span.</p>
+      </div>
+      <button
+        type="button"
+        class="btn ghost sm"
+        aria-label="Close the calendar dialog"
+        (click)="dismissed.emit()"
+      >
+        <span class="icon" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <div class="dialog-body">
+      @if (error()) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ error() }}
+        </div>
+      }
+      @if (flash()) {
+        <div class="notice good" role="status">
+          <span class="icon" aria-hidden="true">check_circle</span>{{ flash() }}
+        </div>
+      }
+
+      <div class="row-fields">
+        <label class="field">
+          <span>College</span>
+          <select
+            class="ctrl"
+            aria-label="College whose calendar this is"
+            (change)="chooseCollege(selectValue($event))"
+          >
+            @for (college of colleges(); track college.college_id) {
+              <option
+                [value]="college.college_id"
+                [selected]="college.college_id === collegeId()"
+              >
+                {{ college.college_name || college.college_id }}
+              </option>
+            } @empty {
+              <option value="">No college is on record</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <h3 class="section-head">Record a day</h3>
+      <div class="row-fields">
+        <label class="field narrow">
+          <span>Date</span>
+          <input
+            class="ctrl"
+            type="date"
+            [value]="newDay()"
+            (input)="newDay.set(inputValue($event))"
+          />
+        </label>
+        <label class="field narrow">
+          <span>The college is</span>
+          <select class="ctrl" aria-label="Kind of day" (change)="newKind.set(selectValue($event))">
+            <option value="holiday" [selected]="newKind() === 'holiday'">Shut (holiday)</option>
+            <option value="working" [selected]="newKind() === 'working'">Open (working day)</option>
+          </select>
+        </label>
+        <label class="field">
+          <span>Label</span>
+          <input
+            class="ctrl"
+            type="text"
+            placeholder="e.g. Republic Day"
+            [value]="newLabel()"
+            (input)="newLabel.set(inputValue($event))"
+          />
+        </label>
+        <button type="button" class="btn primary" [disabled]="!canAdd() || busy()" (click)="addDay()">
+          <span class="icon" aria-hidden="true">add</span> Record
+        </button>
+      </div>
+
+      <div class="notice accent">
+        <span class="icon" aria-hidden="true">info</span>
+        <div>
+          Only a day marked shut is subtracted from a leave span.
+        </div>
+      </div>
+
+      <h3 class="section-head">
+        Days recorded · {{ holidayCount() }} of them shut
+      </h3>
+      <div class="table-scroll">
+        <table class="dt-table">
+          <caption class="sr-only">Recorded calendar days</caption>
+          <thead>
+            <tr>
+              <th scope="col">Date</th>
+              <th scope="col">The college is</th>
+              <th scope="col">Label</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (day of days() ?? []; track day.id) {
+              <tr>
+                <td>{{ day.day }}</td>
+                <td>
+                  <span class="chip {{ day.kind === 'holiday' ? 'warn' : 'neutral' }}">
+                    {{ day.kind === 'holiday' ? 'Shut · not counted' : 'Open · counted' }}
+                  </span>
+                </td>
+                <td>{{ day.label || '—' }}</td>
+                <td>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="btn ghost sm"
+                      [attr.aria-label]="'Remove ' + day.day + ' from the calendar'"
+                      [disabled]="busy()"
+                      (click)="removeDay(day)"
+                    >
+                      <span class="icon" aria-hidden="true">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="4" class="empty-row">
+                  @if (days() === null) {
+                    Pick a college to read its calendar.
+                  } @else {
+                    No day is recorded for this college, so every calendar day of a leave span is
+                    counted as a working day.
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="dialog-foot">
+      <button type="button" class="btn secondary" (click)="dismissed.emit()">Close</button>
+    </footer>
+  </div>
+</div>

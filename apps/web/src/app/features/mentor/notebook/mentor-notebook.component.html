@@ -1,0 +1,170 @@
+<div class="panel" data-p="notebook">
+  <div class="dt-header">
+    <div>
+      <div class="eyebrow">Staff · private notebook</div>
+      <h1 class="dt-title">Faculty notebook</h1>
+      <div class="dt-sub nb-lede">
+        Capture the meeting while it is fresh. Drafts stay staff-private until you publish.
+      </div>
+    </div>
+    <span class="chip nb-private"><span class="icon" aria-hidden="true">lock</span> Private by default</span>
+  </div>
+
+  @if (error()) {
+    <div class="notice nb-notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      <div>{{ error() }}</div>
+    </div>
+  }
+
+  <div class="nb-wrap">
+    <section class="card nb-card" aria-label="Mentoring log">
+      <div class="nb-bar">
+        <div class="nb-kicker">Mentoring log</div>
+        <label class="nb-student">
+          Student
+          <select
+            class="nb-select"
+            [ngModel]="selectedId() ?? ''"
+            (ngModelChange)="select($event)"
+            [disabled]="!mentees()?.length"
+          >
+            @if (mentees() === null) {
+              <option value="">Loading students…</option>
+            } @else if (mentees()!.length === 0) {
+              <option value="">No assigned students</option>
+            } @else {
+              @for (m of mentees()!; track m.student_id) {
+                <option [value]="m.student_id">{{ m.name }} · {{ m.usn || 'No USN' }}</option>
+              }
+            }
+          </select>
+        </label>
+        <button
+          type="button"
+          class="btn primary nb-toggle"
+          [disabled]="!selected()"
+          (click)="toggleForm()"
+        >
+          <span class="icon" aria-hidden="true">{{ formOpen() ? 'close' : 'add' }}</span>
+          {{ formOpen() ? 'Close' : 'Add entry' }}
+        </button>
+      </div>
+
+      @if (mentees()?.length === 0) {
+        <div class="nb-empty">
+          No assigned students. A mentor without an assignment cannot see programme-wide
+          records — mentee groups are assigned by the Main Admin.
+        </div>
+      }
+
+      @if (formOpen() && selected()) {
+        <div class="nb-form">
+          <label class="nb-field">
+            Date
+            <input type="date" [(ngModel)]="logDate" />
+          </label>
+          <label class="nb-field nb-field--wide">
+            Key discussions
+            <input type="text" placeholder="What was discussed" [(ngModel)]="logDiscussion" maxlength="20000" />
+          </label>
+          <label class="nb-field">
+            Follow up
+            <input type="text" placeholder="Agreed action" [(ngModel)]="logFollowup" maxlength="500" />
+          </label>
+          <label class="nb-field">
+            Remarks
+            <select [(ngModel)]="logRemark">
+              @for (r of remarks; track r) {
+                <option [value]="r">{{ r }}</option>
+              }
+            </select>
+          </label>
+          <div class="nb-form__actions">
+            <button type="button" class="btn primary" [disabled]="saving()" (click)="saveEntry()">
+              <span class="icon" aria-hidden="true">send</span> {{ saving() ? 'Saving…' : 'Save entry' }}
+            </button>
+          </div>
+          @if (formError()) {
+            <div class="nb-form__error" role="alert">{{ formError() }}</div>
+          }
+        </div>
+      }
+
+      <div class="nb-scroll">
+        <table class="nb-table">
+          <thead>
+            <tr>
+              <th class="nb-col-date">Date</th>
+              <th>Key discussions</th>
+              <th class="nb-col-follow">Follow up</th>
+              <th class="nb-col-remark">Remarks</th>
+              <th class="nb-col-act"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (!selected()) {
+              @if (mentees() === null) {
+                <tr><td colspan="5" class="nb-row-note">Loading students…</td></tr>
+              }
+            } @else if (entries() === null) {
+              <tr><td colspan="5" class="nb-row-note">Loading the mentoring log…</td></tr>
+            } @else {
+              @for (row of entries()!; track row.id) {
+                <tr>
+                  <td class="nb-date">
+                    {{ (row.meeting_at || row.created_at) | date: 'dd MMM y' }}
+                    @if (isPublished(row)) {
+                      <span class="nb-pub"><span class="icon" aria-hidden="true">visibility</span>Published</span>
+                    }
+                  </td>
+                  <td class="nb-text">
+                    @if (row.title) { <strong class="nb-title">{{ row.title }}</strong> }
+                    {{ row.body }}
+                  </td>
+                  <td class="nb-text">{{ followup(row) }}</td>
+                  <td>
+                    @if (remark(row); as r) {
+                      <span class="chip {{ remarkTone(r) }}">{{ r }}</span>
+                    } @else {
+                      <span class="nb-dash">—</span>
+                    }
+                  </td>
+                  <td class="nb-actions">
+                    @if (!isPublished(row)) {
+                      <button
+                        type="button"
+                        class="nb-rowbtn nb-rowbtn--pub"
+                        title="Publish to the student's Mentor Meeting Log"
+                        [disabled]="busyId() === row.id"
+                        (click)="publish(row)"
+                      >
+                        <span class="icon" aria-hidden="true">send</span>
+                      </button>
+                    }
+                    <button
+                      type="button"
+                      class="nb-rowbtn nb-rowbtn--del"
+                      title="Delete entry"
+                      [disabled]="busyId() === row.id"
+                      (click)="remove(row)"
+                    >
+                      <span class="icon" aria-hidden="true">close</span>
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" class="nb-row-note">No entries yet — add the first one above.</td></tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="nb-foot">
+        <span class="icon" aria-hidden="true">lock</span>
+        Entries stay staff-private until you publish them to the student's Mentor Meeting Log.
+      </div>
+    </section>
+  </div>
+</div>

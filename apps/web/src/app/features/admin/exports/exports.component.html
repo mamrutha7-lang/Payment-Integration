@@ -1,0 +1,194 @@
+<div class="panel" data-p="exports">
+  <div class="dt-header">
+    <div>
+      <div class="crumb"><span>Every day</span><span class="sep">/</span><span>Download reports</span></div>
+      <h1 class="dt-title">Download reports</h1>
+      <p class="dt-sub">CSV files, each covering only the students you can see.</p>
+    </div>
+  </div>
+
+  <!-- The warning comes before the cards, because it is about pressing them. -->
+  <div class="notice info data-note">
+    <span class="icon" aria-hidden="true">shield_person</span>
+    <div>
+      <b>These files carry student data.</b> They leave REEP the moment they are downloaded and
+      nothing here can recall them — share them the way your institution requires for student
+      records.
+    </div>
+  </div>
+
+  @if (justRequested(); as requested) {
+    <p class="request-note" role="status">
+      <span class="icon" aria-hidden="true">download</span>
+      {{ requested }} requested — your browser is saving the file.
+    </p>
+  }
+
+  <div class="extract-grid">
+    @for (extract of extracts; track extract.key) {
+      <div class="card extract-card">
+        <div class="extract-head">
+          <h2 class="extract-title">{{ extract.title }}</h2>
+          @if (extract.path === null) {
+            <span class="chip dot neutral">Not built</span>
+          } @else if (piiChip(extract); as pii) {
+            <span [class]="'chip dot ' + pii.tone">{{ pii.label }}</span>
+          }
+        </div>
+
+        <p class="extract-desc">{{ extract.description }}</p>
+
+        @if (columnLine(extract); as headerRow) {
+          <p class="extract-columns" title="The file's header row">{{ headerRow }}</p>
+        } @else {
+          <p class="extract-columns extract-columns-unknown">
+            No file behind this card, so there are no columns to name.
+          </p>
+        }
+
+        @if (extract.mainAdminOnly) {
+          <p class="extract-gate">
+            <span class="icon" aria-hidden="true">lock</span>
+            @if (isMainAdmin()) {
+              Main Admin only: this file answers to the office account, not to a granted Exports
+              function.
+            } @else {
+              Main Admin only: your Exports function does not open this file, and the office
+              account is the one that can.
+            }
+          </p>
+        } @else if (extract.requiresCapability) {
+          <!-- A SECOND FUNCTION, NAMED ON THE CARD. The Interviews file answers
+               to `admin.interviews`, not to the Exports function this screen
+               opens on, so holding Exports is not enough and the card says so
+               rather than offering a link that saves a 403 to disk. -->
+          <p class="extract-gate">
+            <span class="icon" aria-hidden="true">lock</span>
+            @if (canDownload(extract)) {
+              Opened by the {{ extract.requiresCapabilityLabel }} function, which you hold — not by
+              your Exports function.
+            } @else {
+              Opened by the {{ extract.requiresCapabilityLabel }} function, which this account does
+              not hold. Your Exports function does not reach this file.
+            }
+          </p>
+        }
+
+        <div class="extract-foot">
+          @if (extract.path === null) {
+            <!-- DEMOTED, NOT PENDING. No task in 04-backend-changes.md defines
+                 either of these two files, so the control carries the real
+                 reason and no phase number — a phase here would promise a date
+                 nothing has agreed to. -->
+            <span class="extract-last">No file</span>
+            <button type="button" class="btn secondary sm" disabled [title]="extract.unavailableReason">
+              <span class="icon" aria-hidden="true">download</span> Download CSV
+            </button>
+          } @else if (blockedReason(extract); as blocked) {
+            <!-- A live link here would save a 403 body under a .csv name and
+                 record it as a download. Disabled, with the reason on the
+                 card. -->
+            <span class="extract-last">{{ blockedLabel(extract) }}</span>
+            <button type="button" class="btn secondary sm" disabled [title]="blocked">
+              <span class="icon" aria-hidden="true">download</span> Download CSV
+            </button>
+          } @else {
+            <span class="extract-last">{{ lastDownloadedLabel(extract) }}</span>
+            <!-- A real link, so the browser streams the file straight to disk. -->
+            <a
+              class="btn secondary sm"
+              [href]="downloadUrl(extract)"
+              [attr.download]="extract.filename"
+              (click)="noteDownload(extract)"
+            >
+              <span class="icon" aria-hidden="true">download</span> Download CSV
+            </a>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="notice accent">
+    <span class="icon" aria-hidden="true">info</span>
+    <div>
+      Each file covers only the students your access reaches. The Interviews file is score summaries only: no transcript, no audio.
+    </div>
+  </div>
+
+  <div class="card history-card">
+    <div class="history-head">
+      <div>
+        <h2 class="history-title">Download history</h2>
+        <p class="history-sub">
+          who exported what, with which filters — kept for the life of the deployment, and not
+          removed by a people purge
+        </p>
+        @if (scopeChip(); as scope) {
+          <p class="history-scope">
+            <span [class]="'chip dot ' + scope.tone">{{ scope.label }}</span>
+            <span class="history-scope-text">{{ scopeSentence() }}</span>
+          </p>
+        }
+      </div>
+      <div class="history-actions">
+        <button
+          type="button"
+          class="btn ghost sm"
+          [disabled]="historyLoading()"
+          (click)="loadHistory()"
+        >
+          <span class="icon" aria-hidden="true">sync</span>
+          {{ historyLoading() ? 'Refreshing…' : 'Refresh' }}
+        </button>
+        <!-- `/admin/audit` is roleGuard('ADMIN'); a granted faculty member would
+             be bounced by the guard, so the link is not offered to them. -->
+        @if (isMainAdmin()) {
+          <a class="btn ghost sm" routerLink="/admin/audit">
+            What changed <span class="icon" aria-hidden="true">arrow_forward</span>
+          </a>
+        }
+      </div>
+    </div>
+
+    @if (historyError(); as failure) {
+      <div class="notice history-failed" role="alert">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>
+          {{ failure }} Nothing is drawn below — a history that could not be read and a deployment
+          that has exported nothing are not the same thing.
+        </div>
+      </div>
+    } @else if (!historyLoaded()) {
+      <div class="notice info history-empty" role="status">
+        <span class="icon" aria-hidden="true">hourglass_empty</span>
+        <div>Reading the download history…</div>
+      </div>
+    } @else if (downloadHistory().length === 0) {
+      <div class="notice accent history-empty" role="status">
+        <span class="icon" aria-hidden="true">history</span>
+        <div>
+          Nothing has been downloaded yet.
+        </div>
+      </div>
+    }
+
+    @if (historyError() === null && downloadHistory().length > 0) {
+      <ag-grid-angular
+        class="history-grid"
+        [theme]="gridTheme"
+        [rowData]="downloadHistory()"
+        [columnDefs]="historyColumns"
+        [defaultColDef]="defaultHistoryColumn"
+        [getRowId]="rowId"
+        [overlayNoRowsTemplate]="historyEmptyOverlay"
+        [domLayout]="'autoHeight'"
+        [suppressCellFocus]="true"
+      />
+      <div class="dt-statusbar">
+        <span>{{ historyCountLine() }}</span>
+        <span class="statusbar-note">the history is written by the backend, never here</span>
+      </div>
+    }
+  </div>
+</div>

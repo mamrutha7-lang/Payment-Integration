@@ -1,0 +1,233 @@
+<!-- data-p="contact" — phone/email/links + current & permanent address. -->
+<div class="card">
+  <h3>Phone &amp; email</h3>
+  <div class="grid2">
+    <div class="field">
+      <label
+        >Primary phone <span class="req">*</span><span class="lock">Synced</span
+        ><span class="reqp">Required for placement profile</span></label
+      >
+      <div class="inline">
+        <select class="ctrl code" disabled>
+          <option>+91</option>
+        </select>
+        <input class="ctrl" [value]="syncedPhone()" placeholder="Not on your record yet" disabled />
+      </div>
+    </div>
+    <div class="field">
+      <label
+        >College / official email <span class="req">*</span><span class="lock">Synced</span
+        ><span class="reqp">Required for placement profile</span></label
+      >
+      <input class="ctrl" [value]="email()" placeholder="—" disabled />
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label>Other phone number(s)</label>
+      @for (p of m.other_phones; track $index) {
+        <div class="rowline">
+          <select class="ctrl code" [ngModel]="p.code" (ngModelChange)="p.code = $event; push()">
+            <option>+91</option>
+          </select>
+          <input
+            class="ctrl"
+            placeholder="Alternate number"
+            [ngModel]="p.number"
+            (ngModelChange)="p.number = $event; push()"
+          />
+          <button type="button" class="iconbtn" (click)="removePhone($index)" aria-label="Remove this phone number">
+            <span class="icon" aria-hidden="true">delete</span>
+          </button>
+        </div>
+      }
+      <button type="button" class="addlink" (click)="addPhone()">
+        <span class="icon" style="font-size: 15px" aria-hidden="true">add</span> Add another number
+      </button>
+    </div>
+    <div class="field">
+      <label>Personal email</label>
+      @for (e of m.personal_emails; track $index) {
+        <div class="rowline">
+          <input
+            class="ctrl"
+            placeholder="you@example.com"
+            [ngModel]="e"
+            (ngModelChange)="setEmail($index, $event)"
+          />
+          <button type="button" class="iconbtn" (click)="removeEmail($index)" aria-label="Remove this email address">
+            <span class="icon" aria-hidden="true">delete</span>
+          </button>
+        </div>
+      }
+      <button type="button" class="addlink" (click)="addEmail()">
+        <span class="icon" style="font-size: 15px" aria-hidden="true">add</span> Add another email
+      </button>
+    </div>
+  </div>
+  <div class="field">
+    <label>Web links / professional profiles</label>
+    @for (l of m.web_links; track $index) {
+      <div class="rowline">
+        <select
+          class="ctrl code"
+          style="width: 150px"
+          [ngModel]="l.type"
+          (ngModelChange)="l.type = $event; push()"
+        >
+          @for (t of linkTypes; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+        <input
+          class="ctrl"
+          placeholder="https://…"
+          [ngModel]="l.url"
+          (ngModelChange)="l.url = $event; push()"
+        />
+        <button type="button" class="iconbtn" (click)="removeLink($index)" aria-label="Remove this link">
+          <span class="icon" aria-hidden="true">delete</span>
+        </button>
+      </div>
+    }
+    <button type="button" class="addlink" (click)="addLink()">
+      <span class="icon" style="font-size: 15px" aria-hidden="true">add</span> Add link
+    </button>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Current address</h3>
+  <div class="field">
+    <label>Address line 1 <span class="req">*</span></label>
+    <input
+      class="ctrl"
+      placeholder="House / street"
+      [ngModel]="m.current_address.line1"
+      (ngModelChange)="m.current_address.line1 = $event; push()"
+    />
+  </div>
+  <div class="field">
+    <label>Address line 2</label>
+    <input
+      class="ctrl"
+      placeholder="Area / landmark"
+      [ngModel]="m.current_address.line2"
+      (ngModelChange)="m.current_address.line2 = $event; push()"
+    />
+  </div>
+  <div class="grid4">
+    <div class="field">
+      <label>Country <span class="req">*</span></label>
+      <select
+        class="ctrl"
+        [ngModel]="m.current_address.country"
+        (ngModelChange)="m.current_address.country = $event; push()"
+      >
+        <option>India</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>State <span class="req">*</span></label>
+      <input
+        class="ctrl"
+        placeholder="State"
+        [ngModel]="m.current_address.state"
+        (ngModelChange)="m.current_address.state = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>City <span class="req">*</span></label>
+      <input
+        class="ctrl"
+        placeholder="City"
+        [ngModel]="m.current_address.city"
+        (ngModelChange)="m.current_address.city = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Postal code</label>
+      <input
+        class="ctrl"
+        placeholder="560000"
+        [ngModel]="m.current_address.postal"
+        (ngModelChange)="m.current_address.postal = $event; push()"
+      />
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>
+    Permanent address
+    <label class="check" style="font-weight: 600">
+      <input
+        type="checkbox"
+        [ngModel]="m.permanent_same"
+        (ngModelChange)="m.permanent_same = $event; push()"
+      />
+      Same as current address
+    </label>
+  </h3>
+  @if (m.permanent_same) {
+    <div class="desc">Unchecking reveals the full address form again.</div>
+  } @else {
+    <div class="field">
+      <label>Address line 1 <span class="req">*</span></label>
+      <input
+        class="ctrl"
+        placeholder="House / street"
+        [ngModel]="m.permanent_address.line1"
+        (ngModelChange)="m.permanent_address.line1 = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Address line 2</label>
+      <input
+        class="ctrl"
+        placeholder="Area / landmark"
+        [ngModel]="m.permanent_address.line2"
+        (ngModelChange)="m.permanent_address.line2 = $event; push()"
+      />
+    </div>
+    <div class="grid4">
+      <div class="field">
+        <label>Country <span class="req">*</span></label>
+        <select
+          class="ctrl"
+          [ngModel]="m.permanent_address.country"
+          (ngModelChange)="m.permanent_address.country = $event; push()"
+        >
+          <option>India</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>State <span class="req">*</span></label>
+        <input
+          class="ctrl"
+          placeholder="State"
+          [ngModel]="m.permanent_address.state"
+          (ngModelChange)="m.permanent_address.state = $event; push()"
+        />
+      </div>
+      <div class="field">
+        <label>City <span class="req">*</span></label>
+        <input
+          class="ctrl"
+          placeholder="City"
+          [ngModel]="m.permanent_address.city"
+          (ngModelChange)="m.permanent_address.city = $event; push()"
+        />
+      </div>
+      <div class="field">
+        <label>Postal code</label>
+        <input
+          class="ctrl"
+          placeholder="560000"
+          [ngModel]="m.permanent_address.postal"
+          (ngModelChange)="m.permanent_address.postal = $event; push()"
+        />
+      </div>
+    </div>
+  }
+</div>

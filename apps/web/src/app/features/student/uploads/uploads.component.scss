@@ -1,0 +1,474 @@
+/* Screen-specific tweaks only. Layout primitives (.card, .dropzone, .chip,
+   .dt-btn, .dt-header) come from the global reep-v2.scss and are not redefined
+   — these rules only add the uploads flow (stepper, checklist, dropzone states,
+   preview, document cards) at the handoff's sizes and tones. */
+
+:host {
+  display: block;
+}
+
+/* --- 1. stepper ----------------------------------------------------------
+   Prefixed `up-`: `.stepper` and `.step-*` are GLOBAL names owned by the resume
+   builder (reep-v2-resume.scss), where they draw a vertical section list. A
+   bare `.stepper` here inherited that box and stacked the three steps. */
+.up-stepper {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 0;
+  flex-wrap: wrap;
+}
+.up-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--faint);
+  font-size: 13px;
+  font-weight: 700;
+}
+.up-step:not(:last-child)::after {
+  content: '';
+  width: clamp(18px, 4vw, 48px);
+  height: 2px;
+  border-radius: 2px;
+  background: var(--hairline);
+  margin-left: 4px;
+}
+.up-step__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--tint-1);
+  border: 1px solid var(--hairline);
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--muted);
+}
+.up-step__num .icon {
+  font-size: 16px;
+}
+.up-step.active {
+  color: var(--ink);
+}
+.up-step.active .up-step__num {
+  background: var(--primary-gradient);
+  border-color: rgba(255, 255, 255, 0.9);
+  color: var(--tint-2);
+}
+.up-step.done {
+  color: var(--good);
+}
+.up-step.done .up-step__num {
+  background: rgba(19, 122, 74, 0.14);
+  border-color: rgba(19, 122, 74, 0.4);
+  color: var(--good);
+}
+
+/* --- 5. checklist -------------------------------------------------------- */
+.checklist__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.checklist__head h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.checklist__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  /* `min(Npx, 100%)` and not a bare `Npx`: a minmax() track whose minimum is a
+     fixed length does NOT collapse when the container is narrower than it — the
+     track keeps its minimum and the grid overflows. On a 320px handset the
+     content box inside a card is about 260px, so every one of these was wider
+     than the screen it was drawn on. `min()` caps the minimum at the container,
+     which changes nothing at any width where the track already fitted. */
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+  gap: 10px;
+}
+.ck {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid var(--hairline-42);
+  border-radius: 16px;
+  background: var(--surface);
+}
+.ck--done {
+  background: rgba(19, 122, 74, 0.07);
+  border-color: rgba(19, 122, 74, 0.28);
+}
+.ck__mark .icon {
+  font-size: 21px;
+  color: var(--muted);
+}
+.ck__mark.good .icon {
+  color: var(--good);
+}
+.ck__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.ck__label {
+  font-weight: 700;
+  font-size: 13px;
+}
+.ck__hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+.checklist__prompt {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--warn);
+  font-weight: 600;
+}
+
+/* --- 1–3. upload panel --------------------------------------------------- */
+.up-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.dz-kind {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.dz-kind select {
+  font-family: var(--font);
+  font-size: 13px;
+  padding: 7px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-42);
+  background: var(--surface);
+  color: var(--ink);
+}
+.up-accepts {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.up-accepts .icon {
+  font-size: 17px;
+  color: var(--purple-mid);
+}
+.up-accepts strong {
+  color: var(--ink);
+}
+
+/* dropzone: click + drag-and-drop, with dragover + busy states */
+.dz {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  cursor: pointer;
+  font-family: var(--font);
+  margin-bottom: 0;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.dz__title {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+}
+.dz__hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+.dz:hover:not(:disabled),
+.dz--over {
+  border-color: var(--warn);
+  background: rgba(143, 97, 0, 0.08);
+}
+.dz--busy {
+  cursor: default;
+  opacity: 0.75;
+}
+.dz--busy .icon {
+  animation: dz-spin 0.9s linear infinite;
+}
+.dz:disabled {
+  cursor: default;
+}
+@keyframes dz-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* feedback banners (error / success) */
+.feedback {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-top: 14px;
+  font-size: 13px;
+}
+.feedback--err {
+  background: var(--risk-bg);
+  color: var(--risk);
+}
+.feedback--ok {
+  background: rgba(19, 122, 74, 0.1);
+  color: var(--good);
+}
+.feedback .icon {
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+.feedback__main {
+  min-width: 0;
+}
+.feedback__title {
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.feedback__body {
+  color: var(--ink-nav);
+  margin-top: 3px;
+  line-height: 1.4;
+}
+.feedback--err .feedback__body {
+  color: var(--risk);
+}
+
+/* success preview thumbnail. Prefixed: `.preview` is a global name (the
+   resume builder's preview pane) and inherits that pane's layout otherwise. */
+.up-preview {
+  flex: 0 0 auto;
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.up-preview__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.up-preview__icon {
+  font-size: 24px;
+  color: var(--risk);
+}
+
+/* --- 4. document cards --------------------------------------------------- */
+.section-head {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+  margin: 4px 0 12px;
+}
+.up-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.up-card {
+  display: flex;
+  gap: 14px;
+  background: var(--card-gradient);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-card);
+  padding: 14px;
+}
+.up-card--busy {
+  opacity: 0.6;
+}
+.up-thumb {
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--tint-1);
+  border: 1px solid var(--hairline-42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.up-thumb__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.up-thumb__icon {
+  font-size: 28px;
+  color: var(--risk);
+}
+.up-body {
+  flex: 1;
+  min-width: 0;
+}
+.up-card__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.up-title {
+  font-weight: 700;
+  font-size: 14px;
+  word-break: break-word;
+}
+.up-file {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+  word-break: break-all;
+}
+.up-meta {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 4px;
+}
+/* The reviewer's note is a capsule in the handoff — a pill radius even when
+   the comment wraps to a second line. */
+.up-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 9px 11px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  line-height: 1.4;
+  background: var(--tint-1);
+  color: var(--ink-nav);
+}
+.up-note .icon {
+  font-size: 16px;
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+.up-note.risk {
+  background: rgba(173, 36, 82, 0.09);
+  color: var(--risk);
+}
+.up-note.good {
+  background: rgba(19, 122, 74, 0.09);
+  color: var(--good);
+}
+.up-note.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.up-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+/* Replace / Remove are pills on this screen, tinted like the card behind them. */
+.up-actions .dt-btn {
+  cursor: pointer;
+  font-family: var(--font);
+  padding: 9px 16px;
+  border-radius: var(--r-pill);
+  border-color: var(--hairline-42);
+  background: var(--tint-2);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: var(--sh-card);
+}
+.up-actions .dt-btn .icon {
+  font-size: 16px;
+}
+.up-actions .dt-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.up-actions .dt-btn.danger {
+  color: var(--risk);
+  border-color: rgba(173, 36, 82, 0.35);
+}
+.up-actions .dt-btn.danger:hover:not(:disabled) {
+  background: rgba(173, 36, 82, 0.08);
+}
+
+/* --- states --------------------------------------------------------------
+   Prefixed: `.empty` is the global centred empty-state block, whose
+   text-align/padding pushed this row's icon and copy apart. */
+.up-empty {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.up-empty .icon {
+  font-size: 30px;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+.up-empty__title {
+  font-weight: 700;
+  font-size: 14px;
+}
+.up-empty__hint {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+/* loading skeletons */
+.up-card--skeleton {
+  align-items: center;
+}
+.sk {
+  background: linear-gradient(90deg, var(--tint-1), var(--surface), var(--tint-1));
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.2s ease-in-out infinite;
+  border-radius: var(--r-pill);
+}
+.sk--thumb {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+}
+.sk--lines {
+  flex: 1;
+  height: 40px;
+}
+@keyframes sk-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

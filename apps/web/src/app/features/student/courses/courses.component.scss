@@ -1,0 +1,176 @@
+// The warm v2 palette + shared classes (.card, .chip, .dt-btn, .dt-sub) live in
+// the global reep-v2.scss. Only the progress-plan layout and the local meter /
+// neutral-chip tones — which the global sheet doesn't define — are scoped here.
+:host {
+  display: block;
+}
+
+.c-note {
+  color: var(--muted);
+}
+
+.plan-list {
+  display: grid;
+  /* `min(Npx, 100%)` and not a bare `Npx`: a minmax() track whose minimum is a
+     fixed length does NOT collapse when the container is narrower than it — the
+     track keeps its minimum and the grid overflows. On a 320px handset the
+     content box inside a card is about 260px, so every one of these was wider
+     than the screen it was drawn on. `min()` caps the minimum at the container,
+     which changes nothing at any width where the track already fitted. */
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 16px;
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 0;
+}
+
+.plan-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.c-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.c-code {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+// --- progress meter (not in the global sheet) ---
+.plan-meter {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.meter {
+  height: 8px;
+  border-radius: 5px;
+  background: var(--hairline);
+  overflow: hidden;
+  box-shadow: var(--sh-well);
+}
+
+.meter__fill {
+  height: 100%;
+  border-radius: 5px;
+  background: linear-gradient(90deg, #a865c9, var(--purple-mid));
+  transition: width 0.3s ease;
+}
+
+.plan-pct {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.plan-next {
+  font-size: 13px;
+  color: var(--ink-soft);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.plan-next .icon {
+  font-size: 17px;
+  color: var(--purple-mid);
+}
+
+.plan-next-label {
+  font-weight: 700;
+}
+
+.plan-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.fact {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.fact .icon {
+  font-size: 16px;
+}
+
+.plan-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+// A smaller, pill-shaped dt-btn and a router-link styled as a button.
+.dt-btn.sm {
+  padding: 7px 12px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+// The "Unlocks" chip is the handoff's quiet 6% purple wash, not the global
+// neutral's solid tint — it must read as a footnote under the CTA, not a status.
+.chip.neutral {
+  background: rgba(58, 31, 82, 0.06);
+  color: var(--muted);
+}
+
+.chip.unlocks {
+  font-weight: 600;
+}
+
+// Visible keyboard focus on the interactive Continue control.
+.dt-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--sh-ctrl), var(--edge-hi), var(--focus-ring);
+}
+
+.avail-title {
+  margin: 28px 0 4px;
+  font-size: 18px;
+}
+
+.avail-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.avail-card .plan-id {
+  flex: 1;
+  min-width: 0;
+}
+
+.avail-fee {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.c-note.risk {
+  border-color: #b3261e;
+}
+
+@media (max-width: 600px) {
+  .avail-card {
+    flex-wrap: wrap;
+  }
+}

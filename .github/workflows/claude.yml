@@ -1,0 +1,119 @@
+# Claude as a teammate: mention @claude on an issue or a pull request and it
+# does the work there.
+#
+#   On an ISSUE        -> it reads AGENTS.md, implements the change on a new
+#                         branch, runs the checks it can, and opens a PR that
+#                         fills in .github/pull_request_template.md.
+#   On a PR comment    -> it answers the question or pushes the requested fix
+#   or review comment     to that PR's branch.
+#   Labelled `agent`   -> the same as an @claude on the issue, so a task filed
+#                         from the "Agent task" template can be handed over
+#                         with one click and no comment.
+#
+# THE TRIGGER IS GATED ON WHO ASKED, AND THAT IS NOT DECORATION. The agent runs
+# with `contents: write` on this repository. An issue body or a comment is text
+# the agent will read as instructions, so letting anybody who can comment start
+# a run is letting anybody who can comment write code here. Only the owner,
+# members and collaborators can start one (`author_association`).
+#
+# RULE 1 STILL HOLDS. This job holds no AWS credentials, no DATABASE_URL and no
+# production secret — the agent sees source code and nothing else. Do not add
+# `aws-actions/configure-aws-credentials` or a real DATABASE_URL to it: a run
+# that can read student records can paste them into a PR comment.
+#
+# Setup (once): install the Claude GitHub app on the repository and add ONE of
+# the secrets ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN
+# (`claude setup-token` prints the second). See docs/agentic-sdlc.md.
+#
+# This is NOT a CI job and must never become one: §34 pins ci.yml's five job
+# names against the ruleset, and a required check that only runs when somebody
+# types @claude is a required check that never reports.
+
+name: Claude
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+  issues:
+    types: [opened, assigned, labeled]
+
+concurrency:
+  # One agent per issue / PR at a time: two runs pushing to one branch race.
+  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  claude:
+    if: |
+      (
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+        (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+        (github.event_name == 'issues' && github.event.action != 'labeled' && contains(github.event.issue.body, '@claude')) ||
+        (github.event_name == 'issues' && github.event.action == 'labeled' && github.event.label.name == 'agent')
+      ) && contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'),
+                    github.event.comment.author_association ||
+                    github.event.review.author_association ||
+                    github.event.issue.author_association)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read   # lets it read CI results on the PR it is fixing
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      # The owner is the only commit author; see the action's header.
+      - uses: ./.github/actions/sole-author
+
+      # The fast, database-free checks the agent is told to run before it
+      # pushes. The pytest suite needs Postgres and is left to CI's `api` job.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # package.json pins npm@11.16.0; the runner's npm 10 crashes on this
+      # lockfile ("reading 'edgesOut'"), which is why the first maintenance
+      # run could not regenerate it.
+      - name: Use the npm version package.json pins
+        run: npm install -g npm@11.16.0
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          # The action reacts to a label named `claude` by default; ours is `agent`.
+          # Without this the labelled path runs and skips: "No trigger was met".
+          label_trigger: agent
+          additional_permissions: |
+            actions: read
+          # The checks the ship skill tells it to run must be allowed, or it
+          # opens PRs it could not verify.
+          # The owner allows it to edit its own .claude/ files (Claude Code protects
+          # them unless a rule names them) and to manage labels. Either change
+          # still reaches main only through a PR the owner merges, and on PR
+          # events the action restores .claude/ from the base branch first.
+          # Claude Code still refuses an Edit on .claude/settings.json whatever
+          # the allow list says (#112), so its permission lists are changed only
+          # through tools/agent/claude_settings.py, which cannot touch any other key.
+          # A multi-line `gh pr create --body` is refused by the permission
+          # matcher (#112's retry pushed but opened no PR), so the body goes
+          # through a file under runner.temp, which --add-dir makes writable.
+          claude_args: |
+            --max-turns 80
+            --add-dir ${{ runner.temp }}
+            --allowedTools "Read,Grep,Glob,Edit,Write,Edit(.claude/**),Write(.claude/**),Bash(ls:*),Bash(git:*),Bash(gh pr:*),Bash(gh issue:*),Bash(gh label:*),Bash(python tools/ci/*),Bash(python -m pytest:*),Bash(python3 tools/ci/*),Bash(python3 tools/agent/claude_settings.py:*),Bash(npm ci:*),Bash(npx tsc:*),Bash(npx ng:*)"
+            --append-system-prompt "You are working in the REEP repository. AGENTS.md is the house rulebook: read it before changing code, and never break its two rules (student data must not leave the machine unbidden; staff scope is decided by role). Follow .claude/skills/ship/SKILL.md to finish: branch, run the fast checks, commit with a Symptom/Mechanism/Why/Not-done body, and open a PR that fills in .github/pull_request_template.md. Keep the change minimal and in scope. If the request is ambiguous or touches auth, migrations or infra/, say what you would do and stop instead of guessing. Claude Code refuses direct edits to .claude/settings.json, so change its permission lists only with python3 tools/agent/claude_settings.py (add|remove|list) (allow|deny) ENTRY [--after ENTRY]. To open the PR, write its body with the Write tool to ${{ runner.temp }}/pr-body.md (outside the repository, so it is never committed) and run gh pr create --draft --base <the base .claude/skills/ship/SKILL.md step 1 names: dev for ordinary work, main only for a hotfix/* branch or when origin/dev does not exist> --title \"<title>\" --body-file ${{ runner.temp }}/pr-body.md; a multi-line --body is refused. The owner is the only author: never add a Co-authored-by line or a Generated with Claude Code line to a commit, PR or comment."

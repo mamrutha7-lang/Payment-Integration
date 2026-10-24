@@ -1,0 +1,134 @@
+/* The same centred card as password-link, plus a step strip and a code field.
+   field / btn / chip / notice / icon are global (reep-v2.scss); only the page
+   frame is local. Deliberately a copy of the frame rather than a shared
+   partial: two screens is not yet a pattern, and reep-v2.scss must not gain
+   names it does not own (see AGENTS.md on reep-v2-resume.scss). */
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.link-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.link-card {
+  width: min(440px, 100%);
+  padding: 28px 28px 24px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.link-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+  color: var(--brand-purple);
+}
+
+.link-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.link-sub {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Where you are, in three words. The current step is bold AND coloured -
+   never colour alone, the house rule for status everywhere in this app. */
+.steps {
+  display: flex;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 11px;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  color: var(--muted);
+
+  li {
+    flex: 1;
+    padding: 5px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--hairline);
+    text-align: center;
+  }
+
+  li.on {
+    color: var(--brand-purple);
+    border-color: var(--brand-purple);
+    font-weight: 700;
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pw-row {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+.pw-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Six digits read back from an email, so they are spaced and large enough to
+   check against the message without squinting. */
+.code-input {
+  font-family: ui-monospace, 'Cascadia Mono', 'SF Mono', Menlo, monospace;
+  font-size: 22px;
+  letter-spacing: 0.32em;
+  text-align: center;
+}
+
+.field .chip {
+  align-self: flex-start;
+}
+
+.btn.wide {
+  width: 100%;
+  justify-content: center;
+}
+
+/* "Send a new code" is a secondary action and must not look like the submit
+   button next to it. */
+.link-btn {
+  align-self: center;
+  background: none;
+  border: none;
+  color: var(--brand-purple);
+  text-decoration: underline;
+  font-size: 12.5px;
+  padding: 4px;
+}
+
+.notice.good {
+  background: var(--good-bg);
+  color: var(--good);
+}

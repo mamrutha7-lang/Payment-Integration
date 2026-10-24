@@ -1,0 +1,2486 @@
+[
+ {
+  "area": "setup",
+  "name": "create college C1F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"c8a687468caf4d648c07067ab88aedcf\",\"code\":\"C1F7DD\",\"name\":\"Alpha Institute of Technology\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c1f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD dept CSE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"d5dd3bbe01ce46ba95bd8161554e8718\",\"college_id\":\"c8a687468caf4d648c07067ab88aedcf\",\"code\":\"CSE\",\"name\":\"CSE dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD/CSE course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"8e18765b3f0148d7be2d3ebd5a8abe5f\",\"department_id\":\"d5dd3bbe01ce46ba95bd8161554e8718\",\"code\":\"BE\",\"name\":\"B.E. CSE\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD/CSE spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"754a475b5a5444199d922a7dc4f60479\",\"course_id\":\"8e18765b3f0148d7be2d3ebd5a8abe5f\",\"code\":\"GEN\",\"name\":\"CSE General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD/CSE batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"83ff67d3ee2a4d4a8fb12a0eb5a805f9\",\"department_id\":\"d5dd3bbe01ce46ba95bd8161554e8718\",\"course_id\":\"8e18765b3f0148d7be2d3ebd5a8abe5f\",\"specialization_id\":\"754a475b5a5444199d922a7dc4f60479\",\"code\":\"C1F7DD-CSE-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD dept ECE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"0b19503a46c04a2f82da2d721dacd5cb\",\"college_id\":\"c8a687468caf4d648c07067ab88aedcf\",\"code\":\"ECE\",\"name\":\"ECE dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD/ECE course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"6a2751e945304b0fb00d9a5e9f8b5fdd\",\"department_id\":\"0b19503a46c04a2f82da2d721dacd5cb\",\"code\":\"BE\",\"name\":\"B.E. ECE\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD/ECE spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"cd00b341044441c7b21eb80b5b916051\",\"course_id\":\"6a2751e945304b0fb00d9a5e9f8b5fdd\",\"code\":\"GEN\",\"name\":\"ECE General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD/ECE batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"f089de261e834c648e20ff25a8acb4b9\",\"department_id\":\"0b19503a46c04a2f82da2d721dacd5cb\",\"course_id\":\"6a2751e945304b0fb00d9a5e9f8b5fdd\",\"specialization_id\":\"cd00b341044441c7b21eb80b5b916051\",\"code\":\"C1F7DD-ECE-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD dept MECH",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"47a13f59339d4d578bce120d06a54b22\",\"college_id\":\"c8a687468caf4d648c07067ab88aedcf\",\"code\":\"MECH\",\"name\":\"MECH dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD/MECH course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"b7741824913b43b795cd91ee01237395\",\"department_id\":\"47a13f59339d4d578bce120d06a54b22\",\"code\":\"BE\",\"name\":\"B.E. MECH\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD/MECH spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"962446a89a41480fb512043fd9e206c5\",\"course_id\":\"b7741824913b43b795cd91ee01237395\",\"code\":\"GEN\",\"name\":\"MECH General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C1F7DD/MECH batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"3e2827bc86e34dd2a0341b864a798aeb\",\"department_id\":\"47a13f59339d4d578bce120d06a54b22\",\"course_id\":\"b7741824913b43b795cd91ee01237395\",\"specialization_id\":\"962446a89a41480fb512043fd9e206c5\",\"code\":\"C1F7DD-MECH-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "create college C2F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"50312402a0fc439682dfdd3821ef8ae9\",\"code\":\"C2F7DD\",\"name\":\"Beta Engineering College\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c2f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C2F7DD dept CIVIL",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"bde25a8493b74fe0a0a9548c10a8cc71\",\"college_id\":\"50312402a0fc439682dfdd3821ef8ae9\",\"code\":\"CIVIL\",\"name\":\"CIVIL dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C2F7DD/CIVIL course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"83f55fecd93845a884ad472cb573c87d\",\"department_id\":\"bde25a8493b74fe0a0a9548c10a8cc71\",\"code\":\"BE\",\"name\":\"B.E. CIVIL\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C2F7DD/CIVIL spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"e918c6eb838e4c5690ac07a8a5ae4b69\",\"course_id\":\"83f55fecd93845a884ad472cb573c87d\",\"code\":\"GEN\",\"name\":\"CIVIL General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C2F7DD/CIVIL batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"5fbb1e21853143819c0f131008b8bc6a\",\"department_id\":\"bde25a8493b74fe0a0a9548c10a8cc71\",\"course_id\":\"83f55fecd93845a884ad472cb573c87d\",\"specialization_id\":\"e918c6eb838e4c5690ac07a8a5ae4b69\",\"code\":\"C2F7DD-CIVIL-BE-20"
+ },
+ {
+  "area": "setup",
+  "name": "C2F7DD dept EEE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"cecf14901c01496f9985166399923948\",\"college_id\":\"50312402a0fc439682dfdd3821ef8ae9\",\"code\":\"EEE\",\"name\":\"EEE dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C2F7DD/EEE course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"ea4d8c92109a4cdda4f7ea79bb43c1c4\",\"department_id\":\"cecf14901c01496f9985166399923948\",\"code\":\"BE\",\"name\":\"B.E. EEE\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C2F7DD/EEE spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"a4eecbb43a3f4f49b9efe3d07cb84c29\",\"course_id\":\"ea4d8c92109a4cdda4f7ea79bb43c1c4\",\"code\":\"GEN\",\"name\":\"EEE General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C2F7DD/EEE batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"d887821f32124ddcbf068d6be0118d3a\",\"department_id\":\"cecf14901c01496f9985166399923948\",\"course_id\":\"ea4d8c92109a4cdda4f7ea79bb43c1c4\",\"specialization_id\":\"a4eecbb43a3f4f49b9efe3d07cb84c29\",\"code\":\"C2F7DD-EEE-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "create college C3F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"e8d050fef187479cb32961ef3be388d0\",\"code\":\"C3F7DD\",\"name\":\"Gamma College of Engineering\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c3f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD dept ISE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"cdd4b8d2a8db4515aa947e8a2c117d4e\",\"college_id\":\"e8d050fef187479cb32961ef3be388d0\",\"code\":\"ISE\",\"name\":\"ISE dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD/ISE course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"8edb732ccb314a1c8321f7a64ffaf239\",\"department_id\":\"cdd4b8d2a8db4515aa947e8a2c117d4e\",\"code\":\"BE\",\"name\":\"B.E. ISE\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD/ISE spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"e4cd63e4005448f0a14971da47439a9b\",\"course_id\":\"8edb732ccb314a1c8321f7a64ffaf239\",\"code\":\"GEN\",\"name\":\"ISE General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD/ISE batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"3aa899183c624580b984576c94d8aa77\",\"department_id\":\"cdd4b8d2a8db4515aa947e8a2c117d4e\",\"course_id\":\"8edb732ccb314a1c8321f7a64ffaf239\",\"specialization_id\":\"e4cd63e4005448f0a14971da47439a9b\",\"code\":\"C3F7DD-ISE-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD dept AIML",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"518608dd7dd7473b996b0c20b56e450d\",\"college_id\":\"e8d050fef187479cb32961ef3be388d0\",\"code\":\"AIML\",\"name\":\"AIML dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD/AIML course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"1300500980044da7967e085109a94922\",\"department_id\":\"518608dd7dd7473b996b0c20b56e450d\",\"code\":\"BE\",\"name\":\"B.E. AIML\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD/AIML spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"1b8e4974e6124b80944159cf020627b6\",\"course_id\":\"1300500980044da7967e085109a94922\",\"code\":\"GEN\",\"name\":\"AIML General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD/AIML batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"8246d4b91adb4495bd4534b7bcefd707\",\"department_id\":\"518608dd7dd7473b996b0c20b56e450d\",\"course_id\":\"1300500980044da7967e085109a94922\",\"specialization_id\":\"1b8e4974e6124b80944159cf020627b6\",\"code\":\"C3F7DD-AIML-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD dept CSE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"56982af7b6ce4194abbe255fb56793a6\",\"college_id\":\"e8d050fef187479cb32961ef3be388d0\",\"code\":\"CSE\",\"name\":\"CSE dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD/CSE course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"4b4dc9ebebe940d59f1f956a82a7ae56\",\"department_id\":\"56982af7b6ce4194abbe255fb56793a6\",\"code\":\"BE\",\"name\":\"B.E. CSE\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD/CSE spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"4251a85b999a436e9c382c8c2f01e196\",\"course_id\":\"4b4dc9ebebe940d59f1f956a82a7ae56\",\"code\":\"GEN\",\"name\":\"CSE General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C3F7DD/CSE batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"7f18164445fd4f5fb34fceeb6022b028\",\"department_id\":\"56982af7b6ce4194abbe255fb56793a6\",\"course_id\":\"4b4dc9ebebe940d59f1f956a82a7ae56\",\"specialization_id\":\"4251a85b999a436e9c382c8c2f01e196\",\"code\":\"C3F7DD-CSE-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "create college C4F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"dbfc013fc0474687a17f685cc5dd7310\",\"code\":\"C4F7DD\",\"name\":\"Delta School of Management\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c4f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C4F7DD dept MBA",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"46f6c34a739c4b8e80e8349ecdf3ebbf\",\"college_id\":\"dbfc013fc0474687a17f685cc5dd7310\",\"code\":\"MBA\",\"name\":\"MBA dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C4F7DD/MBA course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"959dc5b26a69437e8161e0397bf8615a\",\"department_id\":\"46f6c34a739c4b8e80e8349ecdf3ebbf\",\"code\":\"BE\",\"name\":\"B.E. MBA\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C4F7DD/MBA spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"5d466979fd5047f686694871b13d8def\",\"course_id\":\"959dc5b26a69437e8161e0397bf8615a\",\"code\":\"GEN\",\"name\":\"MBA General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C4F7DD/MBA batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"a2abbbfceca6468685a7298add0bf94b\",\"department_id\":\"46f6c34a739c4b8e80e8349ecdf3ebbf\",\"course_id\":\"959dc5b26a69437e8161e0397bf8615a\",\"specialization_id\":\"5d466979fd5047f686694871b13d8def\",\"code\":\"C4F7DD-MBA-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "create college C5F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"6552754fc75b4f449b3a8108297ea39c\",\"code\":\"C5F7DD\",\"name\":\"Epsilon Polytechnic\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c5f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD dept MECH",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"a4b406c5ab664a89bf24826f9b608d80\",\"college_id\":\"6552754fc75b4f449b3a8108297ea39c\",\"code\":\"MECH\",\"name\":\"MECH dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD/MECH course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"a947dc80ec78438c9606b72a6249aaf9\",\"department_id\":\"a4b406c5ab664a89bf24826f9b608d80\",\"code\":\"BE\",\"name\":\"B.E. MECH\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD/MECH spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"0cb21511e35546128d9ee3413e321c8b\",\"course_id\":\"a947dc80ec78438c9606b72a6249aaf9\",\"code\":\"GEN\",\"name\":\"MECH General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD/MECH batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"ea754f238779472a92686017f23aa91d\",\"department_id\":\"a4b406c5ab664a89bf24826f9b608d80\",\"course_id\":\"a947dc80ec78438c9606b72a6249aaf9\",\"specialization_id\":\"0cb21511e35546128d9ee3413e321c8b\",\"code\":\"C5F7DD-MECH-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD dept AUTO",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"49664f279e6e4ac0a5ada390cde58e10\",\"college_id\":\"6552754fc75b4f449b3a8108297ea39c\",\"code\":\"AUTO\",\"name\":\"AUTO dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD/AUTO course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"ed9ab1da126b463ca61b401874f20737\",\"department_id\":\"49664f279e6e4ac0a5ada390cde58e10\",\"code\":\"BE\",\"name\":\"B.E. AUTO\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD/AUTO spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"7be72bedeb37449188bba18656da2e39\",\"course_id\":\"ed9ab1da126b463ca61b401874f20737\",\"code\":\"GEN\",\"name\":\"AUTO General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD/AUTO batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"cc54d964d8a24a28819fd42e084c5f8d\",\"department_id\":\"49664f279e6e4ac0a5ada390cde58e10\",\"course_id\":\"ed9ab1da126b463ca61b401874f20737\",\"specialization_id\":\"7be72bedeb37449188bba18656da2e39\",\"code\":\"C5F7DD-AUTO-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD dept CHEM",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"ad8f9233dd334d73aec593c082db5196\",\"college_id\":\"6552754fc75b4f449b3a8108297ea39c\",\"code\":\"CHEM\",\"name\":\"CHEM dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD/CHEM course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"7b68b931266a4f5b98f2f2b5cc83fab7\",\"department_id\":\"ad8f9233dd334d73aec593c082db5196\",\"code\":\"BE\",\"name\":\"B.E. CHEM\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD/CHEM spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"c50510880cb445a3aebcbb6fc3a3b528\",\"course_id\":\"7b68b931266a4f5b98f2f2b5cc83fab7\",\"code\":\"GEN\",\"name\":\"CHEM General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C5F7DD/CHEM batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"44626a17eee94a8b85292a7fb796a049\",\"department_id\":\"ad8f9233dd334d73aec593c082db5196\",\"course_id\":\"7b68b931266a4f5b98f2f2b5cc83fab7\",\"specialization_id\":\"c50510880cb445a3aebcbb6fc3a3b528\",\"code\":\"C5F7DD-CHEM-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "create college C6F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"f508bfa2ac664d3aaed8901b855527db\",\"code\":\"C6F7DD\",\"name\":\"Zeta Institute\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c6f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C6F7DD dept MCA",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"b77fab7077e44a4bba2ec950af67408b\",\"college_id\":\"f508bfa2ac664d3aaed8901b855527db\",\"code\":\"MCA\",\"name\":\"MCA dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C6F7DD/MCA course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"29abae335c7f4fde88da680da143156b\",\"department_id\":\"b77fab7077e44a4bba2ec950af67408b\",\"code\":\"BE\",\"name\":\"B.E. MCA\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C6F7DD/MCA spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"4e40b121ae9e4ce8b59c610f2ff98682\",\"course_id\":\"29abae335c7f4fde88da680da143156b\",\"code\":\"GEN\",\"name\":\"MCA General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C6F7DD/MCA batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"41e91fde972a4495a64fe87ef744fb04\",\"department_id\":\"b77fab7077e44a4bba2ec950af67408b\",\"course_id\":\"29abae335c7f4fde88da680da143156b\",\"specialization_id\":\"4e40b121ae9e4ce8b59c610f2ff98682\",\"code\":\"C6F7DD-MCA-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "C6F7DD dept CSE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"15f0275a18bb45b5b50d541bd6126db5\",\"college_id\":\"f508bfa2ac664d3aaed8901b855527db\",\"code\":\"CSE\",\"name\":\"CSE dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C6F7DD/CSE course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"3e8ab0507318472a92e5cc9b12b3a1bf\",\"department_id\":\"15f0275a18bb45b5b50d541bd6126db5\",\"code\":\"BE\",\"name\":\"B.E. CSE\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C6F7DD/CSE spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"487afefadca84299ad046d66900a2ee0\",\"course_id\":\"3e8ab0507318472a92e5cc9b12b3a1bf\",\"code\":\"GEN\",\"name\":\"CSE General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C6F7DD/CSE batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"f4c1d00d3de04874bf691e5b983e68ef\",\"department_id\":\"15f0275a18bb45b5b50d541bd6126db5\",\"course_id\":\"3e8ab0507318472a92e5cc9b12b3a1bf\",\"specialization_id\":\"487afefadca84299ad046d66900a2ee0\",\"code\":\"C6F7DD-CSE-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "create college C7F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"e1aa246934524be5aabbfdd4cbf5bb24\",\"code\":\"C7F7DD\",\"name\":\"Eta Women's College\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c7f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD dept ECE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"af4b6d6074f24c9398160fb521f19d52\",\"college_id\":\"e1aa246934524be5aabbfdd4cbf5bb24\",\"code\":\"ECE\",\"name\":\"ECE dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/ECE course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"39d4a9aabe1245ce9ffbc692074397ba\",\"department_id\":\"af4b6d6074f24c9398160fb521f19d52\",\"code\":\"BE\",\"name\":\"B.E. ECE\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/ECE spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"927148f7a4f84eca8918ab2b5c94ef8d\",\"course_id\":\"39d4a9aabe1245ce9ffbc692074397ba\",\"code\":\"GEN\",\"name\":\"ECE General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/ECE batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"c94e4a111d86489ab8c852627d5fed00\",\"department_id\":\"af4b6d6074f24c9398160fb521f19d52\",\"course_id\":\"39d4a9aabe1245ce9ffbc692074397ba\",\"specialization_id\":\"927148f7a4f84eca8918ab2b5c94ef8d\",\"code\":\"C7F7DD-ECE-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD dept BT",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"63765e0cd11540d682453e1dde5c630e\",\"college_id\":\"e1aa246934524be5aabbfdd4cbf5bb24\",\"code\":\"BT\",\"name\":\"BT dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/BT course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"3222fa1f3704471e93e4af2ded6f956c\",\"department_id\":\"63765e0cd11540d682453e1dde5c630e\",\"code\":\"BE\",\"name\":\"B.E. BT\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/BT spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"d31ebbf7b3674d8f9317da85f0249037\",\"course_id\":\"3222fa1f3704471e93e4af2ded6f956c\",\"code\":\"GEN\",\"name\":\"BT General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/BT batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"f7b490898fb4446297216ce6eda2f064\",\"department_id\":\"63765e0cd11540d682453e1dde5c630e\",\"course_id\":\"3222fa1f3704471e93e4af2ded6f956c\",\"specialization_id\":\"d31ebbf7b3674d8f9317da85f0249037\",\"code\":\"C7F7DD-BT-BE-2026-"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD dept EEE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"3b4633dbfa524f829327f59129a5b794\",\"college_id\":\"e1aa246934524be5aabbfdd4cbf5bb24\",\"code\":\"EEE\",\"name\":\"EEE dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/EEE course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"ca060008ccb445a08eebf203e69d1b17\",\"department_id\":\"3b4633dbfa524f829327f59129a5b794\",\"code\":\"BE\",\"name\":\"B.E. EEE\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/EEE spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"2592bfa2965f41269dbfd0c92dbda620\",\"course_id\":\"ca060008ccb445a08eebf203e69d1b17\",\"code\":\"GEN\",\"name\":\"EEE General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/EEE batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"895d3b1d638c4304bc8e6a3a141a3385\",\"department_id\":\"3b4633dbfa524f829327f59129a5b794\",\"course_id\":\"ca060008ccb445a08eebf203e69d1b17\",\"specialization_id\":\"2592bfa2965f41269dbfd0c92dbda620\",\"code\":\"C7F7DD-EEE-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD dept CSE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"0d74fc03c213494ebf60f09b8cb7b309\",\"college_id\":\"e1aa246934524be5aabbfdd4cbf5bb24\",\"code\":\"CSE\",\"name\":\"CSE dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/CSE course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"94e6f56ff329454dad7f4329ab9e5d0a\",\"department_id\":\"0d74fc03c213494ebf60f09b8cb7b309\",\"code\":\"BE\",\"name\":\"B.E. CSE\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/CSE spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"f19755d30b12456f897e02f5fdd42dd3\",\"course_id\":\"94e6f56ff329454dad7f4329ab9e5d0a\",\"code\":\"GEN\",\"name\":\"CSE General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C7F7DD/CSE batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"286ab7828d1c4cd8bcb57edcacfe5950\",\"department_id\":\"0d74fc03c213494ebf60f09b8cb7b309\",\"course_id\":\"94e6f56ff329454dad7f4329ab9e5d0a\",\"specialization_id\":\"f19755d30b12456f897e02f5fdd42dd3\",\"code\":\"C7F7DD-CSE-BE-2026"
+ },
+ {
+  "area": "setup",
+  "name": "create college C8F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"4b4b7145abe847afb5040fe636e39221\",\"code\":\"C8F7DD\",\"name\":\"Theta Technical University\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c8f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C8F7DD dept AERO",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"e91f8c0c7d3340499c2e1e9fa14ac3f2\",\"college_id\":\"4b4b7145abe847afb5040fe636e39221\",\"code\":\"AERO\",\"name\":\"AERO dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C8F7DD/AERO course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"465792972ca74250a71cdabdbea38af8\",\"department_id\":\"e91f8c0c7d3340499c2e1e9fa14ac3f2\",\"code\":\"BE\",\"name\":\"B.E. AERO\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C8F7DD/AERO spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"34cf139b5a2147b5be66b44e01bfd86f\",\"course_id\":\"465792972ca74250a71cdabdbea38af8\",\"code\":\"GEN\",\"name\":\"AERO General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C8F7DD/AERO batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"14a8c4d934e246afacb2b9d07ad6bf30\",\"department_id\":\"e91f8c0c7d3340499c2e1e9fa14ac3f2\",\"course_id\":\"465792972ca74250a71cdabdbea38af8\",\"specialization_id\":\"34cf139b5a2147b5be66b44e01bfd86f\",\"code\":\"C8F7DD-AERO-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "C8F7DD dept MECH",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"5c5f913224864cfa8ad5ad98837ecb67\",\"college_id\":\"4b4b7145abe847afb5040fe636e39221\",\"code\":\"MECH\",\"name\":\"MECH dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C8F7DD/MECH course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"b4389c25ea46487ea50431ff0692e53c\",\"department_id\":\"5c5f913224864cfa8ad5ad98837ecb67\",\"code\":\"BE\",\"name\":\"B.E. MECH\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C8F7DD/MECH spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"a808e709473c4115bbf9440e85ec9c68\",\"course_id\":\"b4389c25ea46487ea50431ff0692e53c\",\"code\":\"GEN\",\"name\":\"MECH General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C8F7DD/MECH batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"47e47c43f2d94a76b8f199a62b19e87c\",\"department_id\":\"5c5f913224864cfa8ad5ad98837ecb67\",\"course_id\":\"b4389c25ea46487ea50431ff0692e53c\",\"specialization_id\":\"a808e709473c4115bbf9440e85ec9c68\",\"code\":\"C8F7DD-MECH-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "create college C9F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"5c3187fcae2346d3a91bad875ca505f7\",\"code\":\"C9F7DD\",\"name\":\"Iota College\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c9f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C9F7DD dept CSDS",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"d34affeef8a34d54aa814e452c4d7b16\",\"college_id\":\"5c3187fcae2346d3a91bad875ca505f7\",\"code\":\"CSDS\",\"name\":\"CSDS dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C9F7DD/CSDS course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"06668b02476844fe92b310289d3a2e11\",\"department_id\":\"d34affeef8a34d54aa814e452c4d7b16\",\"code\":\"BE\",\"name\":\"B.E. CSDS\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C9F7DD/CSDS spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"ea973d148eea4ab9b217a379a5456cff\",\"course_id\":\"06668b02476844fe92b310289d3a2e11\",\"code\":\"GEN\",\"name\":\"CSDS General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C9F7DD/CSDS batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"35472dae2d884b4fb166ac2e5a5d42f2\",\"department_id\":\"d34affeef8a34d54aa814e452c4d7b16\",\"course_id\":\"06668b02476844fe92b310289d3a2e11\",\"specialization_id\":\"ea973d148eea4ab9b217a379a5456cff\",\"code\":\"C9F7DD-CSDS-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "C9F7DD dept CSBS",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"f4e6daa667ae4ad5bad1d2cdebaec73d\",\"college_id\":\"5c3187fcae2346d3a91bad875ca505f7\",\"code\":\"CSBS\",\"name\":\"CSBS dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C9F7DD/CSBS course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"dba0d5a701144cf0a67d58ca1e038ece\",\"department_id\":\"f4e6daa667ae4ad5bad1d2cdebaec73d\",\"code\":\"BE\",\"name\":\"B.E. CSBS\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C9F7DD/CSBS spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"0716718e3bdb4673beb481601fcb29e6\",\"course_id\":\"dba0d5a701144cf0a67d58ca1e038ece\",\"code\":\"GEN\",\"name\":\"CSBS General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C9F7DD/CSBS batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"ae8bca973414453fb851925e5831fc66\",\"department_id\":\"f4e6daa667ae4ad5bad1d2cdebaec73d\",\"course_id\":\"dba0d5a701144cf0a67d58ca1e038ece\",\"specialization_id\":\"0716718e3bdb4673beb481601fcb29e6\",\"code\":\"C9F7DD-CSBS-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "create college C10F7DD",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"86a84771a77142d1b4f3543eb3587b01\",\"code\":\"C10F7DD\",\"name\":\"Kappa Institute of Science\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"c10f7dd.edu.in\"]}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD dept PHY",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"7bc934614cd748e8be527a5d5bc4ed78\",\"college_id\":\"86a84771a77142d1b4f3543eb3587b01\",\"code\":\"PHY\",\"name\":\"PHY dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD/PHY course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"16bde06f3e4846028020cd7890233853\",\"department_id\":\"7bc934614cd748e8be527a5d5bc4ed78\",\"code\":\"BE\",\"name\":\"B.E. PHY\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD/PHY spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"3d0758ab84bb440282b375faa9c7c63c\",\"course_id\":\"16bde06f3e4846028020cd7890233853\",\"code\":\"GEN\",\"name\":\"PHY General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD/PHY batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"0cf6501bc5e04f8ca61f6ea388cca008\",\"department_id\":\"7bc934614cd748e8be527a5d5bc4ed78\",\"course_id\":\"16bde06f3e4846028020cd7890233853\",\"specialization_id\":\"3d0758ab84bb440282b375faa9c7c63c\",\"code\":\"C10F7DD-PHY-BE-202"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD dept MATHS",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"948a9a91a7cf45fd962fb3ce06a65308\",\"college_id\":\"86a84771a77142d1b4f3543eb3587b01\",\"code\":\"MATHS\",\"name\":\"MATHS dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD/MATHS course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"b63ec221f22745779ac990455dc5b212\",\"department_id\":\"948a9a91a7cf45fd962fb3ce06a65308\",\"code\":\"BE\",\"name\":\"B.E. MATHS\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD/MATHS spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"4594a612ed4647b7a005dcd34f513a72\",\"course_id\":\"b63ec221f22745779ac990455dc5b212\",\"code\":\"GEN\",\"name\":\"MATHS General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD/MATHS batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"1f0e166fdb92487ea5cec88e05abd9bf\",\"department_id\":\"948a9a91a7cf45fd962fb3ce06a65308\",\"course_id\":\"b63ec221f22745779ac990455dc5b212\",\"specialization_id\":\"4594a612ed4647b7a005dcd34f513a72\",\"code\":\"C10F7DD-MATHS-BE-2"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD dept CHEM",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"57f9df515ce9424a8c3584d3cf1b3d6f\",\"college_id\":\"86a84771a77142d1b4f3543eb3587b01\",\"code\":\"CHEM\",\"name\":\"CHEM dept\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD/CHEM course",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"3aeddec5ccbd4bd9b74b61286d44b4cb\",\"department_id\":\"57f9df515ce9424a8c3584d3cf1b3d6f\",\"code\":\"BE\",\"name\":\"B.E. CHEM\",\"duration_months\":48,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD/CHEM spec",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"5bfd9aa090324f679ddc7b371d597bbf\",\"course_id\":\"3aeddec5ccbd4bd9b74b61286d44b4cb\",\"code\":\"GEN\",\"name\":\"CHEM General\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "setup",
+  "name": "C10F7DD/CHEM batch",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"30295c4cd67e49b8aabb420adf57f2df\",\"department_id\":\"57f9df515ce9424a8c3584d3cf1b3d6f\",\"course_id\":\"3aeddec5ccbd4bd9b74b61286d44b4cb\",\"specialization_id\":\"5bfd9aa090324f679ddc7b371d597bbf\",\"code\":\"C10F7DD-CHEM-BE-20"
+ },
+ {
+  "area": "authz",
+  "name": "anonymous lists colleges",
+  "got": 401,
+  "expect": "401",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Sign in required.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "anonymous creates college",
+  "got": 401,
+  "expect": "401",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Sign in required.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "student lists colleges",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Institution hierarchy' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "student creates college",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Institution hierarchy' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "student adds dept to C1",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Institution hierarchy' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "student patches C1",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Institution hierarchy' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "mentor lists colleges",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Institution hierarchy' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "mentor creates college",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Institution hierarchy' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "mentor adds dept to C1",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Institution hierarchy' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "mentor patches C1",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Institution hierarchy' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "forged cookie",
+  "got": 401,
+  "expect": "401",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Sign in required.\"}"
+ },
+ {
+  "area": "authz",
+  "name": "alg=none cookie",
+  "got": 401,
+  "expect": "401",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Sign in required.\"}"
+ },
+ {
+  "area": "college",
+  "name": "duplicate code",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A college with code C1F7DD already exists.\"}"
+ },
+ {
+  "area": "college",
+  "name": "duplicate code lowercase",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A college with code C1F7DD already exists.\"}"
+ },
+ {
+  "area": "college",
+  "name": "duplicate code padded",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A college with code C1F7DD already exists.\"}"
+ },
+ {
+  "area": "college",
+  "name": "whitespace-only code",
+  "got": 409,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"detail\":\"A college with code  already exists.\"}"
+ },
+ {
+  "area": "college",
+  "name": "whitespace-only name",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"5e1bfa83a4714d7b884ba4402140ca7b\",\"code\":\"WSF7DD\",\"name\":\"\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[]}"
+ },
+ {
+  "area": "college",
+  "name": "empty code",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"string_too_short\",\"loc\":[\"body\",\"code\"],\"msg\":\"String should have at least 1 character\",\"input\":\"\",\"ctx\":{\"min_length\":1}}]}"
+ },
+ {
+  "area": "college",
+  "name": "code 33 chars",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"string_too_long\",\"loc\":[\"body\",\"code\"],\"msg\":\"String should have at most 32 characters\",\"input\":\"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\",\"ctx\":{\"max_length\":32}}]}"
+ },
+ {
+  "area": "college",
+  "name": "name 201 chars",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"string_too_long\",\"loc\":[\"body\",\"name\"],\"msg\":\"String should have at most 200 characters\",\"input\":\"nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn"
+ },
+ {
+  "area": "college",
+  "name": "missing name",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"name\"],\"msg\":\"Field required\",\"input\":{\"code\":\"MNF7DD\"}}]}"
+ },
+ {
+  "area": "college",
+  "name": "code is number",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"string_type\",\"loc\":[\"body\",\"code\"],\"msg\":\"Input should be a valid string\",\"input\":123}]}"
+ },
+ {
+  "area": "college",
+  "name": "code with SQL",
+  "got": 409,
+  "expect": "{201, 422}",
+  "ok": false,
+  "note": "",
+  "body": "{\"detail\":\"A college with code X';DROP-- already exists.\"}"
+ },
+ {
+  "area": "college",
+  "name": "invalid domain 'not a domain'",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "junk / public-mail domains should be refused",
+  "body": "{\"id\":\"eeee4ae156234bea98370f6e7a52a28d\",\"code\":\"BDF7DD\",\"name\":\"Bad domain\",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":0,\"email_domains\":[\"not a domain\",\"http://x.com/\",\"gmail.com\"]}"
+ },
+ {
+  "area": "college",
+  "name": "body not JSON",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"json_invalid\",\"loc\":[\"body\",1],\"msg\":\"JSON decode error\",\"input\":{},\"ctx\":{\"error\":\"Expecting property name enclosed in double quotes\"}}]}"
+ },
+ {
+  "area": "college",
+  "name": "PATCH unknown id",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"College not found.\"}"
+ },
+ {
+  "area": "college",
+  "name": "PATCH status garbage",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"status must be one of ['ACTIVE', 'ARCHIVED'].\"}"
+ },
+ {
+  "area": "college",
+  "name": "PATCH name null",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\"],\"msg\":\"Value error, These fields cannot be cleared: name. Omit a field to leave it unchanged, or send a new value.\",\"input\":{\"name\":null},\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "college",
+  "name": "PATCH code -> other college's code",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A college with code C2F7DD already exists.\"}"
+ },
+ {
+  "area": "college",
+  "name": "PATCH code whitespace",
+  "got": 409,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"detail\":\"A college with code  already exists.\"}"
+ },
+ {
+  "area": "college",
+  "name": "PATCH name whitespace",
+  "got": 200,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"50312402a0fc439682dfdd3821ef8ae9\",\"code\":\"C2F7DD\",\"name\":\"   \",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":2,\"email_domains\":[\"c2f7dd.edu.in\"]}"
+ },
+ {
+  "area": "college",
+  "name": "PATCH unknown field",
+  "got": 200,
+  "expect": "{200, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"50312402a0fc439682dfdd3821ef8ae9\",\"code\":\"C2F7DD\",\"name\":\"   \",\"campus\":null,\"contact\":null,\"status\":\"ACTIVE\",\"department_count\":2,\"email_domains\":[\"c2f7dd.edu.in\"]}"
+ },
+ {
+  "area": "dept",
+  "name": "dup code same college",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"This college already has a department with code CSE.\"}"
+ },
+ {
+  "area": "dept",
+  "name": "dup code lowercase",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"This college already has a department with code CSE.\"}"
+ },
+ {
+  "area": "dept",
+  "name": "same code different college ok",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"8427001f729d48cda5df503a69ffb0c0\",\"college_id\":\"50312402a0fc439682dfdd3821ef8ae9\",\"code\":\"CSE\",\"name\":\"CSE at C2\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "dept",
+  "name": "under missing college",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"College not found.\"}"
+ },
+ {
+  "area": "dept",
+  "name": "whitespace code",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"d5a72de01be4462bb4e3db43339c309b\",\"college_id\":\"c8a687468caf4d648c07067ab88aedcf\",\"code\":\"\",\"name\":\"x\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "dept",
+  "name": "whitespace name",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"4897acfbcc7c4704b30454f727d3bdc6\",\"college_id\":\"c8a687468caf4d648c07067ab88aedcf\",\"code\":\"WSN\",\"name\":\"\",\"head\":null,\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "dept",
+  "name": "PATCH code to sibling's code",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"This college already has a department with code MECH.\"}"
+ },
+ {
+  "area": "dept",
+  "name": "PATCH status garbage",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"status must be one of ['ACTIVE', 'ARCHIVED'].\"}"
+ },
+ {
+  "area": "dept",
+  "name": "list depts of missing college",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"College not found.\"}"
+ },
+ {
+  "area": "dept",
+  "name": "PATCH code whitespace",
+  "got": 409,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"detail\":\"This college already has a department with code .\"}"
+ },
+ {
+  "area": "course",
+  "name": "duration 0",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"greater_than_equal\",\"loc\":[\"body\",\"duration_months\"],\"msg\":\"Input should be greater than or equal to 1\",\"input\":0,\"ctx\":{\"ge\":1}}]}"
+ },
+ {
+  "area": "course",
+  "name": "duration -12",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"greater_than_equal\",\"loc\":[\"body\",\"duration_months\"],\"msg\":\"Input should be greater than or equal to 1\",\"input\":-12,\"ctx\":{\"ge\":1}}]}"
+ },
+ {
+  "area": "course",
+  "name": "duration 121",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"less_than_equal\",\"loc\":[\"body\",\"duration_months\"],\"msg\":\"Input should be less than or equal to 120\",\"input\":121,\"ctx\":{\"le\":120}}]}"
+ },
+ {
+  "area": "course",
+  "name": "dup code same dept",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"This department already has a course with code BE.\"}"
+ },
+ {
+  "area": "course",
+  "name": "missing dept",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Department not found.\"}"
+ },
+ {
+  "area": "course",
+  "name": "whitespace code",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"cf9efb37a08149a9b30b5171ba2b2816\",\"department_id\":\"d5dd3bbe01ce46ba95bd8161554e8718\",\"code\":\"\",\"name\":\"z\",\"duration_months\":null,\"status\":\"ACTIVE\",\"specialization_count\":0}"
+ },
+ {
+  "area": "course",
+  "name": "PATCH duration 0",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"greater_than_equal\",\"loc\":[\"body\",\"duration_months\"],\"msg\":\"Input should be greater than or equal to 1\",\"input\":0,\"ctx\":{\"ge\":1}}]}"
+ },
+ {
+  "area": "course",
+  "name": "PATCH status garbage",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"status must be one of ['ACTIVE', 'ARCHIVED'].\"}"
+ },
+ {
+  "area": "spec",
+  "name": "dup code same course",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"This course already has a specialization with code GEN.\"}"
+ },
+ {
+  "area": "spec",
+  "name": "missing course",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Course not found.\"}"
+ },
+ {
+  "area": "spec",
+  "name": "whitespace code",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"3dc20d7127084aae95f0e94d8860d943\",\"course_id\":\"8e18765b3f0148d7be2d3ebd5a8abe5f\",\"code\":\"\",\"name\":\"x\",\"status\":\"ACTIVE\",\"cohort_count\":0}"
+ },
+ {
+  "area": "cohort",
+  "name": "end before start",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Expected completion must be after the entry date.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "end == start",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Expected completion must be after the entry date.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "spec from other college",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"department_id contradicts the course you chose, which sits under department_id bde25a8493b74fe0a0a9548c10a8cc71. Clear the course first, or pick one under the department you want.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "course from other college",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"department_id contradicts the course you chose, which sits under department_id bde25a8493b74fe0a0a9548c10a8cc71. Clear the course first, or pick one under the department you want.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "spec of course A + course B",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"department_id contradicts the course you chose, which sits under department_id 0b19503a46c04a2f82da2d721dacd5cb. Clear the course first, or pick one under the department you want.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "nonexistent spec id",
+  "got": 404,
+  "expect": "{404, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Specialization not found.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "duplicate cohort code",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A batch with code C1F7DD-CSE-BE-2026-30 already exists.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "duplicate cohort code lowercase",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A batch with code C1F7DD-CSE-BE-2026-30 already exists.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "degree_level garbage",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"enum\",\"loc\":[\"body\",\"degree_level\"],\"msg\":\"Input should be 'UG' or 'PG'\",\"input\":\"PHD\",\"ctx\":{\"expected\":\"'UG' or 'PG'\"}}]}"
+ },
+ {
+  "area": "cohort",
+  "name": "invalid date",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"date_from_datetime_parsing\",\"loc\":[\"body\",\"entry_date\"],\"msg\":\"Input should be a valid date or datetime, day value is outside expected range\",\"input\":\"2026-02-30\",\"ctx\":{\"error\":\"day value is outside "
+ },
+ {
+  "area": "cohort",
+  "name": "whitespace code",
+  "got": 409,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"detail\":\"A batch with code  already exists.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "whitespace name",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"18af2e37e41f4a119342b20120c49d05\",\"department_id\":\"d5dd3bbe01ce46ba95bd8161554e8718\",\"course_id\":null,\"specialization_id\":null,\"code\":\"NEG-46F0EF\",\"name\":\"\",\"batch_label\":\"2026-30\",\"course_name\":null,\"specializati"
+ },
+ {
+  "area": "cohort",
+  "name": "missing dept",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Department not found.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "PATCH end before start",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Expected completion must be after the entry date.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "PATCH move to other college's dept but keep spec",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"department_id contradicts the course you chose, which sits under department_id d5dd3bbe01ce46ba95bd8161554e8718. Clear the course first, or pick one under the department you want.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "PATCH name null",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\"],\"msg\":\"Value error, These fields cannot be cleared: name. Omit a field to leave it unchanged, or send a new value.\",\"input\":{\"name\":null},\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "cohort",
+  "name": "PATCH name whitespace",
+  "got": 200,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"83ff67d3ee2a4d4a8fb12a0eb5a805f9\",\"department_id\":\"d5dd3bbe01ce46ba95bd8161554e8718\",\"course_id\":\"8e18765b3f0148d7be2d3ebd5a8abe5f\",\"specialization_id\":\"754a475b5a5444199d922a7dc4f60479\",\"code\":\"C1F7DD-CSE-BE-2026"
+ },
+ {
+  "area": "cohort",
+  "name": "PATCH unknown cohort",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Batch not found.\"}"
+ },
+ {
+  "area": "cohort",
+  "name": "DELETE unknown cohort",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Batch not found.\"}"
+ },
+ {
+  "area": "register",
+  "name": "baseline valid application C1/CSE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"77449f7588d4429dbf94ab8612795e73\",\"name\":\"Test Student\",\"email\":\"1luc6v68v7@c1f7dd.edu.in\",\"usn\":\"1LUC6V68V7\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 nee"
+ },
+ {
+  "area": "register",
+  "name": "baseline valid application C3",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"19e27d8c5fc94ab4bef6fe482a18d17b\",\"name\":\"Test Student\",\"email\":\"1cksk1qoee@c3f7dd.edu.in\",\"usn\":\"1CKSK1QOEE\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 nee"
+ },
+ {
+  "area": "register",
+  "name": "baseline valid application C5",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"3c9237ec58f943b9abcba9e08d1ff6a2\",\"name\":\"Test Student\",\"email\":\"1r6jwxit2o@c5f7dd.edu.in\",\"usn\":\"1R6JWXIT2O\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 nee"
+ },
+ {
+  "area": "register",
+  "name": "baseline valid application C7",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"6fd8cff0cdb040989a7fe71a82620d8a\",\"name\":\"Test Student\",\"email\":\"1e0musf4oj@c7f7dd.edu.in\",\"usn\":\"1E0MUSF4OJ\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 nee"
+ },
+ {
+  "area": "register",
+  "name": "baseline valid application C10",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"634c788aadb04baf8d78fea0585ee560\",\"name\":\"Test Student\",\"email\":\"18yzuosyoh@c10f7dd.edu.in\",\"usn\":\"18YZUOSYOH\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 ne"
+ },
+ {
+  "area": "register",
+  "name": "duplicate submission same email",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"This application could not be accepted. If you have already applied, or you think this is a mistake, contact the placement office.\"}"
+ },
+ {
+  "area": "register",
+  "name": "duplicate email UPPERCASE",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"This application could not be accepted. If you have already applied, or you think this is a mistake, contact the placement office.\"}"
+ },
+ {
+  "area": "register",
+  "name": "no CV",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"cv\"],\"msg\":\"Field required\",\"input\":{\"name\":\"Test Student\",\"email\":\"1l5d9646li@c1f7dd.edu.in\",\"usn\":\"1L5D9646LI\",\"phone\":\"9876543210\",\"personal_email\":\"1l5d9646li@gmail.com\",\"l"
+ },
+ {
+  "area": "register",
+  "name": "no photo",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"photo\"],\"msg\":\"Field required\",\"input\":{\"name\":\"Test Student\",\"email\":\"1vvdw830uk@c1f7dd.edu.in\",\"usn\":\"1VVDW830UK\",\"phone\":\"9876543210\",\"personal_email\":\"1vvdw830uk@gmail.com\""
+ },
+ {
+  "area": "register",
+  "name": "CV is text renamed .pdf",
+  "got": 415,
+  "expect": "415",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Unsupported file type \u2014 only PDF, PNG and JPEG are accepted.\"}"
+ },
+ {
+  "area": "register",
+  "name": "CV empty file",
+  "got": 415,
+  "expect": "{422, 415}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Unsupported file type \u2014 only PDF, PNG and JPEG are accepted.\"}"
+ },
+ {
+  "area": "register",
+  "name": "photo is a PDF",
+  "got": 415,
+  "expect": "415",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"The photo must be a PNG or JPG.\"}"
+ },
+ {
+  "area": "register",
+  "name": "CV 11 MB",
+  "got": 413,
+  "expect": "413",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"The cv is larger than 10 MB.\"}"
+ },
+ {
+  "area": "register",
+  "name": "CV is HTML with script",
+  "got": 415,
+  "expect": "415",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Unsupported file type \u2014 only PDF, PNG and JPEG are accepted.\"}"
+ },
+ {
+  "area": "register",
+  "name": "dept of other college",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"The college you chose contradicts the department you chose. Pick a college under it, or clear the department.\"}"
+ },
+ {
+  "area": "register",
+  "name": "college C1 + course of C2",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"The course you chose contradicts the specialization or batch you chose. Pick a course under it, or clear the specialization or batch.\"}"
+ },
+ {
+  "area": "register",
+  "name": "spec of other dept",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"The specialization you chose contradicts the batch you chose. Pick a specialization under it, or clear the batch.\"}"
+ },
+ {
+  "area": "register",
+  "name": "cohort of other college",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"The specialization you chose contradicts the batch you chose. Pick a specialization under it, or clear the batch.\"}"
+ },
+ {
+  "area": "register",
+  "name": "nonexistent college",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"The college you chose contradicts the department you chose. Pick a college under it, or clear the department.\"}"
+ },
+ {
+  "area": "register",
+  "name": "invalid college email",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A valid email is required.\"}"
+ },
+ {
+  "area": "register",
+  "name": "college email is gmail",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"someone123@gmail.com is a personal address. Enter the email your college gave you in the college email box, and your personal address in the personal email box.\"}"
+ },
+ {
+  "area": "register",
+  "name": "personal == college email",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Your college email and personal email are the same. Enter your college address (for example, your USN at your college's domain) in the college email box.\"}"
+ },
+ {
+  "area": "register",
+  "name": "LinkedIn is instagram",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"linkedin_url\"],\"msg\":\"Value error, enter your LinkedIn profile link, e.g. linkedin.com/in/your-name\",\"input\":\"https://instagram.com/test\",\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "register",
+  "name": "LinkedIn javascript:",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"linkedin_url\"],\"msg\":\"Value error, enter your LinkedIn profile link, e.g. linkedin.com/in/your-name\",\"input\":\"javascript:alert(1)//linkedin.com/in/x\",\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "register",
+  "name": "name whitespace only",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"2015f0ef564e418ba56c3a9ff4eb7f33\",\"name\":\"\",\"email\":\"1dgrijvwnm@c1f7dd.edu.in\",\"usn\":\"1DGRIJVWNM\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 needs manual re"
+ },
+ {
+  "area": "register",
+  "name": "USN whitespace",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"usn\"],\"msg\":\"Value error, this field is required\",\"input\":\"   \",\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "register",
+  "name": "USN 33 chars",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"string_too_long\",\"loc\":[\"body\",\"usn\"],\"msg\":\"String should have at most 32 characters\",\"input\":\"111111111111111111111111111111111\",\"ctx\":{\"max_length\":32}}]}"
+ },
+ {
+  "area": "register",
+  "name": "phone letters",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"id\":\"6a86d2678bbc4a69aaf0d48419898095\",\"name\":\"Test Student\",\"email\":\"1m2slzhlm7@c1f7dd.edu.in\",\"usn\":\"1M2SLZHLM7\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 nee"
+ },
+ {
+  "area": "register",
+  "name": "name with HTML",
+  "got": 201,
+  "expect": "{201, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"f94d95f85d1e497b9b1c6100c2c576a6\",\"name\":\"<img src=x onerror=alert(1)>\",\"email\":\"1hcz5io2e8@c1f7dd.edu.in\",\"usn\":\"1HCZ5IO2E8\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No ru"
+ },
+ {
+  "area": "register",
+  "name": "3 distinct specializations",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\"],\"msg\":\"Value error, tick at most 2 specializations: one, or two if you opted for a dual specialization\",\"input\":{\"name\":\"Test Student\",\"email\":\"12k37fm9l8@c3f7dd.edu.in\",\"u"
+ },
+ {
+  "area": "register",
+  "name": "archived department",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "an archived branch should not take applications",
+  "body": "{\"id\":\"5193a3eafbcb4ffbb74f6ee4fda9c57f\",\"name\":\"Test Student\",\"email\":\"1row4pqn10@c3f7dd.edu.in\",\"usn\":\"1ROW4PQN10\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 nee"
+ },
+ {
+  "area": "register",
+  "name": "degree_level garbage",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"enum\",\"loc\":[\"body\",\"degree_level\"],\"msg\":\"Input should be 'UG' or 'PG'\",\"input\":\"PHD\",\"ctx\":{\"expected\":\"'UG' or 'PG'\"}}]}"
+ },
+ {
+  "area": "register",
+  "name": "submission_key bad pattern",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"string_pattern_mismatch\",\"loc\":[\"body\",\"submission_key\"],\"msg\":\"String should match pattern '^[A-Za-z0-9-]{16,64}$'\",\"input\":\"short\",\"ctx\":{\"pattern\":\"^[A-Za-z0-9-]{16,64}$\"}}]}"
+ },
+ {
+  "area": "register",
+  "name": "archived college",
+  "got": 201,
+  "expect": "422",
+  "ok": false,
+  "note": "an archived college should not take applications",
+  "body": "{\"id\":\"96b269f477ea40d6a8f883239281c082\",\"name\":\"Test Student\",\"email\":\"1u5ch9uubp@c9f7dd.edu.in\",\"usn\":\"1U5CH9UUBP\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 nee"
+ },
+ {
+  "area": "register",
+  "name": "USN reused at another email",
+  "got": 201,
+  "expect": "{409, 201, 422}",
+  "ok": true,
+  "note": "duplicate USN",
+  "body": "{\"id\":\"f936f31acba04e28b0cd2a2453fac69b\",\"name\":\"Test Student\",\"email\":\"1nrq4cxmn9@c1f7dd.edu.in\",\"usn\":\"1LUC6V68V7\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 nee"
+ },
+ {
+  "area": "review",
+  "name": "reject without reason",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A reason is required when rejecting an application.\"}"
+ },
+ {
+  "area": "review",
+  "name": "reject whitespace reason",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A reason is required when rejecting an application.\"}"
+ },
+ {
+  "area": "review",
+  "name": "decision garbage",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"decision must be APPROVE or REJECT.\"}"
+ },
+ {
+  "area": "review",
+  "name": "decision lowercase approve",
+  "got": 200,
+  "expect": "{200, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"77449f7588d4429dbf94ab8612795e73\",\"name\":\"Test Student\",\"email\":\"1luc6v68v7@c1f7dd.edu.in\",\"usn\":\"1LUC6V68V7\",\"degree_level\":\"UG\",\"status\":\"APPROVED\",\"cohort_id\":null,\"matched_rule_id\":null,\"decision_reason\":\"No r"
+ },
+ {
+  "area": "review",
+  "name": "student decides",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "review",
+  "name": "mentor decides",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "review",
+  "name": "approve",
+  "got": 409,
+  "expect": "{200, 409}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Application already decided.\"}"
+ },
+ {
+  "area": "review",
+  "name": "approve twice",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Application already decided.\"}"
+ },
+ {
+  "area": "review",
+  "name": "reject after approve",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Application already decided.\"}"
+ },
+ {
+  "area": "review",
+  "name": "hold after approve",
+  "got": 409,
+  "expect": "{409, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Only an application waiting for review can be held.\"}"
+ },
+ {
+  "area": "review",
+  "name": "re-apply after approval",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"This application could not be accepted. If you have already applied, or you think this is a mistake, contact the placement office.\"}"
+ },
+ {
+  "area": "review",
+  "name": "decide missing id",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Application not found.\"}"
+ },
+ {
+  "area": "review",
+  "name": "anon lists pending",
+  "got": 401,
+  "expect": "401",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Sign in required.\"}"
+ },
+ {
+  "area": "review",
+  "name": "student lists pending",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+ },
+ {
+  "area": "review",
+  "name": "reject with reason",
+  "got": 200,
+  "expect": "200",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"09c7237a26844b86bd486a623f924e62\",\"name\":\"Test Student\",\"email\":\"1u4imenotl@c2f7dd.edu.in\",\"usn\":\"1U4IMENOTL\",\"degree_level\":\"UG\",\"status\":\"REJECTED\",\"cohort_id\":null,\"matched_rule_id\":null,\"decision_reason\":\"No r"
+ },
+ {
+  "area": "review",
+  "name": "re-apply after REJECT allowed",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"id\":\"b370366ea008433ca333152123c25107\",\"name\":\"Test Student\",\"email\":\"1u4imenotl@c2f7dd.edu.in\",\"usn\":\"1MHW390QVU\",\"degree_level\":\"UG\",\"status\":\"PENDING_REVIEW\",\"cohort_id\":null,\"decision_reason\":\"No rule matched \u2014 nee"
+ },
+ {
+  "area": "faculty",
+  "name": "create faculty C1/CSE",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"user_id\":\"e3c975efdbf9454b86291a9b08e46947\",\"name\":\"Prof Test\",\"email\":\"prof468e4d@c1f7dd.edu.in\",\"designation\":null,\"department\":\"CSE dept\",\"placement\":{\"filed\":true,\"department_id\":\"d5dd3bbe01ce46ba95bd8161554e8718\","
+ },
+ {
+  "area": "faculty",
+  "name": "create faculty C2/CIVIL",
+  "got": 201,
+  "expect": "201",
+  "ok": true,
+  "note": "",
+  "body": "{\"user_id\":\"db247c4eecbb40289c233472a2613ec6\",\"name\":\"Prof Test\",\"email\":\"prof5be375@c2f7dd.edu.in\",\"designation\":null,\"department\":\"CIVIL dept\",\"placement\":{\"filed\":true,\"department_id\":\"bde25a8493b74fe0a0a9548c10a8cc71"
+ },
+ {
+  "area": "faculty",
+  "name": "email off college domain",
+  "got": 422,
+  "expect": "{403, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"x8b308@gmail.com is not on this college's domains (c1f7dd.edu.in). Tick \\\"outside the college domain\\\" and give a reason if that is deliberate.\"}"
+ },
+ {
+  "area": "faculty",
+  "name": "email of C2 domain filed under C1",
+  "got": 422,
+  "expect": "{403, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"x0fa13@c2f7dd.edu.in is not on this college's domains (c1f7dd.edu.in). Tick \\\"outside the college domain\\\" and give a reason if that is deliberate.\"}"
+ },
+ {
+  "area": "faculty",
+  "name": "external w/o reason",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"An address outside the college's domains needs a reason. It is recorded against this account.\"}"
+ },
+ {
+  "area": "faculty",
+  "name": "blank name",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"name\"],\"msg\":\"Value error, name must not be blank\",\"input\":\"   \",\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "faculty",
+  "name": "bad email",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"email\"],\"msg\":\"Value error, not an email address\",\"input\":\"nope\",\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "faculty",
+  "name": "missing department_id",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"department_id\"],\"msg\":\"Field required\",\"input\":{\"name\":\"x\",\"email\":\"a@c1f7dd.edu.in\"}}]}"
+ },
+ {
+  "area": "faculty",
+  "name": "nonexistent department",
+  "got": 422,
+  "expect": "{404, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"No department with id 'nope'.\"}"
+ },
+ {
+  "area": "faculty",
+  "name": "duplicate email",
+  "got": 409,
+  "expect": "{409, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"mentor@bgscet.ac.in already belongs to a MENTOR account.\"}"
+ },
+ {
+  "area": "faculty",
+  "name": "email = existing student's",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"1luc6v68v7@c1f7dd.edu.in already belongs to a STUDENT account.\"}"
+ },
+ {
+  "area": "mentor",
+  "name": "assign C2 faculty to C1 student",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"A faculty member can only mentor students in their own college. This student and this faculty account are filed under different colleges \u2014 pick a faculty member from the student's college, or file the account "
+ },
+ {
+  "area": "mentor",
+  "name": "assign w/o reason",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"reason\"],\"msg\":\"Field required\",\"input\":{\"mentor_user_id\":\"e3c975efdbf9454b86291a9b08e46947\"}}]}"
+ },
+ {
+  "area": "mentor",
+  "name": "assign whitespace reason",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"reason\"],\"msg\":\"Value error, say why this student is being moved\",\"input\":\"   \",\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "mentor",
+  "name": "assign same-college",
+  "got": 204,
+  "expect": "204",
+  "ok": true,
+  "note": "",
+  "body": ""
+ },
+ {
+  "area": "mentor",
+  "name": "assign student user id as mentor",
+  "got": 404,
+  "expect": "{404, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Not a faculty account.\"}"
+ },
+ {
+  "area": "mentor",
+  "name": "assign the ADMIN as mentor",
+  "got": 404,
+  "expect": "{404, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Not a faculty account.\"}"
+ },
+ {
+  "area": "mentor",
+  "name": "assign to missing student",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Student not found.\"}"
+ },
+ {
+  "area": "seat",
+  "name": "bulk-move C1 batch into C2 batch",
+  "got": 200,
+  "expect": "422",
+  "ok": false,
+  "note": "bulk move carries the C1 mentor across the college fence",
+  "body": "{\"action\":\"move\",\"affected\":1}"
+ },
+ {
+  "area": "seat",
+  "name": "seat C1 student into C2 batch (PUT cohort)",
+  "got": 204,
+  "expect": "422",
+  "ok": false,
+  "note": "moving a student to another college's batch while their C1 mentor stays",
+  "body": ""
+ },
+ {
+  "area": "seat",
+  "name": "PATCH student into C2 batch",
+  "got": 200,
+  "expect": "422",
+  "ok": false,
+  "note": "",
+  "body": "{\"student_id\":\"2b672565988d45f885da39fab80b8ba2\",\"user_id\":\"62c549455fc84b0f959b71be3b9ba3e2\",\"name\":\"Test Student\",\"email\":\"1luc6v68v7@c1f7dd.edu.in\",\"usn\":\"1LUC6V68V7\",\"cohort_id\":\"5fbb1e21853143819c0f131008b8bc6a\",\"ba"
+ },
+ {
+  "area": "seat",
+  "name": "seat into missing batch",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Batch not found.\"}"
+ },
+ {
+  "area": "seat",
+  "name": "PATCH USN to existing USN",
+  "got": 409,
+  "expect": "409",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"USN 1BG24MBA001 already belongs to a student.\"}"
+ },
+ {
+  "area": "seat",
+  "name": "PATCH email to admin's",
+  "got": 422,
+  "expect": "{409, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"admin@bgscet.ac.in is not on a college domain (c2f7dd.edu.in). A student account is a sign-in, and only a college address gets one.\"}"
+ },
+ {
+  "area": "seat",
+  "name": "PATCH semester 0",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"greater_than_equal\",\"loc\":[\"body\",\"current_semester\"],\"msg\":\"Input should be greater than or equal to 1\",\"input\":0,\"ctx\":{\"ge\":1}}]}"
+ },
+ {
+  "area": "seat",
+  "name": "PATCH semester 99",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Semester 99 is above the default bound of 8. This batch names no course with a semester count, so the deployment-wide default applies \u2014 set Total semesters on the course to raise it.\"}"
+ },
+ {
+  "area": "seat",
+  "name": "PATCH name blank",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"name\"],\"msg\":\"Value error, name must not be blank\",\"input\":\"  \",\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "seat",
+  "name": "POST create student (should be 405)",
+  "got": 405,
+  "expect": "405",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Method Not Allowed\"}"
+ },
+ {
+  "area": "seat",
+  "name": "DELETE student (should be 405)",
+  "got": 405,
+  "expect": "405",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Method Not Allowed\"}"
+ },
+ {
+  "area": "deletion",
+  "name": "C1 delete plan (has a student)",
+  "got": 200,
+  "expect": "200",
+  "ok": true,
+  "note": "",
+  "body": "{\"college_id\":\"c8a687468caf4d648c07067ab88aedcf\",\"code\":\"C1F7DD\",\"name\":\"Alpha Institute of Technology\",\"rows\":{\"academic_courses\":4,\"academic_specializations\":4,\"cohorts\":4,\"colleges\":1,\"departments\":6},\"cleared\":{\"regi"
+ },
+ {
+  "area": "deletion",
+  "name": "delete C1 with wrong code",
+  "got": 409,
+  "expect": "{409, 403}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"C1F7DD still has people attached: 4 registrations.open; 1 faculty account(s) filed under its departments. Move them to another college first (Students and Faculty screens) and decide the open applications; not"
+ },
+ {
+  "area": "deletion",
+  "name": "delete with code of 5 chars",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"code\"],\"msg\":\"Value error, the code is six digits\",\"input\":\"12345\",\"ctx\":{\"error\":{}}}]}"
+ },
+ {
+  "area": "deletion",
+  "name": "delete w/o reason",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"reason\"],\"msg\":\"Field required\",\"input\":{\"code\":\"123456\"}}]}"
+ },
+ {
+  "area": "deletion",
+  "name": "mentor deletes college",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"Main Admin access required.\"}"
+ },
+ {
+  "area": "deletion",
+  "name": "delete missing college",
+  "got": 404,
+  "expect": "{403, 404}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"College not found.\"}"
+ },
+ {
+  "area": "deletion",
+  "name": "delete-plan missing college",
+  "got": 404,
+  "expect": "404",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"College not found.\"}"
+ },
+ {
+  "area": "deletion",
+  "name": "remove student w/o reason",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"reason\"],\"msg\":\"Field required\",\"input\":{}}]}"
+ },
+ {
+  "area": "deletion",
+  "name": "restore not-removed student",
+  "got": 409,
+  "expect": "{409, 422}",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"1luc6v68v7@c1f7dd.edu.in is not removed.\"}"
+ },
+ {
+  "area": "deletion",
+  "name": "delete student wrong code",
+  "got": 403,
+  "expect": "403",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":\"That code is not right, has expired, or was already used. Ask for a new one - it is emailed to the office account's own address.\"}"
+ },
+ {
+  "area": "leave",
+  "name": "dates backwards",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\"],\"msg\":\"Value error, The last day of leave cannot fall before the first day. You asked for 2026-12-20 to 2026-12-10.\",\"input\":{\"leave_type\":\"CASUAL\",\"from_date\":\"2026-12-20\""
+ },
+ {
+  "area": "leave",
+  "name": "no reason",
+  "got": 422,
+  "expect": "422",
+  "ok": true,
+  "note": "",
+  "body": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"reason\"],\"msg\":\"Field required\",\"input\":{\"leave_type\":\"CASUAL\",\"from_date\":\"2026-12-20\",\"to_date\":\"2026-12-21\"}}]}"
+ },
+ {
+  "area": "public",
+  "name": "hierarchy reachable",
+  "got": 200,
+  "expect": "200",
+  "ok": true,
+  "note": "",
+  "body": "{\"levels\":[{\"key\":\"college\",\"label\":\"College\",\"required\":true},{\"key\":\"department\",\"label\":\"Department\",\"required\":true},{\"key\":\"course\",\"label\":\"Course\",\"required\":false},{\"key\":\"specialization\",\"label\":\"Specialization\""
+ },
+ {
+  "area": "public",
+  "name": "archived/blank-name colleges not offered",
+  "got": 299,
+  "expect": "200",
+  "ok": false,
+  "note": "blank-named colleges/departments created above leak into the public form",
+  "body": ""
+ }
+]

@@ -1,0 +1,214 @@
+/* Audit log — this screen's LAYOUT only.
+ *
+ * .panel .card .chip .btn .select .notice .crumb .eyebrow .dt-header .dt-title
+ * .dt-sub .dt-toolbar .dt-gridbar .dt-quickfilter .dt-statusbar (and its
+ * .pager) .card-head .card-heading .card-sub are global (styles/reep-v2.scss)
+ * and are used as they are. What is here is the shape of this board: the filter
+ * row, the grid beside its 380px event panel, and the panel's own blocks.
+ *
+ * .pagesize, .columns-panel and .columns-panel__* are the same names the
+ * Registrations queue defines for the same two controls; both are component
+ * scoped and neither is claimed by reep-v2.scss or reep-v2-resume.scss, which
+ * is the check check_style_duplicates.py enforces.
+ */
+:host {
+  display: block;
+}
+
+/* --- the board's filter row ---------------------------------------------- */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+/* The College pill, and only it. The <select> inside is plainly `disabled`
+   and carries the reason in its title; this dims the pill it sits in so the
+   one filter the trail cannot answer reads as unavailable at a glance. */
+.filter-pending {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.filter-hint {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.panel > .notice {
+  margin-bottom: 12px;
+}
+.panel > .notice code,
+.diff-note code {
+  font-family: ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+  font-size: 11.5px;
+}
+
+/* --- the grid beside the event panel ------------------------------------- */
+.board-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 12px;
+  align-items: start;
+}
+@media (max-width: 1180px) {
+  .board-columns {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.grid-card {
+  padding: 0;
+  overflow: visible;
+}
+/* The anchor for the columns popover, which has to escape the toolbar. */
+.gridbar-actions {
+  position: relative;
+  margin-left: auto;
+  display: inline-flex;
+  gap: 6px;
+}
+/* A fixed height rather than autoHeight: an empty range must still be tall
+   enough to draw the grid's own empty-state overlay under the header. */
+.audit-grid {
+  display: block;
+  width: 100%;
+  height: 420px;
+}
+
+.columns-panel {
+  position: absolute;
+  top: 34px;
+  right: 0;
+  z-index: 5;
+  width: 200px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-card);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.columns-panel__title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin-bottom: 2px;
+}
+.columns-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+/* --- the status bar's page-size control ---------------------------------- */
+.pagesize {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.pagesize select {
+  height: 24px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-seg);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 11.5px;
+  color: var(--ink);
+  padding: 0 4px;
+}
+
+/* --- the event panel ----------------------------------------------------- */
+.event-card {
+  padding: 16px;
+}
+.event-card .notice {
+  margin-bottom: 12px;
+}
+.panel-state,
+.copy-note {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.event-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+  margin: 0 0 12px;
+}
+.event-fact {
+  min-width: 0;
+}
+/* The target pair is a type and an id; wrapping it into a half column breaks
+   the id across three lines. */
+.event-fact-wide {
+  grid-column: 1 / -1;
+}
+.fact {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.event-block {
+  margin-bottom: 12px;
+}
+
+/* Before → after, side by side, as the board draws them. */
+.diff {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 6px;
+}
+.diff-side {
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-control);
+  padding: 8px 10px;
+  background: var(--tint-3);
+  min-width: 0;
+}
+.diff-after {
+  background: var(--good-bg);
+}
+/* A <pre> so a snapshot keeps its indentation, but wrapped: a JSON document
+   inside a 380px panel must not give the page a horizontal scrollbar. */
+.diff-body {
+  margin: 4px 0 0;
+  font-family: ui-monospace, 'SFMono-Regular', 'Menlo', monospace;
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 220px;
+  overflow-y: auto;
+}
+.event-block > .diff-body {
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-control);
+  padding: 8px 10px;
+  background: var(--tint-3);
+}
+.diff-note {
+  margin: 8px 0 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.event-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}

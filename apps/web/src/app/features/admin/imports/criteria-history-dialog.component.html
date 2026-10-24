@@ -1,0 +1,113 @@
+<div class="dialog-backdrop" (click)="dismissed.emit()">
+  <div
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="titleId"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="dialog-head">
+      <div>
+        <h2 class="dialog-title" [id]="titleId">Placement criteria · history</h2>
+        <p class="dialog-sub">
+          @if (courseId()) {
+            Every set of gates written for {{ courseLabel() }}, newest first.
+          } @else {
+            Every set of gates ever written, at every rung, newest first.
+          }
+        </p>
+      </div>
+      <button
+        type="button"
+        class="btn ghost sm"
+        aria-label="Close the criteria history dialog"
+        (click)="dismissed.emit()"
+      >
+        <span class="icon" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <div class="dialog-body">
+      @if (error()) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ error() }}
+        </div>
+      }
+
+      @if (isLoading()) {
+        <p class="state-note" role="status">
+          <span class="icon" aria-hidden="true">hourglass_empty</span>Reading the history…
+        </p>
+      }
+
+      @if (isEmpty()) {
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">info</span>
+          <div>
+            No placement criteria set yet; built-in defaults apply.
+          </div>
+        </div>
+      }
+
+      @if (rows(); as history) {
+        @if (history.length > 0) {
+          <div class="table-scroll">
+            <table class="dt-table">
+              <caption class="sr-only">Placement criteria, newest first</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Written</th>
+                  <th scope="col">Rung</th>
+                  <th scope="col">State</th>
+                  <th scope="col">Effective from</th>
+                  <th scope="col">Min CGPA</th>
+                  <th scope="col">Max backlogs</th>
+                  <th scope="col">Min attendance</th>
+                  <th scope="col">Cert completion</th>
+                  <th scope="col">Max gap</th>
+                  <th scope="col">By</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of history; track $index) {
+                  <tr>
+                    <td>{{ row.updated_at | date: 'd MMM y, HH:mm' }}</td>
+                    <td>{{ rungLabel(row.source) }}<br /><span class="row-name">{{ row.name }}</span></td>
+                    <td>
+                      @if (row.active) {
+                        <span class="chip dot good">Live</span>
+                      } @else {
+                        <span class="chip dot neutral">Superseded</span>
+                      }
+                    </td>
+                    <td>
+                      @if (row.effective_from) {
+                        {{ row.effective_from | date: 'd MMM y' }}
+                      } @else {
+                        {{ notReadable }}
+                      }
+                    </td>
+                    <td>{{ row.min_cgpa }}</td>
+                    <td>{{ row.max_live_backlogs }}</td>
+                    <td>{{ row.min_attendance_pct }}%</td>
+                    <td>{{ row.min_cert_completion_pct }}%</td>
+                    <td>{{ row.max_gap_months }} months</td>
+                    <td>{{ row.created_by_name || 'Not recorded' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    </div>
+
+    <div class="dialog-foot">
+      <span class="summary">
+        A programme-wide set and a course set can both be live: they are different rungs, and the
+        deeper one wins for the students it reaches.
+      </span>
+      <button type="button" class="btn secondary" (click)="dismissed.emit()">Close</button>
+    </div>
+  </div>
+</div>

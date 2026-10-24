@@ -1,0 +1,57 @@
+# BA — Business Analytics
+# Track code: ba   Interviewer: a highly technical, problem-solving Director of
+# Analytics (voice: arjun)
+# Paste into Main Admin -> Interview questions -> Business Analytics -> Add many.
+# Frameworks the persona already carries: SQL/Python logic, data modelling,
+# predictive analytics, A/B test significance, data visualisation.
+
+# ---------------------------------------------------------------- opening --
+[opening] Tell me about yourself and how you ended up in analytics rather than in a pure engineering or pure business role.
+[opening] Walk me through the analysis you are proudest of, and tell me who acted on it.
+[opening] What is your strongest tool today — SQL, Python, Excel or a BI tool — and how did you get good at it?
+[opening] Describe a dataset you have worked with end to end, from where it came from to what changed because of it.
+[opening] What kind of analytics problem do you find most interesting, and why that one?
+
+# ---------------------------------------------------------------- probing --
+[probing] Explain the difference between an inner join and a left join, and give me a case where using the wrong one silently changes your answer.
+[probing] What does GROUP BY actually do, and what is the difference between WHERE and HAVING?
+[probing] Explain what a window function is and give me a problem you would solve with one rather than with a self-join.
+[probing] You need the second highest salary in each department. Talk me through the query.
+[probing] What is the difference between a fact table and a dimension table, and why do we separate them at all?
+[probing] Explain normalisation, and then tell me when you would deliberately denormalise.
+[probing] What is the difference between a list, a tuple and a dictionary in Python, and when does that choice matter for performance?
+[probing] How would you find and handle missing values in a dataset, and why is dropping the rows usually the wrong first move?
+[probing] Explain the difference between correlation and causation using an example from a business you know.
+[probing] What is a p-value, in words a marketing manager would accept?
+[probing] Explain overfitting, how you would detect it, and two ways to reduce it.
+[probing] What is the difference between classification and regression, and which would you use to predict whether a customer will churn?
+[probing] Explain precision and recall, and tell me which one matters more for fraud detection and why.
+[probing] What is a confusion matrix, and what does accuracy hide when the classes are imbalanced?
+[probing] How would you decide the sample size for an A/B test before you run it?
+[probing] Your A/B test is not statistically significant after two weeks. What are your options, and which one is dishonest?
+[probing] When would you use a bar chart rather than a line chart, and when is a pie chart the right answer?
+[probing] You have to present a model's output to people who do not trust models. How do you structure that presentation?
+[probing] What is the difference between ETL and ELT, and why did the industry move towards the second?
+[probing] How would you validate that a data pipeline you did not build is producing correct numbers?
+
+# -------------------------------------------------------------- deep_dive --
+[deep_dive] How would you design a machine learning pipeline to predict customer churn using messy e-commerce logs?
+[deep_dive] Define churn for a business with no subscription. Defend your definition against two alternatives.
+[deep_dive] Your churn model has ninety-four percent accuracy and the business says it is useless. Explain how both can be true and what you do next.
+[deep_dive] A dashboard the CFO has used for two years turns out to have been double-counting refunds. Walk me through the next forty-eight hours.
+[deep_dive] Design the data model for a food delivery company that needs to answer questions about orders, restaurants, riders and refunds.
+[deep_dive] A query that took four seconds last month now takes nine minutes and nothing changed in the code. How do you investigate?
+[deep_dive] Revenue is down eight percent this month. You have every table in the warehouse. Take me through your analysis in order, and tell me when you would stop.
+[deep_dive] Design an experiment to measure whether a new recommendation engine increases revenue, when users see the site on both mobile and desktop.
+[deep_dive] Two teams report different numbers for monthly active users in the same meeting. How do you resolve it, and how do you stop it happening again?
+[deep_dive] You are asked to build a model that predicts which employees will resign. Take the brief, then tell me what you would push back on.
+[deep_dive] How would you detect that a model in production has started to degrade, before the business notices?
+[deep_dive] Your training data comes from a period that included a lockdown. What do you do about that, and what do you tell the stakeholders?
+[deep_dive] Explain how you would estimate the causal impact of a price change that was rolled out to everyone at once, with no control group.
+[deep_dive] A stakeholder asks you to remove an outlier because it makes the chart look wrong. How do you handle that conversation?
+
+# ---------------------------------------------------------------- wrap_up --
+[wrap_up] Which part of the analytics stack do you know least well, and what are you doing about it?
+[wrap_up] Would you rather be the person who builds the pipeline or the person who presents the finding, and why?
+[wrap_up] What would you want to learn in your first six months here?
+[wrap_up] What questions do you have for us about the data, the team, or how decisions actually get made here?

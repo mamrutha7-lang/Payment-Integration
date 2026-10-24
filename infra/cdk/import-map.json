@@ -1,0 +1,207 @@
+{
+  "Alb16C2F182": {
+    "LoadBalancerArn": "arn:aws:elasticloadbalancing:ap-south-1:445363794125:loadbalancer/app/reep-alb/b9d2909f4f124ee0"
+  },
+  "Alb5xxAlarm99BFF946": {
+    "AlarmName": "reep-alb-5xx"
+  },
+  "AlbHttpRedirect2E78FE2C": {
+    "ListenerArn": "arn:aws:elasticloadbalancing:ap-south-1:445363794125:listener/app/reep-alb/b9d2909f4f124ee0/36e6ea7346bd27c0"
+  },
+  "AlbHttpsB7CA700A": {
+    "ListenerArn": "arn:aws:elasticloadbalancing:ap-south-1:445363794125:listener/app/reep-alb/b9d2909f4f124ee0/98249ddc7d1a063f"
+  },
+  "AlbLogsBucket9F12F2B8": {
+    "BucketName": "reep-alb-logs-20260827213148167800000004"
+  },
+  "AlbLogsBucketPolicy7C40ACF9": {
+    "Bucket": "reep-alb-logs-20260827213148167800000004"
+  },
+  "AlbSg": {
+    "Id": "sg-06685f9a6446cfed2"
+  },
+  "Alerts91F83244": {
+    "TopicArn": "arn:aws:sns:ap-south-1:445363794125:reep-alerts"
+  },
+  "ApiCpuPeggedAlarm6E17126A": {
+    "AlarmName": "reep-api-cpu-at-max"
+  },
+  "ApiLogs3D05D88B": {
+    "LogGroupName": "/reep/api"
+  },
+  "ApiRepo": {
+    "RepositoryName": "reep/api"
+  },
+  "ApiServiceC9037CF0": {
+    "Cluster": "reep",
+    "ServiceArn": "arn:aws:ecs:ap-south-1:445363794125:service/reep/api"
+  },
+  "ApiServiceTaskCountTargetBFC64025": {
+    "ResourceId": "service/reep/api",
+    "ScalableDimension": "ecs:service:DesiredCount",
+    "ServiceNamespace": "ecs"
+  },
+  "ApiServiceTaskCountTargetCpuTarget57B0017C": {
+    "Arn": "arn:aws:autoscaling:ap-south-1:445363794125:scalingPolicy:4e0988f9-b405-4db5-9aef-3c84f12bfb64:resource/ecs/service/reep/api:policyName/cpu-target",
+    "ScalableDimension": "ecs:service:DesiredCount"
+  },
+  "ApiServiceTaskCountTargetMemoryTarget123A0189": {
+    "Arn": "arn:aws:autoscaling:ap-south-1:445363794125:scalingPolicy:4e0988f9-b405-4db5-9aef-3c84f12bfb64:resource/ecs/service/reep/api:policyName/memory-target",
+    "ScalableDimension": "ecs:service:DesiredCount"
+  },
+  "ApiSg": {
+    "Id": "sg-0dfa5c76167d79093"
+  },
+  "ApiTargetGroup5723F19D": {
+    "TargetGroupArn": "arn:aws:elasticloadbalancing:ap-south-1:445363794125:targetgroup/reep-api/85197cc035bb5ef1"
+  },
+  "ApiTaskDef37DBDBD0": {
+    "TaskDefinitionArn": "arn:aws:ecs:ap-south-1:445363794125:task-definition/reep-api:4"
+  },
+  "ApiTaskRole12FAD4A7": {
+    "RoleName": "reep-api-task"
+  },
+  "BackupPlan": {
+    "BackupPlanId": "86be484d-5665-49ed-97bf-a2a4bb06683f"
+  },
+  "BackupRoleF43CFD90": {
+    "RoleName": "reep-backup"
+  },
+  "BackupSelection": {
+    "Id": "f151d9af-8ee1-4cfe-b5dd-f396468b040a_86be484d-5665-49ed-97bf-a2a4bb06683f"
+  },
+  "ClaudeObserverRole7AA68AFF": {
+    "RoleName": "reep-claude-observer"
+  },
+  "ClusterEB0386A7": {
+    "ClusterName": "reep"
+  },
+  "DataAccessPoint": {
+    "AccessPointId": "fsap-02e1a240bad3d2a3c"
+  },
+  "DataFs": {
+    "FileSystemId": "fs-0befeee1010e6a098"
+  },
+  "DataMount0": {
+    "Id": "fsmt-01f19306ae0712997"
+  },
+  "DataMount1": {
+    "Id": "fsmt-03dfe6f82aad62322"
+  },
+  "Db": {
+    "DBInstanceIdentifier": "reep-postgres"
+  },
+  "DbSg": {
+    "Id": "sg-0891ef9d6ac00d9aa"
+  },
+  "DbSubnets": {
+    "DBSubnetGroupName": "reep-db"
+  },
+  "Distribution830FAC52": {
+    "Id": "EW482RJIK9CVE"
+  },
+  "DroppedTurnsAlarm15544CE2": {
+    "AlarmName": "reep-interview-dropped-turns"
+  },
+  "DroppedTurnsFilterA84CD645": {
+    "FilterName": "interview-dropped-turns",
+    "LogGroupName": "/reep/api"
+  },
+  "EfsSg": {
+    "Id": "sg-0d7a17a4ad601eaf1"
+  },
+  "GithubDeployRoleB0CF66A5": {
+    "RoleName": "reep-github-deploy"
+  },
+  "GithubOidc": {
+    "Arn": "arn:aws:iam::445363794125:oidc-provider/token.actions.githubusercontent.com"
+  },
+  "Igw": {
+    "InternetGatewayId": "igw-0582b6726003f07b0"
+  },
+  "IgwAttach": {
+    "AttachmentType": "IGW",
+    "VpcId": "vpc-010669fa9293137e2"
+  },
+  "Nat": {
+    "NatGatewayId": "nat-08aede406509bee46"
+  },
+  "NatEip": {
+    "AllocationId": "eipalloc-0548fe08f83b54cf0",
+    "PublicIp": "15.252.169.29"
+  },
+  "NoHealthyApiAlarmF11C8F10": {
+    "AlarmName": "reep-no-healthy-api"
+  },
+  "PrivateDefaultRoute": {
+    "CidrBlock": "0.0.0.0/0",
+    "RouteTableId": "rtb-083fb1723d72ddfb5"
+  },
+  "PrivateRouteTable": {
+    "RouteTableId": "rtb-083fb1723d72ddfb5"
+  },
+  "PrivateRta0": {
+    "Id": "rtbassoc-020542152120d62e4"
+  },
+  "PrivateRta1": {
+    "Id": "rtbassoc-01bf8b54cf5ff1ff7"
+  },
+  "PrivateSubnet0": {
+    "SubnetId": "subnet-0792c0ddcdd02f34f"
+  },
+  "PrivateSubnet1": {
+    "SubnetId": "subnet-0a41b8c5a98485d1a"
+  },
+  "PublicDefaultRoute": {
+    "CidrBlock": "0.0.0.0/0",
+    "RouteTableId": "rtb-074fa41fec72a17b7"
+  },
+  "PublicRouteTable": {
+    "RouteTableId": "rtb-074fa41fec72a17b7"
+  },
+  "PublicRta0": {
+    "Id": "rtbassoc-0606dcc7264aa2cd4"
+  },
+  "PublicRta1": {
+    "Id": "rtbassoc-0f1aeab0767ff0752"
+  },
+  "PublicSubnet0": {
+    "SubnetId": "subnet-0fbcb2e5327e5cd9d"
+  },
+  "PublicSubnet1": {
+    "SubnetId": "subnet-0839c5e9b47878236"
+  },
+  "RdsCpuAlarm29EF1690": {
+    "AlarmName": "reep-rds-cpu"
+  },
+  "RdsStorageAlarm879B47F1": {
+    "AlarmName": "reep-rds-low-storage"
+  },
+  "RetentionSchedule": {
+    "Name": "reep-retention-daily"
+  },
+  "SchedulerRole59E73443": {
+    "RoleName": "reep-scheduler"
+  },
+  "SpaFallback7C7D7D98": {
+    "FunctionARN": "arn:aws:cloudfront::445363794125:function/reep-spa-fallback"
+  },
+  "TaskExecutionRole250D2532": {
+    "RoleName": "reep-task-execution"
+  },
+  "Vault": {
+    "BackupVaultName": "reep-vault"
+  },
+  "Vpc": {
+    "VpcId": "vpc-010669fa9293137e2"
+  },
+  "WebBucket12880F5B": {
+    "BucketName": "reep-web-20260827213147410900000003"
+  },
+  "WebBucketPolicy95D08FAA": {
+    "Bucket": "reep-web-20260827213147410900000003"
+  },
+  "WebOac39029C1F": {
+    "Id": "E3QS0L8BWD4LHS"
+  }
+}

@@ -1,0 +1,522 @@
+<div class="panel" data-p="jobs-sheet">
+  <div class="dt-header">
+    <div>
+      <div class="crumb"><span>Every day</span><span class="sep">/</span><span>Job postings</span></div>
+      <h1 class="dt-title">Job postings</h1>
+      <div class="dt-sub">Openings students can apply to.</div>
+    </div>
+
+    <div class="dt-toolbar">
+      @if (canSeePlacement()) {
+        <a class="btn secondary" routerLink="/admin/placement">
+          <span class="icon" aria-hidden="true">verified</span> Placement &amp; offers
+        </a>
+      }
+      <!-- ONE PRIMARY PER VIEW (01-design-system.md §4): while the panel is open
+           its Publish is the view's primary action, so this one steps back to
+           secondary rather than the two competing. -->
+      <button
+        type="button"
+        class="btn"
+        [class.primary]="!formOpen()"
+        [class.secondary]="formOpen()"
+        [attr.aria-expanded]="formOpen()"
+        (click)="togglePostingForm()"
+      >
+        <span class="icon" aria-hidden="true">{{ postingFormToggleIcon() }}</span>
+        {{ postingFormToggleLabel() }}
+      </button>
+    </div>
+  </div>
+
+  <!-- The board's three tabs. Jobs is this screen; the funnel and the offers
+       queue are both on Placement (spec §15), so both tabs go there. -->
+  <div class="tabs jobs-tabs" role="group" aria-label="Jobs and placement views">
+    <button type="button" class="tab active" aria-current="page">Jobs</button>
+    @if (canSeePlacement()) {
+      <a class="tab" routerLink="/admin/placement">Placement</a>
+      <a class="tab" routerLink="/admin/placement" title="The offers queue is on the Placement screen">
+        Offers
+      </a>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="notice jobs-banner" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      <span>{{ error() }}</span>
+      <button type="button" class="btn ghost sm jobs-banner__dismiss" (click)="dismissError()">
+        Dismiss
+      </button>
+    </div>
+  }
+  @if (flash()) {
+    <div class="notice good jobs-banner" role="status">
+      <span class="icon" aria-hidden="true">check_circle</span>
+      <span>{{ flash() }}</span>
+      <button type="button" class="btn ghost sm jobs-banner__dismiss" (click)="dismissFlash()">
+        Dismiss
+      </button>
+    </div>
+  }
+
+  <!-- The board's filter row, all four live. `GET /api/admin/jobs` takes no
+       query parameters and is scoped server-side, so every one of these narrows
+       the rows already returned and none of them changes what may be read —
+       the Leave queue's Department filter, exactly.
+
+       PICKING A COLLEGE INCLUDES THE POSTINGS THAT NAME NONE, because those are
+       on that college's board too (`app/jobs_visibility.py::visible_clauses`).
+       "Every college" is offered as its own choice for the office that wants
+       exactly the un-narrowed ones. A select with nothing to offer is disabled
+       with that as its reason rather than left standing as an empty menu. -->
+  <div class="jobs-filters">
+    <div class="select" [class.jobs-filter--empty]="collegeFilterDisabledReason() !== null">
+      <span class="lbl">College</span>
+      <span class="val">{{ collegeFilterLabel() }}</span>
+      <select
+        aria-label="College — narrows to the postings a student at that college can see"
+        [disabled]="collegeFilterDisabledReason() !== null"
+        [attr.title]="collegeFilterDisabledReason()"
+        (change)="setCollegeFilter(selectValue($event))"
+      >
+        <option [value]="anyFilter" [selected]="collegeFilter() === anyFilter">All</option>
+        @for (college of collegeOptions(); track college.id) {
+          <option [value]="college.id" [selected]="college.id === collegeFilter()">
+            {{ college.label }}
+          </option>
+        }
+        @if (hasUnnarrowedCollege()) {
+          <option [value]="namesNone" [selected]="collegeFilter() === namesNone">
+            {{ everyCollege }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="select" [class.jobs-filter--empty]="courseFilterDisabledReason() !== null">
+      <span class="lbl">Course</span>
+      <span class="val">{{ courseFilterLabel() }}</span>
+      <select
+        aria-label="Course — narrows to the postings a student on that course can see"
+        [disabled]="courseFilterDisabledReason() !== null"
+        [attr.title]="courseFilterDisabledReason()"
+        (change)="setCourseFilter(selectValue($event))"
+      >
+        <option [value]="anyFilter" [selected]="courseFilter() === anyFilter">All</option>
+        @for (course of courseOptions(); track course.id) {
+          <option [value]="course.id" [selected]="course.id === courseFilter()">
+            {{ course.label }}
+          </option>
+        }
+        @if (hasUnnarrowedCourse()) {
+          <option [value]="namesNone" [selected]="courseFilter() === namesNone">
+            {{ everyCourse }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="select" [class.jobs-filter--empty]="trackFilterDisabledReason() !== null">
+      <span class="lbl">Track</span>
+      <span class="val">{{ trackFilterLabel() }}</span>
+      <select
+        aria-label="Track — narrows to the postings a student on that specialization can see"
+        [disabled]="trackFilterDisabledReason() !== null"
+        [attr.title]="trackFilterDisabledReason()"
+        (change)="setTrackFilter(selectValue($event))"
+      >
+        <option [value]="anyFilter" [selected]="trackFilter() === anyFilter">All</option>
+        @for (code of trackOptions(); track code) {
+          <option [value]="code" [selected]="code === trackFilter()">{{ code }}</option>
+        }
+        @if (hasUnnarrowedTrack()) {
+          <option [value]="namesNone" [selected]="trackFilter() === namesNone">
+            {{ everyTrack }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">Status</span>
+      <span class="val">{{ statusFilterLabel() }}</span>
+      <select aria-label="Filter postings by status" (change)="setStatusFilter(selectValue($event))">
+        @for (option of statusFilters; track option.key) {
+          <option [value]="option.key" [selected]="option.key === statusFilter()">
+            {{ option.label }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="jobs-stats">
+      <span><b>{{ listedCount() }}</b> on the boards</span>
+      <span><b>{{ closingThisWeekCount() }}</b> closing this week</span>
+      @if (pastDeadlineCount() > 0) {
+        <span class="jobs-stats__warn">
+          <b>{{ pastDeadlineCount() }}</b> past deadline, still listed
+        </span>
+      }
+      <span><b>{{ applicationCount() | plural: 'application' }}</b></span>
+    </div>
+  </div>
+
+  <div class="notice accent jobs-gaps">
+    <span class="icon" aria-hidden="true">info</span>
+    <div>
+      Only <b>Close posting</b> takes a posting off the student and alumni boards; a posting past its deadline is still open to applications.
+    </div>
+  </div>
+
+  <div class="jobs-body">
+    <!-- ------------------------------------------------------------- grid -->
+    <div class="dt-frame jobs-grid">
+      <div class="dt-gridbar">
+        <input
+          class="dt-quickfilter"
+          type="search"
+          placeholder="Search postings…"
+          aria-label="Search postings by role, company or location"
+          (input)="onQuickFilterInput($event)"
+        />
+
+        <button
+          type="button"
+          class="btn secondary sm"
+          [disabled]="!canClose()"
+          [title]="closeHint()"
+          (click)="closeSelectedPosting()"
+        >
+          <span class="icon" aria-hidden="true">block</span> Close posting
+        </button>
+        <button
+          type="button"
+          class="btn secondary sm"
+          [disabled]="!canDuplicate()"
+          title="Copy the ticked posting into the form"
+          (click)="duplicateSelectedPosting()"
+        >
+          <span class="icon" aria-hidden="true">content_copy</span> Duplicate
+        </button>
+        <button
+          type="button"
+          class="btn danger sm"
+          [disabled]="!canRemove()"
+          [title]="removeHint()"
+          (click)="removeSelectedPosting()"
+        >
+          <span class="icon" aria-hidden="true">delete</span> Remove
+        </button>
+
+        <span class="jobs-gridbar-end">
+          <button
+            type="button"
+            class="btn secondary sm"
+            [attr.aria-expanded]="columnsPanelOpen()"
+            aria-label="Choose which columns are shown"
+            (click)="toggleColumnsPanel()"
+          >
+            <span class="icon" aria-hidden="true">table_rows</span>
+          </button>
+          <button
+            type="button"
+            class="btn secondary sm"
+            [attr.aria-pressed]="isCompact()"
+            aria-label="Toggle compact rows"
+            (click)="toggleDensity()"
+          >
+            <span class="icon" aria-hidden="true">tune</span>
+          </button>
+        </span>
+
+        @if (columnsPanelOpen()) {
+          <div class="jobs-columns-panel">
+            <div class="jobs-columns-panel__title">Columns</div>
+            @for (column of toggleableColumns; track column.id) {
+              <label class="jobs-columns-panel__row">
+                <input
+                  type="checkbox"
+                  [checked]="isColumnVisible(column.id)"
+                  (change)="toggleColumn(column.id)"
+                />
+                <span>{{ column.label }}</span>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      @if (isLoading()) {
+        <p class="jobs-state" role="status">Loading the sheet…</p>
+      } @else {
+        <!-- Mounted once and never torn down: an @if around the grid destroys
+             the GridApi the toolbar and the status bar hold, so the empty case
+             is main's own words in the no-rows overlay instead. -->
+        <ag-grid-angular
+          class="jobs-ag"
+          [theme]="gridTheme"
+          [rowData]="visibleRows()"
+          [columnDefs]="columns"
+          [defaultColDef]="defaultColumn"
+          [rowSelection]="rowSelection"
+          [selectionColumnDef]="selectionColumn"
+          [overlayNoRowsTemplate]="emptyOverlay()"
+          [getRowId]="rowId"
+          [quickFilterText]="quickFilter()"
+          [rowHeight]="rowHeight()"
+          [pagination]="true"
+          [paginationPageSize]="pageSize()"
+          [suppressPaginationPanel]="true"
+          [suppressCellFocus]="true"
+          (gridReady)="onGridReady($event)"
+          (selectionChanged)="onSelectionChanged()"
+          (paginationChanged)="onPaginationChanged()"
+        />
+      }
+
+      <div class="dt-statusbar">
+        <span>Rows: <b>{{ filteredRowCount() }}</b></span>
+        <span>Selected: <b>{{ selectedCount() }}</b></span>
+        <span class="pager">
+          <label class="jobs-pagesize">
+            <span>Page size</span>
+            <select aria-label="Rows per page" (change)="setPageSize(numberValue($event))">
+              @for (size of pageSizes; track size) {
+                <option [value]="size" [selected]="size === pageSize()">{{ size }}</option>
+              }
+            </select>
+          </label>
+          <span>{{ rowRangeLabel() }}</span>
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="isFirstPage()"
+            aria-label="Previous page"
+            (click)="goToPreviousPage()"
+          >
+            <span class="icon" aria-hidden="true">chevron_left</span>
+          </button>
+          <span>{{ pagerLabel() }}</span>
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="isLastPage()"
+            aria-label="Next page"
+            (click)="goToNextPage()"
+          >
+            <span class="icon" aria-hidden="true">chevron_right</span>
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------- Post a job ----- -->
+    @if (formOpen()) {
+      <aside class="card jobs-post" aria-label="Post a job">
+        <h2 class="jobs-post__title">Post a job</h2>
+
+        <div class="field">
+          <label for="jobs-title">Title <span class="req">*</span></label>
+          <input
+            id="jobs-title"
+            class="ctrl"
+            type="text"
+            placeholder="HR Generalist"
+            [value]="draft().title"
+            (input)="setDraft('title', inputValue($event))"
+          />
+        </div>
+
+        <div class="jobs-post__row">
+          <div class="field">
+            <label for="jobs-company">Company <span class="req">*</span></label>
+            <input
+              id="jobs-company"
+              class="ctrl"
+              type="text"
+              placeholder="Infosys BPM"
+              [value]="draft().company"
+              (input)="setDraft('company', inputValue($event))"
+            />
+          </div>
+          <div class="field">
+            <label for="jobs-location">Location</label>
+            <input
+              id="jobs-location"
+              class="ctrl"
+              type="text"
+              placeholder="Mysuru"
+              [value]="draft().location"
+              (input)="setDraft('location', inputValue($event))"
+            />
+          </div>
+        </div>
+
+        <div class="jobs-post__row">
+          <div class="field">
+            <label for="jobs-level">Level</label>
+            <select
+              id="jobs-level"
+              class="ctrl"
+              (change)="setDraft('degreeLevel', selectValue($event))"
+            >
+              @for (level of degreeLevels; track level.key) {
+                <option [value]="level.key" [selected]="level.key === draft().degreeLevel">
+                  {{ level.label }}
+                </option>
+              }
+            </select>
+            <div class="help">Which board the posting appears on</div>
+          </div>
+          <div class="field">
+            <label for="jobs-deadline">Deadline</label>
+            <input
+              id="jobs-deadline"
+              class="ctrl"
+              type="date"
+              [value]="draft().closesOn"
+              (input)="setDraft('closesOn', inputValue($event))"
+            />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="jobs-tracks">Tracks</label>
+          <input
+            id="jobs-tracks"
+            class="ctrl"
+            type="text"
+            placeholder="HR, DM"
+            [value]="draft().tracks"
+            (input)="setDraft('tracks', inputValue($event))"
+          />
+          <div class="help">
+            Specialization codes, comma separated.
+            @if (draftTracks().length > 0) {
+              Sent as <b>{{ draftTracks().join(' · ') }}</b>.
+            } @else {
+              Leave it empty and every track sees the posting.
+            }
+          </div>
+        </div>
+
+        @if (hasCarriedSkills()) {
+          <div class="field">
+            <label for="jobs-skills">Required skills</label>
+            <input id="jobs-skills" class="ctrl" type="text" readonly [value]="carriedSkillsLabel()" />
+            <div class="help">Copied from the duplicated posting.</div>
+          </div>
+        }
+
+        <div class="jobs-post__row">
+          <div class="field synced">
+            <label for="jobs-min-cgpa">Min CGPA</label>
+            <div class="synced-row">
+              <input id="jobs-min-cgpa" class="ctrl" type="text" readonly [value]="minimumCgpaLabel()" />
+              <span class="chip"><span class="icon" aria-hidden="true">lock</span> Synced</span>
+            </div>
+          </div>
+          <div class="field synced">
+            <label for="jobs-max-backlogs">Max backlogs</label>
+            <div class="synced-row">
+              <input
+                id="jobs-max-backlogs"
+                class="ctrl"
+                type="text"
+                readonly
+                [value]="maximumBacklogsLabel()"
+              />
+              <span class="chip"><span class="icon" aria-hidden="true">lock</span> Synced</span>
+            </div>
+          </div>
+        </div>
+        <div class="jobs-post__help">
+          Both gates come from the active placement criteria. A per-posting override is deliberately
+          not on this form — that is how a cut-off gets set a notch too high by accident.
+        </div>
+
+        <!-- SCOPE IS TWO SELECTS AND ONE ANSWER. A course belongs to exactly
+             one college through the spine, so picking a course sets the college
+             too; picking a college that the chosen course does not sit in
+             clears the course, because a posting naming a mismatched pair
+             matches no student at all and reads on this sheet as published. -->
+        <div class="jobs-post__row">
+          <div class="field">
+            <label for="jobs-scope-college">College</label>
+            <select
+              id="jobs-scope-college"
+              class="ctrl"
+              [disabled]="!scopePickerReady()"
+              [attr.title]="scopePickerReady() ? null : scopeNote()"
+              (change)="setScopeCollege(selectValue($event))"
+            >
+              <option value="" [selected]="draft().collegeId === ''">{{ everyCollege }}</option>
+              @for (college of scopeColleges(); track college.id) {
+                <option [value]="college.id" [selected]="college.id === draft().collegeId">
+                  {{ college.label }}
+                </option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="jobs-scope-course">Course</label>
+            <select
+              id="jobs-scope-course"
+              class="ctrl"
+              [disabled]="!scopePickerReady()"
+              [attr.title]="scopePickerReady() ? null : scopeNote()"
+              (change)="setScopeCourse(selectValue($event))"
+            >
+              <option value="" [selected]="draft().courseId === ''">{{ everyCourse }}</option>
+              @for (course of scopeCourses(); track course.id) {
+                <option [value]="course.id" [selected]="course.id === draft().courseId">
+                  {{ scopeCourseLabel(course) }}
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="jobs-post__help">
+          {{ scopeNote() }} This posting will be published to
+          <b>{{ scopeSentence() }}</b>.
+        </div>
+
+        <div class="field">
+          <label for="jobs-apply-url">Apply link</label>
+          <input
+            id="jobs-apply-url"
+            class="ctrl"
+            type="url"
+            placeholder="https://careers.example.com/…"
+            [value]="draft().applyUrl"
+            (input)="setDraft('applyUrl', inputValue($event))"
+          />
+          <div class="help">Apply opens this URL and records the application</div>
+        </div>
+
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">info</span>
+          <div>
+            Publishing puts the opening on the student and alumni boards. Once anyone has applied it can only be closed, not removed; there is no reopen.
+          </div>
+        </div>
+
+        @if (formError()) {
+          <div class="notice jobs-post__error" role="alert">
+            <span class="icon" aria-hidden="true">error</span>
+            <span>{{ formError() }}</span>
+          </div>
+        }
+
+        <div class="jobs-post__foot">
+          <button type="button" class="btn secondary" (click)="closePostingForm()">Cancel</button>
+          <button type="button" class="btn primary" [disabled]="!canPublish()" (click)="publish()">
+            <span class="icon" aria-hidden="true">send</span>
+            {{ publishButtonLabel() }}
+          </button>
+        </div>
+      </aside>
+    }
+  </div>
+</div>

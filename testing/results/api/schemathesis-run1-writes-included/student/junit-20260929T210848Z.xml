@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites errors="0" failures="25" skipped="0" tests="58" time="11.568192">
+  <testsuite name="schemathesis" hostname="vm" errors="0" failures="25" skipped="0" tests="58" time="11.568192">
+    <testcase name="POST /api/student/badges/{code}/evidence" time="0.976862">
+      <failure type="failure">1. Test Case ID: FDtjqy
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 201, 422
+
+[404] Not Found:
+
+    `{"detail":"No such badge."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"evidence_type": null, "approved_certification_id": null, "upload_id": null, "title": "", "provider": "", "completed_on": 0, "note": ""}' http://localhost:3300/api/student/badges/0/evidence</failure>
+      <failure type="failure">1. Test Case ID: NWT9Op
+
+- Response violates schema
+
+    "evidence_type must be EXTERNAL_VERIFIED, BGSCET_ASSESSED or APPLIED." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "evidence_type must be EXTERNAL_VERIFIED, BGSCET_ASSESSED or APPLIED."
+
+[422] Unprocessable Content:
+
+    `{"detail":"evidence_type must be EXTERNAL_VERIFIED, BGSCET_ASSESSED or APPLIED."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/student/badges/MGR-BUSINESS-COMMUNICATION/evidence
+
+2. Test Case ID: mLPDM4
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 201, 422
+
+[409] Conflict:
+
+    `{"detail":"Readiness badges are awarded on BGSCET assessment thresholds, not evidence uploads."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"\ud80c\udedar\u00bd\u00aa\u0002": {}, "Y\u000b\u0005\rG\uda32\ude40-": [12894, 239970356, false], "note": null, "approved_certification_id": "\u0096'"'"'\u0093(!\u00a1\u00c2*"}' http://localhost:3300/api/student/badges/RDY-INTERVIEW/evidence</failure>
+    </testcase>
+    <testcase name="POST /api/student/badges/{code}/start" time="0.236709">
+      <failure type="failure">1. Test Case ID: utLCjB
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"No such badge."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/student/badges/0/start</failure>
+    </testcase>
+    <testcase name="POST /api/student/checkin" time="0.272812">
+      <failure type="failure">1. Test Case ID: Qi5Vjf
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 200, 422
+
+[500] Internal Server Error:
+
+    `Internal Server Error`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"course_code": "", "module": ""}' http://localhost:3300/api/student/checkin</failure>
+      <failure type="failure">1. Test Case ID: t2IxJb
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/checkin
+
+2. Test Case ID: dpicMh
+
+- Response violates schema
+
+    "Invalid activity or mode." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Invalid activity or mode."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Invalid activity or mode."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"\u00e4\u000b\u008c;r\u00ec@": {}, "": [], "\u009a\u0084": null, "6z\ud801\udd91\u0017\u007f\u00e0": 729291356, "'"'"'\u00a9\u00f1": {"i\u0097d\u0082\u00d1\u008c\u00f8": ["\u008c"], "\u009e\u00d7\u009c-\u00a0": {"": "\u00b0\u0017K\u00b6cQ", "9\u00cf\u00bd?\ud992\udd8f\n": true}, "\u00bb\u0099\u00e5\u5818\uda15\ude18z": false}, "course_code": "\ud87d\udf8b\u00b4\u00b1f\u00c7\udb9f\udd1d\u0085\u00b7\u00f0\u0082^X\u00bc\u00f6\u00ec\u00d9", "mode": "-\u00a1", "activity": "5&lt;\u0081\u0082\udb14\udffd", "module": ""}' http://localhost:3300/api/student/checkin</failure>
+    </testcase>
+    <testcase name="POST /api/student/checkout/{session_id}" time="0.316956">
+      <failure type="failure">1. Test Case ID: DmpXIi
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Session not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/student/checkout/0</failure>
+    </testcase>
+    <testcase name="POST /api/student/english-baseline/start" time="0.074036" />
+    <testcase name="POST /api/student/ledger/copy-yesterday" time="0.164256">
+      <failure type="failure">1. Test Case ID: WrPfe4
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"01 Jan 1970 is locked — it could be filled in until 03 Jan 1970. A day stays open for 2 days after it ends."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"day": 0}' http://localhost:3300/api/student/ledger/copy-yesterday</failure>
+      <failure type="failure">1. Test Case ID: T671sU
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/ledger/copy-yesterday
+
+2. Test Case ID: Q0dxQu
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"No submitted ledger for 29 Sep 2026 to copy from."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{",\u000bJ\u0085\u00bd\u00ea\u00bd \u0087\ud8b5\ude3b": {"\u009f\u0019f\u0005": {"\u00f2\ub76d\u00a7m\u00ee\u00c5@\u0007": false, "\u00d9R[\u0090\u000e\udbfb\ude6eVs\uda26\ude0f\u0088\ud962\udf13\udb38\udf02\udb39\udd36\u00f9\uda8e\udce1z": null, "\ud84a\udc2c+\udbbb\ude49\u00bd\u0081": null}, "": {}, " ": []}, "day": "2026-09-30"}' http://localhost:3300/api/student/ledger/copy-yesterday</failure>
+    </testcase>
+    <testcase name="POST /api/student/ledger/submit" time="0.175248">
+      <failure type="failure">1. Test Case ID: fnUxBd
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"01 Jan 1970 is locked — it could be filled in until 03 Jan 1970. A day stays open for 2 days after it ends."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"day": 0}' http://localhost:3300/api/student/ledger/submit</failure>
+      <failure type="failure">1. Test Case ID: V8UtYR
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/ledger/submit</failure>
+    </testcase>
+    <testcase name="POST /api/student/mentor-meetings/request" time="0.292731">
+      <failure type="failure">1. Test Case ID: f3hax0
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"You do not have a mentor assigned yet, so there is nobody to send this to. The placement office assigns mentors."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "0", "preferred": null}' http://localhost:3300/api/student/mentor-meetings/request</failure>
+      <failure type="failure">1. Test Case ID: AkqwAC
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/mentor-meetings/request</failure>
+    </testcase>
+    <testcase name="POST /api/student/offers" time="0.351728">
+      <failure type="failure">1. Test Case ID: JkNIGr
+
+- Response violates schema
+
+    "Invalid role_type / channel / work_mode." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Invalid role_type / channel / work_mode."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Invalid role_type / channel / work_mode."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"role_type": "", "job_title": "", "organisation": "", "channel": "ON_CAMPUS", "work_mode": "ONSITE", "location": null, "ctc_inr": 0, "fixed_gross_inr": 0, "joining_date": 0, "job_id": null}' http://localhost:3300/api/student/offers</failure>
+      <failure type="failure">1. Test Case ID: 3cj8De
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/offers</failure>
+    </testcase>
+    <testcase name="POST /api/student/resume/generate" time="0.164530">
+      <failure type="failure">1. Test Case ID: gXArz8
+
+- Undocumented HTTP status code
+
+    Received: 429
+    Documented: 200, 422
+
+[429] Too Many Requests:
+
+    `{"detail":"Too many AI requests. Wait a moment and try again — the limit is 5 per minute."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d 0 http://localhost:3300/api/student/resume/generate</failure>
+      <failure type="failure">1. Test Case ID: odP13C
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/resume/generate</failure>
+    </testcase>
+    <testcase name="POST /api/student/swoc/{entry_id}/acknowledge" time="0.411761">
+      <failure type="failure">1. Test Case ID: VaalmS
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"No such entry."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/student/swoc/0/acknowledge</failure>
+    </testcase>
+    <testcase name="POST /api/student/timesheet" time="0.236579">
+      <failure type="failure">1. Test Case ID: 31sQjQ
+
+- Response violates schema
+
+    "Invalid activity." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Invalid activity."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Invalid activity."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"day": "2000-01-01", "activity": "", "minutes": false}' http://localhost:3300/api/student/timesheet</failure>
+      <failure type="failure">1. Test Case ID: RyyHPv
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/timesheet</failure>
+    </testcase>
+    <testcase name="POST /api/student/uploads" time="0.235185">
+      <failure type="failure">1. Test Case ID: z6Tkps
+
+- Response violates schema
+
+    "The file is empty." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "The file is empty."
+
+[422] Unprocessable Content:
+
+    `{"detail":"The file is empty."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: multipart/form-data; boundary=0ff96badd39c780eef5d44cbe26f2c5f' -d $'--0ff96badd39c780eef5d44cbe26f2c5f\r\nContent-Disposition: form-data; name="file"; filename="file"\r\n\r\n\r\n--0ff96badd39c780eef5d44cbe26f2c5f\r\nContent-Disposition: form-data; name="kind"\r\n\r\nDOCUMENT\r\n--0ff96badd39c780eef5d44cbe26f2c5f\r\nContent-Disposition: form-data; name="title"\r\n\r\n\r\n--0ff96badd39c780eef5d44cbe26f2c5f\r\nContent-Disposition: form-data; name="cert_code"\r\n\r\n\r\n--0ff96badd39c780eef5d44cbe26f2c5f--\r\n' http://localhost:3300/api/student/uploads</failure>
+    </testcase>
+    <testcase name="PUT /api/student/leaderboard-visibility" time="0.189401">
+      <failure type="failure">1. Test Case ID: 9J31VJ
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/leaderboard-visibility</failure>
+    </testcase>
+    <testcase name="PUT /api/student/ledger" time="0.317899">
+      <failure type="failure">1. Test Case ID: Rn0H3p
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"01 Jan 2000 is locked — it could be filled in until 03 Jan 2000. A day stays open for 2 days after it ends."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"day": "2000-01-01", "cells": [{"slot": "", "activity": "", "hours": false}]}' http://localhost:3300/api/student/ledger</failure>
+      <failure type="failure">1. Test Case ID: 3gX4zU
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/ledger
+
+2. Test Case ID: XEk8vk
+
+- Response violates schema
+
+    "Unknown slot '5&lt;\\x81\\x82\\U000d53fd'." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Unknown slot '5&lt;\\x81\\x82\\U000d53fd'."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Unknown slot '5&lt;\\x81\\x82\\U000d53fd'."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"\u00c5@\u0007": [], "\u00d9R[\u0090\u000e\udbfb\ude6eVs\uda26\ude0f\u0088\ud962\udf13\udb38\udf02\udb39\udd36\u00f9\uda8e\udce1z": [-1.7976931348623157e+308], "\u00d1\u0017\u00a9\udaae\udd10\u0013\u00bd\u009f\ud8ad\udd87": {}, "day": "2026-09-30", "cells": [{"\u00c7\udae8\udf2d\u001b[": [], "\u00c7\u00ff\u00df\u0095\u00d7@\u008b\udad4\udf29D\u00e0\ud937\udd3b\u0004\u00aa\ud82a\udc77\u00e5\uda9f\ude17\u00fe\ud826\udef3&amp;\ud836\udd66%\udbf9\udfce\u00d5K\u00cf\u00d2": ["]"], "\udba2\udfa8?\u0017\u007f\u00e0": 729291356, "'"'"'\u00a9\u00f1": {"i\u0097d\u0082\u00d1\u008c\u00f8": ["\u008c"], "\u009e\u00d7\u009c-\u00a0": {"": "\u00b0\u0017K\u00b6cQ", "9\u00cf\u00bd?\ud992\udd8f\n": true}, "\u00bb\u0099\u00e5\u5818\uda15\ude18z": false}, "I\u0088": {"\u00c2,\u000bJ\u0085\u00bd\u00ea\u00bd \u0087\ud8b5\ude3b": 2.832373921770567e+16, "\u0019f\u0005": -1.192092896e-07, "": null}, "hours": 5.802387457609049, "activity": "\u00d3\u00c0$\u00b4\u00b1f\u00c7\udb9f\udd1d\u0085\u00b7\u00f0\u0082^X\u00bc\u00f6\u00ec\u00d9", "slot": "5&lt;\u0081\u0082\udb14\udffd"}]}' http://localhost:3300/api/student/ledger</failure>
+    </testcase>
+    <testcase name="PUT /api/student/profile" time="1.107184">
+      <failure type="failure">1. Test Case ID: 1hKqa4
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 200, 422
+
+[500] Internal Server Error:
+
+    `Internal Server Error`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"phone": null, "email": null, "linkedin_url": null, "github_url": null, "portfolio_url": null, "city": null, "career_summary": null, "interested_in_jobs": null, "interested_in_internships": null, "leaderboard_opt_out": 0, "education": null, "experience": null, "projects": null, "achievements": null}' http://localhost:3300/api/student/profile</failure>
+      <failure type="failure">1. Test Case ID: vFr09l
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/profile</failure>
+    </testcase>
+    <testcase name="PUT /api/student/resume-profile" time="0.271524">
+      <failure type="failure">1. Test Case ID: ah96Y1
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/resume-profile</failure>
+    </testcase>
+    <testcase name="GET /api/student/academics" time="0.035780" />
+    <testcase name="GET /api/student/attendance" time="0.026514" />
+    <testcase name="GET /api/student/badges" time="0.043013" />
+    <testcase name="GET /api/student/badges/leaderboards" time="0.293637">
+      <failure type="failure">1. Test Case ID: yYvcdo
+
+- Response violates schema
+
+    "Unknown view." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Unknown view."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Unknown view."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/badges/leaderboards?track=MARKETING&amp;view='</failure>
+    </testcase>
+    <testcase name="GET /api/student/courses" time="0.032073" />
+    <testcase name="GET /api/student/dashboard" time="0.028896" />
+    <testcase name="GET /api/student/english-baseline" time="0.039407" />
+    <testcase name="GET /api/student/english-baseline/report" time="0.055250">
+      <failure type="failure">1. Test Case ID: DjkqXW
+
+- Undocumented Content-Type
+
+    Received: application/pdf
+    Documented: application/json
+
+[200] OK:
+
+    &lt;BINARY&gt;
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/student/english-baseline/report</failure>
+    </testcase>
+    <testcase name="GET /api/student/focus" time="0.026838" />
+    <testcase name="GET /api/student/growth" time="0.033306" />
+    <testcase name="GET /api/student/jobs" time="0.046744" />
+    <testcase name="GET /api/student/leaderboards" time="0.161319">
+      <failure type="failure">1. Test Case ID: euhkXx
+
+- Response violates schema
+
+    "Unknown board. One of: overall, certificates, skills, vtu, streak, mocks." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Unknown board. One of: overall, certificates, skills, vtu, streak, mocks."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Unknown board. One of: overall, certificates, skills, vtu, streak, mocks."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/leaderboards?board=%F0%BA%83%9C%C3%91C&amp;%02%C3%BD%7C%C2%94%C3%AA=false'</failure>
+    </testcase>
+    <testcase name="GET /api/student/ledger" time="0.158188" />
+    <testcase name="GET /api/student/ledger/history" time="0.246576" />
+    <testcase name="GET /api/student/mentor-meetings" time="0.044878" />
+    <testcase name="GET /api/student/mocks" time="0.029510" />
+    <testcase name="GET /api/student/next-actions" time="0.043643" />
+    <testcase name="GET /api/student/offers" time="0.013678" />
+    <testcase name="GET /api/student/overview" time="0.082787" />
+    <testcase name="GET /api/student/placement-readiness" time="0.036113" />
+    <testcase name="GET /api/student/profile" time="0.014949" />
+    <testcase name="GET /api/student/programme" time="0.034030" />
+    <testcase name="GET /api/student/recommendations" time="0.026313" />
+    <testcase name="GET /api/student/results" time="0.026666" />
+    <testcase name="GET /api/student/resume" time="0.026505" />
+    <testcase name="GET /api/student/resume-profile" time="0.012083" />
+    <testcase name="GET /api/student/schedule" time="0.167859" />
+    <testcase name="GET /api/student/skill-claims" time="0.026395" />
+    <testcase name="GET /api/student/skills" time="0.031235" />
+    <testcase name="GET /api/student/skills/catalogue" time="0.024941" />
+    <testcase name="GET /api/student/streak" time="0.026644" />
+    <testcase name="GET /api/student/swoc" time="0.028174" />
+    <testcase name="GET /api/student/timesheet" time="0.189919" />
+    <testcase name="GET /api/student/uploads" time="0.015007" />
+    <testcase name="POST /api/student/jobs/{job_id}/apply" time="0.305872">
+      <failure type="failure">1. Test Case ID: jhOGH3
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�K�A��' http://localhost:3300/api/student/jobs/%C3%96%F2%BA%A2%A1%C3%95%C2%92%5E/apply
+
+2. Test Case ID: ryxxFM
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Job not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"R[\u0090\u000e\udbfb\ude6eVs\uda26\ude0f\u0088\ud962\udf13\udb38\udf02\udb39\udd36\u00f9\uda8e\udce1z": [-1.7976931348623157e+308], "\u00d1\u0017\u00a9\udaae\udd10\u0013\u00bd\u009f\ud8ad\udd87": {}}' http://localhost:3300/api/student/jobs/%C3%90%C3%85%40%07/apply</failure>
+    </testcase>
+    <testcase name="POST /api/student/offers/{offer_id}/submit" time="0.302013">
+      <failure type="failure">1. Test Case ID: jKHhQk
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Offer not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/student/offers/0/submit</failure>
+    </testcase>
+    <testcase name="POST /api/student/skill-claims" time="0.244756">
+      <failure type="failure">1. Test Case ID: 62bF8m
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 201, 422
+
+[404] Not Found:
+
+    `{"detail":"Skill not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"skill_id": "", "upload_id": "", "claimed_level": 3, "student_note": ""}' http://localhost:3300/api/student/skill-claims</failure>
+      <failure type="failure">1. Test Case ID: t2qPbG
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/skill-claims</failure>
+    </testcase>
+    <testcase name="GET /api/student/resume/{resume_id}/pdf" time="0.283816">
+      <failure type="failure">1. Test Case ID: L5hP0w
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Resume not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/resume/0/pdf?appendix=false'</failure>
+    </testcase>
+    <testcase name="GET /api/student/uploads/{upload_id}/file" time="0.289019">
+      <failure type="failure">1. Test Case ID: QAawxG
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Upload not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/student/uploads/0/file</failure>
+    </testcase>
+    <testcase name="DELETE /api/student/uploads/{upload_id}" time="0.352630">
+      <failure type="failure">1. Test Case ID: LEL4PJ
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 204, 422
+
+[404] Not Found:
+
+    `{"detail":"Upload not found."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/student/uploads/0</failure>
+    </testcase>
+    <testcase name="Stateful tests" time="1.865818" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,92 @@
+<div class="dialog-backdrop" (click)="dismiss()">
+  <div
+    #panel
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+    [attr.aria-labelledby]="titleId"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="dialog-head">
+      <div>
+        <h2 class="dialog-title" [id]="titleId">{{ headline() }}</h2>
+        <p class="dialog-sub">{{ subLine() }}</p>
+      </div>
+      <button type="button" class="btn ghost sm" aria-label="Close this dialog" (click)="dismiss()">
+        <span class="icon" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <div class="dialog-body">
+      @for (consequence of consequences(); track consequence.sentence) {
+        <div class="consequence" [class.kept]="consequence.isKept">
+          <span class="icon" aria-hidden="true">{{ consequence.icon }}</span>
+          <div>{{ consequence.sentence }}</div>
+        </div>
+      }
+
+      <div class="dialog-fields">
+        <div class="field">
+          <label for="disable-faculty-reason">Reason</label>
+          <input
+            id="disable-faculty-reason"
+            class="ctrl"
+            type="text"
+            required
+            placeholder="e.g. Left the institution"
+            [value]="reason()"
+            [disabled]="busy()"
+            [attr.aria-invalid]="reasonIsUsable() ? null : 'true'"
+            aria-describedby="disable-faculty-reason-help"
+            (input)="setReason($event)"
+          />
+          <span class="help" id="disable-faculty-reason-help">Required.</span>
+        </div>
+        <!-- DISABLED ON PURPOSE, and not through the pending directive: the
+             endpoint takes a reason and nothing else, and stamps the moment it
+             runs. There is no phase that brings a schedule, so the note says
+             what actually happens instead of naming one. -->
+        <div class="field dated">
+          <label for="disable-faculty-effective">Effective</label>
+          <input
+            id="disable-faculty-effective"
+            class="ctrl"
+            type="date"
+            disabled
+            [value]="today"
+            aria-describedby="disable-faculty-effective-help"
+          />
+          <span class="help" id="disable-faculty-effective-help">Takes effect immediately.</span>
+        </div>
+      </div>
+
+      <div class="notice accent">
+        <span class="icon" aria-hidden="true">undo</span>
+        Reversible: the account can be re-enabled by the Main Admin within {{ reversibleForDays | plural: 'day' }}
+        with its history intact — the functions are re-granted explicitly, never restored silently.
+        Deleting data is a separate, audited purge.
+      </div>
+
+      @if (error(); as message) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ message }}
+        </div>
+      }
+    </div>
+
+    <footer class="dialog-foot">
+      <button type="button" class="btn secondary" [disabled]="busy()" (click)="dismiss()">Cancel</button>
+      <button
+        type="button"
+        class="btn danger"
+        [disabled]="!canDisable()"
+        [title]="reasonIsUsable() ? '' : 'Give a reason first — the account cannot be disabled without one.'"
+        (click)="confirm()"
+      >
+        <span class="icon" aria-hidden="true">block</span>
+        {{ busy() ? 'Disabling…' : 'Disable account' }}
+      </button>
+    </footer>
+  </div>
+</div>

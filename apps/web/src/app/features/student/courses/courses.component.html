@@ -1,0 +1,119 @@
+<div class="dt-header">
+  <div>
+    <h1 class="dt-title">Courses</h1>
+    @if (state() === 'ready' && courses().length) {
+      <div class="dt-sub">
+        {{ courses().length }} enrolled · {{ inProgressCount() }} in progress ·
+        {{ completedCount() }} completed
+      </div>
+    }
+  </div>
+</div>
+
+@if (state() === 'loading') {
+  <div class="card c-note">Loading your courses…</div>
+} @else if (state() === 'error') {
+  <div class="card c-note">
+    We could not load your courses just now. Please refresh in a moment.
+  </div>
+} @else if (!courses().length) {
+  <div class="card c-note">
+    You are not enrolled in any courses yet. Enrol below, or they appear here once the office
+    registers you for the semester.
+  </div>
+} @else {
+  <div class="plan-list">
+    @for (c of courses(); track c.code) {
+      @let chip = statusChip(c.status);
+      <div class="card plan-card">
+        <div class="plan-top">
+          <div class="plan-id">
+            <div class="c-name">{{ c.name }}</div>
+            <div class="c-code">
+              {{ c.code }} · Sem {{ c.semester }} · {{ stageLabel(c.stage) }}
+            </div>
+          </div>
+          <span class="chip {{ chip.cls }}">
+            <span class="icon" aria-hidden="true">{{ chip.icon }}</span
+            >{{ chip.label }}
+          </span>
+        </div>
+
+        <div class="plan-meter">
+          <div
+            class="meter"
+            role="progressbar"
+            [attr.aria-valuenow]="c.progress_pct"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-label]="c.name + ' progress'"
+          >
+            <div class="meter__fill" [style.width.%]="c.progress_pct"></div>
+          </div>
+          <div class="plan-pct">{{ c.progress_pct }}% complete</div>
+        </div>
+
+        <div class="plan-next">
+          <span class="icon" aria-hidden="true">arrow_forward</span>
+          <span class="plan-next-label">Next:</span> {{ c.next_task }}
+        </div>
+
+        <div class="plan-facts">
+          <span class="fact">
+            <span class="icon" aria-hidden="true">menu_book</span>
+            {{ c.lectures_attended }}/{{ c.lectures_total }} lectures
+          </span>
+          @if (c.status !== 'COMPLETED' && lecturesLeft(c) > 0) {
+            <span class="fact">
+              <span class="icon" aria-hidden="true">schedule</span>
+              {{ lecturesLeft(c) }} {{ lecturesLeft(c) === 1 ? 'lecture' : 'lectures' }} left
+            </span>
+          }
+        </div>
+
+        <div class="plan-foot">
+          <a
+            class="dt-btn primary sm"
+            routerLink="/student/courses"
+            [attr.aria-label]="'Continue ' + c.name"
+          >
+            <span class="icon" aria-hidden="true">play_arrow</span>Continue
+          </a>
+          <span class="chip neutral unlocks">
+            <span class="icon" aria-hidden="true">lock_open</span>Unlocks: {{ c.unlocks }}
+          </span>
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@if (available().length) {
+  <h2 class="avail-title">Open for enrolment</h2>
+  <p class="dt-sub">Courses for your current semester. Paid courses are added once your payment is confirmed.</p>
+  @if (notice(); as n) {
+    <div class="card c-note" [class.risk]="n.tone === 'risk'" role="status">{{ n.text }}</div>
+  }
+  <div class="plan-list">
+    @for (a of available(); track a.code) {
+      <div class="card avail-card">
+        <div class="plan-id">
+          <div class="c-name">{{ a.name }}</div>
+          <div class="c-code">{{ a.code }} · Sem {{ a.semester }} · {{ stageLabel(a.stage) }}</div>
+        </div>
+        <div class="avail-fee">{{ a.fee_paise ? '₹' + a.fee : 'Free' }}</div>
+        <button
+          type="button"
+          class="dt-btn primary sm"
+          [disabled]="enrolling() !== null"
+          (click)="enroll(a)"
+          [attr.aria-label]="(a.fee_paise ? 'Pay ₹' + a.fee + ' and enroll in ' : 'Enroll in ') + a.name"
+        >
+          {{ enrolling() === a.code ? 'Please wait…' : a.fee_paise ? 'Pay & enroll' : 'Enroll' }}
+        </button>
+      </div>
+    }
+  </div>
+} @else if (notice(); as n) {
+  <div class="card c-note" [class.risk]="n.tone === 'risk'" role="status">{{ n.text }}</div>
+}

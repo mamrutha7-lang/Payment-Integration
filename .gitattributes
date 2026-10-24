@@ -1,0 +1,28 @@
+# Line endings, scoped deliberately narrowly.
+#
+# The rule that earns its place is the shell one. tools/ci/preflight.sh and
+# tools/ci/protect-main.sh are executed by the Ubuntu runner and by developers in
+# Git Bash. A script committed with CRLF from a Windows clone fails as
+# `bad interpreter: /usr/bin/env bash^M`, which reads as a missing binary rather
+# than as a line-ending problem, and costs an afternoon to recognise.
+*.sh   text eol=lf
+*.bash text eol=lf
+
+# PowerShell is the other direction: Windows tooling expects CRLF, which is why
+# .pre-commit-config.yaml excludes `\.ps1$` from mixed-line-ending.
+*.ps1  text eol=crlf
+
+# There is deliberately NO global `* text=auto eol=lf` here. 29 tracked files are
+# stored CRLF in the index today -- among them apps/api-py/app/config.py and
+# app/interview_relay.py, which are live backend source. A global rule would
+# renormalise all 29 on the next `git add`, burying a whitespace migration inside
+# whatever change happened to carry it. That migration may well be worth doing;
+# it is worth doing as its own commit, where the diff is the point rather than
+# the noise. Check the current state with `git ls-files --eol | grep i/crlf`.
+
+# Terraform heredocs are sent to AWS verbatim: the CloudFront function body in
+# infra/aws/cdn.tf, checked out CRLF on Windows, made `terraform plan` propose
+# to rewrite a live function that differed only by a carriage return per line.
+# The index already holds the .tf files LF, so this rule renormalises nothing;
+# it only stops autocrlf undoing that on checkout (docs/cdk-cutover.md step 0).
+*.tf   text eol=lf

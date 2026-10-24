@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- REEP API performance test plan. Run NON-GUI only (see testing/jmeter/run.sh).
+     Every knob is a JMeter property: -Jthreads -Jrampup -Jduration -Jthink_ms -Jsla_ms -Jhost -Jport -Jprotocol -Jmax_users -Juser_prefix -Juser_password -->
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+<hashTree>
+<TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="REEP API - load, stress, spike, soak" enabled="true">
+<boolProp name="TestPlan.functional_mode">false</boolProp><boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+<elementProp name="TestPlan.user_defined_variables" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp>
+</TestPlan>
+<hashTree><ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP defaults" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp>
+<stringProp name="HTTPSampler.domain">${__P(host,localhost)}</stringProp><stringProp name="HTTPSampler.port">${__P(port,3300)}</stringProp><stringProp name="HTTPSampler.protocol">${__P(protocol,http)}</stringProp><stringProp name="HTTPSampler.connect_timeout">5000</stringProp><stringProp name="HTTPSampler.response_timeout">30000</stringProp><stringProp name="HTTPSampler.implementation">HttpClient4</stringProp>
+</ConfigTestElement><hashTree/>
+<HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="JSON headers" enabled="true"><collectionProp name="HeaderManager.headers">
+<elementProp name="" elementType="Header"><stringProp name="Header.name">Content-Type</stringProp><stringProp name="Header.value">application/json</stringProp></elementProp>
+<elementProp name="" elementType="Header"><stringProp name="Header.name">Accept</stringProp><stringProp name="Header.value">application/json</stringProp></elementProp>
+<elementProp name="" elementType="Header"><stringProp name="Header.name">User-Agent</stringProp><stringProp name="Header.value">REEP-JMeter-LoadTest/1.0</stringProp></elementProp>
+</collectionProp></HeaderManager><hashTree/><ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Student journey (authenticated)" enabled="true">
+<stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+<elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController"><boolProp name="LoopController.continue_forever">false</boolProp><intProp name="LoopController.loops">-1</intProp></elementProp>
+<stringProp name="ThreadGroup.num_threads">${__P(threads,50)}</stringProp><stringProp name="ThreadGroup.ramp_time">${__P(rampup,30)}</stringProp><boolProp name="ThreadGroup.scheduler">true</boolProp><stringProp name="ThreadGroup.duration">${__P(duration,180)}</stringProp><stringProp name="ThreadGroup.delay"></stringProp><boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+</ThreadGroup>
+<hashTree><CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="Session cookie (reep_session)" enabled="true"><collectionProp name="CookieManager.cookies"/><boolProp name="CookieManager.clearEachIteration">false</boolProp><boolProp name="CookieManager.controlledByThreadGroup">false</boolProp></CookieManager><hashTree/><OnceOnlyController guiclass="OnceOnlyControllerGui" testclass="OnceOnlyController" testname="Sign in once per virtual user" enabled="true"/>
+<hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST /api/auth/login" enabled="true">
+<boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments">
+<elementProp name="" elementType="HTTPArgument"><boolProp name="HTTPArgument.always_encode">false</boolProp><stringProp name="Argument.value">{"email":"${email}","password":"${password}"}</stringProp><stringProp name="Argument.metadata">=</stringProp></elementProp>
+</collectionProp></elementProp><stringProp name="HTTPSampler.path">/api/auth/login</stringProp><stringProp name="HTTPSampler.method">POST</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><JSR223PreProcessor guiclass="TestBeanGUI" testclass="JSR223PreProcessor" testname="One account per virtual user" enabled="true">
+<stringProp name="scriptLanguage">groovy</stringProp><stringProp name="parameters"></stringProp><stringProp name="filename"></stringProp><stringProp name="cacheKey">true</stringProp>
+<stringProp name="script">// Thread N (1-based) signs in as loadtestNNN. Deterministic on purpose: REEP keeps ONE
+// live session per account, so two virtual users on one account retire each other (401).
+// A CSV Data Set hands out a new line on EVERY iteration and caused exactly that.
+int n = ctx.getThreadNum() + 1
+int max = (props.get('max_users') ?: '100') as int
+if (n &gt; max) { throw new IllegalStateException('threads &gt; load-test accounts (' + max + ')') }
+vars.put('email', String.format('%s%03d@bgscet.ac.in', props.get('user_prefix') ?: 'loadtest', n))
+vars.put('password', props.get('user_password') ?: 'LoadTest#2026')</stringProp>
+</JSR223PreProcessor><hashTree/><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><JSONPathAssertion guiclass="JSONPathAssertionGui" testclass="JSONPathAssertion" testname="JSON $.role" enabled="true">
+<stringProp name="JSON_PATH">$.role</stringProp><stringProp name="EXPECTED_VALUE">STUDENT</stringProp><boolProp name="JSONVALIDATION">true</boolProp><boolProp name="EXPECT_NULL">false</boolProp><boolProp name="INVERT">false</boolProp><boolProp name="ISREGEX">false</boolProp>
+</JSONPathAssertion><hashTree/></hashTree></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/auth/me" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/auth/me</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/student/dashboard" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/student/dashboard</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/student/programme" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/student/programme</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/student/jobs" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/student/jobs</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/student/leaderboards" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/student/leaderboards</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/student/ledger" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/student/ledger</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/student/badges" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/student/badges</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/student/timesheet" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/student/timesheet</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/student/placement-readiness" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/student/placement-readiness</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/student/profile" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/student/profile</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Think time" enabled="true">
+<stringProp name="ConstantTimer.delay">${__P(think_ms,500)}</stringProp><stringProp name="RandomTimer.range">${__P(think_jitter_ms,500)}</stringProp></UniformRandomTimer><hashTree/></hashTree><ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Public endpoints (anonymous)" enabled="true">
+<stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+<elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController"><boolProp name="LoopController.continue_forever">false</boolProp><intProp name="LoopController.loops">-1</intProp></elementProp>
+<stringProp name="ThreadGroup.num_threads">${__P(public_threads,5)}</stringProp><stringProp name="ThreadGroup.ramp_time">${__P(rampup,30)}</stringProp><boolProp name="ThreadGroup.scheduler">true</boolProp><stringProp name="ThreadGroup.duration">${__P(duration,180)}</stringProp><stringProp name="ThreadGroup.delay"></stringProp><boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+</ThreadGroup>
+<hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /health" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/health</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/auth/sso/status" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/auth/sso/status</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET /api/register/hierarchy" enabled="true">
+<elementProp name="HTTPsampler.Arguments" elementType="Arguments"><collectionProp name="Arguments.arguments"/></elementProp><stringProp name="HTTPSampler.path">/api/register/hierarchy</stringProp><stringProp name="HTTPSampler.method">GET</stringProp><boolProp name="HTTPSampler.follow_redirects">false</boolProp><boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+</HTTPSamplerProxy>
+<hashTree><ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="Status 200" enabled="true">
+<collectionProp name="Asserion.test_strings"><stringProp name="0">200</stringProp></collectionProp>
+<stringProp name="Assertion.custom_message"></stringProp><stringProp name="Assertion.test_field">Assertion.response_code</stringProp><boolProp name="Assertion.assume_success">false</boolProp><intProp name="Assertion.test_type">8</intProp>
+</ResponseAssertion><hashTree/><DurationAssertion guiclass="DurationAssertionGui" testclass="DurationAssertion" testname="SLA ${__P(sla_ms,1000)} ms" enabled="true">
+<stringProp name="DurationAssertion.duration">${__P(sla_ms,1000)}</stringProp></DurationAssertion><hashTree/></hashTree><UniformRandomTimer guiclass="UniformRandomTimerGui" testclass="UniformRandomTimer" testname="Think time" enabled="true">
+<stringProp name="ConstantTimer.delay">${__P(think_ms,500)}</stringProp><stringProp name="RandomTimer.range">${__P(think_jitter_ms,500)}</stringProp></UniformRandomTimer><hashTree/></hashTree></hashTree>
+</hashTree>
+</jmeterTestPlan>

@@ -1,0 +1,185 @@
+<!-- data-p="family" — parents + optional guardian/sibling records. -->
+<div class="card">
+  <h3>Father's details</h3>
+  <div class="grid2">
+    <div class="field">
+      <label>Name</label>
+      <input
+        class="ctrl"
+        placeholder="Father's name"
+        [ngModel]="m.father.name"
+        (ngModelChange)="m.father.name = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Occupation</label>
+      <input
+        class="ctrl"
+        placeholder="Occupation"
+        [ngModel]="m.father.occupation"
+        (ngModelChange)="m.father.occupation = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Organisation</label>
+      <input
+        class="ctrl"
+        placeholder="Organisation"
+        [ngModel]="m.father.organisation"
+        (ngModelChange)="m.father.organisation = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Designation</label>
+      <input
+        class="ctrl"
+        placeholder="Designation"
+        [ngModel]="m.father.designation"
+        (ngModelChange)="m.father.designation = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input
+        class="ctrl"
+        placeholder="Enter email"
+        [ngModel]="m.father.email"
+        (ngModelChange)="m.father.email = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Phone number</label>
+      <div class="inline">
+        <select class="ctrl code">
+          <option>+91</option>
+        </select>
+        <input
+          class="ctrl"
+          placeholder="Enter phone"
+          [ngModel]="m.father.phone"
+          (ngModelChange)="m.father.phone = $event; push()"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Mother's details</h3>
+  <div class="grid2">
+    <div class="field">
+      <label>Name</label>
+      <input
+        class="ctrl"
+        placeholder="Mother's name"
+        [ngModel]="m.mother.name"
+        (ngModelChange)="m.mother.name = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Occupation</label>
+      <input
+        class="ctrl"
+        placeholder="Occupation"
+        [ngModel]="m.mother.occupation"
+        (ngModelChange)="m.mother.occupation = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Organisation</label>
+      <input
+        class="ctrl"
+        placeholder="Organisation"
+        [ngModel]="m.mother.organisation"
+        (ngModelChange)="m.mother.organisation = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Designation</label>
+      <input
+        class="ctrl"
+        placeholder="Designation"
+        [ngModel]="m.mother.designation"
+        (ngModelChange)="m.mother.designation = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input
+        class="ctrl"
+        placeholder="Enter email"
+        [ngModel]="m.mother.email"
+        (ngModelChange)="m.mother.email = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Phone number</label>
+      <div class="inline">
+        <select class="ctrl code">
+          <option>+91</option>
+        </select>
+        <input
+          class="ctrl"
+          placeholder="Enter phone"
+          [ngModel]="m.mother.phone"
+          (ngModelChange)="m.mother.phone = $event; push()"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>
+    Guardian / siblings
+    <button type="button" class="addlink right" (click)="addGuardian()">
+      <span class="icon" style="font-size: 15px" aria-hidden="true">add</span> Add
+    </button>
+  </h3>
+  <div class="desc">
+    Optional. Only used where the placement office requires next-of-kin details.
+  </div>
+  @for (g of m.guardians; track $index) {
+    <div class="entry">
+      <div class="tools">
+        <button type="button" (click)="removeGuardian($index)" aria-label="Remove this guardian">
+          <span class="icon" style="font-size: 17px" aria-hidden="true">delete</span>
+        </button>
+      </div>
+      <div class="grid3">
+        <div class="field">
+          <label>Name</label>
+          <input
+            class="ctrl"
+            placeholder="Full name"
+            [ngModel]="g.name"
+            (ngModelChange)="g.name = $event; push()"
+          />
+        </div>
+        <div class="field">
+          <label>Relationship</label>
+          <input
+            class="ctrl"
+            placeholder="e.g. Guardian, Sister"
+            [ngModel]="g.relationship"
+            (ngModelChange)="g.relationship = $event; push()"
+          />
+        </div>
+        <div class="field">
+          <label>Phone number</label>
+          <div class="inline">
+            <select class="ctrl code">
+              <option>+91</option>
+            </select>
+            <input
+              class="ctrl"
+              placeholder="Enter phone"
+              [ngModel]="g.phone"
+              (ngModelChange)="g.phone = $event; push()"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

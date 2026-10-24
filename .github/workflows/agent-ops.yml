@@ -1,0 +1,73 @@
+# Operate: route every production signal to the triage agent.
+#
+#   Infra drift finished and left an open `infra-drift` issue -> triage it
+#   A human deploy (deploy.yml / cdk-deploy.yml) failed        -> triage it
+#   An issue was labelled `incident`                            -> triage it
+#     (by you, or by Sentry's GitHub integration: in Sentry, set an alert rule
+#      whose action creates a GitHub issue with the label `incident`)
+#
+# Automatic deploys are triaged by agent-release.yml itself, so runs started by
+# github-actions[bot] are skipped here rather than triaged twice.
+#
+# Only people with triage access can add a label, which is what makes the
+# `incident` path trusted to START. The issue TEXT is still untrusted (a Sentry
+# message can carry user input) and agent-triage.yml says so to the agent.
+
+name: Agent ops
+
+on:
+  workflow_run:
+    workflows: ["Infra drift", "Deploy", "CDK deploy"]
+    types: [completed]
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  actions: read
+  id-token: write
+
+jobs:
+  route:
+    runs-on: ubuntu-latest
+    outputs:
+      kind: ${{ steps.pick.outputs.kind }}
+      subject: ${{ steps.pick.outputs.subject }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Decide what, if anything, needs triage
+        id: pick
+        run: |
+          EVENT="${{ github.event_name }}"
+          if [ "$EVENT" = "issues" ]; then
+            if [ "${{ github.event.label.name }}" = "incident" ]; then
+              echo "kind=incident" >> "$GITHUB_OUTPUT"
+              echo "subject=${{ github.event.issue.number }}" >> "$GITHUB_OUTPUT"
+            fi
+            exit 0
+          fi
+          WF="${{ github.event.workflow_run.name }}"
+          CONCLUSION="${{ github.event.workflow_run.conclusion }}"
+          ACTOR="${{ github.event.workflow_run.triggering_actor.login }}"
+          if [ "$WF" = "Infra drift" ]; then
+            N=$(gh issue list --repo "${{ github.repository }}" --label infra-drift --state open \
+                  --limit 1 --json number --jq '.[0].number // ""')
+            if [ -n "$N" ]; then
+              echo "kind=infra-drift" >> "$GITHUB_OUTPUT"; echo "subject=$N" >> "$GITHUB_OUTPUT"
+            fi
+          elif [ "$CONCLUSION" = "failure" ] && [ "$ACTOR" != "github-actions[bot]" ]; then
+            echo "kind=deploy-failure" >> "$GITHUB_OUTPUT"
+            echo "subject=${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
+          fi
+
+  triage:
+    needs: route
+    if: needs.route.outputs.kind != ''
+    uses: ./.github/workflows/agent-triage.yml
+    with:
+      kind: ${{ needs.route.outputs.kind }}
+      subject: ${{ needs.route.outputs.subject }}
+    secrets: inherit

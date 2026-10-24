@@ -1,0 +1,86 @@
+Schemathesis v4.28.0
+━━━━━━━━━━━━━━━━━━━━
+
+
+ ✅  Loaded specification from http://localhost:3300/openapi.json (in 0.47s)    
+
+     Base URL:         http://localhost:3300/                                   
+     Specification:    Open API 3.1.0                                           
+     Operations:       4 selected / 370 total                                   
+
+
+ ✅  API capabilities:                                                          
+
+     Supports NULL byte in headers:                            ✘                
+     Accepts backslash and control characters in URL paths:    ✓                
+     Cache:                                                    1 stale          
+                                                               removed          
+
+ ⏭   Examples (in 0.01s)                                                        
+                                                                                
+     ⏭  4 skipped                                                               
+
+ ❌  Coverage (in 0.11s)                                                        
+                                                                                
+     ✅ 3 passed  ❌ 1 failed                                                   
+
+ ❌  Fuzzing (in 0.12s)                                                         
+                                                                                
+     ✅ 3 passed  ❌ 1 failed                                                   
+
+=================================== FAILURES ===================================
+__________________________ GET /api/interview/status ___________________________
+1. Test Case ID: DOEWkv
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET http://localhost:3300/api/interview/status
+    
+    st replay DOEWkv
+
+=================================== WARNINGS ===================================
+
+Authentication failed: 1 operation returned authentication errors
+
+401 Unauthorized (1 operation):
+  - GET /api/interview/status
+
+💡 Ensure valid authentication credentials are set via --auth or -H
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 4/370
+  Tested: 4
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ Undocumented HTTP status code: 1
+
+Warnings:
+  ⚠️ Missing authentication: 1 operation returned only 401/403 responses
+
+Test cases:
+  36 generated, 1 found 1 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis/public/junit-20260929T210847Z.xml
+  - NDJSON: results/api/schemathesis/public/ndjson-20260929T210847Z.ndjson
+
+Seed: 136633938779889345716284045364863252318
+
+======================== 1 failure, 1 warning in 0.38s =========================

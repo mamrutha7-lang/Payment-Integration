@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>REEP — Student Desktop App (v2, full spec)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink-900:#1c1810; --ink-800:#2a231a; --ink-700:#443c2d; --ink-500:#5a5142; --ink-400:#847a67;
+  --paper-0:#efe9dd; --paper-1:#f8f4ec; --paper-2:#fffdf8;
+  --amber-700:#6b4413; --amber-600:#8a5a1e; --amber-500:#a8752f; --amber-400:#c99a4e; --amber-300:#e8c48c;
+  --line: rgba(28,24,16,.12);
+  --good:#5c7a3a; --warn:#a8752f; --risk:#8b3a2e;
+  --radius-lg:20px; --radius-md:14px; --radius-sm:10px;
+  --shadow-lift: 0 4px 10px rgba(28,24,16,.08), 0 16px 40px rgba(28,24,16,.10);
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+*{box-sizing:border-box;}
+body{margin:0; font-family:var(--font); background:#d8d0bd; color:var(--ink-900); -webkit-font-smoothing:antialiased;}
+.icon{font-family:'Material Symbols Rounded'; font-variation-settings:'opsz' 24,'wght' 400,'FILL' 0,'GRAD' 0; font-size:20px; line-height:1; vertical-align:middle;}
+h1,h2,h3,h4,p{margin:0;}
+button{font-family:var(--font); cursor:pointer; border:none; background:none;}
+.meta-bar{position:sticky; top:0; z-index:50; background:var(--ink-900); color:var(--paper-1); padding:10px 20px; display:flex; align-items:center; gap:16px; font-size:13px;}
+.meta-tabs{display:flex; gap:6px; background:rgba(255,255,255,.08); padding:4px; border-radius:999px;}
+.meta-tabs button{padding:7px 14px; border-radius:999px; color:var(--paper-1); font-size:12.5px; font-weight:600; opacity:.65;}
+.meta-tabs button.active{background:var(--paper-1); color:var(--ink-900); opacity:1;}
+.meta-note{opacity:.6; font-size:12px; margin-left:auto;}
+.wrap{display:flex; justify-content:center; padding:32px 20px 70px;}
+.stage-view{display:none;} .stage-view.active{display:flex; justify-content:center; width:100%;}
+
+/* --- registration (own frame, no sidebar) --- */
+.reg-frame{width:820px; max-width:100%; border-radius:16px; overflow:hidden; box-shadow:var(--shadow-lift); background:var(--paper-2); padding:40px;}
+.reg-frame h2{font-size:22px; font-weight:800; margin-bottom:4px;}
+.reg-sub{color:var(--ink-500); font-size:13.5px; margin-bottom:26px;}
+.reg-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+.field{margin-bottom:14px;}
+.field label{font-size:12px; font-weight:700; color:var(--ink-500); display:block; margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+.field input, .field textarea, .field select{width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--line); background:var(--paper-1); font-size:13.5px; font-family:var(--font);}
+.dropzone{border:2px dashed var(--line); border-radius:var(--radius-md); padding:26px; text-align:center; color:var(--ink-500); background:var(--paper-1); margin-bottom:16px;}
+.dropzone .icon{font-size:28px; color:var(--amber-600); margin-bottom:6px; display:block;}
+.autofill-note{background:rgba(92,122,58,.1); color:var(--good); border-radius:10px; padding:12px 14px; font-size:12.5px; margin-bottom:18px; display:flex; gap:8px; align-items:center;}
+.dt-btn{padding:9px 16px; border-radius:8px; border:1px solid var(--line); background:var(--paper-1); font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px;}
+.dt-btn.primary{background:var(--ink-900); color:var(--paper-1); border-color:var(--ink-900);}
+.chip{display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:8px; font-size:12px; font-weight:700;}
+.chip.good{background:rgba(92,122,58,.12); color:var(--good);}
+.chip.warn{background:rgba(168,117,47,.14); color:var(--warn);}
+.chip.risk{background:rgba(139,58,46,.12); color:var(--risk);}
+.chip .icon{font-size:14px;}
+.reg-approval{border-radius:10px; padding:14px; margin-top:6px; font-size:12.5px; display:flex; gap:10px; align-items:flex-start;}
+.reg-approval.ok{background:rgba(92,122,58,.1); color:var(--good);}
+.reg-approval.flag{background:rgba(168,117,47,.12); color:var(--warn);}
+
+/* --- desktop app --- */
+.desktop-frame{width:1300px; max-width:100%; border-radius:12px; overflow:hidden; box-shadow:var(--shadow-lift); background:var(--paper-0); border:1px solid #00000018;}
+.desktop-titlebar{background:var(--ink-900); color:var(--paper-1); padding:8px 16px; font-size:12px; display:flex; align-items:center; gap:8px;}
+.desktop-shell{display:flex; min-height:740px;}
+.desktop-nav{width:220px; background:var(--paper-1); border-right:1px solid var(--line); padding:18px 14px; flex:0 0 auto;}
+.desktop-nav .brand{font-weight:800; font-size:16px; padding:6px 10px 18px;}
+.desktop-nav a{display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:9px; font-size:13px; font-weight:600; color:var(--ink-500); margin-bottom:2px; cursor:pointer;}
+.desktop-nav a.active{background:var(--ink-900); color:var(--paper-1);}
+.desktop-nav .sec-label{font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-400); padding:16px 12px 6px; font-weight:700;}
+.desktop-main{flex:1; padding:24px 30px; overflow:auto;}
+.panel{display:none;} .panel.active{display:block;}
+.dt-header{display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;}
+.dt-title{font-size:19px; font-weight:800;}
+.dt-sub{color:var(--ink-500); font-size:13px; margin-top:3px;}
+.dt-toolbar{display:flex; gap:8px;}
+.dense-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:18px;}
+.dense-stat{background:var(--paper-1); border:1px solid var(--line); border-radius:10px; padding:14px;}
+.dense-stat .lbl{font-size:11px; color:var(--ink-500); font-weight:600; text-transform:uppercase; letter-spacing:.04em;}
+.dense-stat .val{font-size:22px; font-weight:800; margin-top:4px;}
+.dt-table{width:100%; border-collapse:collapse; background:var(--paper-1); border:1px solid var(--line); border-radius:10px; overflow:hidden; font-size:12.6px; margin-bottom:18px;}
+.dt-table th{text-align:left; padding:9px 13px; background:var(--paper-0); color:var(--ink-500); font-weight:700; font-size:10.8px; text-transform:uppercase; letter-spacing:.04em;}
+.dt-table td{padding:9px 13px; border-top:1px solid var(--line); vertical-align:middle;}
+.tabs-row{display:flex; gap:6px; margin-bottom:16px; border-bottom:1px solid var(--line);}
+.tabs-row button{padding:10px 14px; font-size:13px; font-weight:700; color:var(--ink-500); border-bottom:2px solid transparent;}
+.tabs-row button.active{color:var(--ink-900); border-color:var(--ink-900);}
+.grid-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.grid-2{display:grid; grid-template-columns:1.4fr 1fr; gap:16px;}
+.card{background:var(--paper-1); border:1px solid var(--line); border-radius:var(--radius-md); padding:18px; margin-bottom:16px;}
+.card h4{font-size:13.5px; font-weight:700; margin-bottom:12px; display:flex; justify-content:space-between;}
+/* fake charts */
+.bar-chart{display:flex; align-items:flex-end; gap:8px; height:120px; padding-top:10px;}
+.bar-chart .bar{flex:1; background:linear-gradient(180deg,var(--amber-400),var(--amber-600)); border-radius:5px 5px 0 0; position:relative;}
+.bar-chart .bar span{position:absolute; top:-18px; left:0; right:0; text-align:center; font-size:10.5px; font-weight:700; color:var(--ink-500);}
+.bar-labels{display:flex; gap:8px; margin-top:6px;}
+.bar-labels div{flex:1; text-align:center; font-size:10px; color:var(--ink-500);}
+.donut{width:110px; height:110px; border-radius:50%; background:conic-gradient(var(--amber-600) 0% 62%, var(--line) 62% 100%); display:flex; align-items:center; justify-content:center; margin:0 auto;}
+.donut span{background:var(--paper-1); width:74px; height:74px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px;}
+.swoc-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.swoc-box{border-radius:10px; padding:12px; font-size:12px;}
+.swoc-box b{display:block; font-size:11px; text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px;}
+.swoc-s{background:rgba(92,122,58,.1); color:var(--good);}
+.swoc-w{background:rgba(139,58,46,.1); color:var(--risk);}
+.swoc-o{background:rgba(168,117,47,.1); color:var(--warn);}
+.swoc-c{background:var(--paper-2); color:var(--ink-500); border:1px solid var(--line);}
+.badge-row{display:flex; gap:10px; flex-wrap:wrap;}
+.badge{width:64px; text-align:center; font-size:10.5px; color:var(--ink-500);}
+.badge .ico{width:52px; height:52px; border-radius:14px; background:linear-gradient(135deg,var(--amber-400),var(--amber-700)); color:#fff; display:flex; align-items:center; justify-content:center; margin:0 auto 6px;}
+.badge.locked .ico{background:var(--line); color:var(--ink-400);}
+.reco-row{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line); font-size:12.5px;}
+.reco-row:last-child{border-bottom:none;}
+.reco-rank{width:20px; font-weight:800; color:var(--amber-600);}
+.streak-row{display:flex; gap:6px;}
+.streak-day{width:26px; height:26px; border-radius:7px; background:var(--line);}
+.streak-day.on{background:var(--amber-600);}
+.match-bar{width:60px; height:6px; border-radius:3px; background:var(--line); display:inline-block; overflow:hidden; vertical-align:middle; margin-right:6px;}
+.match-fill{height:100%; background:var(--good);}
+.lb-row{display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:10px; margin-bottom:6px;}
+.lb-row.me{background:var(--ink-900); color:var(--paper-1);}
+.lb-row:not(.me){background:var(--paper-1); border:1px solid var(--line);}
+.lb-rank{width:22px; font-weight:800; text-align:center;}
+.lb-avatar{width:30px; height:30px; border-radius:8px; background:var(--amber-500); color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;}
+.ts-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:16px;}
+.ts-cell{background:var(--paper-1); border:1px solid var(--line); border-radius:12px; padding:14px; text-align:center;}
+.ts-cell .icon{font-size:24px; color:var(--amber-600); display:block; margin-bottom:8px;}
+.ts-cell input{width:60px; text-align:center; padding:6px; border-radius:6px; border:1px solid var(--line); font-family:var(--font); font-size:13px;}
+.ts-cell small{display:block; font-size:11px; color:var(--ink-500); margin-top:6px;}
+</style>
+</head>
+<body>
+<div class="meta-bar">
+  <b>REEP — v2 (full spec)</b>
+  <div class="meta-tabs" id="views">
+    <button data-view="reg" class="active">Registration</button>
+    <button data-view="app">Student App</button>
+  </div>
+  <span class="meta-note">Desktop pass · matches pasted functional spec</span>
+</div>
+
+<div class="wrap">
+
+<!-- ============================== REGISTRATION ============================== -->
+<div class="stage-view active" data-view-panel id="view-reg">
+  <div class="reg-frame">
+    <h2>Student registration</h2>
+    <div class="reg-sub">Fill the form yourself, or upload your CV and we'll auto-fill what we can read from it.</div>
+    <div class="dropzone"><span class="icon">upload_file</span>Upload CV to auto-fill (PDF/DOCX)<br><button class="dt-btn" style="margin-top:10px">Choose file</button></div>
+    <div class="autofill-note"><span class="icon">auto_awesome</span> Auto-filled from CV: name, education, phone, LinkedIn. Please review before submitting.</div>
+    <div class="reg-grid">
+      <div class="field"><label>Full name</label><input value="Aditi Kulkarni"></div>
+      <div class="field"><label>USN</label><input value="1BG24MBA014"></div>
+      <div class="field"><label>College email</label><input value="aditi.k@bgscet.ac.in"></div>
+      <div class="field"><label>Personal email</label><input placeholder="optional"></div>
+      <div class="field"><label>Phone</label><input value="+91 98450 xxxxx"></div>
+      <div class="field"><label>LinkedIn profile</label><input value="linkedin.com/in/aditikulkarni"></div>
+    </div>
+    <div class="field"><label>Professional photo</label><div class="dropzone" style="padding:16px;"><span class="icon" style="font-size:20px; margin-bottom:0">photo_camera</span> Upload a headshot</div></div>
+    <div class="reg-approval ok"><span class="icon">check_circle</span><div><b>Domain matched — auto-approved.</b> aditi.k@bgscet.ac.in is within the approved bgscet.ac.in domain. Your account is active immediately.</div></div>
+    <div class="reg-approval flag" style="margin-top:10px;"><span class="icon">flag</span><div><b>Example — flagged case:</b> a registration from a non-institutional email is held for review and routed to <b>Admin</b> for manual approval before the account activates.</div></div>
+    <div style="margin-top:20px; display:flex; gap:10px;"><button class="dt-btn primary" data-goto="app">Submit registration <span class="icon" style="font-size:16px">arrow_forward</span></button></div>
+  </div>
+</div>
+
+<!-- ============================== APP ============================== -->
+<div class="stage-view" data-view-panel id="view-app">
+  <div class="desktop-frame">
+    <div class="desktop-titlebar"><span class="icon" style="font-size:14px">school</span> REEP — Student</div>
+    <div class="desktop-shell">
+      <div class="desktop-nav" id="nav">
+        <div class="brand">REEP</div>
+        <a class="active" data-panel="landing"><span class="icon">home</span> Landing</a>
+        <a data-panel="jobs"><span class="icon">work</span> Jobs</a>
+        <a data-panel="skilling"><span class="icon">verified</span> Skilling</a>
+        <a data-panel="leaderboards"><span class="icon">leaderboard</span> Leaderboards</a>
+        <a data-panel="timesheet"><span class="icon">schedule</span> Time Sheet</a>
+        <div class="sec-label">Programme</div>
+        <a data-panel="certs"><span class="icon">workspace_premium</span> Certifications</a>
+        <a data-panel="courses"><span class="icon">menu_book</span> Courses</a>
+        <div class="sec-label">Documents</div>
+        <a data-panel="uploads"><span class="icon">upload_file</span> Uploads</a>
+        <a data-panel="resume"><span class="icon">description</span> Resume Builder</a>
+        <div class="sec-label">More</div>
+        <a data-panel="agent"><span class="icon">smart_toy</span> REEP Agent</a>
+        <a data-panel="profile"><span class="icon">person</span> Profile</a>
+      </div>
+      <div class="desktop-main" id="main">
+
+        <!-- LANDING -->
+        <div class="panel active" data-p="landing">
+          <div class="dt-header"><div><div class="dt-title">Welcome back, Aditi</div><div class="dt-sub">Reboot stage · MBA-2026-B</div></div><div class="chip good"><span class="icon">local_fire_department</span>4-day login streak</div></div>
+          <div class="grid-3">
+            <div class="card"><h4>Stage</h4><div class="donut"><span>62%</span></div><div class="dt-sub" style="text-align:center; margin-top:8px">Reboot → Excel → Excel-Adv → Elevate</div></div>
+            <div class="card"><h4>Attendance</h4>
+              <div class="bar-chart"><div class="bar" style="height:70%"><span>88%</span></div><div class="bar" style="height:60%"><span>76%</span></div><div class="bar" style="height:80%"><span>92%</span></div><div class="bar" style="height:50%"><span>64%</span></div></div>
+              <div class="bar-labels"><div>Wk1</div><div>Wk2</div><div>Wk3</div><div>Wk4</div></div>
+            </div>
+            <div class="card"><h4>VTU marks</h4>
+              <div class="bar-chart"><div class="bar" style="height:75%; background:linear-gradient(180deg,#c99a4e,#6b4413)"><span>78</span></div><div class="bar" style="height:60%"><span>62</span></div><div class="bar" style="height:90%"><span>91</span></div></div>
+              <div class="bar-labels"><div>Sem 1</div><div>Sem 2</div><div>Sem 3</div></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><h4>SWOC — Strengths, Weaknesses, Opportunities, Challenges <span class="dt-sub" style="font-weight:400">from placement, mentor &amp; PM inputs</span></h4>
+              <div class="swoc-grid">
+                <div class="swoc-box swoc-s"><b>Strengths</b>Strong analytical scores, consistent attendance</div>
+                <div class="swoc-box swoc-w"><b>Weaknesses</b>Communication mock scores below cohort average</div>
+                <div class="swoc-box swoc-o"><b>Opportunities</b>2 open UG/PG roles match current skill profile</div>
+                <div class="swoc-box swoc-c"><b>Challenges</b>Quant Methods certification behind pace</div>
+              </div>
+            </div>
+            <div class="card"><h4>Mocks taken</h4>
+              <div class="dt-sub" style="margin-bottom:8px">GD: 3 · Interview: 2 · Aptitude: 5</div>
+              <div class="bar-chart" style="height:80px"><div class="bar" style="height:50%"><span>3</span></div><div class="bar" style="height:35%"><span>2</span></div><div class="bar" style="height:85%"><span>5</span></div></div>
+              <div class="bar-labels"><div>GD</div><div>Interview</div><div>Aptitude</div></div>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="card"><h4>Skill badges</h4>
+              <div class="badge-row">
+                <div class="badge"><div class="ico"><span class="icon">calculate</span></div>Excel</div>
+                <div class="badge"><div class="ico"><span class="icon">groups</span></div>Comms</div>
+                <div class="badge"><div class="ico"><span class="icon">insights</span></div>Analytics</div>
+                <div class="badge locked"><div class="ico"><span class="icon">lock</span></div>Leadership</div>
+                <div class="badge locked"><div class="ico"><span class="icon">lock</span></div>SQL</div>
+              </div>
+            </div>
+            <div class="card"><h4>Top 5 skilling recommendations</h4>
+              <div class="reco-row"><span class="reco-rank">1</span>Advanced Excel for Finance</div>
+              <div class="reco-row"><span class="reco-rank">2</span>SQL Fundamentals</div>
+              <div class="reco-row"><span class="reco-rank">3</span>Business Communication II</div>
+              <div class="reco-row"><span class="reco-rank">4</span>Leadership Essentials</div>
+              <div class="reco-row"><span class="reco-rank">5</span>Case Interview Prep</div>
+            </div>
+          </div>
+          <div class="card"><h4>Login streak</h4><div class="streak-row"><div class="streak-day on"></div><div class="streak-day on"></div><div class="streak-day on"></div><div class="streak-day on"></div><div class="streak-day"></div><div class="streak-day"></div><div class="streak-day"></div></div></div>
+        </div>
+
+        <!-- JOBS -->
+        <div class="panel" data-p="jobs">
+          <div class="dt-header"><div><div class="dt-title">Jobs</div><div class="dt-sub">Updated weekly · auto alert emailed to matching students</div></div></div>
+          <div class="tabs-row" id="jobs-subtabs">
+            <button class="active" data-jobs-view="opportunities">Opportunities</button>
+            <button data-jobs-view="applications">Applications</button>
+            <button data-jobs-view="offers">Offers</button>
+          </div>
+          <div class="grid-2" style="margin-bottom:16px;">
+            <div>
+              <div class="tabs-row" style="border-bottom:none; margin-bottom:10px;">
+                <button class="active" style="border:1px solid var(--line); border-radius:8px; margin-right:6px;">Undergraduate</button>
+                <button style="border:1px solid var(--line); border-radius:8px;">Postgraduate</button>
+              </div>
+              <div id="jobs-view-opportunities">
+                <table class="dt-table">
+                  <tr><th>Role</th><th>Company</th><th>Match</th><th>Apply</th><th>Applied</th><th>CV builder</th></tr>
+                  <tr><td>Business Analyst (Grad)</td><td>Nova Fintech</td><td><span class="match-bar"><span class="match-fill" style="width:82%"></span></span>82%</td><td><button class="dt-btn primary" style="padding:5px 10px; font-size:11.5px;">Apply</button></td><td><span class="chip good"><span class="icon">check</span>Applied</span></td><td><button class="dt-btn" style="padding:5px 10px; font-size:11.5px;">Build CV</button></td></tr>
+                  <tr><td>Finance Associate</td><td>Meridian Capital</td><td><span class="match-bar"><span class="match-fill" style="width:64%"></span></span>64%</td><td><button class="dt-btn primary" style="padding:5px 10px; font-size:11.5px;">Apply</button></td><td><span class="chip warn"><span class="icon">schedule</span>Not yet</span></td><td><button class="dt-btn" style="padding:5px 10px; font-size:11.5px;">Build CV</button></td></tr>
+                </table>
+              </div>
+              <div id="jobs-view-applications" style="display:none;">
+                <table class="dt-table">
+                  <tr><th>Role</th><th>Company</th><th>Applied on</th><th>Status</th></tr>
+                  <tr><td>Business Analyst (Grad)</td><td>Nova Fintech</td><td>10 Aug</td><td><span class="chip warn"><span class="icon">hourglass_top</span>Under review</span></td></tr>
+                </table>
+              </div>
+              <div id="jobs-view-offers" style="display:none;">
+                <div class="card"><h4>Have you received an offer directly? <span class="dt-btn primary" style="font-size:11.5px; padding:5px 10px;">+ Create Offer</span></h4><div class="dt-sub">Self-report an off-platform offer for TPO/mentor records and approval.</div></div>
+                <table class="dt-table"><tr><th>Role</th><th>Company</th><th>Status</th></tr><tr><td colspan="3" style="text-align:center; color:var(--ink-500);">No offers yet</td></tr></table>
+              </div>
+            </div>
+            <div>
+              <div class="card"><h4>Opportunities <span style="font-weight:800">2</span></h4><div class="dt-sub">Eligible for: 1 Job · 1 Job+Internship · 0 Internship</div></div>
+              <div class="card"><h4>Applications <span style="font-weight:800">1</span></h4><div class="dt-sub">Applied to: 1 Job · 0 Job+Internship · 0 Internship</div></div>
+              <div class="card"><h4>Offers <span style="font-weight:800">0</span></h4><div class="dt-sub">Received: 0 Job · 0 Job+Internship · 0 Internship</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SKILLING -->
+        <div class="panel" data-p="skilling">
+          <div class="dt-header"><div><div class="dt-title">Skilling</div><div class="dt-sub">Upload a certificate to claim a skill, or browse suggested skills</div></div></div>
+          <div class="grid-2">
+            <div class="card"><h4>Claim a skill</h4><div class="dropzone"><span class="icon">workspace_premium</span>Upload certificate to claim skill</div></div>
+            <div class="card"><h4>Suggested skills to browse</h4>
+              <div class="reco-row">Data Visualization with Power BI <button class="dt-btn" style="margin-left:auto; padding:4px 10px; font-size:11.5px;">Start</button></div>
+              <div class="reco-row">Negotiation Skills <button class="dt-btn" style="margin-left:auto; padding:4px 10px; font-size:11.5px;">Start</button></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- LEADERBOARDS -->
+        <div class="panel" data-p="leaderboards">
+          <div class="dt-header"><div><div class="dt-title">Leaderboards</div></div></div>
+          <div class="tabs-row"><button class="active">Certificates</button><button>Skills</button><button>VTU results</button><button>Streak</button><button>Mocks taken</button></div>
+          <div class="lb-row"><span class="lb-rank">1</span><span class="lb-avatar">RS</span>Rohan Sharma<span style="margin-left:auto; font-weight:700;">11 certs</span></div>
+          <div class="lb-row me"><span class="lb-rank">2</span><span class="lb-avatar">AK</span>Aditi Kulkarni (you)<span style="margin-left:auto; font-weight:700;">9 certs</span></div>
+          <div class="lb-row"><span class="lb-rank">3</span><span class="lb-avatar">PN</span>Priya Nair<span style="margin-left:auto; font-weight:700;">8 certs</span></div>
+        </div>
+
+        <!-- TIME SHEET -->
+        <div class="panel" data-p="timesheet">
+          <div class="dt-header"><div><div class="dt-title">Time Sheet</div><div class="dt-sub">Just 5 activities — quick daily fill</div></div><button class="dt-btn primary"><span class="icon" style="font-size:15px">save</span> Save today</button></div>
+          <div class="ts-grid">
+            <div class="ts-cell"><span class="icon">bedtime</span><input value="7"><small>Sleeping (hrs)</small></div>
+            <div class="ts-cell"><span class="icon">sports_esports</span><input value="1.5"><small>Leisure</small></div>
+            <div class="ts-cell"><span class="icon">record_voice_over</span><input value="3"><small>Lectures</small></div>
+            <div class="ts-cell"><span class="icon">edit_note</span><input value="2"><small>Coursework</small></div>
+            <div class="ts-cell"><span class="icon">school</span><input value="2.5"><small>Skilling</small></div>
+          </div>
+          <div class="dt-sub">Total logged today: 16 hrs</div>
+        </div>
+
+        <!-- CERTS -->
+        <div class="panel" data-p="certs">
+          <div class="dt-header"><div><div class="dt-title">Certification Tracker</div></div></div>
+          <table class="dt-table"><tr><th>Certification</th><th>Stage</th><th>Progress</th><th>Pace</th></tr>
+            <tr><td>Data Analysis with Python</td><td>Excel</td><td>40%</td><td><span class="chip risk"><span class="icon">error</span>Overdue</span></td></tr>
+            <tr><td>Excel for Business</td><td>Reboot</td><td>100%</td><td><span class="chip good"><span class="icon">check_circle</span>Complete</span></td></tr>
+          </table>
+        </div>
+
+        <!-- COURSES -->
+        <div class="panel" data-p="courses">
+          <div class="dt-header"><div><div class="dt-title">Courses</div></div></div>
+          <table class="dt-table"><tr><th>Course</th><th>Stage</th><th>Modules</th></tr>
+            <tr><td>Quantitative Methods</td><td>Excel</td><td>4/10</td></tr>
+            <tr><td>Financial Accounting</td><td>Reboot</td><td>5/9</td></tr>
+          </table>
+        </div>
+
+        <!-- UPLOADS -->
+        <div class="panel" data-p="uploads">
+          <div class="dt-header"><div><div class="dt-title">Uploads</div></div></div>
+          <div class="dropzone"><span class="icon">cloud_upload</span>Certificate proof, CV, photo, documents</div>
+        </div>
+
+        <!-- RESUME -->
+        <div class="panel" data-p="resume">
+          <div class="dt-header"><div><div class="dt-title">AI Resume Builder</div></div></div>
+          <div class="card">Grounded in your REEP record — see full builder in the earlier Journey Home prototype.</div>
+        </div>
+
+        <!-- AGENT -->
+        <div class="panel" data-p="agent">
+          <div class="dt-header"><div><div class="dt-title">REEP Agent</div></div></div>
+          <div class="card">Chat assistant, self-scope only — see earlier Journey Home prototype for full chat UI.</div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="panel" data-p="profile">
+          <div class="dt-header"><div><div class="dt-title">Profile</div></div></div>
+          <div class="card">LinkedIn: linkedin.com/in/aditikulkarni · Photo on file · Registration approved (auto — domain match)</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<script>
+document.querySelectorAll('#views button').forEach(b=>b.addEventListener('click', ()=>showView(b.dataset.view)));
+document.querySelectorAll('[data-goto]').forEach(b=>b.addEventListener('click', ()=>showView(b.dataset.goto)));
+function showView(v){
+  document.querySelectorAll('#views button').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
+  document.querySelectorAll('[data-view-panel]').forEach(p=>p.classList.toggle('active', p.id==='view-'+v));
+}
+const navLinks = document.querySelectorAll('#nav a');
+navLinks.forEach(a => a.addEventListener('click', () => {
+  navLinks.forEach(x=>x.classList.remove('active')); a.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.dataset.p === a.dataset.panel));
+}));
+document.querySelectorAll('.tabs-row').forEach(row=>{
+  row.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+    row.querySelectorAll('button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+  }));
+});
+document.querySelectorAll('#jobs-subtabs button').forEach(b=>b.addEventListener('click', ()=>{
+  ['opportunities','applications','offers'].forEach(v=>{
+    document.getElementById('jobs-view-'+v).style.display = (v===b.dataset.jobsView) ? 'block' : 'none';
+  });
+}));
+</script>
+</body>
+</html>

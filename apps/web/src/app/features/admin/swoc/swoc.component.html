@@ -1,0 +1,355 @@
+<div class="panel" data-p="swoc">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <span>Interviews</span><span class="sep">/</span><span>SWOC notes</span>
+      </div>
+      <h1 class="dt-title">SWOC notes</h1>
+      @if (rows()) {
+        <div class="dt-sub">
+          {{ studentCount() | plural: 'student' }} · {{ writtenCount() }} with notes
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- The reach chip is a READ-OUT of the caller's own grant (B1.4): GET
+       /admin/swoc narrows the list server-side and states that reach in
+       X-Reep-Scope. Batch narrows the list the screen already holds. Semester
+       goes to the SERVER (?semester=) and narrows the ENTRIES, not the
+       students. -->
+  <div class="sw-filters">
+    @if (scopeChip(); as reach) {
+      <span class="chip {{ reach.tone }}">{{ reach.label }}</span>
+    }
+
+    <div class="select">
+      <span class="lbl">Batch</span>
+      <span class="val">{{ batchFilterLabel() }}</span>
+      <select aria-label="Batch" (change)="batchFilter.set(selectValue($event))">
+        <option value="" [selected]="batchFilter() === ''">All batches</option>
+        @for (batch of batches(); track batch) {
+          <option [value]="batch" [selected]="batchFilter() === batch">{{ batch }}</option>
+        }
+      </select>
+    </div>
+
+    @if (semesterOptions().length > 0) {
+      <div class="select">
+        <span class="lbl">Semester</span>
+        <span class="val">{{ semesterFilterLabel() }}</span>
+        <select aria-label="Semester" (change)="setSemesterFilter(selectValue($event))">
+          <option [value]="allSemesters" [selected]="semesterFilter() === allSemesters">
+            All semesters
+          </option>
+          @for (semester of semesterOptions(); track semester) {
+            <option [value]="semester" [selected]="isSemesterFilter(semester)">
+              Semester {{ semester }}
+            </option>
+          }
+        </select>
+      </div>
+    }
+  </div>
+
+  @if (error()) {
+    <div class="notice sw-alert" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      <span class="sw-alert__text">{{ error() }}</span>
+      <button type="button" class="btn secondary sm" (click)="load()">Try again</button>
+    </div>
+  }
+  @if (flash()) {
+    <div class="notice good" role="status">
+      <span class="icon" aria-hidden="true">check</span>{{ flash() }}
+    </div>
+  }
+
+  <div class="sw-board">
+    <!-- ------------------------------------------------- the students -->
+    <section class="card sw-list" aria-labelledby="sw-list-title">
+      <div class="card-head">
+        <h2 class="card-title" id="sw-list-title">Students</h2>
+        <span class="chip neutral">{{ filtered().length }}</span>
+      </div>
+
+      <label class="sw-search">
+        <span class="sr-only">Search students</span>
+        <input
+          class="dt-quickfilter"
+          type="search"
+          placeholder="Name, USN or batch"
+          [value]="query()"
+          (input)="query.set($any($event.target).value)"
+        />
+      </label>
+
+      @if (rows() === null) {
+        <p class="sw-state" role="status">Loading…</p>
+      } @else {
+        <div class="sw-rows">
+          @for (student of filtered(); track student.student_id) {
+            <button
+              type="button"
+              class="sw-pick"
+              [class.selected]="isSelected(student)"
+              [attr.aria-pressed]="isSelected(student)"
+              (click)="selectStudent(student)"
+            >
+              <span class="avatar">{{ initials(student.name) }}</span>
+              <span class="sw-pick__main">
+                <span class="sw-pick__name">{{ student.name }}</span>
+                <span class="sw-pick__meta">
+                  {{ student.usn ?? 'No USN' }}
+                  @if (student.batch) {
+                    · {{ student.batch }}
+                  }
+                </span>
+              </span>
+              <!-- B7.5. A student with nothing written has nothing to
+                   acknowledge, so that row is a dash and not a zero. -->
+              <span class="sw-pick__count">
+                @if (student.entries.length === 0) {
+                  —
+                } @else {
+                  {{ student.entries.length | plural: 'note' }} · {{ ackCount(student) }} read
+                }
+              </span>
+              <span class="icon" aria-hidden="true">chevron_right</span>
+            </button>
+          } @empty {
+            <p class="sw-state">{{ emptyListNote() }}</p>
+          }
+        </div>
+        @if (filtered().length !== studentCount()) {
+          <p class="sw-foot">{{ filtered().length }} of {{ studentCount() }}</p>
+        }
+      }
+    </section>
+
+    <!-- --------------------------------------------------- the editor -->
+    <section class="card sw-editor" aria-labelledby="sw-editor-title">
+      @if (selected(); as student) {
+        <div class="sw-who">
+          <span class="avatar lg">{{ initials(student.name) }}</span>
+          <div class="sw-who__main">
+            <h2 class="card-title" id="sw-editor-title">{{ student.name }}</h2>
+            <p class="sw-who__meta">
+              {{ student.usn ?? 'No USN' }} · {{ student.batch ?? 'No batch' }} ·
+              @if (student.entries.length) {
+                {{ student.entries.length | plural: 'note' }} · {{ ackCount(student) }} read
+              } @else {
+                nothing written yet
+              }
+            </p>
+          </div>
+          <div class="sw-who__actions">
+            <button
+              type="button"
+              class="btn secondary sm"
+              [class.on]="historyOpen()"
+              [attr.aria-expanded]="historyOpen()"
+              aria-controls="sw-history"
+              [disabled]="historyBusy()"
+              (click)="toggleHistory()"
+            >
+              <span class="icon" aria-hidden="true">history</span> Edit history
+            </button>
+            <button
+              type="button"
+              class="btn secondary sm"
+              [class.on]="semesterViewOpen()"
+              [attr.aria-expanded]="semesterViewOpen()"
+              aria-controls="sw-semesters"
+              (click)="toggleSemesterView()"
+            >
+              <span class="icon" aria-hidden="true">schedule</span> By semester
+            </button>
+          </div>
+        </div>
+
+        <!-- B7.3's edit history, scoped exactly as the board is: the same
+             admin.swoc key and the same student ancestry. Deliberately NOT a
+             link to the Main-Admin-only audit trail, which would answer 403
+             for everybody who can press this. -->
+        @if (historyOpen()) {
+          <section class="sw-panel" id="sw-history" aria-labelledby="sw-history-title">
+            <h3 class="sw-panel__title" id="sw-history-title">Edit history</h3>
+            @if (historyBusy()) {
+              <p class="sw-state" role="status">Loading…</p>
+            } @else if (historyError()) {
+              <div class="notice" role="alert">
+                <span class="icon" aria-hidden="true">error</span>{{ historyError() }}
+              </div>
+            } @else if (revisions(); as edits) {
+              @if (edits.length === 0) {
+                <p class="sw-foot">No edit recorded.</p>
+              } @else {
+                <ol class="sw-edits">
+                  @for (edit of edits; track edit.id) {
+                    <li class="sw-edit">
+                      <p class="sw-edit__line">“{{ revisionLine(edit) }}”</p>
+                      <p class="sw-edit__by">
+                        {{ edit.by ?? 'Editor not recorded' }} · {{ when(edit.changed_at) }}
+                      </p>
+                      @for (change of changesIn(edit); track change.field) {
+                        <p class="sw-edit__change">
+                          <span class="chip neutral">{{ change.field }}</span>
+                          {{ change.from }} → {{ change.to }}
+                        </p>
+                      } @empty {
+                        <p class="sw-edit__change">Nothing shown here changed.</p>
+                      }
+                    </li>
+                  }
+                </ol>
+              }
+            }
+          </section>
+        }
+
+        <!-- B7.4's semester view: this student's lines grouped by the semester
+             each was stamped with AT WRITE TIME. "Not recorded" is a group of
+             its own and never folded into a number. -->
+        @if (semesterViewOpen()) {
+          <section class="sw-panel" id="sw-semesters" aria-labelledby="sw-semesters-title">
+            <h3 class="sw-panel__title" id="sw-semesters-title">By semester</h3>
+            @if (semesterBreakdown().length === 0) {
+              <p class="sw-foot">Nothing written yet.</p>
+            } @else {
+              <ul class="sw-semester-list">
+                @for (group of semesterBreakdown(); track group.key) {
+                  <li class="sw-semester">
+                    <span class="sw-semester__label">{{ group.label }}</span>
+                    <span class="chip neutral">{{ group.count | plural: 'note' }}</span>
+                    @if (group.key) {
+                      <button
+                        type="button"
+                        class="btn ghost sm"
+                        (click)="setSemesterFilter(group.key)"
+                      >
+                        Show only this semester
+                      </button>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
+
+        <div class="sw-quads">
+          @for (quadrant of quadrants; track quadrant.key) {
+            <section
+              class="sw-quad"
+              [attr.data-tone]="quadrant.tone"
+              [attr.aria-labelledby]="'sw-quad-' + quadrant.key"
+            >
+              <header class="sw-quad__head">
+                <h3 class="sw-quad__title" [id]="'sw-quad-' + quadrant.key">
+                  {{ quadrant.label }}
+                </h3>
+                <button
+                  type="button"
+                  class="btn ghost sm"
+                  [disabled]="busy()"
+                  (click)="openComposer(quadrant.key)"
+                >
+                  <span class="icon" aria-hidden="true">add</span> Add
+                </button>
+              </header>
+
+              @for (entry of buckets()[quadrant.key]; track entry.id) {
+                <article class="sw-entry">
+                  <textarea
+                    class="sw-entry__text"
+                    rows="2"
+                    [attr.maxlength]="maxEntryChars"
+                    [value]="entry.text"
+                    [disabled]="busy()"
+                    #entryText
+                    (change)="saveText(entry, entryText)"
+                    [attr.aria-label]="quadrant.label + ' entry'"
+                  ></textarea>
+                  <div class="sw-entry__meta">
+                    <span class="chip accent">{{ sourceLabel(entry.source) }}</span>
+                    <span class="chip {{ ackChip(entry).tone }}">{{ ackChip(entry).label }}</span>
+                    <span class="sw-entry__by">{{ entryBy(entry) }}</span>
+                    <label class="sw-weight">
+                      <span class="sr-only">Weight</span>
+                      <select
+                        class="ctrl sw-weight__select"
+                        #weightPicker
+                        [disabled]="busy()"
+                        (change)="setWeight(entry, weightPicker)"
+                      >
+                        @for (weight of weights; track weight) {
+                          <option [value]="weight" [selected]="weight === entry.weight">
+                            {{ weight }}
+                          </option>
+                        }
+                      </select>
+                    </label>
+                    <button
+                      type="button"
+                      class="iconbtn"
+                      [disabled]="busy()"
+                      (click)="removeEntry(entry)"
+                      aria-label="Remove this entry"
+                    >
+                      <span class="icon" aria-hidden="true">delete</span>
+                    </button>
+                  </div>
+                </article>
+              } @empty {
+                <p class="sw-none">Nothing yet</p>
+              }
+
+              @if (composerFor() === quadrant.key) {
+                <div class="sw-composer">
+                  <div class="field">
+                    <label [attr.for]="'sw-draft-' + quadrant.key">
+                      New {{ quadrant.label.toLowerCase() }} note
+                    </label>
+                    <textarea
+                      class="multi"
+                      rows="3"
+                      [id]="'sw-draft-' + quadrant.key"
+                      [attr.maxlength]="maxEntryChars"
+                      [placeholder]="quadrant.hint"
+                      [value]="draft()"
+                      [disabled]="busy()"
+                      (input)="draft.set($any($event.target).value)"
+                      (keydown.control.enter)="addEntry(quadrant.key)"
+                    ></textarea>
+                  </div>
+                  <div class="sw-composer__foot">
+                    <span class="sw-count">{{ draftLength() }}/{{ maxEntryChars }}</span>
+                    <button
+                      type="button"
+                      class="btn ghost sm"
+                      [disabled]="busy()"
+                      (click)="closeComposer()"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      class="btn primary sm"
+                      [disabled]="!canSaveDraft()"
+                      (click)="addEntry(quadrant.key)"
+                    >
+                      <span class="icon" aria-hidden="true">save</span> Save
+                    </button>
+                  </div>
+                </div>
+              }
+            </section>
+          }
+        </div>
+      } @else {
+        <p class="sw-state sw-pick-one" id="sw-editor-title">No student picked.</p>
+      }
+    </section>
+  </div>
+</div>

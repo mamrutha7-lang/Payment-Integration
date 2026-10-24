@@ -1,0 +1,166 @@
+<main class="link-page">
+  <section class="link-card" aria-labelledby="onboard-title">
+    <div class="link-brand"><span class="icon" aria-hidden="true">school</span> REEP</div>
+    <h1 id="onboard-title" class="link-title">{{ heading() }}</h1>
+
+    <!--
+      The step strip is decoration for sighted users and noise for a screen
+      reader, which is told where it is by the <h1> changing. aria-hidden, and
+      the current step is marked with text as well as colour.
+    -->
+    @if (!fatal() && step() < 4) {
+      <ol class="steps" aria-hidden="true">
+        <li [class.on]="step() >= 1">1 Email</li>
+        <li [class.on]="step() >= 2">2 Code</li>
+        <li [class.on]="step() >= 3">3 Password</li>
+      </ol>
+    }
+
+    @if (fatal(); as why) {
+      <div class="notice" role="alert">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>
+          {{ why }}
+          <div class="link-sub">
+            If you have already set your password, just
+            <a routerLink="/login">sign in</a>.
+          </div>
+        </div>
+      </div>
+    } @else if (step() === 4) {
+      <div class="notice good" role="status">
+        <span class="icon" aria-hidden="true">check</span>
+        <div>
+          Your password is set. <a routerLink="/login">Sign in</a> with your college email
+          and the password you just chose.
+        </div>
+      </div>
+    } @else {
+      @if (error(); as why) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span>
+          <div>{{ why }}</div>
+        </div>
+      }
+
+      <!-- ---------------------------------------------------- step 1 --- -->
+      @if (step() === 1) {
+        <p class="link-sub">
+          Type the college email address this link was sent to and we will send you a
+          one-time code to confirm it.
+        </p>
+        <form [formGroup]="emailForm" (ngSubmit)="sendCode()" novalidate>
+          <div class="field">
+            <label for="ob-email">Your college email</label>
+            <input
+              id="ob-email"
+              type="email"
+              inputmode="email"
+              autocomplete="email"
+              formControlName="email"
+              placeholder="1bg26mba001&#64;bgscet.ac.in"
+              [attr.aria-invalid]="email.touched && email.invalid"
+            />
+            @if (email.touched && email.invalid) {
+              <span class="chip warn">
+                <span class="icon" aria-hidden="true">error</span>Enter the email address this link was sent to.
+              </span>
+            }
+          </div>
+          <button type="submit" class="btn primary wide" [disabled]="busy()">
+            {{ busy() ? 'Sending…' : 'Send me a code' }}
+          </button>
+        </form>
+      }
+
+      <!-- ---------------------------------------------------- step 2 --- -->
+      @if (step() === 2) {
+        @if (note(); as msg) {
+          <p class="link-sub" role="status">{{ msg }}</p>
+        }
+        <form [formGroup]="codeForm" (ngSubmit)="checkCode()" novalidate>
+          <div class="field">
+            <label for="ob-code">Six-digit code</label>
+            <input
+              id="ob-code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              maxlength="6"
+              class="code-input"
+              formControlName="code"
+              [attr.aria-invalid]="code.touched && code.invalid"
+            />
+            @if (code.touched && code.invalid) {
+              <span class="chip warn">
+                <span class="icon" aria-hidden="true">error</span>The code is six digits.
+              </span>
+            }
+          </div>
+          <button type="submit" class="btn primary wide" [disabled]="busy()">
+            {{ busy() ? 'Checking…' : 'Confirm my email' }}
+          </button>
+        </form>
+        <button type="button" class="btn link-btn" [disabled]="busy()" (click)="resend()">
+          Send a new code
+        </button>
+      }
+
+      <!-- ---------------------------------------------------- step 3 --- -->
+      @if (step() === 3) {
+        <p class="link-sub">
+          At least {{ minLength }} characters. A memorable phrase of four or five words clears
+          that easily and is stronger than a short scrambled one.
+        </p>
+        <form [formGroup]="passwordForm" (ngSubmit)="setPassword()" novalidate>
+          <div class="field">
+            <label for="ob-pw">Password</label>
+            <div class="pw-row">
+              <input
+                id="ob-pw"
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                autocomplete="new-password"
+                [attr.aria-invalid]="passwordForm.controls.password.touched && passwordForm.controls.password.invalid"
+              />
+              <button
+                type="button"
+                class="btn sm"
+                (click)="showPassword.set(!showPassword())"
+                [attr.aria-pressed]="showPassword()"
+                aria-label="Show password"
+              >
+                <span class="icon" aria-hidden="true">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            @if (passwordForm.controls.password.touched && passwordForm.controls.password.hasError('minlength')) {
+              <span class="chip warn">
+                <span class="icon" aria-hidden="true">error</span>Needs {{ minLength }} characters or more.
+              </span>
+            }
+          </div>
+
+          <div class="field">
+            <label for="ob-confirm">Type it again</label>
+            <input
+              id="ob-confirm"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="confirm"
+              autocomplete="new-password"
+              [attr.aria-invalid]="passwordForm.touched && passwordForm.hasError('mismatch')"
+            />
+            @if (passwordForm.controls.confirm.touched && passwordForm.hasError('mismatch')) {
+              <span class="chip warn">
+                <span class="icon" aria-hidden="true">error</span>The two do not match.
+              </span>
+            }
+          </div>
+
+          <button type="submit" class="btn primary wide" [disabled]="busy()">
+            {{ busy() ? 'Saving…' : 'Set my password' }}
+          </button>
+        </form>
+      }
+    }
+  </section>
+</main>

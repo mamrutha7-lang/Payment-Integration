@@ -1,0 +1,594 @@
+<div class="panel" data-p="interviews">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <span>Interviews</span><span class="sep">/</span><span>Interview records</span>
+      </div>
+      <h1 class="dt-title">Interview records</h1>
+      @if (kpis()) {
+        <div class="dt-sub">
+          {{ sessionCount() | plural: 'interview' }} · {{ studentCount() | plural: 'student' }}
+        </div>
+      }
+    </div>
+    <div class="dt-toolbar">
+      <button type="button" class="btn secondary" [disabled]="!canExport()" (click)="exportCsv()">
+        <span class="icon" aria-hidden="true">download</span>
+        {{ exporting() ? 'Preparing…' : 'Export CSV' }}
+      </button>
+      <button
+        type="button"
+        class="btn primary"
+        [disabled]="!canDownloadSelection()"
+        (click)="downloadSelected()"
+      >
+        <span class="icon" aria-hidden="true">graphic_eq</span>
+        {{ downloading() ? 'Preparing…' : 'Download selected audio' }}
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>{{ error() }}
+    </div>
+  }
+  @if (flash()) {
+    <div class="notice good" role="status">
+      <span class="icon" aria-hidden="true">check_circle</span>{{ flash() }}
+    </div>
+  }
+
+  <!-- ---------------------------------------------------------- filters -->
+  <div class="filters">
+    <!-- The batch list is `admin.analytics`, not this screen's key. A session
+         whose grant cannot read it gets no Batch filter at all rather than a
+         grey one with the reason in a tooltip. -->
+    @if (cohortsBlocked() === null) {
+      <div class="select">
+        <span class="lbl">Batch</span>
+        <span class="val">{{ cohortFilterLabel() }}</span>
+        <select aria-label="Batch" [value]="cohortFilter()" (change)="setCohortFilter($event)">
+          <option value="all">All batches</option>
+          @for (batch of cohorts() ?? []; track batch.id) {
+            <option [value]="batch.id" [selected]="batch.id === cohortFilter()">
+              {{ batch.display_label }}
+            </option>
+          }
+        </select>
+      </div>
+    }
+
+    <div class="select">
+      <span class="lbl">Track</span>
+      <span class="val">{{ trackFilterLabel() }}</span>
+      <select aria-label="Track" [value]="trackFilter()" (change)="setTrackFilter($event)">
+        <option value="all">All tracks</option>
+        @for (track of trackOptions(); track track.code) {
+          <option [value]="track.code" [selected]="track.code === trackFilter()">
+            {{ track.label }}
+          </option>
+        }
+        <option value="generic" [selected]="trackFilter() === 'generic'">Generic interview</option>
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">Status</span>
+      <span class="val">{{ statusFilterLabel() }}</span>
+      <select aria-label="Status" [value]="statusFilter()" (change)="setStatusFilter($event)">
+        <option value="all">All</option>
+        <option value="completed">Completed</option>
+        <option value="abandoned">Abandoned</option>
+        <option value="failed">Failed</option>
+        <option value="running">Running</option>
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">Recording</span>
+      <span class="val">{{ recordingFilterLabel() }}</span>
+      <select
+        aria-label="Recording"
+        [value]="recordingFilter()"
+        (change)="setRecordingFilter($event)"
+      >
+        <option value="any">Any</option>
+        <option value="recorded">Recorded only</option>
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">Date</span>
+      <span class="val">{{ dateFilterLabel() }}</span>
+      <select aria-label="Date" [value]="dateFilter()" (change)="setDateFilter($event)">
+        <option value="all">Whole record</option>
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+        <option value="90">Last 90 days</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- The tiles are `GET /api/admin/interviews/summary`, over exactly the rows
+       the list would return — same gate, same reach, same filters, same query
+       builder — so a tile can never report a number the list cannot produce. -->
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="kpi-head">
+        <div class="eyebrow">Interviews</div>
+        <span class="icon kpi-icon" aria-hidden="true">record_voice_over</span>
+      </div>
+      <div class="num">{{ sessionCount() }}</div>
+      <div class="sub">{{ recordedCount() }} with a recording</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-head">
+        <div class="eyebrow">Average score</div>
+        <span class="icon kpi-icon" aria-hidden="true">insights</span>
+      </div>
+      <div class="num">{{ averageScoreLabel() }}</div>
+      <div class="sub">{{ averageScoreNote() }}</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-head">
+        <div class="eyebrow">Completed</div>
+        <span class="icon kpi-icon" aria-hidden="true">task_alt</span>
+      </div>
+      <div class="num">{{ completionLabel() }}</div>
+      <div class="sub">
+        {{ abandonedCount() }} abandoned · {{ failedCount() }} failed · {{ runningCount() }} running
+      </div>
+    </div>
+  </div>
+
+  <!-- --------------------------------------------------------- the list -->
+  <section class="card grid-card" aria-label="Interview records">
+    <div class="dt-gridbar">
+      <input
+        class="dt-quickfilter"
+        type="search"
+        placeholder="Search…"
+        aria-label="Search the interview records"
+        (input)="setQuickFilter($event)"
+      />
+      @if (selectedCount() > 1) {
+        <span class="grid-note">
+          {{ selectedCount() | plural: 'interview' }} ticked · {{ selectedRecordedCount() }} with
+          audio
+        </span>
+      }
+    </div>
+
+    @if (loading()) {
+      <p class="state-note" role="status">
+        <span class="icon" aria-hidden="true">hourglass_empty</span>Loading…
+      </p>
+    } @else if (noRecordsAtAll()) {
+      <p class="state-note" role="status">No interview yet.</p>
+    } @else if (filtersHideEverything()) {
+      <p class="state-note" role="status">No interview matches these filters.</p>
+    } @else if (!error()) {
+      <ag-grid-angular
+        class="records-grid"
+        [theme]="gridTheme"
+        [rowData]="rows()"
+        [columnDefs]="columns"
+        [defaultColDef]="defaultColumn"
+        [rowSelection]="rowSelection"
+        [selectionColumnDef]="selectionColumn"
+        [quickFilterText]="quickFilter()"
+        [pagination]="true"
+        [paginationPageSize]="interviewsPerPage"
+        [paginationPageSizeSelector]="pageSizes"
+        [domLayout]="'autoHeight'"
+        [suppressCellFocus]="true"
+        [getRowId]="getRowId"
+        (gridReady)="onGridReady($event)"
+        (modelUpdated)="onModelUpdated($event)"
+        (selectionChanged)="onSelectionChanged($event)"
+      />
+      <div class="dt-statusbar">
+        <span
+          >Rows: <b>{{ rowsOnGrid() }}</b></span
+        >
+        <span
+          >Selected: <b>{{ selectedCount() }}</b></span
+        >
+        <span>{{ recordedOnGrid() }} with a recording</span>
+        @if (hasMorePages()) {
+          <span class="statusbar-note">
+            {{ sessionCount() }} match · the newest {{ recordsOnScreen().length }} are loaded
+          </span>
+          <button
+            type="button"
+            class="btn secondary sm"
+            [disabled]="loadingMore()"
+            (click)="loadMore()"
+          >
+            {{ loadingMore() ? 'Loading…' : 'Load more' }}
+          </button>
+        }
+      </div>
+    } @else {
+      <p class="state-note" role="status">
+        <span class="icon" aria-hidden="true">error</span>The records could not be read.
+      </p>
+    }
+  </section>
+
+  <!-- ------------------------------------------------- the open record -->
+  @if (openRecord(); as record) {
+    <section class="card record-card" aria-labelledby="record-title">
+      <div class="card-head">
+        <div>
+          <h2 class="card-title" id="record-title">{{ record.studentName }}</h2>
+          <div class="card-sub">
+            {{ record.usn }} · {{ record.trackLabel }} · {{ openRecordStartedLabel() }} ·
+            {{ openRecordDurationLabel() }}
+          </div>
+        </div>
+        <div class="record-chips">
+          <span class="chip dot {{ record.statusTone }}">{{ record.statusLabel }}</span>
+          <!-- Read from `audio_recorded`, never from a path: the flag is the
+               audio consent scope as it was ENFORCED for this interview. The
+               Download button exists only when there is something to download:
+               a grey button beside "No audio" was the first thing the office
+               pressed, and the sentence below is what it was pressing for. -->
+          @if (record.audioRecorded) {
+            <span class="chip dot good">Audio stored</span>
+            <button type="button" class="btn secondary sm" (click)="downloadOpenRecording()">
+              <span class="icon" aria-hidden="true">download</span> Download recording
+            </button>
+          } @else {
+            <span class="chip dot neutral">No audio</span>
+          }
+          <button
+            type="button"
+            class="btn ghost sm"
+            aria-label="Close this record"
+            (click)="closeRecord()"
+          >
+            <span class="icon" aria-hidden="true">close</span>
+          </button>
+        </div>
+      </div>
+      @if (openSessionFacts(); as facts) {
+        <p class="record-facts">{{ facts }}</p>
+      }
+      @if (!record.audioRecorded && record.audioReason; as reason) {
+        <p class="record-audio-reason" role="status">
+          <span class="icon" aria-hidden="true">mic</span>
+          <span>{{ reason }}</span>
+          @if (record.audioFixableHere) {
+            <button type="button" class="btn ghost sm" (click)="goToPolicyCard()">
+              Open the policy card
+            </button>
+          }
+        </p>
+      }
+
+      <div class="record-body">
+        <div class="record-main">
+          <div class="tabs record-tabs">
+            <button
+              type="button"
+              class="tab"
+              [class.active]="panelTab() === 'report'"
+              (click)="showReport()"
+            >
+              Report
+            </button>
+            <button
+              type="button"
+              class="tab"
+              [class.active]="panelTab() === 'transcript'"
+              (click)="showTranscript()"
+            >
+              Transcript
+            </button>
+          </div>
+
+          @if (panelLoading()) {
+            <p class="state-note" role="status">
+              <span class="icon" aria-hidden="true">hourglass_empty</span>Loading…
+            </p>
+          }
+          @if (panelNote()) {
+            <div class="notice accent" role="status">
+              <span class="icon" aria-hidden="true">info</span>{{ panelNote() }}
+            </div>
+          }
+
+          @if (reportOnScreen(); as scorecard) {
+            @if (reportIsReadable()) {
+              <div class="report-scores">
+                @for (tile of reportScoreTiles(); track tile.label) {
+                  <div class="report-score">
+                    <div class="eyebrow">{{ tile.label }}</div>
+                    <div class="score-value">{{ tile.value === null ? '—' : tile.value }}</div>
+                    <div class="score-hint">
+                      {{ tile.value === null ? 'not scored' : 'out of 100' }}
+                    </div>
+                  </div>
+                }
+              </div>
+              <p class="calibration">
+                <span class="icon" aria-hidden="true">info</span>
+                <span>AI practice score, not a placement decision.</span>
+              </p>
+              @if (scorecard.summary) {
+                <p class="report-summary">{{ scorecard.summary }}</p>
+              }
+              @if (reportStrengths().length > 0) {
+                <h3 class="report-sub">What went well</h3>
+                <ul class="report-list">
+                  @for (item of reportStrengths(); track $index) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              }
+              @if (reportImprovements().length > 0) {
+                <h3 class="report-sub">What to work on</h3>
+                <ul class="report-list">
+                  @for (item of reportImprovements(); track $index) {
+                    <li>{{ item }}</li>
+                  }
+                </ul>
+              }
+              @if (scorecard.drill) {
+                <p class="report-drill">
+                  <span class="eyebrow">Practise next</span>{{ scorecard.drill }}
+                </p>
+              }
+            } @else {
+              <div class="notice accent" role="status">
+                <span class="icon" aria-hidden="true">info</span>
+                No readable report ({{ scorecard.report_status }}). The transcript is still saved.
+              </div>
+            }
+          }
+
+          @if (transcriptOnScreen()) {
+            @if (transcriptTurns().length === 0) {
+              <div class="notice accent" role="status">
+                <span class="icon" aria-hidden="true">info</span>
+                No turns were saved for this interview.
+              </div>
+            } @else {
+              <ol class="transcript" aria-label="Interview transcript">
+                @for (turn of transcriptTurns(); track turn.seq) {
+                  <li class="turn" [class.turn-student]="turn.speaker === 'student'">
+                    <span class="turn-speaker">{{ turn.speaker }}</span>
+                    @if (turn.content) {
+                      <span class="turn-text">{{ turn.content }}</span>
+                    } @else {
+                      <span class="turn-unheard">
+                        not transcribed ({{ turn.transcription_status }})
+                      </span>
+                    }
+                  </li>
+                }
+              </ol>
+            }
+          }
+        </div>
+
+        <aside class="record-side" aria-labelledby="progress-title">
+          <h3 class="record-side-title" id="progress-title">Score over time</h3>
+          @if (hasScoreTrend()) {
+            <p class="record-side-sub">
+              {{ scoreTrend().length | plural: 'interview' }} · {{ scoredSessionCount() }} scored
+            </p>
+            <div
+              #progressChart
+              class="progress-chart"
+              role="img"
+              aria-label="Overall score of each interview this student has taken, oldest first"
+            ></div>
+          } @else {
+            <p class="record-side-sub">No interview scored yet.</p>
+          }
+        </aside>
+      </div>
+    </section>
+  }
+
+  <!-- ------------------------------------------------------ the policy -->
+  <section class="card policy-card" aria-labelledby="policy-title">
+    <div class="card-head">
+      <div>
+        <h2 class="card-title" id="policy-title">Interview policy</h2>
+        <div class="card-sub">
+          @if (policySheet(); as sheet) {
+            {{ sheet.college_name ?? 'one college' }}
+          } @else {
+            per college
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (collegesBlocked(); as blocked) {
+      <div class="notice" role="alert">
+        <span class="icon" aria-hidden="true">error</span>{{ blocked }}
+      </div>
+    } @else {
+      <div class="policy-pick">
+        <div class="field grow">
+          <label for="policy-college">College</label>
+          <select
+            id="policy-college"
+            class="ctrl"
+            [value]="policyCollege()"
+            (change)="setPolicyCollege($event)"
+          >
+            <option value="">Choose…</option>
+            @for (college of colleges() ?? []; track college.id) {
+              <option [value]="college.id" [selected]="college.id === policyCollege()">
+                {{ college.name }}
+              </option>
+            }
+          </select>
+        </div>
+        @if (policySheet(); as sheet) {
+          <div class="field grow">
+            <label for="policy-scope">Applies to</label>
+            <select
+              id="policy-scope"
+              class="ctrl"
+              [value]="policyScope()"
+              (change)="setPolicyScope($event)"
+            >
+              <option value="" [selected]="policyScope() === ''">The whole college</option>
+              @for (override of sheet.courses; track override.id) {
+                <option
+                  [value]="override.course_id"
+                  [selected]="override.course_id === policyScope()"
+                >
+                  {{ override.course_name ?? 'One course' }}
+                </option>
+              }
+            </select>
+          </div>
+        }
+      </div>
+    }
+
+    @if (policyError()) {
+      <div class="notice" role="alert">
+        <span class="icon" aria-hidden="true">error</span>{{ policyError() }}
+      </div>
+    }
+    @if (policyFlash()) {
+      <div class="notice good" role="status">
+        <span class="icon" aria-hidden="true">check_circle</span>{{ policyFlash() }}
+      </div>
+    }
+
+    @if (policyLoading()) {
+      <p class="state-note" role="status">
+        <span class="icon" aria-hidden="true">hourglass_empty</span>Loading…
+      </p>
+    } @else if (policySheet()) {
+      <!-- NO ROW IS EVER SEEDED, AND THE ABSENCE OF ONE IS THE DEFAULT. A
+           college nobody has configured reads "Not configured" with the
+           deployment's numbers in the boxes, never as a stored row: only one
+           of those two is a decision somebody made. -->
+      <p class="policy-state">
+        @if (policyIsConfigured()) {
+          <span class="chip dot good">Configured</span>
+          @if (policyRow()?.updated_by_name; as who) {
+            <span>last changed by {{ who }}</span>
+          }
+        } @else {
+          <span class="chip dot neutral">Not configured</span>
+          <span>deployment defaults</span>
+        }
+      </p>
+
+      @if (recordingOffOnServer()) {
+        <!-- One of the three gates on a recording is the operator's, and it is
+             not on this screen. Said here so "Allow voice recording" is not a
+             box the office ticks and then waits on. -->
+        <p class="notice" role="status">
+          <span class="icon" aria-hidden="true">mic</span>
+          Voice recording is switched off on this server (INTERVIEW_RECORDING_ENABLED). “Allow
+          voice recording” below records nothing until the operator turns it on.
+        </p>
+      }
+
+      <div class="policy-checks">
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="draftStoreTranscript()"
+            (change)="draftStoreTranscript.set(checkboxValue($event))"
+          />
+          <span>Keep the transcript</span>
+        </label>
+        <label class="check">
+          <input
+            type="checkbox"
+            [checked]="draftStoreAudio()"
+            (change)="draftStoreAudio.set(checkboxValue($event))"
+          />
+          <span>Allow voice recording</span>
+        </label>
+      </div>
+
+      <div class="policy-grid">
+        <div class="field">
+          <label for="policy-retention">Keep for (days)</label>
+          <input
+            id="policy-retention"
+            class="ctrl"
+            type="number"
+            [min]="policyBounds.retention_days.min"
+            [max]="policyBounds.retention_days.max"
+            [value]="draftRetentionDays()"
+            (input)="draftRetentionDays.set(numberValue($event))"
+          />
+        </div>
+        <div class="field">
+          <label for="policy-time-limit">Time limit (seconds)</label>
+          <input
+            id="policy-time-limit"
+            class="ctrl"
+            type="number"
+            [min]="policyBounds.time_limit_seconds.min"
+            [max]="policyBounds.time_limit_seconds.max"
+            [value]="draftTimeLimit()"
+            (input)="draftTimeLimit.set(numberValue($event))"
+          />
+        </div>
+        <div class="field">
+          <label for="policy-daily-cap">Completed per day</label>
+          <input
+            id="policy-daily-cap"
+            class="ctrl"
+            type="number"
+            [min]="policyBounds.daily_cap.min"
+            [max]="policyBounds.daily_cap.max"
+            [value]="draftDailyCap()"
+            (input)="draftDailyCap.set(numberValue($event))"
+          />
+        </div>
+        <div class="field">
+          <label for="policy-attempt-cap">Attempts per day</label>
+          <input
+            id="policy-attempt-cap"
+            class="ctrl"
+            type="number"
+            [min]="policyBounds.attempt_cap.min"
+            [max]="policyBounds.attempt_cap.max"
+            [attr.aria-invalid]="policyCapsAreOrdered() ? null : 'true'"
+            [value]="draftAttemptCap()"
+            (input)="draftAttemptCap.set(numberValue($event))"
+          />
+        </div>
+      </div>
+
+      @if (!policyCapsAreOrdered()) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span>
+          Attempts per day cannot be lower than completed per day.
+        </div>
+      }
+
+      <div class="footbar">
+        <button
+          type="button"
+          class="btn primary"
+          [disabled]="!canSavePolicy()"
+          (click)="savePolicy()"
+        >
+          <span class="icon" aria-hidden="true">save</span>
+          {{ policySaving() ? 'Saving…' : 'Save policy' }}
+        </button>
+      </div>
+    }
+  </section>
+</div>

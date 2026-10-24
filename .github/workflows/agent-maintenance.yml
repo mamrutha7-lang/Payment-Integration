@@ -1,0 +1,87 @@
+# Maintain: once a week, the upkeep nobody schedules — outdated and vulnerable
+# dependencies, stale pull requests and issues, and AGENTS.md drifting away
+# from the code it describes. One report issue, and at most one small PR.
+#
+# Monday 03:15 UTC = 08:45 IST, clear of the 01:00 dump, the 02:00 archive and
+# the 03:00 retention sweep, and after infra-drift's 08:00 run.
+#
+# Same limits as every agent here: no AWS credentials, no production secrets,
+# never deploys. A dependency bump is a draft PR that CI, the review agent and
+# you decide on; release_gate.py refuses to auto-ship a manifest change, so a
+# bump always reaches production through a human.
+
+name: Agent maintenance
+
+on:
+  schedule:
+    - cron: "15 3 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: agent-maintenance
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      # The owner is the only commit author; see the action's header.
+      - uses: ./.github/actions/sole-author
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # package.json pins npm@11.16.0; the runner's npm 10 crashes on this
+      # lockfile ("reading 'edgesOut'"), which is why the first maintenance
+      # run could not regenerate it.
+      - name: Use the npm version package.json pins
+        run: npm install -g npm@11.16.0
+
+      # Facts first, gathered by tools, so the agent reports measurements and
+      # not recollections. Every step tolerates failure: a report with one
+      # section saying "could not run" beats no report.
+      - name: Gather dependency facts
+        continue-on-error: true
+        # Outside the checkout, so the agent cannot commit the reports or the venv.
+        env:
+          M: ${{ runner.temp }}/maint
+        run: |
+          mkdir -p "$M"
+          python -m venv "$M/venv"
+          "$M/venv/bin/pip" install -q -r apps/api-py/requirements.txt pip-audit || true
+          "$M/venv/bin/pip" list --outdated --format=json > "$M/pip-outdated.json" 2>&1 || true
+          "$M/venv/bin/pip-audit" -r apps/api-py/requirements.txt -f json > "$M/pip-audit.json" 2>&1 || true
+          (cd apps/web && npm ci --ignore-scripts --no-audit --no-fund >/dev/null 2>&1; \
+           npm outdated --json > "$M/npm-outdated.json" 2>&1; \
+           npm audit --json > "$M/npm-audit.json" 2>&1) || true
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            MEASUREMENTS: ${{ runner.temp }}/maint
+            Follow .claude/skills/maintenance/SKILL.md. The measurements are
+            JSON files in MEASUREMENTS, outside the repository.
+          # In automation mode the agent may run only what is listed here; the
+          # first run was denied nine times and wrote no report. --add-dir lets
+          # it read the measurements, which live outside the checkout.
+          claude_args: |
+            --max-turns 100
+            --add-dir ${{ runner.temp }}/maint
+            --allowedTools "Read,Grep,Glob,Edit,Write,Bash(ls:*),Bash(cat:*),Bash(git:*),Bash(gh issue:*),Bash(gh pr:*),Bash(gh label:*),Bash(python:*),Bash(python3:*),Bash(pip:*),Bash(npm:*),Bash(npx:*)"

@@ -1,0 +1,153 @@
+/* The chrome both batch dialogs wear — Promote batch and Graduate batch, and
+ * the roster's own small dialogs (edit a student, act on a whole batch).
+ *
+ * `.btn` `.chip` `.notice` `.field` `.ctrl` `.icon` are global
+ * (styles/reep-v2.scss) and are used as they are. What is here is the shape of
+ * the 760x560 panel both boards draw: the head with its title and close, the
+ * scrolling body of checks, and the footer with Cancel beside the one primary
+ * action. reep-v2.scss has no dialog vocabulary yet — that gap is reported
+ * rather than filled from here, because a global class is the design system's
+ * to add.
+ */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(30, 27, 41, 0.42);
+  backdrop-filter: blur(2px);
+}
+
+.dialog {
+  width: 760px;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: 0 24px 60px rgba(58, 31, 82, 0.3);
+}
+
+.dialog.narrow {
+  width: 560px;
+}
+
+.dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.dialog-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.dialog-sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin: 5px 0 0;
+}
+
+.dialog-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dialog-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--hairline);
+}
+
+/* --- one pre-flight check ------------------------------------------------ */
+/* NOT `.check`: that name is already taken TWICE at the top level of the two
+   global sheets (reep-v2.scss's checkbox row and reep-v2-resume.scss's, which
+   loads second and so wins app-wide). A component rule of the same name does
+   not replace them — it overrides only the properties it repeats and silently
+   inherits the rest, which is how these rows were picking up the resume
+   sheet's font-weight and --ink-nav colour. One owner per global class. */
+
+.preflight {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12.5px;
+}
+
+.preflight .icon {
+  font-size: 18px;
+  flex: none;
+  line-height: 1.2;
+}
+
+.preflight.good .icon {
+  color: var(--good);
+}
+
+.preflight.warn .icon {
+  color: var(--warn-dot);
+}
+
+/* A check whose input nothing can read today. Not an error and not a pass:
+   the dialog says so in its own words rather than drawing a tick it has not
+   earned. */
+.preflight.pending .icon {
+  color: var(--faint);
+}
+
+.preflight-headline {
+  font-weight: 600;
+}
+
+.preflight.pending .preflight-headline {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.preflight-detail {
+  font-size: 11.5px;
+  color: var(--faint);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+/* --- the two fields under the checks ------------------------------------- */
+
+.dialog-fields {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.dialog-fields .field {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.dialog-fields .field.dated {
+  flex: 0 0 180px;
+}

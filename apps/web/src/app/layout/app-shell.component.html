@@ -1,0 +1,315 @@
+<!-- INSIDE THE PHONE APP (Ionic + Capacitor) the same navigation is drawn
+     by MobileShellComponent instead: an ion-menu, an ion-header, ion-content
+     and bottom tabs. `@defer` makes Ionic a separate download that the
+     website never fetches. The website's frame below is unchanged and is
+     left at its original indentation so this wrap does not rewrite it. -->
+@if (native) {
+  @defer (on immediate) {
+    <app-mobile-shell
+      [navigation]="navigation()"
+      [consoleName]="consoleName()"
+      [displayName]="displayName()"
+      [subtitle]="usn() || roleLabel()"
+      [initials]="initials()"
+      (signOut)="signOut()"
+    />
+  }
+} @else {
+<div class="desktop-frame">
+  <!-- The app bar. 52px, the titlebar gradient, one hairline at the bottom.
+       Brand mark and console name on the left; the admin's environment pill
+       and the scope readout in the middle; the account block on the right.
+       The ⌘K search and the notifications bell the boards drew were disabled
+       controls with nothing behind them (no search API, no per-account feed)
+       and were removed on 2026-09-15: a control that can never work is the
+       first one a first-day clerk presses. -->
+  <header class="appbar">
+    <!-- The drawer's handle. Drawn only below 900px (reep-v2.scss hides it
+         above, with `display: none` rather than opacity, so it is not a tab
+         stop on a desktop where the sidebar is already on screen). -->
+    <button
+      type="button"
+      class="iconbtn appbar__nav-toggle"
+      [attr.aria-expanded]="navOpen()"
+      aria-controls="app-navigation"
+      [attr.aria-label]="navOpen() ? 'Close menu' : 'Open menu'"
+      (click)="toggleNav()"
+    >
+      <span class="icon" aria-hidden="true">{{ navOpen() ? 'close' : 'menu' }}</span>
+    </button>
+
+    <a class="appbar__brand" routerLink="/" aria-label="REEP home">
+      <span class="brandmark" aria-hidden="true">R</span>
+      <span class="brandmark__word">REEP</span>
+      <span class="brandmark__console">{{ consoleName() }}</span>
+    </a>
+
+    @if (navKind() === 'admin') {
+      @if (environmentLabel()) {
+        <!-- Which deployment this is. Rewritten at build time by deploy.yml
+             from the API's ENV, so it says `prod` in production and
+             `development` on a laptop; it is never a guess. -->
+        <span class="envpill">{{ environmentLabel() | uppercase }}</span>
+      }
+
+      <!-- THE SCOPE READOUT. This was a disabled picker reading
+           "Scope | BGSCET · All departments", which was invented twice over:
+           "BGSCET" is one deployment's college name hardcoded into every
+           deployment's app bar, and "All departments" was a claim no request
+           had ever made — the fake data beside a disabled control that
+           shared/pending/pending.directive.ts exists to forbid.
+
+           B1.4 answers "how far does this session reach" in RESPONSE HEADERS
+           (`X-Reep-Scope`, plus the college/department id headers — see
+           app/scope_views.py for why wrapping eleven list endpoints in
+           {scope, rows} was the wrong half of the requirement). There is no
+           "what is my scope" GET, and the app bar itself calls no list
+           endpoint, so it cannot show a per-request scope. That left two
+           honest shapes: delete the control, or state the reach read-only
+           from something the shell genuinely knows.
+
+           This is the second, because here the reach IS knowable. The whole
+           admin block renders only when navKind() === 'admin', i.e. role
+           ADMIN — the Main Admin, the one office account. `policies.
+           scope_filter` short-circuits to Reach(everything=True) for any key
+           held through ROLE_BASELINE, and ROLE_BASELINE["ADMIN"] is
+           `_ALL - _FACULTY_ONLY`: every console list key. So "programme" —
+           the word `exports.scope_note` writes into the header — is what
+           every list this session opens will report, and the readout is the
+           same fact rule 2 states as "the Main Admin sees all".
+
+           A NARROWED reach belongs to a scoped GRANT, and B1.3's college
+           admin is a MENTOR account holding scoped `admin.*` keys. That
+           session gets the faculty navigation and never renders this block,
+           so this readout is never the one that would have to say "narrowed";
+           when narrowing reaches this account, the truth is per response and
+           belongs beside the list it narrowed, not up here.
+
+           A chip and not `.select`: the pill's chevron is a menu affordance
+           and there is no menu to open. Statement, not control — so no
+           aria-disabled either, because nothing here is a disabled widget. -->
+      <span class="chip neutral appbar__scope">
+        <span class="icon" aria-hidden="true">apartment</span>
+        Scope · Whole programme
+      </span>
+
+      <a
+        class="iconbtn appbar__icon"
+        href="https://github.com/darshani8/reep-/blob/main/AGENTS.md"
+        target="_blank"
+        rel="noopener"
+        aria-label="Help"
+        title="Help"
+      >
+        <span class="icon" aria-hidden="true">help</span>
+      </a>
+    }
+
+    <!-- The account block.
+         The student console shows the identity and one Sign out button, as the
+         board does: there is nothing else for a student to reach from here,
+         and their Password link sits in the identity card beside "View
+         profile". Staff and the Main Admin get the menu, because the design
+         puts My account under the avatar and Signature and Password live
+         there until the Account screen lands in Phase 2 — without it neither
+         is reachable except by typing the URL. -->
+    @if (navKind() === 'student') {
+      <div class="account">
+        <span class="account__button account__button--static">
+          <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+          <span class="account__who">
+            <span class="account__name">{{ displayName() }}</span>
+            <span class="account__role">{{ usn() || roleLabel() }}</span>
+          </span>
+        </span>
+      </div>
+      <!-- The label is a SPAN so it can be hidden on its own below 560px,
+           leaving the glyph and an aria-label. It was a bare text node, and a
+           bare text node has no element to hide — the `font-size: 0` trick
+           that works around that lost to `.btn.sm`, which sets a font size at
+           the same specificity further down the sheet. A class of its own
+           beats the problem instead of racing it. -->
+      <button
+        type="button"
+        class="btn secondary sm appbar__signout"
+        aria-label="Sign out"
+        (click)="signOut()"
+      >
+        <span class="icon" aria-hidden="true">logout</span>
+        <span class="appbar__signout-label">Sign out</span>
+      </button>
+    } @else {
+      <div class="account">
+        <button
+          type="button"
+          class="account__button"
+          [attr.aria-expanded]="accountMenuOpen()"
+          aria-haspopup="menu"
+          (click)="toggleAccountMenu()"
+        >
+          <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+          <span class="account__who">
+            <span class="account__name">{{ displayName() }}</span>
+            <span class="account__role">{{ usn() || roleLabel() }}</span>
+          </span>
+        </button>
+
+        @if (accountMenuOpen()) {
+          <div class="account__menu" role="menu" (keydown.escape)="closeAccountMenu()">
+            <span class="account__menuhead">
+              {{ displayName() }}
+              <small>{{ roleLabel() }}</small>
+            </span>
+
+            <a
+              class="account__item"
+              role="menuitem"
+              routerLink="/account"
+              (click)="closeAccountMenu()"
+            >
+              <span class="icon" aria-hidden="true">person</span>
+              My account
+            </a>
+
+            <a
+              class="account__item"
+              role="menuitem"
+              routerLink="/account/password"
+              (click)="closeAccountMenu()"
+            >
+              <span class="icon" aria-hidden="true">lock</span>
+              Password
+            </a>
+
+            <!-- Signature is for the people who SIGN a leave paper: a faculty
+               member on the request they apply on, the Main Admin on the one
+               they sanction. The route is roleGuard('MENTOR', 'ADMIN') and this
+               menu is everything that is not a student, so ALUMNI were being
+               offered it too — an alumnus has no leave paper to sign, and
+               clicking it bounced them to their home screen with no
+               explanation, which reads as a broken app rather than as a screen
+               that is not theirs. The two kinds named here are the two roles
+               the guard admits; one fact, not a second mechanism. -->
+            @if (navKind() === 'staff' || navKind() === 'admin') {
+              <a
+                class="account__item"
+                role="menuitem"
+                routerLink="/mentor/signature"
+                (click)="closeAccountMenu()"
+              >
+                <span class="icon" aria-hidden="true">draw</span>
+                Signature
+              </a>
+            }
+
+            <button type="button" class="account__item" role="menuitem" (click)="signOut()">
+              <span class="icon" aria-hidden="true">logout</span>
+              Sign out
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </header>
+
+  <div class="desktop-shell">
+    <!-- The scrim. A real <button> and not a div: closing the drawer by
+         tapping beside it is an action, and a div with a click handler is one
+         no keyboard or screen reader can reach. Above 900px it is
+         `display: none`, so it is not in the tab order on a desktop. -->
+    @if (navOpen()) {
+      <button type="button" class="nav-scrim" aria-label="Close menu" (click)="closeNav()"></button>
+    }
+
+    <nav
+      id="app-navigation"
+      class="desktop-nav"
+      [class.is-open]="navOpen()"
+      aria-label="Main"
+      (keydown.escape)="closeNav()"
+    >
+      <!-- The student's identity card. The one entry point to /student/profile:
+           the sidebar list deliberately leaves Profile out as "a record rather
+           than a task", and the card is where a person looks for their own
+           details. -->
+      @if (navKind() === 'student') {
+        <div class="nav-profile">
+          <div class="avatar">
+            <span class="icon" aria-hidden="true">person</span>
+          </div>
+          <div class="name">{{ displayName() }}</div>
+          @if (usn(); as studentUsn) {
+            <div class="usn">{{ studentUsn }}</div>
+          }
+          <div class="nav-profile__links">
+            <a
+              class="nav-profile__link"
+              routerLink="/student/profile"
+              routerLinkActive="active"
+              (click)="closeNav()"
+            >
+              <!-- `person`, not `badge`: the icon font is SUBSET to
+                   tools/fonts/icon-names.txt, so a glyph outside it renders as
+                   nothing at all. -->
+              <span class="icon" aria-hidden="true">person</span> View profile
+            </a>
+            <!-- Students have held passwords since the 2026-09-10 onboarding
+                 work, and this is the only route to the screen: the app bar
+                 used to hide it from them under a comment saying they sign in
+                 with Google and would meet a 409. They do not. -->
+            <a
+              class="nav-profile__link"
+              routerLink="/account/password"
+              routerLinkActive="active"
+              (click)="closeNav()"
+            >
+              <span class="icon" aria-hidden="true">lock</span> Password
+            </a>
+          </div>
+        </div>
+      }
+
+      @for (group of navigation(); track group.title) {
+        @if (group.title) {
+          <div class="sec-label">{{ group.title }}</div>
+        }
+        @for (item of group.items; track item.label) {
+          @if (item.path) {
+            <!-- (click) closes the drawer: on a phone the destination is
+                 behind it, and a drawer left standing over the screen the
+                 student just asked for reads as a link that did nothing.
+                 Above 900px `navOpen` is already false and this is a no-op. -->
+            <a
+              [routerLink]="item.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: item.exact === true }"
+              (click)="closeNav()"
+            >
+              <span class="icon" aria-hidden="true">{{ item.icon }}</span> {{ item.label }}
+            </a>
+          } @else {
+            <!-- Routed nowhere yet. Rendered so the console's shape is honest,
+                 disabled so it cannot pretend to work. -->
+            <span class="nav-pending" [title]="item.arrivesIn ?? ''" aria-disabled="true">
+              <span class="icon" aria-hidden="true">{{ item.icon }}</span>
+              <span class="label">{{ item.label }}</span>
+              <small>Soon</small>
+            </span>
+          }
+        }
+      }
+    </nav>
+
+    <main class="desktop-main" [class.desktop-main--admin]="navKind() === 'admin'">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>
+
+<!-- On every authenticated screen, per the design. The orb is draggable; a
+     tap opens the dock beside it — the REEP Agent chat and, for a student,
+     the mock interviewer, as two tabs of one panel — which is why the student
+     sidebar carries no agent link and no interview link of its own. -->
+<app-agent-orb />
+<app-agent-dock />
+}

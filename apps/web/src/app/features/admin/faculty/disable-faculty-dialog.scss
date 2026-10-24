@@ -1,0 +1,120 @@
+/* The Disable faculty dialog's chrome — `design/admin/OffboardFaculty.html`.
+ *
+ * `.btn` `.chip` `.notice` `.field` `.ctrl` `.icon` are global
+ * (styles/reep-v2.scss) and are used as they are. What is here is the shape of
+ * the panel the board draws: the head with its title and close, the body of
+ * consequences, the two fields, and the footer with Cancel beside the one
+ * destructive action. reep-v2.scss has no dialog vocabulary yet — that gap is
+ * reported rather than filled from here, because a global class is the design
+ * system's to add.
+ */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(30, 27, 41, 0.42);
+  backdrop-filter: blur(2px);
+}
+
+.dialog {
+  /* Focused on open, so the outline is the browser's on a panel that is
+     already the only thing the reader can reach. */
+  outline: none;
+  width: 640px;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: 0 24px 60px rgba(58, 31, 82, 0.3);
+}
+
+.dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.dialog-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.dialog-sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin: 5px 0 0;
+}
+
+.dialog-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dialog-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--hairline);
+}
+
+/* --- one consequence of disabling ---------------------------------------- */
+
+.consequence {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12.5px;
+  line-height: 1.45;
+}
+
+.consequence .icon {
+  font-size: 18px;
+  flex: none;
+  line-height: 1.2;
+  color: var(--brand-purple);
+}
+
+.consequence.kept .icon {
+  color: var(--good);
+}
+
+/* --- the reason and the effective date ----------------------------------- */
+
+.dialog-fields {
+  display: flex;
+  gap: 12px;
+  margin-top: 2px;
+  flex-wrap: wrap;
+}
+
+.dialog-fields .field {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.dialog-fields .field.dated {
+  flex: 0 0 180px;
+}

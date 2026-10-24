@@ -1,0 +1,176 @@
+<div class="dialog-backdrop" (click)="dismissed.emit()">
+  <div
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="titleId"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="dialog-head">
+      <div>
+        <h2 class="dialog-title" [id]="titleId">Alert rules</h2>
+        <p class="dialog-sub">One threshold per rule, per batch.</p>
+      </div>
+      <button
+        type="button"
+        class="btn ghost sm"
+        aria-label="Close the alert rules dialog"
+        (click)="dismissed.emit()"
+      >
+        <span class="icon" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <div class="dialog-body">
+      <div class="notice accent">
+        <span class="icon" aria-hidden="true">schedule</span>
+        <div>
+          Saved rules apply at the next alert check.
+        </div>
+      </div>
+
+      @if (error()) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ error() }}
+        </div>
+      }
+
+      <div class="row-fields">
+        <label class="field">
+          <span>Batch</span>
+          <select class="ctrl" aria-label="Batch these rules apply to" (change)="chooseBatch($event)">
+            @if (batches() === null) {
+              <option value="">Loading batches…</option>
+            } @else {
+              @for (batch of batches(); track batch.id) {
+                <option [value]="batch.id" [selected]="batch.id === batchId()">
+                  {{ batch.display_label }} · {{ batch.student_count }} students
+                </option>
+              } @empty {
+                <option value="">No batches on this deployment</option>
+              }
+            }
+          </select>
+        </label>
+        <span class="summary">
+          @if (chosenBatch()) {
+            <b>{{ liveRuleCount() }}</b> of 5 rules will be evaluated for this batch.
+          } @else {
+            Choose a batch to see what it is measured against.
+          }
+        </span>
+      </div>
+
+      @if (loadingRules()) {
+        <p class="state-note" role="status">
+          <span class="icon" aria-hidden="true">hourglass_empty</span>Reading this batch's rules…
+        </p>
+      }
+
+      @for (row of rows(); track row.spec.key) {
+        <section class="rule">
+          <div class="rule-head">
+            <div>
+              <h3 class="rule-title">{{ row.spec.label }}</h3>
+              <p class="rule-text">{{ row.spec.description }}</p>
+            </div>
+            @if (row.configured) {
+              @if (row.enabled) {
+                <span class="chip dot good">Evaluated</span>
+              } @else {
+                <span class="chip dot neutral">Switched off</span>
+              }
+            } @else {
+              <span class="chip dot warn">Not set</span>
+            }
+          </div>
+
+          <p class="rule-skips">
+            <span class="icon" aria-hidden="true">info</span>
+            <span><b>Never alerts on:</b> {{ row.spec.skips }}</span>
+          </p>
+
+          <div class="rule-fields">
+            <label class="field toggle">
+              <input
+                type="checkbox"
+                [checked]="row.enabled"
+                [disabled]="!batchId()"
+                (change)="setEnabled(row.spec.key, $event)"
+              />
+              <span>Evaluate this rule</span>
+            </label>
+
+            <label class="field narrow">
+              <span>Severity</span>
+              <select
+                class="ctrl"
+                [disabled]="!batchId()"
+                [attr.aria-label]="row.spec.label + ' — severity'"
+                (change)="setSeverity(row.spec.key, $event)"
+              >
+                @for (severity of severities; track severity.id) {
+                  <option [value]="severity.id" [selected]="severity.id === row.severity">
+                    {{ severity.label }}
+                  </option>
+                }
+              </select>
+            </label>
+
+            @for (param of row.spec.params; track param.key) {
+              <label class="field narrow">
+                <span>{{ param.label }}</span>
+                <input
+                  class="ctrl"
+                  type="number"
+                  inputmode="decimal"
+                  [step]="param.step"
+                  [value]="row.values[param.key]"
+                  [disabled]="!batchId()"
+                  [attr.aria-describedby]="'hint-' + row.spec.key + '-' + param.key"
+                  (input)="setParam(row.spec.key, param.key, $event)"
+                />
+                <span class="hint" [id]="'hint-' + row.spec.key + '-' + param.key">
+                  {{ param.hint }}
+                </span>
+              </label>
+            }
+
+            <button
+              type="button"
+              class="btn secondary sm rule-save"
+              [disabled]="row.busy || !batchId()"
+              (click)="save(row.spec.key)"
+            >
+              <span class="icon" aria-hidden="true">save</span>
+              {{ row.busy ? 'Saving…' : row.configured ? 'Save' : 'Set this rule' }}
+            </button>
+          </div>
+
+          @if (row.error) {
+            <p class="err" role="alert">
+              <span class="icon" aria-hidden="true">error</span>{{ row.error }}
+            </p>
+          }
+          @if (row.flash) {
+            <p class="rule-flash" role="status">
+              <span class="icon" aria-hidden="true">check_circle</span>{{ row.flash }}
+            </p>
+          }
+        </section>
+      }
+
+      <div class="notice accent">
+        <span class="icon" aria-hidden="true">info</span>
+        <div>
+          A rule can be switched off but not removed.
+        </div>
+      </div>
+    </div>
+
+    <div class="dialog-foot">
+      <span class="summary">Each rule is saved on its own — there is one row per rule, per batch.</span>
+      <button type="button" class="btn secondary" (click)="dismissed.emit()">Close</button>
+    </div>
+  </div>
+</div>

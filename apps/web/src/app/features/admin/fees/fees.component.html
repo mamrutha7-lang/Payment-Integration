@@ -1,0 +1,268 @@
+<div class="panel" data-p="admin-fees">
+  <div class="dt-header">
+    <div>
+      <h1 class="dt-title">Student fees</h1>
+      <div class="dt-sub">Raise a fee for a batch or for chosen students, and see who has paid.</div>
+    </div>
+  </div>
+
+  <!-- ----------------------------------------------------------- raise a fee -->
+  <div class="card">
+    <h2 class="dt-title sm">Raise a fee</h2>
+    <form class="fa-form" (submit)="$event.preventDefault(); raise()">
+      <label class="fa-field" for="fa-title">
+        Title
+        <input
+          id="fa-title"
+          class="ctrl"
+          type="text"
+          maxlength="200"
+          autocomplete="off"
+          placeholder="e.g. Exam fee, Semester 3"
+          [value]="title()"
+          (input)="title.set($any($event.target).value)"
+        />
+      </label>
+      <label class="fa-field" for="fa-amount">
+        Amount (₹)
+        <input
+          id="fa-amount"
+          class="ctrl"
+          type="number"
+          min="0.01"
+          step="0.01"
+          inputmode="decimal"
+          placeholder="1500.00"
+          [value]="amount()"
+          (input)="amount.set($any($event.target).value)"
+        />
+      </label>
+      <label class="fa-field" for="fa-due">
+        Due date (optional)
+        <input
+          id="fa-due"
+          class="ctrl"
+          type="date"
+          [value]="dueDate()"
+          (input)="dueDate.set($any($event.target).value)"
+        />
+      </label>
+
+      <fieldset class="fa-target">
+        <legend>Who pays</legend>
+        <label class="inline-check">
+          <input
+            type="radio"
+            name="fa-target"
+            [checked]="target() === 'batch'"
+            (change)="target.set('batch')"
+          />
+          A whole batch
+        </label>
+        <label class="inline-check">
+          <input
+            type="radio"
+            name="fa-target"
+            [checked]="target() === 'students'"
+            (change)="target.set('students')"
+          />
+          Chosen students
+        </label>
+      </fieldset>
+
+      @if (target() === 'batch') {
+        <label class="fa-field fa-wide" for="fa-batch">
+          Batch
+          <select
+            id="fa-batch"
+            class="ctrl"
+            [value]="cohortId()"
+            (change)="cohortId.set($any($event.target).value)"
+          >
+            <option value="">Choose a batch…</option>
+            @for (c of cohorts(); track c.id) {
+              <option [value]="c.id" [selected]="c.id === cohortId()">
+                {{ c.display_label }} ({{ c.student_count }})
+              </option>
+            }
+          </select>
+        </label>
+      } @else {
+        <div class="fa-wide">
+          <div class="filters">
+            <label class="sr-only" for="fa-search">Search students</label>
+            <input
+              id="fa-search"
+              class="ctrl grow"
+              type="text"
+              autocomplete="off"
+              placeholder="Search by name, USN or email"
+              [value]="query()"
+              (input)="query.set($any($event.target).value)"
+              (keydown.enter)="$event.preventDefault(); search()"
+            />
+            <button
+              type="button"
+              class="btn"
+              [disabled]="searching() || !query().trim()"
+              (click)="search()"
+            >
+              <span class="icon" aria-hidden="true">search</span
+              >{{ searching() ? 'Searching…' : 'Search' }}
+            </button>
+          </div>
+
+          @if (found().length) {
+            <ul class="fa-results">
+              @for (s of found(); track s.student_id) {
+                <li>
+                  <label class="inline-check">
+                    <input
+                      type="checkbox"
+                      [checked]="isPicked(s.student_id)"
+                      (change)="toggle(s)"
+                    />
+                    <span>
+                      <b>{{ s.name }}</b>
+                      <span class="fa-meta">{{ s.usn ?? 'no USN' }} · {{ s.batch ?? 'not seated' }}</span>
+                    </span>
+                  </label>
+                </li>
+              }
+            </ul>
+          }
+
+          @if (pickedList().length) {
+            <p class="dt-sub" role="status">{{ pickedList().length }} chosen:</p>
+            <div class="fa-chips">
+              @for (s of pickedList(); track s.student_id) {
+                <button
+                  type="button"
+                  class="chip neutral"
+                  [attr.aria-label]="'Remove ' + s.name"
+                  (click)="toggle(s)"
+                >
+                  {{ s.name }} <span class="icon" aria-hidden="true">close</span>
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (formError(); as problem) {
+        <div class="notice risk fa-wide" role="alert">
+          <span class="icon" aria-hidden="true">error</span><div>{{ problem }}</div>
+        </div>
+      }
+      @if (raised(); as done) {
+        <div class="notice good fa-wide" role="status">
+          <span class="icon" aria-hidden="true">check_circle</span><div>{{ done }}</div>
+        </div>
+      }
+
+      <div class="footbar fa-wide">
+        <button type="submit" class="btn primary" [disabled]="!canRaise()">
+          <span class="icon" aria-hidden="true">add</span>
+          {{
+            raising()
+              ? 'Raising…'
+              : recipientCount()
+                ? 'Raise fee for ' + recipientCount() + (recipientCount() === 1 ? ' student' : ' students')
+                : 'Raise fee'
+          }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- --------------------------------------------------------- fees raised -->
+  <div class="card">
+    <h2 class="dt-title sm">Fees raised</h2>
+    <form class="filters" (submit)="$event.preventDefault(); load()">
+      <label class="sr-only" for="fa-status">Status</label>
+      <select
+        id="fa-status"
+        class="ctrl"
+        [value]="statusFilter()"
+        (change)="statusFilter.set($any($event.target).value); load()"
+      >
+        <option value="">All statuses</option>
+        <option value="PENDING">Pending</option>
+        <option value="PAID">Paid</option>
+        <option value="CANCELLED">Cancelled</option>
+      </select>
+      <button type="submit" class="btn" [disabled]="loading()">
+        <span class="icon" aria-hidden="true">refresh</span>{{ loading() ? 'Loading…' : 'Refresh' }}
+      </button>
+    </form>
+
+    @if (listError(); as problem) {
+      <div class="notice risk" role="alert">
+        <span class="icon" aria-hidden="true">error</span><div>{{ problem }}</div>
+      </div>
+    }
+
+    @if (loaded() && fees().length === 0) {
+      <div class="notice" role="status">
+        <span class="icon" aria-hidden="true">info</span><div>No fees match.</div>
+      </div>
+    }
+
+    @if (fees().length) {
+      <table class="dt-table">
+        <thead>
+          <tr>
+            <th scope="col">Student</th>
+            <th scope="col">USN</th>
+            <th scope="col">Fee</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Due</th>
+            <th scope="col">Status</th>
+            <th scope="col"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (f of fees(); track f.id) {
+            <tr>
+              <td>{{ f.student_name }}</td>
+              <td>{{ f.usn ?? '—' }}</td>
+              <td>{{ f.title }}</td>
+              <td>₹{{ f.amount }}</td>
+              <td>{{ formatDate(f.due_date) }}</td>
+              <td>
+                @if (f.status === 'PAID') {
+                  <span class="chip good">Paid {{ formatDate(f.paid_at) }}</span>
+                } @else if (f.status === 'CANCELLED') {
+                  <span class="chip neutral">Cancelled</span>
+                } @else if (f.overdue) {
+                  <span class="chip risk">Overdue</span>
+                } @else {
+                  <span class="chip warn">Pending</span>
+                }
+              </td>
+              <td>
+                @if (f.status === 'PENDING') {
+                  <button
+                    type="button"
+                    class="btn sm"
+                    [disabled]="cancelling() === f.id"
+                    (click)="cancel(f)"
+                  >
+                    {{
+                      cancelling() === f.id
+                        ? 'Cancelling…'
+                        : confirming() === f.id
+                          ? 'Press again to cancel'
+                          : 'Cancel fee'
+                    }}
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

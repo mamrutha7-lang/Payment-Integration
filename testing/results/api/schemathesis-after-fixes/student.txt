@@ -1,0 +1,72 @@
+Schemathesis v4.28.0
+━━━━━━━━━━━━━━━━━━━━
+
+
+ ✅  Loaded specification from http://localhost:3300/openapi.json (in 0.34s)    
+
+     Base URL:         http://localhost:3300/                                   
+     Specification:    Open API 3.1.0                                           
+     Operations:       34 selected / 370 total                                  
+
+
+ ✅  API capabilities:                                                          
+
+     Supports NULL byte in headers:                            ✘                
+     Accepts backslash and control characters in URL paths:    ✓                
+
+ ⏭   Examples (in 0.01s)                                                        
+                                                                                
+     ⏭  34 skipped                                                              
+
+ ❌  Coverage (in 0.81s)                                                        
+                                                                                
+     ✅ 33 passed  ❌  1 failed                                                 
+
+ ❌  Fuzzing (in 1.50s)                                                         
+                                                                                
+     ✅ 33 passed  ❌  1 failed                                                 
+
+=================================== FAILURES ===================================
+___________________ GET /api/student/resume/{resume_id}/pdf ____________________
+1. Test Case ID: 4jxgGg
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Resume not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/resume/0/pdf?appendix=false'
+    
+    st replay 4jxgGg
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 34/370
+  Tested: 34
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ Undocumented HTTP status code: 1
+
+Test cases:
+  308 generated, 1 found 1 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis-after-fixes/student/junit-20260930T063350Z.xml
+  - NDJSON: results/api/schemathesis-after-fixes/student/ndjson-20260930T063350Z.ndjson
+
+Seed: 127633210444195874510349789846002932649
+
+============================== 1 failure in 2.41s ==============================

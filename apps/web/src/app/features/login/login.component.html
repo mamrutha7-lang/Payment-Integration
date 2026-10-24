@@ -1,0 +1,351 @@
+<div class="login">
+  <!-- Brand panel — the design's left half. -->
+  <aside class="panel">
+    <div class="panel__brand">
+      <div class="panel__logo" aria-hidden="true">R</div>
+      <div>
+        <div class="panel__reep">REEP</div>
+        <div class="panel__sub">BGSCET Career Readiness Platform</div>
+      </div>
+    </div>
+
+    <div class="panel__copy">
+      <p class="panel__headline">Career readiness, opportunities and progress — all in one place.</p>
+      <p class="panel__body">
+        One workspace for skilling, mentorship and placements — built for students, mentors
+        and alumni alike.
+      </p>
+
+      <ul class="panel__points">
+        <li>
+          <span class="icon" aria-hidden="true">verified</span>
+          Build and verify skills with mentor-backed evidence
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">work</span>
+          Discover curated jobs and internships
+        </li>
+        <li>
+          <span class="icon" aria-hidden="true">event_note</span>
+          Stay on track with mentor guidance
+        </li>
+      </ul>
+    </div>
+
+    <div class="panel__foot">© REEP · BGSCET Placement &amp; Skilling Cell</div>
+  </aside>
+
+  <!-- Sign-in card — the design's right half. -->
+  <main class="signin">
+    <div class="card-login">
+      <div class="card-login__brand">
+        <span class="card-login__mark" aria-hidden="true">R</span>
+        <span>REEP</span>
+      </div>
+      <h1 class="card-login__title">Welcome back</h1>
+      <p class="card-login__sub">{{ subtitle }}</p>
+
+      <!-- The portal picker. It is a DESCRIPTION of where you are heading, not
+           the access control: the API assigns the role from the roster row
+           behind the verified identity, and the home screen is routed from
+           that role. Picking a portal changes the ID field's label, hint and
+           placeholder so a student sees "USN" and a mentor sees "employee
+           email" — nothing more. -->
+      <div class="portal-label" id="portal-label">Choose your portal</div>
+      <div class="portals" role="radiogroup" aria-labelledby="portal-label">
+        @for (p of portals; track p.key) {
+          <button
+            type="button"
+            class="portal"
+            role="radio"
+            [class.portal--on]="portal() === p.key"
+            [attr.aria-checked]="portal() === p.key"
+            (click)="selectPortal(p.key)"
+          >
+            <span class="icon" aria-hidden="true">{{ p.icon }}</span>
+            <span class="portal__label">{{ p.label }}</span>
+            <span class="portal__desc">{{ p.desc }}</span>
+          </button>
+        }
+      </div>
+
+      <!-- The design's Main Admin door. It is a HINT, not a bypass: it selects
+           the Admin portal so the ID field reads "admin email", and the role
+           still comes from the roster row behind the verified identity. -->
+      <button type="button" class="main-admin" [class.main-admin--on]="portal() === 'admin'" [attr.aria-pressed]="portal() === 'admin'" (click)="openMainAdmin()">
+        <span class="icon" aria-hidden="true">admin_panel_settings</span>
+        Main Admin — open the REEP Admin Console
+      </button>
+
+      <!-- A refusal handed back on the Google callback redirect, or a session
+           ended because the account was disabled. Text + icon + colour
+           together, never colour alone. -->
+      @if (error()) {
+        <div class="alert alert--error" role="alert">
+          <span class="icon" aria-hidden="true">error</span>
+          <span>{{ error() }}</span>
+        </div>
+      }
+
+      @if (native) {
+        <!-- No Google button inside the phone app. Google refuses to sign
+             anybody in from inside an app's built-in browser (it calls that
+             an "embedded webview" and answers 403 disallowed_useragent), and
+             the redirect back would land on the phone, not the server. The
+             email + password form below works in the app. -->
+      } @else if (available()) {
+        <!-- A real full-page navigation, not fetch: OAuth needs a top-level
+             redirect out to Google and back. `next` rides in the query string
+             because the SPA's own URL does not survive it. -->
+        <a
+          class="google"
+          [href]="signInUrl"
+          [class.google--pending]="pending()"
+          [attr.aria-disabled]="pending() ? 'true' : null"
+          (click)="beginSignIn()"
+        >
+          @if (pending()) {
+            <span class="spinner" aria-hidden="true"></span>
+            <span>Connecting to Google…</span>
+          } @else {
+            <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
+              <path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.12-.85 2.07-1.82 2.71v2.26h2.94C16.46 14.1 17.64 11.9 17.64 9.2z"/>
+              <path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.19l-2.94-2.26c-.8.55-1.84.87-3.02.87-2.32 0-4.28-1.57-4.98-3.68H1v2.33C2.44 15.98 5.48 18 9 18z"/>
+              <path fill="#FBBC05" d="M4.02 10.74c-.19-.55-.29-1.14-.29-1.74s.1-1.19.29-1.74V4.93H1C.37 6.18 0 7.55 0 9s.37 2.82 1 4.07l3.02-2.33z"/>
+              <path fill="#EA4335" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.6-2.6C13.46.89 11.42 0 9 0 5.48 0 2.44 2.02 1 4.93l3.02 2.33C4.72 5.15 6.68 3.58 9 3.58z"/>
+            </svg>
+            <span>Continue with Google</span>
+          }
+        </a>
+        <p class="google__sub">Continues to your {{ current().label }} workspace</p>
+      } @else {
+        <button type="button" class="google" disabled>
+          <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true">
+            <path fill="currentColor" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84c-.21 1.12-.85 2.07-1.82 2.71v2.26h2.94C16.46 14.1 17.64 11.9 17.64 9.2z"/>
+            <path fill="currentColor" d="M9 18c2.43 0 4.47-.8 5.96-2.19l-2.94-2.26c-.8.55-1.84.87-3.02.87-2.32 0-4.28-1.57-4.98-3.68H1v2.33C2.44 15.98 5.48 18 9 18z"/>
+            <path fill="currentColor" d="M4.02 10.74c-.19-.55-.29-1.14-.29-1.74s.1-1.19.29-1.74V4.93H1C.37 6.18 0 7.55 0 9s.37 2.82 1 4.07l3.02-2.33z"/>
+            <path fill="currentColor" d="M9 3.58c1.32 0 2.51.45 3.44 1.35l2.6-2.6C13.46.89 11.42 0 9 0 5.48 0 2.44 2.02 1 4.93l3.02 2.33C4.72 5.15 6.68 3.58 9 3.58z"/>
+          </svg>
+          <span>Continue with Google</span>
+        </button>
+        <!-- The API positively said Google is not configured. The probe fails
+             open, so this only ever shows when it is really off. -->
+        <div class="alert alert--error" role="status">
+          <span class="icon" aria-hidden="true">error</span>
+          <span>{{ unavailableReason() }}</span>
+        </div>
+      }
+
+      <div class="or" role="separator"><span>or continue with your REEP account</span></div>
+
+      <!-- Email + password, only when the server says it offers it. The probe
+           fails CLOSED for this one (see passwordAvailable): a default
+           deployment renders the note below instead of a form whose every
+           submission would 403. -->
+      @if (passwordAvailable()) {
+        @if (codeStep(); as step) {
+          <!-- The second step. The password was right; the server withheld the
+               session and emailed a six-digit code instead. Same classes as
+               the form below — this is the same card, one beat later. -->
+          <form class="pw" (ngSubmit)="submitCode()" novalidate>
+            <p class="field__help">
+              We emailed a 6-digit code to <strong>{{ step.email }}</strong>. It expires in
+              {{ step.minutes }} minutes.
+            </p>
+
+            <label class="field">
+              <span class="field__label">Sign-in code</span>
+              <input
+                class="field__input"
+                [class.field__input--err]="!!codeError()"
+                type="text"
+                inputmode="numeric"
+                autocomplete="one-time-code"
+                maxlength="6"
+                name="code"
+                placeholder="123456"
+                [ngModel]="code()"
+                (ngModelChange)="code.set($event)"
+                [attr.aria-invalid]="codeError() ? 'true' : null"
+              />
+            </label>
+            @if (codeError()) {
+              <p class="field__err" role="alert">{{ codeError() }}</p>
+            }
+
+            <button class="btn-primary" type="submit" [disabled]="codeBusy() || code().length !== 6">
+              @if (codeBusy()) {
+                <span class="spinner spinner--light" aria-hidden="true"></span>
+                Verifying…
+              } @else {
+                Verify
+              }
+            </button>
+
+            <div class="row-between">
+              <button type="button" class="linkish" (click)="cancelCode()">Use a different account</button>
+            </div>
+          </form>
+        } @else {
+        <form class="pw" [formGroup]="form" (ngSubmit)="submitPassword()" novalidate>
+          @if (formError()) {
+            <div class="alert alert--error" role="alert">
+              <span class="icon" aria-hidden="true">error</span>
+              <span>{{ formError() }}</span>
+            </div>
+          }
+
+          <label class="field">
+            <span class="field__label">{{ current().fieldLabel }}</span>
+            <input
+              class="field__input"
+              [class.field__input--err]="idErr()"
+              type="text"
+              name="id"
+              formControlName="id"
+              [placeholder]="current().placeholder"
+              autocomplete="username"
+              autocapitalize="none"
+              spellcheck="false"
+              [attr.aria-invalid]="idErr() ? 'true' : null"
+            />
+          </label>
+          @if (idErr()) {
+            <p class="field__err" role="alert">{{ idErrMsg() }}</p>
+          }
+          <p class="field__help">{{ current().helper }}</p>
+
+          <label class="field">
+            <span class="field__label">Password</span>
+            <span class="field__pw">
+              <input
+                class="field__input"
+                [class.field__input--err]="pwErr()"
+                [type]="showPassword() ? 'text' : 'password'"
+                name="password"
+                formControlName="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                [attr.aria-invalid]="pwErr() ? 'true' : null"
+              />
+              <button
+                type="button"
+                class="field__eye"
+                (click)="toggleShowPassword()"
+                [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'"
+                [attr.aria-pressed]="showPassword()"
+              >
+                <span class="icon" aria-hidden="true">{{ showPassword() ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </span>
+          </label>
+          @if (pwErr()) {
+            <p class="field__err" role="alert">Enter your password.</p>
+          }
+
+          <div class="row-between">
+            <label class="remember">
+              <input type="checkbox" formControlName="remember" />
+              Remember me
+            </label>
+            <button type="button" class="linkish" (click)="toggleForgot()" [attr.aria-expanded]="forgotOpen()">
+              Forgot password?
+            </button>
+          </div>
+
+
+          <button class="btn-primary" type="submit" [disabled]="submitting()">
+            @if (submitting()) {
+              <span class="spinner spinner--light" aria-hidden="true"></span>
+              Signing in…
+            } @else {
+              Sign in
+            }
+          </button>
+        </form>
+        }
+      } @else if (probeFailed()) {
+        <p class="note" role="status">
+          REEP could not be reached just now, so password sign-in is not shown. Check your
+          connection and try again in a minute.
+          <button type="button" class="linkish" (click)="retryProbe()">Try again</button>
+        </p>
+      } @else {
+        <p class="field__help centered">
+          This server signs in with Google only. A REEP password, when one is issued to you,
+          comes from the placement cell.
+        </p>
+      }
+
+      @if (signedOutElsewhere()) {
+        <p class="note" role="status">
+          You were signed out because this account was signed in on another device. REEP allows
+          one device at a time — sign in again here to carry on, and the other device will be
+          signed out.
+        </p>
+      }
+
+      @if (verified() === '1') {
+        <p class="note note--good" role="status">
+          Email confirmed — thank you. The placement office will review your application and
+          you will hear back by email.
+        </p>
+      } @else if (verified() === '0') {
+        <p class="note" role="alert">
+          That confirmation link has expired or was already used. If your application is still
+          unconfirmed, apply again and use the new link.
+        </p>
+      }
+
+      @if (forgotOpen()) {
+        <form class="forgot" (submit)="sendReset(); $event.preventDefault()" novalidate>
+          @if (forgotAnswer(); as answer) {
+            <p class="note" role="status">{{ answer }}</p>
+          } @else {
+            <label class="field__label" for="forgot-email">Email address</label>
+            <input
+              id="forgot-email"
+              class="field__input"
+              type="email"
+              autocomplete="email"
+              [value]="forgotEmail()"
+              (input)="forgotEmail.set($any($event.target).value)"
+              placeholder="you@bgscet.ac.in"
+            />
+            <p class="field__help">
+              If that address belongs to a REEP account, a link goes to it: to reset your password,
+              or to set one up if you have only ever signed in with Google.
+            </p>
+            <button class="btn-primary" type="submit" [disabled]="forgotBusy() || !forgotEmail().trim()">
+              {{ forgotBusy() ? 'Sending…' : 'Send reset link' }}
+            </button>
+          }
+        </form>
+      }
+
+      <!-- The design's two doors under the card. "New student" is the public
+           application; "Already approved" is a student whose application the
+           placement office approved. Their setup link is the way to a password;
+           Google works for them meanwhile, and that is what the link brings into
+           focus. -->
+      <div class="doors">
+        <a routerLink="/register">New student? Register →</a>
+        <button type="button" class="linkish doors__approved" (click)="approvedSignIn()">
+          Already approved? Sign in →
+        </button>
+      </div>
+
+      <p class="help-foot">
+        Need help signing in?
+        <!-- A BUTTON, and named for what it does. This was an `<a href="#">`
+             labelled "Contact the placement cell" that actually opened the
+             forgot-password form: the words promised contact details and the
+             control did something else, and as an anchor-with-preventDefault it
+             announced itself to assistive tech as a link to nowhere. -->
+        <button type="button" class="help-foot__link" (click)="toggleForgot()">
+          Reset your password
+        </button>
+      </p>
+    </div>
+  </main>
+</div>

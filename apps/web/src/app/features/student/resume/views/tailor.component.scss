@@ -1,0 +1,151 @@
+/* Tailor step. Card / chip / btn / icon are global; the verdict block and the
+   requirement pills are local. */
+:host {
+  display: block;
+}
+
+.verdict {
+  border-left: 3px solid var(--warn-dot);
+}
+.verdict--ok {
+  border-left-color: var(--good);
+}
+.verdict-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.verdict-head > .icon {
+  font-size: 22px;
+  color: var(--warn);
+  flex: none;
+}
+.verdict--ok .verdict-head > .icon {
+  color: var(--good);
+}
+.verdict-head > div {
+  flex: 1;
+  min-width: 180px;
+}
+.verdict-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.verdict-sub {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.verdict-pct {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--brand-purple);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.05;
+}
+.verdict-pct small {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--faint);
+  letter-spacing: 0;
+}
+.verdict-reasons {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  font-size: 13px;
+  color: var(--ink);
+}
+.verdict-reasons li {
+  margin-bottom: 3px;
+}
+.verdict-foot {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+}
+
+/* --- the guidance card: what is still missing for the role --- */
+.tailored {
+  margin-top: 16px;
+}
+.tailored-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+}
+.tailored-lede {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.block {
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.block:last-child {
+  margin-bottom: 0;
+}
+.block--risk {
+  background: rgba(173, 36, 82, 0.08);
+}
+.block--risk .block-title {
+  color: var(--risk);
+}
+.block--tint {
+  background: var(--tint-2);
+}
+.block--tint .block-title {
+  color: var(--muted);
+}
+.block-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.block-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 13px;
+  border-top: 1px solid rgba(173, 36, 82, 0.12);
+  color: var(--ink);
+}
+.block-status {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.block-line {
+  font-size: 13px;
+  padding: 4px 0;
+  color: var(--ink);
+}
+
+.state-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.state-note .icon {
+  font-size: 16px;
+  color: var(--purple-mid);
+}

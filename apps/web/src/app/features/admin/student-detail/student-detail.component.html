@@ -1,0 +1,1424 @@
+<div class="panel" data-p="student-detail">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <span>People</span><span class="sep">/</span>
+        @if (canEdit()) {
+          <a routerLink="/admin/students">Students</a>
+        } @else {
+          <a routerLink="/admin/student-records">Student records</a>
+        }
+        <span class="sep">/</span>
+        <span class="crumb-usn">{{ usnLabel() }}</span>
+      </div>
+      <h1 class="dt-title sr-only">{{ studentName() }}</h1>
+    </div>
+    @if (!readOnly()) {
+      <div class="dt-toolbar">
+        @if (canEdit()) {
+          <button
+            type="button"
+            class="btn secondary"
+            [disabled]="student() === null"
+            (click)="openEditor('profile')"
+          >
+            <span class="icon" aria-hidden="true">edit</span> Edit profile
+          </button>
+          <button
+            type="button"
+            class="btn secondary"
+            [disabled]="student() === null"
+            (click)="openEditor('batch')"
+          >
+            <span class="icon" aria-hidden="true">school</span> Move batch
+          </button>
+        }
+        @if (isMainAdmin()) {
+          <div class="menu-wrap">
+            <button
+              type="button"
+              class="btn secondary"
+              aria-haspopup="menu"
+              [attr.aria-expanded]="menuOpen()"
+              (click)="toggleMenu()"
+            >
+              More <span class="icon" aria-hidden="true">expand_more</span>
+            </button>
+            @if (menuOpen()) {
+              <div class="menu" role="menu">
+                <button type="button" role="menuitem" (click)="askSignOutEverywhere()">
+                  <span class="icon" aria-hidden="true">logout</span> Sign out everywhere
+                </button>
+                <button type="button" role="menuitem" (click)="askCapReset()">
+                  <span class="icon" aria-hidden="true">refresh</span> Reset today's interview limit
+                </button>
+                <button type="button" role="menuitem" (click)="setTab('access')">
+                  <span class="icon" aria-hidden="true">history</span> See what changed
+                </button>
+                @if (isDisabled()) {
+                  <button type="button" role="menuitem" (click)="askEnable()">
+                    <span class="icon" aria-hidden="true">lock_open</span> Enable account
+                  </button>
+                } @else if (!isRemoved()) {
+                  <button type="button" role="menuitem" class="danger" (click)="askDisable()">
+                    <span class="icon" aria-hidden="true">block</span> Disable account
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="ribbon">
+        <span class="icon" aria-hidden="true">lock</span>
+        Read only. The placement office gave you access to this record.
+      </div>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading-line" role="status">Reading this student's record…</div>
+  }
+  @if (error()) {
+    <div class="notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span><span>{{ error() }}</span>
+    </div>
+  }
+  @if (flash()) {
+    <div class="notice good" role="status">
+      <span class="icon" aria-hidden="true">check_circle</span><span>{{ flash() }}</span>
+    </div>
+  }
+
+  @if (confirmingSignOut()) {
+    <div class="card confirm" role="alertdialog" aria-labelledby="signout-title">
+      <h2 class="card-title" id="signout-title">Sign {{ studentName() }} out everywhere?</h2>
+      <p class="card-sub">Every phone and laptop signed in as them is signed out now. Their password and data are not touched.</p>
+      <div class="actions">
+        <button type="button" class="btn secondary" (click)="cancelSignOutEverywhere()">Cancel</button>
+        <button type="button" class="btn primary" [disabled]="busy()" (click)="signOutEverywhere()">
+          Sign out everywhere
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (disableOpen()) {
+    <div class="card confirm" role="dialog" aria-labelledby="disable-title">
+      <h2 class="card-title" id="disable-title">Disable {{ studentName() }}'s account?</h2>
+      <p class="card-sub">
+        They cannot sign in by any door, and every device they are signed in on is signed out now. When they
+        try, they are told the account was disabled for a security reason and to contact the placement office.
+        Nothing in their record is removed, and you can enable the account again from this menu.
+      </p>
+      <div class="field">
+        <label for="disable-reason">Reason</label>
+        <input
+          #disableInput
+          id="disable-reason"
+          type="text"
+          placeholder="For example: password shared with another student"
+          [value]="disableReason()"
+          (input)="disableReason.set(disableInput.value)"
+        />
+        <div class="help">Required. Kept on this student's history. The student is not shown it.</div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn secondary" (click)="cancelDisable()">Cancel</button>
+        <button type="button" class="btn danger" [disabled]="!canDisable()" (click)="disableAccount()">
+          <span class="icon" aria-hidden="true">block</span> Disable account
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (enableOpen()) {
+    <div class="card confirm" role="alertdialog" aria-labelledby="enable-title">
+      <h2 class="card-title" id="enable-title">Enable {{ studentName() }}'s account?</h2>
+      <p class="card-sub">They can sign in again straight away. Their record is as it was.</p>
+      <div class="actions">
+        <button type="button" class="btn secondary" (click)="cancelEnable()">Cancel</button>
+        <button type="button" class="btn primary" [disabled]="busy()" (click)="enableAccount()">
+          <span class="icon" aria-hidden="true">lock_open</span> Enable account
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (capResetOpen()) {
+    <div class="card confirm" role="dialog" aria-labelledby="cap-title">
+      <h2 class="card-title" id="cap-title">Reset today's interview limit</h2>
+      <div class="field">
+        <label for="cap-reason">Reason</label>
+        <input
+          #capInput
+          id="cap-reason"
+          type="text"
+          placeholder="For example: two sessions dropped by the network"
+          [value]="capReason()"
+          (input)="capReason.set(capInput.value)"
+        />
+        <div class="help">Kept on this student's history.</div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn secondary" (click)="cancelCapReset()">Cancel</button>
+        <button type="button" class="btn primary" [disabled]="!canResetCap()" (click)="resetCap()">
+          Reset the limit
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (editorOpen()) {
+    <div class="card" role="dialog" aria-labelledby="editor-title">
+      <div class="card-head">
+        <h2 class="card-title" id="editor-title">{{ editorTitle() }}</h2>
+      </div>
+      <div class="editor-grid">
+        <div class="field">
+          <label for="student-name">Full name</label>
+          <input #nameInput id="student-name" type="text" [value]="formName()" (input)="formName.set(nameInput.value)" />
+        </div>
+        <div class="field">
+          <label for="student-email">College email</label>
+          <input #emailInput id="student-email" type="email" [value]="formEmail()" (input)="formEmail.set(emailInput.value)" />
+        </div>
+        <div class="field">
+          <label for="student-usn">USN</label>
+          <input #usnInput id="student-usn" type="text" [value]="formUsn()" (input)="formUsn.set(usnInput.value)" />
+        </div>
+        <div class="field">
+          <label for="student-batch">Batch</label>
+          <select #batchSelect id="student-batch" (change)="formBatchId.set(batchSelect.value)">
+            <option value="" [selected]="formBatchId() === ''">No batch</option>
+            @for (batch of batches(); track batch.id) {
+              <option [value]="batch.id" [selected]="batch.id === formBatchId()">{{ batch.display_label }}</option>
+            }
+          </select>
+          @if (batchesRefusal(); as refusal) {
+            <div class="help">The batch list could not be read: {{ refusal }}</div>
+          }
+        </div>
+        <div class="field">
+          <label for="student-stage">Stage</label>
+          <select #stageSelect id="student-stage" (change)="formStage.set(stageSelect.value)">
+            @for (stage of stages; track stage.key) {
+              <option [value]="stage.key" [selected]="stage.key === formStage()">{{ stage.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="field">
+          <label for="student-semester">Semester</label>
+          <select #semesterSelect id="student-semester" (change)="onSemester(semesterSelect.value)">
+            @for (semester of semesters(); track semester) {
+              <option [value]="semester" [selected]="semester === formSemester()">{{ semester }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="btn secondary" (click)="closeEditor()">Cancel</button>
+        <button type="button" class="btn primary" [disabled]="!canSaveProfile()" (click)="saveProfile()">
+          <span class="icon" aria-hidden="true">save</span> Save changes
+        </button>
+      </div>
+    </div>
+  }
+
+  @if (student(); as row) {
+    <div class="layout">
+      <!-- ============================================== the candidate rail -->
+      <aside class="rail" aria-label="Student summary">
+        <section class="card">
+          <div class="cand-top">
+            <div class="avatar-lg" aria-hidden="true">{{ initials() }}</div>
+            <div class="cand-name">
+              <h2 class="name">{{ studentName() }}</h2>
+              <div class="usn">
+                {{ usnLabel() }}
+                @if (row.usn) {
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    aria-label="Copy USN"
+                    title="Copy USN"
+                    (click)="copy(row.usn, 'USN')"
+                  >
+                    <span class="icon" aria-hidden="true">content_copy</span>
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="chip-row">
+            <span class="chip dot" [class]="accountStatusTone()">{{ accountStatusLabel() }}</span>
+            <span class="chip accent">{{ stageLabel() }} stage</span>
+            @if (placementLine(); as line) {
+              <span class="chip neutral">{{ line }}</span>
+            }
+          </div>
+          @if (accountLine(); as line) {
+            <p class="account-line">{{ line }}</p>
+          }
+          <dl class="rail-facts">
+            <div><dt>Batch</dt><dd>{{ batchLabel() }}</dd></div>
+            <div><dt>Department</dt><dd>{{ departmentLabel() }}</dd></div>
+            <div><dt>Semester</dt><dd>{{ semesterLabel() }}</dd></div>
+            <div>
+              <dt>Faculty mentor</dt>
+              <dd>
+                @if (mentorName(); as name) {
+                  {{ name }}
+                  @if (mentorSince(); as since) {
+                    <span class="soft">since {{ since }}</span>
+                  }
+                } @else {
+                  <span class="soft">Not assigned yet</span>
+                }
+              </dd>
+            </div>
+            <div><dt>Last signed in</dt><dd>{{ lastSignInLabel() }}</dd></div>
+          </dl>
+        </section>
+
+        <section class="card">
+          <h2 class="card-title">Contact</h2>
+          <ul class="contact">
+            @for (item of contactRows(); track item.label) {
+              <li>
+                <div class="contact-text">
+                  <span class="lbl">{{ item.label }}</span>
+                  @if (item.value) {
+                    <span class="val">{{ item.value }}</span>
+                  } @else {
+                    <span class="val missing">Not filled in</span>
+                  }
+                </div>
+                @if (item.value) {
+                  @if (item.href) {
+                    <a
+                      class="icon-btn"
+                      [href]="item.href"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      [attr.aria-label]="'Open ' + item.label"
+                      title="Open"
+                      ><span class="icon" aria-hidden="true">open_in_new</span></a
+                    >
+                  } @else {
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      [attr.aria-label]="'Copy ' + item.label"
+                      title="Copy"
+                      (click)="copy(item.value, item.label)"
+                    >
+                      <span class="icon" aria-hidden="true">content_copy</span>
+                    </button>
+                  }
+                }
+              </li>
+            }
+          </ul>
+        </section>
+
+        <section class="card">
+          <div class="card-head">
+            <h2 class="card-title">Resume</h2>
+            @if (mainCv(); as cv) {
+              <span class="chip" [class]="documentChip(cv.status).tone">{{ documentChip(cv.status).label }}</span>
+            }
+          </div>
+          @if (mainCv(); as cv) {
+            <div class="file-card">
+              <span class="doc-ico" aria-hidden="true"><span class="icon">picture_as_pdf</span></span>
+              <div>
+                <b>{{ cv.original_name }}</b>
+                <span class="soft">{{ cvSource(cv) }} · {{ formatDay(cv.uploaded_at) }}</span>
+              </div>
+            </div>
+            <a class="btn primary block" [href]="downloadUrl(cv.id)" (click)="noteDownload()">
+              <span class="icon" aria-hidden="true">download</span> Download CV
+            </a>
+            <button type="button" class="btn ghost block" (click)="setTab('resume')">View the CV</button>
+          } @else {
+            <p class="soft small">No CV on file. One is uploaded with every application from 22 Sep 2026.</p>
+          }
+        </section>
+
+        @if (isMainAdmin()) {
+          <section class="card">
+            <h2 class="card-title">Who can open this record</h2>
+            @if (access()) {
+              <div class="stack-row">
+                <div class="avstack">
+                  @for (holder of people(); track holder.holder_id) {
+                    <span class="avatar-sm" [title]="holder.name">{{ holderInitials(holder) }}</span>
+                  }
+                </div>
+                <span class="chip neutral">{{ people().length }} {{ people().length === 1 ? 'person' : 'people' }}</span>
+              </div>
+              <p class="soft small">
+                The placement office{{ mentorName() ? ', the faculty mentor' : '' }}{{
+                  grantedCount() > 0 ? ' and ' + grantedCount() + ' given access' : ''
+                }}.
+              </p>
+            }
+            <button type="button" class="btn secondary block" (click)="setTab('access')">
+              <span class="icon" aria-hidden="true">shield_person</span>
+              {{ canManageAccess() ? 'Manage access' : 'See who has access' }}
+            </button>
+          </section>
+        }
+      </aside>
+
+      <!-- ================================================= the workspace -->
+      <div class="work">
+        <section class="kpis" aria-label="Key numbers">
+          <button type="button" class="kpi-card kpi-tile" (click)="setTab('overview')">
+            <span class="kpi-head"><span class="eyebrow">Readiness</span><span class="icon" aria-hidden="true">insights</span></span>
+            @if (readiness()?.score !== null && readiness() !== null) {
+              <span class="num">{{ readiness()?.score }}<span class="unit">/100</span></span>
+              <span class="meter"><span [style.width.%]="readiness()?.score"></span></span>
+            } @else {
+              <span class="num">{{ notReadable }}</span>
+              <span class="kpi-gap"></span>
+            }
+            <span class="kpi-foot"><span class="chip" [class]="readinessTone()">{{ readiness()?.band ?? notReadable }}</span></span>
+          </button>
+
+          <button type="button" class="kpi-card kpi-tile" (click)="setTab('academics')">
+            <span class="kpi-head"><span class="eyebrow">CGPA</span><span class="icon" aria-hidden="true">school</span></span>
+            @if (cgpa(); as value) {
+              <span class="num">{{ value.toFixed(2) }}<span class="unit">/10</span></span>
+              <span class="meter"><span [style.width.%]="value * 10"></span></span>
+              <span class="kpi-foot">
+                @if (liveBacklogs() === 0) {
+                  <span class="chip good">No backlogs</span>
+                } @else {
+                  <span class="chip warn">{{ liveBacklogs() }} live backlogs</span>
+                }
+              </span>
+            } @else {
+              <span class="num">{{ notReadable }}</span>
+              <span class="kpi-gap"></span>
+              <span class="kpi-foot">No marks imported</span>
+            }
+          </button>
+
+          <button type="button" class="kpi-card kpi-tile" (click)="setTab('academics')">
+            <span class="kpi-head"><span class="eyebrow">Attendance</span><span class="icon" aria-hidden="true">event_available</span></span>
+            @if (attendancePercent(); as percent) {
+              <span class="num">{{ percent }}<span class="unit">%</span></span>
+              <svg class="spark" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
+                @for (bar of attendanceSpark(); track $index) {
+                  @if (bar) {
+                    <rect [attr.x]="bar.x" [attr.y]="bar.y" [attr.width]="bar.width" [attr.height]="bar.height" rx="2" [class.last]="$last" />
+                  }
+                }
+                <line class="threshold" x1="0" x2="120" [attr.y1]="28 - attendanceRequired * 0.28" [attr.y2]="28 - attendanceRequired * 0.28" />
+              </svg>
+              <span class="kpi-foot">
+                <span class="chip" [class]="percent >= attendanceRequired ? 'good' : 'warn'">{{ percent >= attendanceRequired ? 'Met' : 'Below' }}</span>
+                {{ attendanceRequired }}% needed
+              </span>
+            } @else {
+              <span class="num">{{ notReadable }}</span>
+              <span class="kpi-gap"></span>
+              <span class="kpi-foot">No sessions in 6 weeks</span>
+            }
+          </button>
+
+          <button type="button" class="kpi-card kpi-tile" (click)="setTab('leaderboard')">
+            <span class="kpi-head"><span class="eyebrow">Batch rank</span><span class="icon" aria-hidden="true">leaderboard</span></span>
+            @if (leaderboards()?.hidden) {
+              <span class="num">{{ notReadable }}</span>
+              <span class="kpi-gap"></span>
+              <span class="kpi-foot">Hidden by the student</span>
+            } @else if (overallBoard()?.rank; as rank) {
+              <span class="num">#{{ rank }}<span class="unit">of {{ overallBoard()?.ranked }}</span></span>
+              <span class="meter"><span [style.width.%]="100 - (topPercent(overallBoard()!) ?? 100)"></span></span>
+              <span class="kpi-foot"><span class="chip accent">Top {{ topPercent(overallBoard()!) }}%</span>Overall</span>
+            } @else {
+              <span class="num">{{ notReadable }}</span>
+              <span class="kpi-gap"></span>
+              <span class="kpi-foot">Not ranked yet</span>
+            }
+          </button>
+
+          <button type="button" class="kpi-card kpi-tile" (click)="setTab('skills')">
+            <span class="kpi-head"><span class="eyebrow">Verified skills</span><span class="icon" aria-hidden="true">workspace_premium</span></span>
+            @if (skills(); as dashboard) {
+              <span class="num">{{ dashboard.earned_total }}<span class="unit">of {{ dashboard.badge_total }}</span></span>
+              <span class="meter"><span [style.width.%]="categoryPercent(dashboard.earned_total, dashboard.badge_total)"></span></span>
+              <span class="kpi-foot">
+                @if (pendingClaims() > 0) {
+                  <span class="chip warn">{{ pendingClaims() }} waiting</span>
+                }
+                {{ dashboard.points_total }} points
+              </span>
+            } @else {
+              <span class="num">{{ notReadable }}</span>
+            }
+          </button>
+
+          <button type="button" class="kpi-card kpi-tile" (click)="setTab('interviews')">
+            <span class="kpi-head"><span class="eyebrow">Interviews</span><span class="icon" aria-hidden="true">mic</span></span>
+            <span class="num">{{ interviews().length }}<span class="unit">mocks</span></span>
+            @if (interviewSpark().length > 1) {
+              <svg class="spark" viewBox="0 0 120 28" preserveAspectRatio="none" aria-hidden="true">
+                <polyline class="line" [attr.points]="sparkLine(interviewSpark())" />
+              </svg>
+            } @else {
+              <span class="kpi-gap"></span>
+            }
+            <span class="kpi-foot">
+              @if (bestInterview() !== null) {
+                <span class="chip good">Best {{ bestInterview() }}</span>
+              } @else {
+                None scored yet
+              }
+            </span>
+          </button>
+        </section>
+
+        @if (attention().length > 0) {
+          <section class="card" aria-labelledby="attention-title">
+            <div class="card-head">
+              <h2 class="card-title" id="attention-title">Needs attention</h2>
+              <span class="chip warn">{{ attention().length }}</span>
+            </div>
+            <ul class="att-list">
+              @for (item of attention(); track item.title) {
+                <li class="att" [class.staff]="item.who === 'staff'">
+                  <span class="att-icon" aria-hidden="true"><span class="icon">{{ item.icon }}</span></span>
+                  <div>
+                    <span class="who-waits">{{ item.who === 'staff' ? 'Waiting on staff' : 'Waiting on the student' }}</span>
+                    <b>{{ item.title }}</b>
+                    @if (item.why) {
+                      <span class="why">{{ item.why }}</span>
+                    }
+                  </div>
+                  <button type="button" class="btn sm secondary" (click)="setTab(item.tab)">{{ item.action }}</button>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        @if (panelsRefusal(); as refusal) {
+          <div class="notice warn" role="status">
+            <span class="icon" aria-hidden="true">lock</span><span>{{ refusal }}</span>
+          </div>
+        }
+
+        <div class="tabs-scroll">
+          <div class="tabs" role="tablist" aria-label="Parts of the record">
+            @for (view of tabs(); track view.key; let index = $index) {
+              <button
+                type="button"
+                role="tab"
+                class="tab"
+                [id]="'tab-' + view.key"
+                [class.active]="tab() === view.key"
+                [attr.aria-selected]="tab() === view.key"
+                [attr.aria-controls]="'panel-' + view.key"
+                [tabIndex]="tab() === view.key ? 0 : -1"
+                (click)="setTab(view.key)"
+                (keydown)="onTabKey($event, index)"
+              >
+                {{ view.label }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" [id]="'panel-' + tab()" [attr.aria-labelledby]="'tab-' + tab()">
+          @switch (tab()) {
+            <!-- ======================================================= OVERVIEW -->
+            @case ('overview') {
+              <div class="grid-2">
+                <div class="col">
+                  <section class="card">
+                    <div class="card-head">
+                      <div>
+                        <h2 class="card-title">Placement readiness</h2>
+                        <div class="card-sub">{{ readiness()?.summary }}</div>
+                      </div>
+                    </div>
+                    <div class="big-row">
+                      <span class="big">{{ readiness()?.score ?? notReadable }}@if (readiness()?.score !== null) {<small> /100</small>}</span>
+                      <span class="chip" [class]="readinessTone()">{{ readiness()?.band }}</span>
+                    </div>
+                    <div class="table-scroll">
+                      <table class="dt-table">
+                        <caption class="sr-only">Readiness checks for {{ studentName() }}</caption>
+                        <thead>
+                          <tr><th scope="col">Check</th><th scope="col">Where they are</th><th scope="col">Status</th></tr>
+                        </thead>
+                        <tbody>
+                          @for (factor of readinessFactors(); track factor.label) {
+                            <tr>
+                              <td>{{ factor.label }}</td>
+                              <td>{{ factor.detail }}</td>
+                              <td><span class="chip" [class]="factorChip(factor).tone">{{ factorChip(factor).label }}</span></td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+
+                  <section class="card">
+                    <div class="card-head">
+                      <div>
+                        <h2 class="card-title">Profile as filled in</h2>
+                        @if (profile()?.updated_at; as updated) {
+                          <div class="card-sub">Updated {{ formatDay(updated) }}</div>
+                        }
+                      </div>
+                    </div>
+                    @if (profile(); as p) {
+                      @if (p.on_record) {
+                        <dl class="rail-facts">
+                          <div><dt>Career summary</dt><dd>{{ p.career_summary ?? 'Not written yet' }}</dd></div>
+                          <div><dt>Education</dt><dd>{{ p.education_entries }} entries</dd></div>
+                          <div><dt>Experience</dt><dd>{{ p.experience_entries }} entries</dd></div>
+                          <div><dt>Projects</dt><dd>{{ p.project_entries }} entries</dd></div>
+                          <div><dt>English baseline</dt><dd>{{ englishLine() ?? notReadable }}</dd></div>
+                        </dl>
+                      } @else {
+                        <div class="empty">
+                          <span class="icon" aria-hidden="true">person</span>The student has not filled in a profile yet.
+                        </div>
+                      }
+                    }
+                  </section>
+                </div>
+
+                <div class="col">
+                  <section class="card">
+                    <div class="card-head">
+                      <h2 class="card-title">Semester by semester</h2>
+                      <span class="chip neutral">{{ semesterLabel() }}</span>
+                    </div>
+                    <ol class="timeline">
+                      @for (step of semesterSteps(); track step.number) {
+                        <li>
+                          <span class="step" [class]="step.state">
+                            @if (step.state === 'done') {
+                              <span class="icon" aria-hidden="true">check</span>
+                            } @else {
+                              {{ step.number }}
+                            }
+                          </span>
+                          <div>
+                            <b>Semester {{ step.number }}</b>
+                            @if (step.when) {
+                              <span class="when">{{ step.when }}</span>
+                            }
+                            <div class="what">{{ step.what }}</div>
+                          </div>
+                        </li>
+                      }
+                    </ol>
+                  </section>
+
+                  <section class="card">
+                    <h2 class="card-title">Faculty mentor</h2>
+                    @if (mentorName(); as name) {
+                      <div class="mentor-row">
+                        <span class="avatar-sm" aria-hidden="true">{{ mentorInitials() }}</span>
+                        <div>
+                          <b>{{ name }}</b>
+                          <div class="soft small">{{ mentorSince() ? 'Since ' + mentorSince() : 'Assigned' }}</div>
+                        </div>
+                      </div>
+                    } @else {
+                      <p class="soft small">No faculty member is assigned. Assign one on Assign faculty.</p>
+                    }
+                    @if (mentorSpells().length > 0) {
+                      <h3 class="sub-heading">Mentor history</h3>
+                      <ul class="mentor-spells">
+                        @for (spell of mentorSpells(); track spell.id) {
+                          <li [class.current]="spell.current">
+                            <div class="spell-who">
+                              <b>{{ spell.who }}</b>
+                              @if (spell.current) {
+                                <span class="chip good">Current</span>
+                              }
+                            </div>
+                            <div class="soft small">{{ spell.when }}</div>
+                            @if (spell.opened) {
+                              <div class="soft small">{{ spell.opened }}</div>
+                            }
+                            @if (spell.closed) {
+                              <div class="soft small">{{ spell.closed }}</div>
+                            }
+                          </li>
+                        }
+                      </ul>
+                    } @else if (mentorName() && mentorHistoryNote()) {
+                      <!-- A pairing older than the history. An unassigned
+                           student's note would repeat the line above. -->
+                      <p class="soft small">{{ mentorHistoryNote() }}</p>
+                    }
+                    @if (canEdit()) {
+                      <a class="btn sm secondary" routerLink="/admin/mentors">Assign faculty</a>
+                    }
+                  </section>
+
+                  <section class="card">
+                    <h2 class="card-title">Recent history</h2>
+                    @if (auditRows().length > 0) {
+                      <ul class="feed">
+                        @for (row of auditRows().slice(0, 5); track row.id) {
+                          <li><span>{{ auditLine(row) }}</span><time>{{ formatMoment(row.occurred_at) }}</time></li>
+                        }
+                      </ul>
+                    } @else {
+                      <p class="soft small">Nothing has been done to this record yet.</p>
+                    }
+                  </section>
+                </div>
+              </div>
+            }
+
+            <!-- ========================================================= RESUME -->
+            @case ('resume') {
+              <div class="resume-grid">
+                <div class="col">
+                  <section class="card">
+                    <h2 class="card-title">CV</h2>
+                    <p class="card-sub">The file the student uploaded when they registered</p>
+                    @if (cvs().length > 0) {
+                      <ul class="pick-list">
+                        @for (cv of cvs(); track cv.id) {
+                          <li>
+                            <button
+                              type="button"
+                              class="pick"
+                              [attr.aria-pressed]="shownCv()?.id === cv.id"
+                              (click)="selectCv(cv.id)"
+                            >
+                              <span class="pick-top">
+                                <b>{{ cv.original_name }}</b>
+                                <span class="chip" [class]="documentChip(cv.status).tone">{{ documentChip(cv.status).label }}</span>
+                              </span>
+                              <span class="soft small">{{ cvSource(cv) }} · {{ formatDay(cv.uploaded_at) }} · {{ documentSize(cv.size_bytes) }}</span>
+                            </button>
+                          </li>
+                        }
+                      </ul>
+                    } @else {
+                      <div class="empty">
+                        <span class="icon" aria-hidden="true">description</span>No CV on file for this student.
+                      </div>
+                    }
+                  </section>
+
+                  <section class="card">
+                    <h2 class="card-title">Also built in REEP</h2>
+                    <p class="card-sub">Versions from the resume builder</p>
+                    @if (builtResumes().length > 0) {
+                      @for (resume of builtResumes(); track resume.id) {
+                        <div class="file-row">
+                          <span class="doc-ico small" aria-hidden="true"><span class="icon">description</span></span>
+                          <div>
+                            <b>{{ resume.title }}</b>
+                            <span class="soft small">Version {{ resume.version }} · {{ resumeStatusLabel(resume.status) }} · {{ formatDay(resume.updated_at) }}</span>
+                          </div>
+                          <a
+                            class="icon-btn"
+                            [href]="builtResumeUrl(resume)"
+                            [attr.aria-label]="'Download ' + resume.title + ', version ' + resume.version"
+                            title="Download"
+                            (click)="noteDownload()"
+                            ><span class="icon" aria-hidden="true">download</span></a
+                          >
+                        </div>
+                      }
+                    } @else {
+                      <p class="soft small">None yet.</p>
+                    }
+                  </section>
+                </div>
+
+                <section class="card">
+                  @if (shownCv(); as cv) {
+                    <div class="preview-bar">
+                      <div class="left">
+                        <h2 class="card-title">{{ cv.original_name }}</h2>
+                        <span class="chip" [class]="documentChip(cv.status).tone">{{ documentChip(cv.status).label }}</span>
+                      </div>
+                      <a class="btn primary sm" [href]="downloadUrl(cv.id)" (click)="noteDownload()">
+                        <span class="icon" aria-hidden="true">download</span> Download
+                      </a>
+                    </div>
+                    <div class="viewer">
+                      <app-pdf-preview [src]="fileUrl(cv.id)" [label]="'The CV ' + studentName() + ' uploaded'" />
+                    </div>
+                    <p class="soft small note">This is the student's own file, as uploaded.{{ isMainAdmin() ? ' Downloads are recorded on the Access tab.' : '' }}</p>
+                  } @else {
+                    <div class="empty">
+                      <span class="icon" aria-hidden="true">description</span>Nothing to show.
+                    </div>
+                  }
+                </section>
+              </div>
+            }
+
+            <!-- ========================================================= SKILLS -->
+            @case ('skills') {
+              @if (skills(); as dashboard) {
+                <section class="card">
+                  <div class="stat-row">
+                    <div class="stat"><b>{{ dashboard.earned_total }}</b><span>verified of {{ dashboard.badge_total }}</span></div>
+                    <div class="stat"><b>{{ dashboard.points_total }}</b><span>badge points</span></div>
+                    <div class="stat"><b>{{ pendingClaims() }}</b><span>waiting for a decision</span></div>
+                    <div class="stat"><b>{{ record()?.open_items?.badge_claims_needing_info ?? 0 }}</b><span>sent back to the student</span></div>
+                  </div>
+                </section>
+
+                <div class="grid-2 even">
+                  <section class="card">
+                    <h2 class="card-title">By category</h2>
+                    <div class="cat-rows">
+                      @for (category of dashboard.categories; track category.key) {
+                        <div class="cat-row">
+                          <span>{{ category.label }}</span>
+                          <span class="meter"><span [style.width.%]="categoryPercent(category.earned, category.total)"></span></span>
+                          <span class="n">{{ category.earned }}/{{ category.total }}</span>
+                        </div>
+                      }
+                    </div>
+                  </section>
+                  <section class="card">
+                    <h2 class="card-title">Skills the student listed</h2>
+                    <p class="card-sub">From the profile. Nobody has checked these.</p>
+                    @if ((profile()?.skills ?? []).length > 0) {
+                      <div class="self-skills">
+                        @for (skill of profile()?.skills ?? []; track skill) {
+                          <span class="chip neutral">{{ skill }}</span>
+                        }
+                      </div>
+                    } @else {
+                      <p class="soft small">None listed.</p>
+                    }
+                  </section>
+                </div>
+
+                <section class="card">
+                  <h2 class="card-title">Verified skills</h2>
+                  <p class="card-sub">Badges earned after staff checked the evidence, newest first</p>
+                  @if (earnedBadges().length > 0) {
+                    <div class="badge-grid">
+                      @for (badge of earnedBadges(); track badge.code) {
+                        <div class="badge-tile">
+                          <span class="hex" aria-hidden="true"><span class="icon">verified</span></span>
+                          <div>
+                            <b>{{ badge.name }}</b>
+                            <span class="soft small">{{ badge.category_label }} · {{ badge.points_earned }} points</span>
+                            @if (badge.earned_at) {
+                              <span class="good-line">Verified {{ formatDay(badge.earned_at) }}</span>
+                            }
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  } @else {
+                    <div class="empty">
+                      <span class="icon" aria-hidden="true">workspace_premium</span>No badge has been verified yet.
+                    </div>
+                  }
+                </section>
+
+                @if (openClaims().length > 0) {
+                  <section class="card">
+                    <h2 class="card-title">Claims not decided yet</h2>
+                    <p class="card-sub">Decided on the Verifications screen by the faculty mentor</p>
+                    <ul class="claims">
+                      @for (claim of openClaims(); track claim.badge.code + claim.filed) {
+                        <li class="claim">
+                          <span class="hex" [class]="claim.state" aria-hidden="true">
+                            <span class="icon">{{ claim.state === 'pending' ? 'hourglass_top' : 'undo' }}</span>
+                          </span>
+                          <div>
+                            <b>{{ claim.badge.name }}</b>
+                            <span class="soft small">
+                              Filed {{ formatDay(claim.filed) }}
+                              @if (claim.state === 'back') {
+                                · sent back{{ claim.note ? ': "' + claim.note + '"' : '' }}
+                              }
+                            </span>
+                          </div>
+                          <span class="chip" [class]="claim.state === 'pending' ? 'warn' : 'neutral'">
+                            {{ claim.state === 'pending' ? 'Waiting' : 'With the student' }}
+                          </span>
+                        </li>
+                      }
+                    </ul>
+                  </section>
+                }
+
+                @if (growth(); as g) {
+                  <section class="card">
+                    <h2 class="card-title">Growth across checkpoints</h2>
+                    <p class="card-sub">Scores out of 10, entered by staff. A dash means not assessed yet.</p>
+                    <div class="table-scroll">
+                      <table class="dt-table">
+                        <caption class="sr-only">Capability scores by checkpoint</caption>
+                        <thead>
+                          <tr>
+                            <th scope="col">Capability</th>
+                            @for (checkpoint of g.checkpoints; track checkpoint) {
+                              <th scope="col" class="n">{{ checkpoint }}</th>
+                            }
+                            <th scope="col" class="n">Growth</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (row of g.rows; track row.capability) {
+                            <tr>
+                              <td>{{ row.label }}</td>
+                              @for (checkpoint of g.checkpoints; track checkpoint) {
+                                <td class="n">{{ scoreOf(row.scores, checkpoint) }}</td>
+                              }
+                              <td class="n" [class.up]="(row.growth ?? 0) > 0">{{ growthLabel(row.growth) }}</td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </section>
+                }
+              } @else {
+                <div class="loading-line" role="status">Reading the skills…</div>
+              }
+            }
+
+            <!-- ==================================================== LEADERBOARD -->
+            @case ('leaderboard') {
+              @if (leaderboards(); as boards) {
+                @if (boards.hidden) {
+                  <div class="notice" role="status">
+                    <span class="icon" aria-hidden="true">visibility_off</span>
+                    <span>The student has hidden themselves from the leaderboards, so no rank is shown, here or to classmates.</span>
+                  </div>
+                } @else {
+                  <section class="card">
+                    <h2 class="card-title">Where they stand</h2>
+                    <p class="card-sub">{{ scopeLine() }}</p>
+                    <div class="boards" role="group" aria-label="Boards">
+                      @for (board of boards.boards; track board.board) {
+                        <button
+                          type="button"
+                          class="board"
+                          [attr.aria-pressed]="boardKey() === board.board"
+                          (click)="boardKey.set(board.board)"
+                        >
+                          <span class="board-name">{{ board.label }}</span>
+                          @if (board.rank !== null) {
+                            <span class="board-rank">#{{ board.rank }}<small> of {{ board.ranked }}</small></span>
+                            <span class="soft small">{{ board.value_label }}</span>
+                            <span class="meter"><span [style.width.%]="100 - (topPercent(board) ?? 100)"></span></span>
+                            <span class="soft small">Top {{ topPercent(board) }}%</span>
+                          } @else {
+                            <span class="board-rank">{{ notReadable }}</span>
+                            <span class="soft small">Nothing on this board yet</span>
+                          }
+                        </button>
+                      }
+                    </div>
+                  </section>
+
+                  @if (shownBoard(); as board) {
+                    <section class="card">
+                      <h2 class="card-title">{{ board.label }}</h2>
+                      @if (board.rows.length > 0) {
+                        <div class="table-scroll">
+                          <table class="dt-table">
+                            <caption class="sr-only">{{ board.label }} board</caption>
+                            <thead>
+                              <tr><th scope="col">Rank</th><th scope="col">Student</th><th scope="col" class="n">Value</th></tr>
+                            </thead>
+                            <tbody>
+                              @for (entry of board.rows; track entry.student_id) {
+                                @if (entry.gap_before) {
+                                  <tr class="gap"><td colspan="3" aria-label="Ranks in between not shown">···</td></tr>
+                                }
+                                <tr [class.me]="entry.is_this_student">
+                                  <td class="rank">#{{ entry.rank }}</td>
+                                  <td>
+                                    <span class="lb-name">
+                                      <span class="avatar-sm" aria-hidden="true">{{ entry.initials }}</span>
+                                      {{ entry.name }}
+                                      @if (entry.is_this_student) {
+                                        <span class="chip accent">This student</span>
+                                      }
+                                    </span>
+                                  </td>
+                                  <td class="n">{{ entry.value_label }}</td>
+                                </tr>
+                              }
+                            </tbody>
+                          </table>
+                        </div>
+                      } @else {
+                        <p class="soft small">Nobody in the batch has anything on this board yet.</p>
+                      }
+                      @if (board.unranked_total > 0) {
+                        <p class="soft small note">{{ plural(board.unranked_total, 'classmate') }} not ranked yet: nothing on this board.</p>
+                      }
+                    </section>
+                  }
+                }
+              } @else {
+                <div class="loading-line" role="status">Reading the boards…</div>
+              }
+            }
+
+            <!-- ====================================================== ACADEMICS -->
+            @case ('academics') {
+              <section class="card">
+                <h2 class="card-title">Results, semester by semester</h2>
+                @if (resultRows().length > 0) {
+                  <div class="table-scroll">
+                    <table class="dt-table">
+                      <caption class="sr-only">Semester results</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Semester</th><th scope="col" class="n">SGPA</th><th scope="col" class="n">CGPA</th>
+                          <th scope="col" class="n">Live backlogs</th><th scope="col" class="n">Cleared</th>
+                          <th scope="col" class="n">Subjects</th><th scope="col">Class</th><th scope="col">Published</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (semester of resultRows(); track semester.semester) {
+                          <tr>
+                            <td>{{ semester.semester }}</td>
+                            <td class="n">{{ semester.results?.sgpa ?? notReadable }}</td>
+                            <td class="n">{{ semester.results?.cgpa ?? notReadable }}</td>
+                            <td class="n">{{ semester.results?.live_backlogs }}</td>
+                            <td class="n">{{ semester.results?.closed_backlogs }}</td>
+                            <td class="n">{{ semester.results?.subjects_recorded }}</td>
+                            <td>{{ semester.results?.result_class ?? notReadable }}</td>
+                            <td>{{ formatDay(semester.results?.published_on ?? null) }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div class="empty"><span class="icon" aria-hidden="true">table_rows</span>No marks imported yet.</div>
+                }
+              </section>
+
+              <section class="card">
+                <h2 class="card-title">Promotions and graduations</h2>
+                @if (semesterMoves().length > 0) {
+                  <div class="table-scroll">
+                    <table class="dt-table">
+                      <caption class="sr-only">Promotions and graduations recorded for {{ studentName() }}</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Move</th><th scope="col">Semester</th><th scope="col">Effective</th>
+                          <th scope="col">By</th><th scope="col">Reason</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (move of semesterMoves(); track move.id) {
+                          <tr>
+                            <td><span class="chip neutral">{{ moveLabel(move.kind) }}</span></td>
+                            <td>{{ move.from_semester }} → {{ move.to_semester }}</td>
+                            <td>{{ formatDay(move.effective_on) }}</td>
+                            <!-- Null means the account that made the move has been
+                                 removed, not that nobody made it. -->
+                            <td>{{ move.by_name ?? 'Account since removed' }}</td>
+                            <td>{{ move.reason ?? notReadable }}</td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div class="empty"><span class="icon" aria-hidden="true">school</span>No promotion or graduation recorded yet.</div>
+                }
+              </section>
+
+              <div class="grid-2">
+                <section class="card">
+                  <div class="card-head">
+                    <div>
+                      <h2 class="card-title">Attendance, last six weeks</h2>
+                      <div class="card-sub">Weekly percentage. A week with no classes has no bar.</div>
+                    </div>
+                    @if (attendancePercent(); as percent) {
+                      <span class="chip" [class]="percent >= attendanceRequired ? 'good' : 'warn'">{{ percent }}% average</span>
+                    }
+                  </div>
+                  @if (attendanceChart().length > 0) {
+                    <svg class="chart" viewBox="0 0 520 200" role="img" aria-label="Weekly attendance for the last six weeks">
+                      @for (tick of [0, 25, 50, 75, 100]; track tick) {
+                        <line class="grid" x1="40" x2="510" [attr.y1]="10 + 160 - tick * 1.6" [attr.y2]="10 + 160 - tick * 1.6" />
+                        <text class="tick" x="32" [attr.y]="14 + 160 - tick * 1.6" text-anchor="end">{{ tick }}%</text>
+                      }
+                      @for (bar of attendanceChart(); track $index) {
+                        @if (bar) {
+                          <rect class="bar" [class.low]="bar.below" [attr.x]="45 + bar.x" [attr.y]="10 + bar.y" [attr.width]="bar.width" [attr.height]="bar.height" rx="4" />
+                          <text class="val" [attr.x]="45 + bar.x + bar.width / 2" [attr.y]="4 + bar.y" text-anchor="middle">{{ bar.value }}%</text>
+                        }
+                        <text class="xl" [attr.x]="45 + (460 / attendanceChart().length) * ($index + 0.5)" y="192" text-anchor="middle">{{ panels()?.weekly?.weeks?.[$index]?.label }}</text>
+                      }
+                      <line class="threshold" x1="40" x2="510" [attr.y1]="10 + requiredY" [attr.y2]="10 + requiredY" />
+                    </svg>
+                    <div class="legend"><i></i>{{ attendanceRequired }}% required</div>
+                  }
+                </section>
+
+                <section class="card">
+                  <div class="card-head">
+                    <div>
+                      <h2 class="card-title">English baseline</h2>
+                      @if (english()?.taken_on; as taken) {
+                        <div class="card-sub">Taken {{ formatDay(taken) }}</div>
+                      }
+                    </div>
+                    @if (english()?.provisional) {
+                      <span class="chip warn">Provisional</span>
+                    }
+                  </div>
+                  @if (english(); as attempt) {
+                    @if (attempt.exists) {
+                      <div class="big-row"><span class="big">{{ attempt.band ?? notReadable }}</span><span class="soft">{{ englishLine() }}</span></div>
+                      <table class="dt-table">
+                        <caption class="sr-only">English baseline sections</caption>
+                        <thead><tr><th scope="col">Section</th><th scope="col">Level</th><th scope="col" class="n">Score</th></tr></thead>
+                        <tbody>
+                          @for (section of attempt.sections ?? []; track section.skill) {
+                            <tr>
+                              <td>{{ section.label }}</td>
+                              <td>{{ section.band ?? 'Pending' }}</td>
+                              <td class="n">{{ section.score ?? notReadable }}</td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    } @else {
+                      <p class="soft small">Not taken yet.</p>
+                    }
+                  }
+                </section>
+              </div>
+            }
+
+            <!-- ===================================================== INTERVIEWS -->
+            @case ('interviews') {
+              @if (scoredInterviews().length > 1) {
+                <section class="card">
+                  <div class="card-head">
+                    <div>
+                      <h2 class="card-title">Score over time</h2>
+                      <div class="card-sub">Scored interviews only, out of 100</div>
+                    </div>
+                  </div>
+                  <svg class="chart" viewBox="0 0 520 200" role="img" aria-label="Interview scores over time">
+                    @for (tick of [0, 25, 50, 75, 100]; track tick) {
+                      <line class="grid" x1="36" x2="510" [attr.y1]="10 + 150 - tick * 1.5" [attr.y2]="10 + 150 - tick * 1.5" />
+                      <text class="tick" x="28" [attr.y]="14 + 150 - tick * 1.5" text-anchor="end">{{ tick }}</text>
+                    }
+                    <polyline class="line" [attr.points]="interviewLine(interviewChart())" />
+                    @for (point of interviewChart(); track $index) {
+                      <circle class="pt" [class.end]="$last" [attr.cx]="point.x + 40" [attr.cy]="point.y + 10" [attr.r]="$last ? 5 : 4" />
+                      <text class="val" [attr.x]="point.x + 40" [attr.y]="point.y + 1" text-anchor="middle">{{ point.value }}</text>
+                      <text class="xl" [attr.x]="point.x + 40" y="190" text-anchor="middle">{{ scoredDates()[$index] }}</text>
+                    }
+                  </svg>
+                </section>
+              }
+
+              <section class="card">
+                <div class="card-head">
+                  <h2 class="card-title">Every mock interview</h2>
+                  @if (isMainAdmin()) {
+                    <button type="button" class="btn sm secondary" (click)="askCapReset()">
+                      <span class="icon" aria-hidden="true">refresh</span> Reset today's limit
+                    </button>
+                  }
+                </div>
+                @if (interviews().length > 0) {
+                  <div class="table-scroll">
+                    <table class="dt-table">
+                      <caption class="sr-only">Mock interviews</caption>
+                      <thead>
+                        <tr>
+                          <th scope="col">Started</th><th scope="col">Track</th><th scope="col">Reached</th>
+                          <th scope="col" class="n">Answers</th><th scope="col" class="n">Score</th><th scope="col">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (sitting of interviews(); track sitting.id) {
+                          <tr>
+                            <td>{{ formatMoment(sitting.started_at) }}</td>
+                            <td>{{ sitting.specialization ?? 'General' }}</td>
+                            <td>{{ sitting.final_phase ?? notReadable }}</td>
+                            <td class="n">{{ sitting.answers_accepted }}</td>
+                            <td class="n">
+                              @if (sitting.overall_score === null) {
+                                <span class="soft">Not scored</span>
+                              } @else {
+                                <b>{{ sitting.overall_score }}</b>
+                              }
+                            </td>
+                            <td><span class="chip" [class]="interviewStatus(sitting.status).tone">{{ interviewStatus(sitting.status).label }}</span></td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div class="empty"><span class="icon" aria-hidden="true">record_voice_over</span>No mock interview yet.</div>
+                }
+              </section>
+            }
+
+            <!-- ===================================================== TIME SHEET -->
+            @case ('timesheet') {
+              <section class="card">
+                <div class="card-head">
+                  <div>
+                    <h2 class="card-title">Last 14 days</h2>
+                    <div class="card-sub">A day must add up to 24 hours before it can be submitted.</div>
+                  </div>
+                  @if (ledger(); as summary) {
+                    <span class="chip neutral">{{ summary.days_submitted }} of {{ summary.window_days }} submitted</span>
+                  }
+                </div>
+                @if (ledgerChips().length > 0) {
+                  <div class="days">
+                    @for (chip of ledgerChips(); track chip.day) {
+                      <div class="day" [class]="chip.tone">
+                        <span class="d">{{ chip.day }}</span>
+                        <span class="s">{{ chip.label }}</span>
+                        <span class="h">{{ chip.hours }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </section>
+              @if (skillingWeek(); as week) {
+                <section class="card">
+                  <h2 class="card-title">Skilling this week</h2>
+                  <div class="big-row"><span class="big">{{ week.hours }}<small> of {{ week.target }} h</small></span></div>
+                  <span class="meter"><span [style.width.%]="categoryPercent(week.hours, week.target)"></span></span>
+                </section>
+              }
+            }
+
+            <!-- ====================================================== DOCUMENTS -->
+            @case ('documents') {
+              <section class="card">
+                <h2 class="card-title">Documents</h2>
+                <p class="card-sub">Everything the student uploaded, with the decision on each</p>
+                @if (documents().length > 0) {
+                  <div class="table-scroll">
+                    <table class="dt-table">
+                      <caption class="sr-only">Documents uploaded by {{ studentName() }}</caption>
+                      <thead>
+                        <tr><th scope="col">Kind</th><th scope="col">File</th><th scope="col" class="n">Size</th><th scope="col">Status</th><th scope="col">Uploaded</th><th scope="col"><span class="sr-only">Download</span></th></tr>
+                      </thead>
+                      <tbody>
+                        @for (document of documents(); track document.id) {
+                          <tr>
+                            <td>{{ documentKind(document.kind) }}</td>
+                            <td>
+                              <b>{{ document.original_name }}</b>
+                              @if (document.review_note) {
+                                <span class="cellnote">{{ document.review_note }}</span>
+                              }
+                            </td>
+                            <td class="n">{{ documentSize(document.size_bytes) }}</td>
+                            <td><span class="chip" [class]="documentChip(document.status).tone">{{ documentChip(document.status).label }}</span></td>
+                            <td>{{ formatDay(document.uploaded_at) }}</td>
+                            <td>
+                              <a class="icon-btn" [href]="downloadUrl(document.id)" [attr.aria-label]="'Download ' + document.original_name" title="Download" (click)="noteDownload()"
+                                ><span class="icon" aria-hidden="true">download</span></a
+                              >
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div class="empty"><span class="icon" aria-hidden="true">upload_file</span>Nothing uploaded yet.</div>
+                }
+              </section>
+            }
+
+            <!-- ============================== ACCESS (the Main Admin's alone) -->
+            @case ('access') {
+              @if (isMainAdmin()) {
+                <section class="card">
+                  <div class="card-head">
+                    <div>
+                      <h2 class="card-title">Who can open this record</h2>
+                      <div class="card-sub">Anybody else needs access from the placement office</div>
+                    </div>
+                    @if (canManageAccess() && !giveOpen()) {
+                      <button type="button" class="btn primary sm" (click)="openGive()">
+                        <span class="icon" aria-hidden="true">person_add</span> Give access
+                      </button>
+                    }
+                  </div>
+
+                  @if (giveOpen()) {
+                    <div class="give" role="group" aria-labelledby="give-title">
+                      <h3 class="give-title" id="give-title">Give access to student records</h3>
+                      <p class="soft small">They can open records and download CVs and documents. They cannot edit, move or remove students.</p>
+                      <div class="field">
+                        <label for="give-person">Faculty member</label>
+                        <select #personSelect id="give-person" (change)="giveTo.set(personSelect.value)">
+                          <option value="" [selected]="giveTo() === ''">Choose a faculty member</option>
+                          @for (person of grantableStaff(); track person.user_id) {
+                            <option [value]="person.user_id" [selected]="person.user_id === giveTo()">{{ person.name }} · {{ person.email }}</option>
+                          }
+                        </select>
+                      </div>
+                      <fieldset class="field reach">
+                        <legend>Which students</legend>
+                        @for (option of reachOptions(); track reachKey(option)) {
+                          <label class="reach-opt">
+                            <input
+                              type="radio"
+                              name="give-reach"
+                              [value]="reachKey(option)"
+                              [checked]="giveReach() === reachKey(option)"
+                              (change)="giveReach.set(reachKey(option))"
+                            />
+                            <span><b>{{ option.label }}</b><span class="soft small">{{ plural(option.students, 'student') }}</span></span>
+                          </label>
+                        }
+                      </fieldset>
+                      <div class="field">
+                        <label for="give-until">Until</label>
+                        <input #untilInput id="give-until" type="date" [min]="todayIso" [value]="giveUntil()" (input)="giveUntil.set(untilInput.value)" />
+                        <div class="help">Access ends on its own on this date.</div>
+                      </div>
+                      <div class="field">
+                        <label for="give-reason">Reason</label>
+                        <textarea
+                          #reasonInput
+                          id="give-reason"
+                          rows="3"
+                          placeholder="For example: placement coordinator for the 2025-27 MBA batches"
+                          [value]="giveReason()"
+                          (input)="giveReason.set(reasonInput.value)"
+                        ></textarea>
+                        <div class="help">At least {{ minReason }} characters. Kept on the history.</div>
+                      </div>
+                      <div class="actions">
+                        <button type="button" class="btn secondary" (click)="closeGive()">Cancel</button>
+                        <button type="button" class="btn primary" [disabled]="!canGive()" (click)="give()">
+                          <span class="icon" aria-hidden="true">person_add</span> Give access
+                        </button>
+                      </div>
+                    </div>
+                  }
+
+                  <ul class="holders">
+                    @for (holder of holders(); track holder.holder_id + holder.kind + (holder.grant_id ?? '')) {
+                      <li class="holder">
+                        <span class="avatar-sm" aria-hidden="true">{{ holderInitials(holder) }}</span>
+                        <div>
+                          <b>{{ holder.name }}</b>
+                          <span class="soft small">{{ holder.detail }}</span>
+                          <span class="chip-row">
+                            @if (holder.kind === 'admin') {
+                              <span class="chip accent">Every student</span>
+                            } @else if (holder.kind === 'mentor') {
+                              <span class="chip accent">Their mentees</span>
+                            }
+                            @if (holder.reach_label) {
+                              <span class="chip accent">{{ holder.reach_label }}</span>
+                            }
+                            @if (holder.until) {
+                              <span class="chip neutral">Until {{ formatDay(holder.until) }}</span>
+                            }
+                          </span>
+                          @if (holder.reason) {
+                            <span class="cellnote">
+                              Given{{ holder.granted_at ? ' ' + formatDay(holder.granted_at) : '' }}{{ holder.granted_by ? ' by ' + holder.granted_by : '' }}: "{{ holder.reason }}"
+                            </span>
+                          }
+                          @if (holder.grant_id && removing() === holder.grant_id) {
+                            <div class="field remove">
+                              <label [for]="'remove-' + holder.grant_id">Why remove access?</label>
+                              <input
+                                #removeInput
+                                [id]="'remove-' + holder.grant_id"
+                                type="text"
+                                [value]="removeReason()"
+                                (input)="removeReason.set(removeInput.value)"
+                              />
+                              <div class="help">At least {{ minReason }} characters.</div>
+                              <div class="actions">
+                                <button type="button" class="btn secondary sm" (click)="cancelRemove()">Cancel</button>
+                                <button type="button" class="btn danger sm" [disabled]="!canRemove()" (click)="remove(holder)">Remove access</button>
+                              </div>
+                            </div>
+                          }
+                        </div>
+                        @if (canManageAccess() && holder.grant_id && removing() !== holder.grant_id) {
+                          <button type="button" class="btn danger sm" (click)="askRemove(holder.grant_id)">Remove access</button>
+                        }
+                      </li>
+                    }
+                  </ul>
+                </section>
+
+                <div class="grid-2 even">
+                  <section class="card">
+                    <div class="card-head">
+                      <h2 class="card-title">Sign-in</h2>
+                      @if (isMainAdmin()) {
+                        <button type="button" class="btn sm secondary" (click)="askSignOutEverywhere()">
+                          <span class="icon" aria-hidden="true">logout</span> Sign out everywhere
+                        </button>
+                      }
+                    </div>
+                    <dl class="rail-facts">
+                      <div><dt>Signs in with</dt><dd>{{ doorsLine() }}</dd></div>
+                      <div><dt>Last signed in</dt><dd>{{ lastSignInLabel() }}</dd></div>
+                    </dl>
+                    @if (signIns().length > 0) {
+                      <h3 class="eyebrow sub">Recent sign-ins</h3>
+                      <ul class="feed">
+                        @for (signIn of signIns(); track signIn.at) {
+                          <li><span>{{ signIn.door }}</span><time>{{ formatMoment(signIn.at) }}</time></li>
+                        }
+                      </ul>
+                    }
+                  </section>
+                  <section class="card">
+                    <h2 class="card-title">History of this record</h2>
+                    @if (auditRows().length > 0) {
+                      <ul class="feed">
+                        @for (row of auditRows(); track row.id) {
+                          <li><span>{{ auditLine(row) }}</span><time>{{ formatMoment(row.occurred_at) }}</time></li>
+                        }
+                      </ul>
+                    } @else {
+                      <p class="soft small">Nothing has been done to this record yet.</p>
+                    }
+                  </section>
+                </div>
+              }
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,0 +1,156 @@
+<div class="dialog-backdrop" (click)="close()">
+  <div class="dialog" role="dialog" aria-modal="true" [attr.aria-labelledby]="titleId" (click)="$event.stopPropagation()">
+    <header class="dialog-head">
+      <div>
+        <h2 class="dialog-title" [id]="titleId">{{ headline() }}</h2>
+        <p class="dialog-sub">{{ subLine() }}</p>
+      </div>
+      <button type="button" class="btn ghost sm" aria-label="Close this dialog" (click)="close()">
+        <span class="icon" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <div class="dialog-body">
+      @if (error()) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span><span>{{ error() }}</span>
+        </div>
+      }
+
+      @if (outcome(); as done) {
+        <!-- Written. The counts are the server's own, not this dialog's
+             arithmetic over what it asked for. -->
+        <div class="notice good" role="status">
+          <span class="icon" aria-hidden="true">check_circle</span>
+          <span>
+            {{ done.batch }} promoted · {{ done.affected }} moved up a semester ·
+            {{ done.held_back }} held back · {{ done.skipped }} skipped (already graduated). A
+            history row was written for each student who moved; no result, ledger day, interview or
+            badge was touched.
+          </span>
+        </div>
+      } @else {
+        @if (checking()) {
+          <p class="preflight-loading" role="status">
+            <span class="icon" aria-hidden="true">hourglass_top</span>
+            Running the preflight — this asks the promote endpoint itself, with nothing written.
+          </p>
+        }
+
+        @for (check of checks(); track check.key) {
+          <div class="preflight {{ toneFor(check) }}">
+            <span class="icon" aria-hidden="true">{{ iconFor(check) }}</span>
+            <div>
+              <div class="preflight-headline">
+                {{ check.label }}
+                @if (check.status === 'blocked') {
+                  <span class="chip risk">Blocked</span>
+                }
+                @if (check.status === 'unavailable') {
+                  <span class="chip neutral">Cannot be checked</span>
+                }
+              </div>
+              <div class="preflight-detail">{{ check.detail }}</div>
+            </div>
+          </div>
+        }
+
+        <div class="dialog-fields">
+          <label class="field dated">
+            <span>Effective date</span>
+            <input
+              class="ctrl"
+              type="date"
+              [value]="effectiveOn()"
+              (change)="onEffectiveOn(valueOf($event))"
+            />
+          </label>
+          <label class="field">
+            <span>Reason</span>
+            <input
+              class="ctrl"
+              type="text"
+              [value]="reason()"
+              placeholder="e.g. Semester results declared by the university"
+              (input)="onReason(valueOf($event))"
+            />
+          </label>
+        </div>
+        <p class="field-note">
+          The date is the day the office says the move took effect, which is routinely earlier than
+          today. The reason is optional and is written onto every history row this promotion
+          creates.
+        </p>
+
+        @if (rows().length > 0) {
+          <div class="roster-scroll">
+            <table class="dt-table">
+              <caption class="sr-only">Students in this batch and where this promotion puts them</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Hold back</th>
+                  <th scope="col">Student</th>
+                  <th scope="col">Semester</th>
+                  <th scope="col">Stage</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of rows(); track row.student_id) {
+                  <tr>
+                    <td>
+                      <input
+                        type="checkbox"
+                        [checked]="isHeld(row.student_id)"
+                        [attr.aria-label]="'Hold ' + row.name + ' back'"
+                        (change)="toggleHold(row.student_id)"
+                      />
+                    </td>
+                    <td>
+                      {{ row.name }}
+                      <span class="usn">{{ row.usn ?? 'no USN' }}</span>
+                    </td>
+                    <td>
+                      @if (row.blocked_reason !== null) {
+                        <span class="chip risk">Blocked</span>
+                        <span class="blocked-why">{{ row.blocked_reason }}</span>
+                      } @else if (row.held_back) {
+                        <span class="chip neutral">Stays on {{ row.from_semester }}</span>
+                      } @else {
+                        {{ row.from_semester }} → <b>{{ row.to_semester }}</b>
+                      }
+                    </td>
+                    <td>
+                      @if (row.to_stage === row.from_stage) {
+                        <span class="chip neutral">{{ row.from_stage }}</span>
+                      } @else {
+                        <span class="chip good">{{ row.from_stage }} → {{ row.to_stage }}</span>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+    </div>
+
+    <footer class="dialog-foot">
+      @if (outcome() !== null) {
+        <button type="button" class="btn primary" (click)="close()">Close</button>
+      } @else {
+        <button type="button" class="btn secondary" (click)="close()">Cancel</button>
+        <button
+          type="button"
+          class="btn primary"
+          [disabled]="busy() || refusal() !== null"
+          [attr.title]="refusal()"
+          (click)="promote()"
+        >
+          <span class="icon" aria-hidden="true">arrow_forward</span>
+          {{ confirmLabel() }}
+        </button>
+      }
+    </footer>
+  </div>
+</div>

@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python tools/ci/check_*)",
+      "Bash(./tools/ci/preflight.sh*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git show*)",
+      "Bash(npx ng build*)",
+      "Bash(npx ng test*)",
+      "Bash(npx tsc --noEmit*)"
+    ]
+  },
+  "includeCoAuthoredBy": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
+}

@@ -1,0 +1,3639 @@
+/**
+ * REEP v2 design system — global.
+ *
+ * The restrained Y2K-chrome / glass language from the design handoff
+ * (`REEP Student App.dc.html` + its README): a soft lilac-to-pink page wash,
+ * white translucent cards with 1px lavender hairlines and layered soft shadows,
+ * Plus Jakarta Sans for headings and labels, Inter for body, and a purple→magenta
+ * gradient reserved for primary actions and the active nav pill.
+ *
+ * NOT COMPONENT SCOPED, on purpose. These classes (.card, .dt-table, .chip,
+ * .desktop-*, .ledger-*, …) are used across many standalone components and must
+ * resolve globally; AGENTS.md's frontend convention is to reuse them rather than
+ * redefine a global inside a component.
+ *
+ * ONE TOKEN VOCABULARY. This file defines the handoff's tokens under honest
+ * names (--brand-purple, --ink, --surface, --hairline, …) and every consumer
+ * reads those. The warm-paper aliases (--paper-0, --amber-500, --ink-900, …)
+ * that stood here while the two designs coexisted are gone: 286 references
+ * across 26 files were renamed to the honest names, so a colour is now defined
+ * once and called one thing. The MUI-era `--reep-*` names still exist for the
+ * login, register and resume-builder surfaces, but they are DEFINED in
+ * reep-theme.scss with the v2 values rather than re-pointed from here — one
+ * token, one place.
+ *
+ * SINGLE THEME, DELIBERATELY. The handoff is one committed visual world (a lilac
+ * wash with a magenta accent) rather than a light/dark pair, so every colour
+ * here is painted explicitly and there is no prefers-color-scheme block. The
+ * page background is set on both html and body so the design owns the canvas
+ * whatever the host paints behind it.
+ *
+ * The prototype's inline styles are NOT reproduced — the README is explicit that
+ * they are an artefact of the single-file format. Everything is tokens and real
+ * component classes here.
+ */
+
+:root {
+  /* --- brand ------------------------------------------------------------ */
+  --brand-purple: #552c7e;
+  /* MAGENTA APPEARS IN EXACTLY ONE PLACE, AND A CI CHECK ENFORCES IT.
+     The 2026-09 design system (docs/redesign-2026-09/01-design-system.md §1)
+     reserves magenta for the primary gradient below: the one primary button of
+     a view, the active nav pill, the active tab, the brand mark and the meters.
+     It is never a text colour, never a chip, never a chart series — at 4.0:1 on
+     the card fill it is the weakest colour in the palette to read, and a second
+     standalone accent leaves the gradient with nothing to mean.
+     tools/ci/check_brand_magenta.py fails the build if `--brand-magenta`, the
+     literal `#ba2185` or its rgba form appears anywhere but --primary-gradient
+     and this declaration. Reach for --brand-purple or --purple-mid instead. */
+  --brand-magenta: #ba2185;
+  --purple-mid: #7a2f9e;
+  --magenta-mid: #a0248f;
+
+  /* --- ink -------------------------------------------------------------- */
+  /* Primary and secondary text are CHARCOAL, not tinted purple. The tint read
+     as a third brand colour on text-dense screens and left the actual accent
+     with nothing to contrast against; purple is now accent-only. --ink-soft
+     and --ink-nav keep their violet because the legend and the sidebar are
+     where the brand still belongs. */
+  --ink: #1e1b29;
+  --ink-soft: #4a2668;
+  --ink-nav: #5b3080;
+  --muted: #585566;
+  /* #a08cb2 was ~2.9:1 on the card fill and failed WCAG AA. Its successor
+     #7c7891 passed on white but measured 3.42:1 on the lavender sidebar and
+     page wash (#ece4f5), where the nav's section labels sit (axe, DEF-010).
+     #67637c is 4.65:1 there and 5.75:1 on white: the only tertiary text colour. */
+  --faint: #67637c;
+
+  /* --- series (the ledger's five heads) ---------------------------------
+     ONE ORDERED RAMP, NOT FIVE HUES. These were violet, pale violet, purple,
+     deep purple and magenta, which read as five unrelated categories competing
+     for attention on a screen that is mostly a table of numbers. They are now a
+     sequence: the two heads that are not work (sleep, personal) sit in neutral
+     lavender-greys, and the three that are step light -> deep purple in the
+     order a day's effort escalates. Amber is then left as the only accent in
+     the ledger, reserved for unlogged and over-capacity hours, which is the one
+     thing there worth interrupting for.
+     The two pale steps are darker than the handoff's first pass — #b9a8c9 and
+     #d9c8e6 disappeared against the track behind them. */
+  --series-sleep: #a795b8;
+  --series-personal: #c9b8d8;
+  --series-lectures: #9a5fbf;
+  --series-coursework: #7a2f9e;
+  --series-skilling: #552c7e;
+
+  /* --- surfaces --------------------------------------------------------- */
+  --surface: #ffffff;
+  --tint-1: #efe4f6;
+  --tint-2: #f5edfa;
+  --tint-3: #faf6fd;
+
+  /* --- hairlines. Four weights, each with a job ------------------------- */
+  --hairline: rgba(160, 138, 178, 0.38); /* cards */
+  --hairline-42: rgba(160, 138, 178, 0.42);
+  --hairline-45: rgba(160, 138, 178, 0.45);
+  --hairline-26: rgba(160, 138, 178, 0.26); /* table + metric rules */
+
+  /* --- status. Text colour AND fill, so a chip is never colour alone ---- */
+  /* #137a4a was 4.34:1 on the page wash, where a transparent .chip.good sits
+     (the home header's status chip); #107045 is 4.96:1 (DEF-010). The chart
+     theme's copy is --st-good, which is on white and is unchanged. */
+  --good: #107045;
+  --good-bg: rgba(19, 122, 74, 0.12);
+  --warn: #8f6100;
+  --warn-dot: #d99a00;
+  --warn-bg: rgba(217, 154, 0, 0.12);
+  --risk: #ad2452;
+  --risk-bg: rgba(173, 36, 82, 0.1);
+
+  /* --- washes and gradients --------------------------------------------- */
+  --page-wash: linear-gradient(180deg, #ece4f5 0%, #f2e7f8 45%, #fbe6f2 100%);
+  --primary-gradient: linear-gradient(120deg, #552c7e, #7a2f9e 38%, #a0248f 68%, #ba2185);
+  --card-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(245, 237, 250, 0.7));
+  --titlebar-gradient: linear-gradient(180deg, #faf6fd, #ece0f2);
+  --voice-overlay: radial-gradient(
+    120% 85% at 50% 12%,
+    rgba(96, 45, 138, 0.96),
+    rgba(26, 10, 42, 0.98)
+  );
+
+  /* --- chart palette (2026-09) ------------------------------------------
+     Charts get their own vocabulary because a data series is not a status and
+     neither is a brand colour. Four categorical hues, fixed per interview
+     track so a track is the same colour on every screen (FIN 1, HR 2, MKT 3,
+     BA 4); one single-hue sequential ramp for magnitude; the status trio for
+     status. All pairs were checked on the --tint-3 table ground: CVD deltaE
+     10.1, normal-vision deltaE 21.9, contrast at or above 3:1.
+     Brand purple is series 1 of a single-series chart and nothing else —
+     see 01-design-system.md §1. */
+  --cat-1: #9e6cd5;
+  --cat-2: #c47c00;
+  --cat-3: #009592;
+  --cat-4: #89275b;
+  --seq: #552c7e;
+  --seq-light: #c9b8d8;
+  --axis: #7c7891;
+  --split: rgba(160, 138, 178, 0.26);
+  --st-good: #137a4a;
+  --st-warn: #d99a00;
+  --st-risk: #ad2452;
+  --st-neutral: #c9b8d8;
+
+  /* --- radii ------------------------------------------------------------ */
+  --r-pill: 999px;
+  /* 22px -> 16px with the 2026-09 design system. The enterprise dress sets
+     cards at 16 and controls at 12, which reads as a document rather than a
+     consumer app; at 22 the corner ate into dense table content. This one
+     token reshapes .card/.res-card, .dense-stat, .reg-frame, .skill-card and
+     the uploads panel at once, which is why it is called out here. */
+  --r-card: 16px;
+  --r-ledger: 20px;
+  --r-profile: 18px;
+  --r-alert: 14px;
+  --r-btn: 12px;
+  /* The control radius, named for what it is. An alias rather than a second
+     value: --r-btn already carries 12px across seven component sheets, and
+     two names holding one number is how they come to disagree. */
+  --r-control: var(--r-btn);
+  /* Small tiles (KPI sparkline wells, swatches, the grid's inner cells). */
+  --r-tile: 10px;
+  --r-icon: 8px;
+  --r-seg: 6px;
+  --r-swatch: 3px;
+
+  /* --- shadows ---------------------------------------------------------- */
+  --sh-card: 0 10px 26px rgba(58, 31, 82, 0.1), inset 0 1px 0 #fff;
+  --sh-ctrl: 0 2px 6px rgba(58, 31, 82, 0.06), inset 0 1px 0 #fff;
+  --sh-primary: 0 8px 18px rgba(85, 44, 126, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --sh-primary-hover: 0 10px 22px rgba(85, 44, 126, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --sh-navpill: 0 5px 14px rgba(85, 44, 126, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --sh-well: inset 0 1px 2px rgba(58, 31, 82, 0.12);
+  --sh-voice: 0 10px 24px rgba(12, 4, 22, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+
+  /* THE FLOATING ORB'S ELEVATION IS FOUR LAYERS AND NOT ONE
+     (layout/agent-orb.component.ts). A 1px contact shadow anchors the disc to
+     the page, then near, mid and ambient widen the blur while the opacity
+     falls. One blurred drop at one radius is what an undesigned float looks
+     like -- the falloff is what reads as HEIGHT, and it is the whole reason
+     the orb no longer needs the 4px opaque-white ring it used to wear to
+     separate itself from the wash. The ring was a cut-out line rather than
+     anything light does, and it was the single thing making the orb read as a
+     sticker pasted on the screen. */
+  --sh-orb:
+    0 1px 1px rgba(30, 12, 48, 0.12), 0 4px 8px rgba(58, 31, 82, 0.14),
+    0 12px 24px rgba(58, 31, 82, 0.18), 0 22px 44px rgba(58, 31, 82, 0.16);
+  --sh-orb-hover:
+    0 1px 1px rgba(30, 12, 48, 0.14), 0 6px 12px rgba(58, 31, 82, 0.18),
+    0 16px 32px rgba(58, 31, 82, 0.22), 0 30px 60px rgba(58, 31, 82, 0.2);
+  /* The rim, and it is a separate token because it does not move on hover
+     while the four above all do: a hairline all round, a lit top edge and a
+     shaded bottom one, so the silhouette has a material thickness where it
+     meets the page instead of a cut edge. */
+  --sh-orb-rim:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16), inset 0 1.5px 1px rgba(255, 255, 255, 0.32),
+    inset 0 -3px 8px rgba(24, 8, 40, 0.18);
+
+  /* --- motion ----------------------------------------------------------- */
+  /* TWO CURVES, AND NEITHER IS `ease`. A control answering a press should
+     leave fast and arrive slow (--ease-out); one springing back from a press
+     should overshoot a little and settle (--ease-spring). The browser default
+     eases IN as well as out, which on a 160ms transition spends the first
+     third of it going nowhere and reads as lag. Both are here rather than
+     written at the call site so a second animated control cannot pick a
+     third curve. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* --- type ------------------------------------------------------------- */
+  /* Plus Jakarta Sans carries the display role and Inter the UI/data role.
+     Orbitron's wide techno letterforms were hurting the dense data screens —
+     the ledger, the analytics tables, the leaderboard — where the type is
+     small and set in columns. The pair keeps the geometric character in
+     headings while reading cleanly at the 13-14px the tables actually use. */
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* --- nav -------------------------------------------------------------- */
+  --nav-width: 220px;
+  /* The app bar is a fixed 52px band, not a content-sized one. The scope
+     control, the search and the avatar block all sit on its baseline, and a
+     bar that grows with its tallest control moves the whole page under it. */
+  --appbar-height: 52px;
+
+  /* --- ground + focus, the two tokens that are not colours or shadows ---- */
+  /* The page's flat ground, under the wash. Named for what it is rather than
+     inherited from the old warm-paper vocabulary. */
+  --ground: #ece4f5;
+  --edge-hi: inset 0 1px 0 #fff;
+  /* Brand purple at 25%, 2px, per 01-design-system.md §7. It was magenta at
+     18%, which is both the colour the palette reserves for the gradient and
+     the faintest ring in it — on the white input fill the old value was
+     barely visible, so keyboard users could not see where focus was. */
+  --focus-ring: 0 0 0 2px rgba(85, 44, 126, 0.25);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+html {
+  /* THE WASH LIVES HERE, not on body, and it is fixed so it is sized to the
+     viewport rather than to the document.
+     
+     It used to be a flat #ece4f5 here and the gradient on `body` with
+     `background-attachment: fixed`. A fixed background is SIZED to the viewport
+     but still PAINTED across the element's whole box, and background-repeat
+     defaults to `repeat` -- so on any page taller than the window the gradient
+     restarted at the fold: lilac, down to pink, then hard back to lilac, with
+     this flat colour showing wherever the repeat did not reach. Inside the
+     shell nothing noticed, because the shell scrolls its own middle and the
+     body never exceeds the window. It showed on the pages that have no shell
+     and do scroll -- sign-in at 390px, register, onboard, activate, reset.
+     
+     On the root element the background propagates to the canvas, which is
+     painted over the whole viewport whatever the document height, so there is
+     no repeat to see and no second colour to keep in step. */
+  background: var(--page-wash);
+  background-attachment: fixed;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 13px;
+  /* Transparent: html owns the wash (see above). */
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.45;
+  /* Document-wide, so every metric column aligns without each screen having
+     to remember. The app is mostly numbers in columns. */
+  font-variant-numeric: tabular-nums;
+  /* Only the horizontal axis is locked (setting overflow-x makes overflow-y
+     compute to auto). The full-bleed shell contains its OWN vertical scroll via
+     .desktop-main; pages OUTSIDE the shell (login, register) must still scroll
+     the document, so the body's vertical axis must not be hidden. */
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  /* Orbitron needed the extra 0.005em to breathe. Plus Jakarta Sans is
+     already generously spaced and reads tighter and more deliberate pulled
+     in, which is what the handoff sets on every header. */
+  letter-spacing: -0.02em;
+}
+
+p,
+li {
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--purple-mid);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--brand-purple);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--purple-mid);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Material Symbols Rounded, at the weight the handoff specifies. */
+.icon {
+  font-family: 'Material Symbols Rounded';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-variation-settings:
+    'opsz' 24,
+    'wght' 400,
+    'FILL' 0,
+    'GRAD' 0;
+  -webkit-font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  flex: none;
+
+  /* A GLYPH-SIZED BOX, and it is load-bearing rather than tidiness.
+     Material Symbols renders from LIGATURES: the markup says
+     `<span class="icon">leaderboard</span>` and the font folds that text into
+     one glyph. If the font does not arrive, the span is as wide as the WORD —
+     so a sidebar item reserves 90px for its icon, the label is pushed out of
+     the 220px nav and clipped, and every toolbar wraps. Clamping to 1em (the
+     em box these glyphs are drawn to fill) makes the layout identical whether
+     the font loaded or not.
+     `visibility: hidden` on top of that keeps the space but hides the stray
+     letters the clip would otherwise leave; main.ts reveals it once the face
+     reports itself genuinely loaded. */
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+html.fonts-ready .icon {
+  visibility: visible;
+}
+
+/* ==========================================================================
+ * Shell
+ * ======================================================================= */
+
+.desktop-frame {
+  display: flex;
+  flex-direction: column;
+  /* 100vh FIRST AND 100dvh SECOND, both deliberately. On a phone `vh` is the
+     LARGEST viewport — the height the page has once the URL bar has scrolled
+     away — so a 100vh frame is taller than the visible area for as long as the
+     bar is showing, and the bottom of the sidebar and the last row of every
+     table sit under it with nothing to scroll them into view, because the
+     frame itself is `overflow: hidden`. `dvh` is the height as it actually is
+     at this moment. The vh line stays as the fallback for a browser that does
+     not know dvh — the same browsers polyfills.ts is written for. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* THE APP BAR. A fixed 52px band (01-design-system.md §3), not a
+   content-sized one: the scope control, the search and the account block all
+   sit on its baseline, and a bar that grows with its tallest control moves the
+   whole page under it. It replaced `.desktop-titlebar`, which had no height at
+   all and carried the brand in the SIDEBAR. */
+.appbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--appbar-height);
+  flex: none;
+  padding: 0 14px;
+  background: var(--titlebar-gradient);
+  border-bottom: 1px solid var(--hairline);
+  color: var(--ink);
+  font-size: 12.5px;
+}
+
+.appbar__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+  text-decoration: none;
+  flex: none;
+}
+
+/* The brand mark is one of the three places the gradient is allowed. */
+.brandmark {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-icon);
+  background: var(--primary-gradient);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: var(--sh-primary);
+}
+.brandmark__word {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.brandmark__console {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+/* Which deployment this is. Only the Main Admin sees it, because they are the
+   one person for whom the question is real. */
+.envpill {
+  flex: none;
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+  background: var(--tint-1);
+  color: var(--ink-soft);
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.appbar__search {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: 300px;
+  max-width: 34vw;
+  height: 32px;
+  margin-left: 6px;
+  padding: 0 10px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  box-shadow: var(--sh-well);
+  color: var(--faint);
+  font-family: var(--font);
+  font-size: 12.5px;
+  text-align: left;
+}
+.appbar__search-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.appbar__search .icon {
+  font-size: 17px;
+  color: var(--ink-nav);
+}
+.kbd {
+  margin-left: auto;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-swatch);
+  padding: 0 4px;
+  font-size: 10.5px;
+  color: var(--faint);
+}
+
+.appbar__scope {
+  flex: none;
+  max-width: 34vw;
+}
+
+/* The bar pushes everything after the scope control to the right edge. */
+.appbar__icon {
+  flex: none;
+}
+.appbar__icon:first-of-type {
+  margin-left: auto;
+}
+
+.appbar [disabled],
+.appbar [aria-disabled='true'] {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Right-align the account block whether or not the admin controls are there. */
+.account {
+  position: relative;
+  margin-left: auto;
+  flex: none;
+}
+.appbar__icon ~ .account {
+  margin-left: 0;
+}
+
+.account__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 8px 0 6px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font);
+  text-align: left;
+}
+.account__button:hover {
+  background: var(--surface);
+  border-color: var(--hairline-42);
+}
+/* The student console's identity is a label, not a menu. */
+.account__button--static {
+  cursor: default;
+}
+.account__button--static:hover {
+  background: transparent;
+  border-color: transparent;
+}
+.appbar__signout {
+  flex: none;
+}
+.account__button .icon {
+  font-size: 18px;
+  color: var(--ink-nav);
+}
+.account__who {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  min-width: 0;
+}
+.account__name {
+  font-size: 12.5px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 16ch;
+}
+.account__role {
+  font-size: 10.5px;
+  color: var(--faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 16ch;
+}
+
+.account__menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 40;
+  min-width: 216px;
+  padding: 6px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-card);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.account__menuhead {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--hairline-26);
+  margin-bottom: 4px;
+}
+.account__menuhead small {
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--faint);
+}
+.account__item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--r-seg);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+}
+.account__item .icon {
+  font-size: 17px;
+  color: var(--ink-nav);
+}
+.account__item small {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.account__item:hover {
+  background: var(--tint-2);
+}
+.account__item.is-disabled {
+  color: var(--faint);
+  cursor: not-allowed;
+}
+.account__item.is-disabled:hover {
+  background: transparent;
+}
+
+.desktop-shell {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.desktop-nav {
+  width: var(--nav-width);
+  flex: none;
+  padding: 14px 12px 22px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* The sidebar profile card — avatar frame, name, USN. */
+.nav-profile {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-profile);
+  box-shadow: var(--sh-ctrl);
+  padding: 14px 12px 12px;
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.nav-profile .avatar {
+  width: 88px;
+  height: 106px;
+  border-radius: var(--r-icon);
+  background: var(--tint-1);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.nav-profile .avatar .icon {
+  font-size: 52px;
+  color: var(--faint);
+}
+.nav-profile .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.nav-profile .name {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 1.25;
+}
+.nav-profile .usn {
+  font-size: 10.5px;
+  color: var(--faint);
+  letter-spacing: 0.04em;
+}
+
+.desktop-nav .brand {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--brand-purple);
+  padding: 2px 12px 10px;
+}
+
+.desktop-nav a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-nav);
+  background: transparent;
+  margin-bottom: 2px;
+  transition:
+    background 0.14s ease,
+    color 0.14s ease;
+}
+.desktop-nav a:hover {
+  background: var(--tint-2);
+  color: var(--brand-purple);
+}
+.desktop-nav a.active {
+  background: var(--primary-gradient);
+  color: #fff;
+  box-shadow: var(--sh-navpill);
+}
+.desktop-nav a.active:hover {
+  color: #fff;
+}
+
+/* A navigation row with no route yet: the console's shape is honest, and the
+   row cannot pretend to work. Not an <a>, so it is not in the tab order and a
+   screen reader does not offer it as a link. */
+.nav-pending {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--faint);
+  margin-bottom: 2px;
+  cursor: not-allowed;
+}
+/* The label keeps the room; the badge is what gives way. A two-line "Data
+   imports" in a 220px rail looks like a bug rather than a state. */
+.nav-pending .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+.nav-pending small {
+  margin-left: auto;
+  flex: none;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--faint);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-pill);
+  padding: 1px 5px;
+}
+
+.desktop-nav .sec-label {
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--faint);
+  padding: 16px 12px 6px;
+}
+
+.desktop-main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  /* 16/24 (01 §3). The bottom keeps clear of the floating agent orb. */
+  padding: 16px 24px 90px;
+}
+/* The console's boards are denser and sit against the sidebar. */
+.desktop-main--admin {
+  padding: 16px 20px 90px;
+}
+
+/* ==========================================================================
+ * THE SHELL AT PHONE WIDTH (2026-09-22)
+ *
+ * `.desktop-shell` is a flex row with a fixed 220px `.desktop-nav` beside
+ * `.desktop-main`, and that is the whole problem on a handset: 220px of a
+ * 360px screen is the navigation, and the 140px left over is where a student
+ * was expected to read their marks. Every student screen inherited it,
+ * whatever its own stylesheet said.
+ *
+ * At 900px the sidebar leaves the flow and becomes an off-canvas drawer behind
+ * a hamburger in the app bar. The number is a literal and not a token because
+ * a media query cannot read a custom property — `@media (max-width: var(--x))`
+ * is invalid and fails open, which is a breakpoint that silently never fires. It is the SAME `<nav>` with the
+ * same items in the same order — no second navigation to keep in step with
+ * `ADMIN_NAVIGATION` and its three siblings, which is the whole point of the
+ * navigation being data.
+ *
+ * CLOSED MEANS `visibility: hidden`, NOT ONLY `translateX(-100%)`. A drawer
+ * moved off-screen with a transform is still in the focus order: tabbing from
+ * the app bar walks every nav row of an invisible panel before reaching the
+ * page, which is the same class of defect as the `hidden` file inputs in
+ * AGENTS.md's reachability audit. `visibility` takes it out of the focus order
+ * and still transitions, because it is animatable between its two keywords.
+ * ======================================================================= */
+
+.nav-scrim {
+  display: none;
+}
+
+/* The hamburger. Absent above the breakpoint rather than merely invisible, so
+   it is not a tab stop on a desktop where the sidebar is already on screen.
+
+   QUALIFIED BY `.appbar`, AND THAT IS NOT DECORATION. The button also carries
+   `.iconbtn`, which is declared ~600 lines further down and sets
+   `display: grid`. Two single-class selectors have the same specificity, so
+   SOURCE ORDER decides and `.iconbtn` wins: a bare `.appbar__nav-toggle` rule
+   here is overruled and the hamburger renders at every width, beside a sidebar
+   that is already on screen. Measured in Chromium at 1280px before this was
+   written down. */
+.appbar .appbar__nav-toggle {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .appbar .appbar__nav-toggle {
+    display: inline-flex;
+  }
+
+  .desktop-nav {
+    position: fixed;
+    top: var(--appbar-height);
+    left: 0;
+    bottom: 0;
+    /* Never the full width: the strip of page still showing is what says the
+       drawer is a layer over the screen rather than a screen of its own. */
+    width: min(280px, 82vw);
+    z-index: 45;
+    background: var(--surface);
+    border-right: 1px solid var(--hairline);
+    box-shadow: var(--sh-card);
+    transform: translateX(-100%);
+    visibility: hidden;
+    transition:
+      transform 0.2s ease,
+      visibility 0.2s ease;
+  }
+
+  .desktop-nav.is-open {
+    transform: none;
+    visibility: visible;
+  }
+
+  .nav-scrim {
+    display: block;
+    position: fixed;
+    inset: var(--appbar-height) 0 0;
+    z-index: 44;
+    border: 0;
+    padding: 0;
+    width: 100%;
+    background: rgb(28 18 44 / 38%);
+    cursor: pointer;
+  }
+
+  .desktop-main,
+  .desktop-main--admin {
+    padding: 14px 16px 88px;
+  }
+}
+
+/* The app bar's own contents. The brand block is three elements — mark, word,
+   console name — and on a 360px screen the account block and Sign out have to
+   share the row with them, so the two that are decoration give way first. The
+   MARK stays at every width: it is the link home. */
+@media (max-width: 760px) {
+  .appbar {
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .appbar__scope {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .brandmark__console {
+    display: none;
+  }
+
+  /* The name and USN under the avatar. The avatar itself stays, because it is
+     what the account menu hangs off for staff. */
+  .appbar .account__who {
+    display: none;
+  }
+
+  /* Sign out keeps its glyph and loses its word — still a real target beside
+     the avatar, and the button carries an aria-label so the name survives for
+     anyone who cannot see the icon. */
+  .appbar__signout-label {
+    display: none;
+  }
+
+  .appbar .appbar__signout {
+    padding: 0 10px;
+  }
+}
+
+/* The last thing to go, and only on a genuinely tiny screen. Once the console
+   name, the identity block and Sign out's label are gone the bar has room to
+   spare at 390px, so hiding the word there — as this first did at 420 — took
+   the product's name off the screen for nothing. Measured, not guessed. */
+@media (max-width: 340px) {
+  .brandmark__word {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+ * TOUCH AND TYPING AT PHONE WIDTH (2026-09-22)
+ *
+ * Found by driving the real app in Chromium at 320/360/390 rather than by
+ * reading this file: 50 form fields across six screens and every icon button
+ * in the shell were below the sizes a phone needs. Both rules are INSIDE this
+ * query and nothing above 760px is touched — the desktop console keeps its
+ * 12.5px controls exactly as they are.
+ *
+ * 16px IS NOT A PREFERENCE, IT IS THE NUMBER iOS WATCHES. Safari zooms the
+ * whole page in when a focused input's font-size is under 16px, and it does
+ * not zoom back out when the field blurs — so on /register, the most public
+ * form in the product, every tap into a box left the applicant on a page
+ * wider than their screen, panning sideways to find the next field. Fourteen
+ * fields there, sixteen on the resume builder, twelve on the profile. The
+ * element selectors are deliberate: a class list would have to name every
+ * bespoke input class on every screen, and the one somebody adds next month
+ * is the one that keeps the bug.
+ *
+ * 44px is Apple's floor and 48 is Material's; `min-height` and `min-width`
+ * rather than `height`, so a control that is already bigger is left alone and
+ * one with an explicit `width` (the 28px `.iconbtn`) still grows — the used
+ * value is max(min-width, width).
+ * ======================================================================= */
+
+@media (max-width: 760px) {
+  /* `!important` IS LOAD-BEARING HERE AND WAS ADDED AFTER MEASURING. Without
+     it this rule fixed two screens and lost on the other six: Angular scopes a
+     component's styles by appending an attribute, so `input` written in a
+     component sheet is `input[_ngcontent-x]` at (0,1,1) and beats a global
+     `input` at (0,0,1) — and a class like `.ctrl` or `.field input` beats it
+     from the global resume sheet too. Re-measured in Chromium: 50 fields still
+     under 16px. This is the same case as the `prefers-reduced-motion` block
+     above, which carries `!important` for the same reason — a platform floor
+     that no component may opt out of by accident. */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+
+  /* A checkbox is not a button: its label is the real target, so this is a
+     modest bump rather than 44px, which would draw a box bigger than the
+     words beside it. */
+  input[type='checkbox'],
+  input[type='radio'] {
+    min-width: 20px;
+    min-height: 20px;
+  }
+
+  .btn,
+  .dt-btn,
+  .iconbtn,
+  .tabs .tab,
+  .seg button,
+  select {
+    min-height: 44px;
+  }
+
+  .iconbtn {
+    min-width: 44px;
+  }
+
+  /* The app bar's two remaining small targets. Sign out is icon-only below
+     560px, so it needs a width as well as the height `.btn` now gives it; the
+     brand is a 26px-tall link and is the way home from every screen. */
+  .appbar .appbar__signout {
+    min-width: 44px;
+  }
+
+  .appbar__brand {
+    min-height: 44px;
+  }
+}
+
+/* ==========================================================================
+ * TABLES AT PHONE WIDTH
+ *
+ * A REEP screen is mostly tables — marks, attendance, the ledger, jobs, the
+ * leaderboard, interview records — and at 390px a six-column table is wider
+ * than the screen. It did not overflow the DOCUMENT, which is why this is easy
+ * to miss from a scroll bar: `body` is `overflow-x: hidden` and
+ * `.desktop-frame` is `overflow: hidden`, so the columns past the edge were
+ * CLIPPED. The student saw the first three columns of their marks and had no
+ * way — no scroll bar, no gesture, nothing on screen — to reach the other
+ * three. Measured in Chromium: .dt-table's right edge at 414px sits outside
+ * the viewport at every width below 768.
+ *
+ * `display: block` turns the table into a scroll container (its rows still lay
+ * out through an anonymous table box), and the nowrap on the cells is what
+ * gives it something to scroll: without it the columns squeeze to one word per
+ * line and the table "fits" while being unreadable.
+ *
+ * SCOPED TO `.desktop-main` AND TO THE ELEMENT, on purpose. To the element,
+ * because student screens use four different table classes (.dt-table, .tbl,
+ * .ledger-table, .jobs-table) and the fifth somebody adds next month must not
+ * have to be remembered here. To `.desktop-main`, because the screens OUTSIDE
+ * the shell — login, register, and the resume PREVIEW, which is laid out to
+ * paper width on purpose — must not be touched.
+ *
+ * THIS IS THE FALLBACK. THE WRAPPER IS THE PATTERN. Three screens already do
+ * this properly and did it first: Jobs (`.jobs-frame`), Records
+ * (`.rec-scroll`) and the Ledger (`.table-scroll`) each put the table in a
+ * scrolling box and give the table a `min-width`, which is better than this
+ * rule because the table stays a table — `.jobs-table` is `table-layout:
+ * fixed` with six percentage columns the design weights, and turning it into a
+ * block with nowrap cells would both drop the fixed layout and stop the role
+ * and company names wrapping inside their columns. So those three are excluded
+ * BY THEIR WRAPPER.
+ *
+ * The exclusion is a list of WRAPPERS and deliberately not a list of tables.
+ * Both lists need maintaining; they fail in opposite directions. Forget to add
+ * a new wrapper here and its table merely gets this treatment as well as its
+ * own — redundant, still readable, still scrollable. Forget to add a new table
+ * to a list of tables and it CLIPS, which is the bug this whole section
+ * exists for and the one nobody reports because there is nothing on screen to
+ * report.
+ *
+ * IT IS WRITTEN AS AN OVERRIDE AND NOT AS `:not(.jobs-frame *, …)`, WHICH IS
+ * WHAT IT SAID FIRST. A `:not()` holding COMPLEX selectors is Selectors 4, and
+ * a browser that cannot parse it drops THE WHOLE RULE — so on exactly the old
+ * handset browsers src/polyfills.ts exists for, the tables would go back to
+ * clipping, silently, with the stylesheet looking correct in every devtools
+ * anyone would open. Two plain rules and specificity do the same job on every
+ * engine that can parse a descendant selector.
+ * ======================================================================= */
+
+@media (max-width: 760px) {
+  .desktop-main table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    /* The scroll container is the table itself, so a sticky header would have
+       nothing to stick to; no student screen sets one, and the three that come
+       closest are the wrapper-based three restored below. */
+    overscroll-behavior-x: contain;
+  }
+
+  .desktop-main table th,
+  .desktop-main table td {
+    white-space: nowrap;
+  }
+
+  /* The three that scroll themselves stay real tables. One class deeper than
+     the rules above, so this wins wherever it applies without !important. */
+  .desktop-main .jobs-frame table,
+  .desktop-main .rec-scroll table,
+  .desktop-main .table-scroll table {
+    display: table;
+    max-width: none;
+    overflow: visible;
+  }
+
+  .desktop-main .jobs-frame table th,
+  .desktop-main .jobs-frame table td,
+  .desktop-main .rec-scroll table th,
+  .desktop-main .rec-scroll table td,
+  .desktop-main .table-scroll table th,
+  .desktop-main .table-scroll table td {
+    white-space: normal;
+  }
+
+  /* The card is the table's frame, and at this width its 20px sides are 10% of
+     the screen. */
+  .desktop-main .card {
+    padding: 14px;
+  }
+}
+
+/* ==========================================================================
+ * Page furniture
+ * ======================================================================= */
+
+.panel {
+  display: block;
+}
+
+.dt-header,
+.main-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.dt-title {
+  font-family: var(--font-display);
+  /* Every screen title in the handoff is 28/700/120%. At 22px the titles sat
+     too close to the 16px card headings for the page to have an obvious top. */
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.dt-sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin: 5px 0 0;
+}
+
+.eyebrow {
+  font-family: var(--font-display);
+  /* 9.5px uppercase was legible in Orbitron's wide caps and is not in Inter's;
+     the handoff sets these at 11-12px with the tracking relaxed to match. */
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin: 0 0 6px;
+}
+
+.dt-toolbar,
+.head-actions,
+.res-actions,
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+ * Cards and grids
+ * ======================================================================= */
+
+.card,
+.res-card {
+  background: var(--card-gradient);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-card);
+  padding: 18px;
+}
+
+/* The card title row. `.card > h3` carried a second declaration in
+   reep-v2-resume.scss which, loading last, made every h3 directly inside a
+   card flex with its action right-aligned — on the resume sections, and on
+   Skilling and Interviews too. That is the design system's own card-title
+   pattern (01 §4: title + faint sub, actions right), so it is stated once,
+   here, rather than arriving from the other sheet by accident. */
+.card h4,
+.card > h3,
+.res-card h4 {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  margin: 0 0 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--hairline-26);
+}
+
+/* An `h3` used as the card's title row takes an action on its right: the
+   resume sections put "Add another" there, Skilling puts its claim link.
+   These are the declarations reep-v2-resume.scss used to contribute to the
+   same selector, kept verbatim so no screen moves, and stated beside the rule
+   they refine instead of arriving from a file that loads later. */
+.card > h3 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+/* The faint line under a card title. */
+.card > .desc {
+  font-size: 12.3px;
+  color: var(--muted);
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.grid-3,
+.grid3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+.grid-2,
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.grid4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+@media (max-width: 1100px) {
+  .grid-3,
+  .grid3,
+  .grid4 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 720px) {
+  .grid-3,
+  .grid3,
+  .grid-2,
+  .grid2,
+  .grid4 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* A row inside a landing stage card: chevron · label · status glyph. */
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  width: 100%;
+  background: none;
+  border: 0;
+  text-align: left;
+  font-family: inherit;
+}
+.link-row .icon.lead {
+  font-size: 16px;
+  color: var(--faint);
+}
+.link-row .lbl {
+  flex: 1;
+  font-size: 12.8px;
+  font-weight: 600;
+  color: var(--purple-mid);
+  min-width: 0;
+}
+.link-row:hover .lbl {
+  color: var(--brand-purple);
+}
+.link-row.static .lbl {
+  color: var(--ink-soft);
+  cursor: default;
+}
+.link-row .icon.state {
+  font-size: 16px;
+}
+.link-row .icon.state.good {
+  color: var(--good);
+}
+.link-row .icon.state.warn {
+  color: var(--warn);
+}
+.link-row .icon.state.neutral {
+  color: var(--faint);
+}
+
+/* ==========================================================================
+ * Metrics
+ * ======================================================================= */
+
+.dense-grid {
+  display: grid;
+  /* `min(160px, 100%)`: a minmax() minimum that is a fixed length does not
+     collapse when the container is narrower than it — the track keeps the
+     160px and the grid overflows its card. This is the most reused grid in the
+     app and it nests, so the container is not always the page. No effect at
+     any width where 160px already fitted. */
+  grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.dense-stat {
+  background: var(--card-gradient);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-card);
+  padding: 14px 16px 16px;
+}
+.dense-stat .lbl {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--faint);
+  display: block;
+  margin-bottom: 6px;
+}
+.dense-stat .val {
+  font-family: var(--font-display);
+  font-size: 27px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+  color: var(--ink);
+  display: block;
+}
+.dense-stat .val .unit {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--faint);
+  margin-left: 4px;
+}
+.dense-stat .sub {
+  font-size: 11.5px;
+  color: var(--muted);
+  display: block;
+  margin-top: 5px;
+}
+
+/* ==========================================================================
+ * Tables
+ * ======================================================================= */
+
+.dt-table,
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+
+.dt-table th,
+.tbl th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--hairline-45);
+  white-space: nowrap;
+}
+
+.dt-table td,
+.tbl td {
+  padding: 9px 10px;
+  border-bottom: 1px solid var(--hairline-26);
+  color: var(--ink-soft);
+  vertical-align: middle;
+}
+
+.dt-table tbody tr:nth-child(even),
+.tbl tbody tr:nth-child(even) {
+  background: rgba(250, 246, 253, 0.7);
+}
+
+/* ==========================================================================
+ * Tabs and segmented controls
+ * ======================================================================= */
+
+.tabs-row {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--hairline-26);
+}
+.tabs-row button {
+  background: none;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  padding: 8px 2px 10px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: -1px;
+}
+.tabs-row button.active {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+
+/* The UG / PG style level toggle. */
+.seg {
+  display: inline-flex;
+  /* Wraps, because this is a filter switcher whose buttons are words: three or
+     four of them on one line is wider than a handset, and an inline-flex row
+     that cannot wrap pushes its tail off the screen with nothing to scroll it
+     back. `.rb-tabs` and `.dt-header` already wrap for the same reason. */
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.seg button {
+  background: var(--surface);
+  border: 1px solid rgba(58, 31, 82, 0.12);
+  border-radius: var(--r-btn);
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.seg button.active {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+/* Pill tabs — the resume builder's switcher. */
+.rb-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.rb-tabs button {
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  border-radius: var(--r-pill);
+  padding: 8px 16px;
+  font-size: 12.8px;
+  font-weight: 600;
+  color: var(--ink-nav);
+}
+.rb-tabs button.active {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--sh-navpill);
+}
+
+/* ==========================================================================
+ * Chips, badges, tags
+ * ======================================================================= */
+
+.chip,
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: var(--r-pill);
+  padding: 3px 10px;
+  font-size: 11.5px;
+  font-weight: 700;
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.chip .icon,
+.tag .icon {
+  font-size: 14px;
+}
+.chip.good {
+  background: transparent;
+  color: var(--good);
+}
+.chip.warn {
+  background: transparent;
+  color: var(--warn);
+}
+.chip.risk {
+  background: transparent;
+  color: var(--risk);
+}
+/* Tint-2 on ink-soft, per 01-design-system.md §4. Declared twice before —
+   tint-1/muted here and --ground/muted in reep-v2-resume.scss, which won
+   everywhere because it loads last, so neither of the written values was the
+   one on screen. */
+.chip.neutral {
+  background: transparent;
+  color: var(--ink-soft);
+}
+.tag.lock,
+.tag.evi {
+  background: transparent;
+  color: var(--muted);
+}
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  padding: 6px 12px 6px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  box-shadow: var(--sh-ctrl);
+}
+.badge .ico {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-pill);
+  display: grid;
+  place-items: center;
+  background: var(--primary-gradient);
+  color: #fff;
+}
+.badge .ico .icon {
+  font-size: 15px;
+}
+.badge.locked {
+  color: var(--faint);
+}
+.badge.locked .ico {
+  background: var(--tint-1);
+  color: var(--faint);
+}
+
+/* ==========================================================================
+ * Buttons
+ * ======================================================================= */
+
+.btn,
+.dt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--hairline-42);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: var(--r-btn);
+  padding: 8px 14px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  box-shadow: var(--sh-ctrl);
+  transition:
+    background 0.14s ease,
+    border-color 0.14s ease,
+    box-shadow 0.14s ease,
+    transform 0.14s ease;
+}
+.btn .icon,
+.dt-btn .icon {
+  font-size: 16px;
+}
+.btn:hover,
+.dt-btn:hover {
+  background: var(--tint-3);
+  border-color: rgba(122, 47, 158, 0.45);
+}
+.btn:active,
+.dt-btn:active {
+  transform: translateY(1px);
+}
+.btn[disabled],
+.dt-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn.primary,
+.dt-btn.primary {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--sh-primary);
+}
+.btn.primary:hover,
+.dt-btn.primary:hover {
+  background: var(--primary-gradient);
+  box-shadow: var(--sh-primary-hover);
+}
+.btn.accent {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--sh-primary);
+}
+.btn.ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  color: var(--purple-mid);
+}
+.btn.ghost:hover {
+  background: var(--tint-2);
+}
+
+.iconbtn {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  border-radius: var(--r-icon);
+  color: var(--ink-nav);
+}
+.iconbtn:hover {
+  background: var(--tint-2);
+}
+.iconbtn .icon {
+  font-size: 18px;
+}
+.iconbtn[disabled] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* A date stepper: ‹ · label · › inside one white control. */
+.stepper-ctrl {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-btn);
+  box-shadow: var(--sh-ctrl);
+  padding: 3px 5px;
+}
+.stepper-ctrl .lbl {
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  padding: 0 8px;
+  min-width: 132px;
+  text-align: center;
+}
+
+/* ==========================================================================
+ * Fields
+ * ======================================================================= */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+/* A FORM FIELD'S LABEL IS SENTENCE CASE, not an uppercase micro-eyebrow.
+   
+   This was 9.5px, uppercase, tracked 0.14em, in --faint — which is the app's
+   EYEBROW treatment, correct over a card or a metric and wrong over an input.
+   All 59 boards in docs/redesign-2026-09/design agree and not one of them
+   tracks or uppercases `.lbl`: 11.5px, 700, --ink-soft, sentence case. The
+   same class of drift as `.kpi`, found the same way — by building a screen to
+   its board and watching the result disagree.
+   
+   This is a GLOBAL and it reaches 138 `.field` labels across 13 templates,
+   several outside Phase 1 (register, profile, institution, mentors & students,
+   account password). Every one of them moves toward its board rather than away,
+   and 9.5px uppercase tracked at 0.14em was the least legible text in the
+   product. */
+.field label {
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+}
+
+.ctrl,
+.field input,
+.field select,
+.field textarea,
+.ts-cell input {
+  font-family: inherit;
+  font-size: 12.8px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-btn);
+  padding: 8px 10px;
+  box-shadow: var(--sh-well);
+  width: 100%;
+}
+.ctrl:focus,
+.field input:focus,
+.field select:focus,
+.field textarea:focus,
+.ts-cell input:focus {
+  outline: none;
+  border-color: var(--purple-mid);
+  box-shadow: var(--focus-ring);
+}
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--faint);
+}
+
+.radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+.taginput {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ==========================================================================
+ * Notices and empty states
+ * ======================================================================= */
+
+.notice {
+  border-radius: var(--r-alert);
+  padding: 12px 14px;
+  font-size: 12.8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--risk-bg);
+  color: var(--risk);
+}
+.notice.info,
+.notice.evi {
+  background: var(--tint-2);
+  color: var(--ink-soft);
+}
+.notice .icon {
+  font-size: 16px;
+}
+
+.empty {
+  text-align: center;
+  padding: 28px 16px;
+  color: var(--muted);
+  font-size: 12.8px;
+}
+.empty .icon {
+  font-size: 30px;
+  color: var(--faint);
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.loading-line {
+  font-size: 13px;
+  color: var(--muted);
+  padding: 8px 0;
+}
+
+/* ==========================================================================
+ * Bars, meters, charts
+ * ======================================================================= */
+
+/* ONE OWNER. reep-v2-resume.scss declared .meter as well, and because it loads
+   last (src/styles.scss) its 7px hairline track was what every meter in the app
+   actually rendered — the assistant's mic level, the records attendance bars,
+   the profile completeness and the resume's own — while this rule's 8px tint-1
+   track applied to nothing but the box-shadow. Merged here at the design
+   system's size (01-design-system.md §4: 6-7px track, tint-1 fill, brand purple
+   or the gradient), with both fill elements the templates actually use. */
+.meter,
+.match-bar {
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: var(--tint-1);
+  overflow: hidden;
+  box-shadow: var(--sh-well);
+}
+/* `span` in the shell's meters, `i` in the resume builder's completeness bar.
+   Two elements, one fill — renaming either would touch templates this phase
+   is not allowed to redesign. */
+.meter > span,
+.meter > i,
+.match-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: var(--primary-gradient);
+}
+
+/* A label + meter + value on one line. NOT `.completeness`: the resume builder
+   owns that name for a bordered CARD in reep-v2-resume.scss, and a `display:
+   flex` here silently reflowed it — the section list's group headings ended up
+   inline with the items they head. Two components, two names. */
+.meter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+ * SWOC
+ * ======================================================================= */
+
+.swoc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.swoc-box {
+  border-radius: var(--r-alert);
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  border: 1px solid var(--hairline-26);
+  background: var(--tint-3);
+}
+.swoc-box b {
+  font-family: var(--font-display);
+  display: block;
+  font-size: 9.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 5px;
+}
+.swoc-s b {
+  color: var(--good);
+}
+.swoc-w b {
+  color: var(--risk);
+}
+.swoc-o b {
+  color: var(--purple-mid);
+}
+.swoc-c b {
+  color: var(--warn);
+}
+
+/* ==========================================================================
+ * Lists: recommendations, leaderboard, streak
+ * ======================================================================= */
+
+/* `.entry` is deliberately NOT in this group. The resume builder owns that name
+   for a bordered CARD (reep-v2-resume.scss) — every repeatable education /
+   experience / project block — and flexing it here turned each of those cards
+   into a single squashed row. Same lesson as `.completeness` above: a global
+   stylesheet may not claim a name another one is already using for a different
+   thing. */
+.reco-row,
+.rowline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--hairline-26);
+  font-size: 12.8px;
+  color: var(--ink-soft);
+}
+.reco-row:last-child,
+.rowline:last-child {
+  border-bottom: 0;
+}
+.reco-rank,
+.lb-rank {
+  width: 24px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--faint);
+  flex: none;
+}
+
+.lb-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--r-btn);
+  font-size: 12.8px;
+}
+.lb-row.me {
+  background: var(--tint-2);
+  box-shadow: inset 0 0 0 1px var(--hairline);
+}
+.lb-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-pill);
+  display: grid;
+  place-items: center;
+  background: var(--tint-1);
+  color: var(--brand-purple);
+  font-size: 10.5px;
+  font-weight: 700;
+  flex: none;
+}
+
+/* ==========================================================================
+ * Registration / upload
+ * ======================================================================= */
+
+.reg-frame {
+  max-width: 880px;
+  margin: 40px auto;
+  background: var(--card-gradient);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-card);
+  padding: 26px 28px 30px;
+}
+.reg-frame h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 6px;
+}
+.reg-sub {
+  font-size: 12.8px;
+  color: var(--muted);
+  margin: 0 0 20px;
+}
+.reg-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 16px;
+}
+@media (max-width: 720px) {
+  .reg-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.reg-approval {
+  border-radius: var(--r-alert);
+  padding: 12px 14px;
+  font-size: 12.8px;
+  margin-top: 16px;
+}
+.reg-approval.ok {
+  background: var(--good-bg);
+  color: var(--good);
+}
+.reg-approval.flag {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+.dropzone {
+  border: 1px dashed var(--hairline-45);
+  border-radius: var(--r-alert);
+  background: var(--tint-3);
+  padding: 26px 18px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 12.8px;
+}
+.dropzone .icon {
+  font-size: 28px;
+  color: var(--faint);
+  display: block;
+  margin: 0 auto 8px;
+}
+
+.autofill-note {
+  font-size: 11.5px;
+  color: var(--faint);
+  margin-top: 6px;
+}
+
+/* ==========================================================================
+ * Misc layout helpers carried over from v2
+ * ======================================================================= */
+
+/* The rail is redefined as the design system's tree/rail row further down
+   (search "Rail and tree rows"). This vertical stack keeps the name working
+   for the one thing that used it as a layout. */
+.rail-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.right {
+  margin-left: auto;
+}
+.footbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-top: 14px;
+  margin-top: 14px;
+  border-top: 1px solid var(--hairline-26);
+}
+.addlink {
+  background: none;
+  border: 0;
+  color: var(--purple-mid);
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 6px 0;
+}
+.evi-tag {
+  font-size: 11px;
+  color: var(--muted);
+}
+.preview {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-alert);
+  padding: 18px;
+}
+.res-card.default {
+  border-color: var(--purple-mid);
+}
+.res-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+/* Legacy time-log grid. The Time Allocation Ledger below supersedes it; these
+   rules stay so the old screen is not left unstyled while it exists. */
+.ts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+.ts-cell {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-alert);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ts-cell .icon {
+  color: var(--purple-mid);
+}
+.ts-cell small {
+  font-size: 10.5px;
+  color: var(--faint);
+}
+
+/* ==========================================================================
+ * Time Allocation Ledger
+ * ======================================================================= */
+
+.ledger-card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-ledger);
+  box-shadow: var(--sh-card);
+  padding: 20px 22px;
+}
+
+/* The ledger's metric row: separate tiles, one per entry in `metrics[]`.
+   
+   These were one card divided by left hairlines. The 2026-09 board draws four
+   separate cards, and so does every other metric row in the product — so this
+   is `.card` plus the shared `.eyebrow` / `.kpi`, with only the row and the two
+   value modifiers left here. `flex` rather than a 4-column grid because the
+   server decides how many metrics there are; a hardcoded `repeat(4, …)` is a
+   layout that silently breaks the day a fifth is added. */
+.ledger-kpis {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.ledger-kpis > .kpi-tile {
+  flex: 1 1 0;
+  min-width: 160px;
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.ledger-kpis .kpi-line {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.ledger-kpis .kpi-unit {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.ledger-kpis .kpi-sub {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--muted);
+  /* The subs are one line on the board and several of them are long
+     ("Lectures · coursework · skilling"); ellipsis rather than a second line
+     keeps the four tiles the same height. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ledger-kpis .kpi-sub.warn {
+  color: var(--warn);
+}
+@media (max-width: 900px) {
+  .ledger-metrics {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 0;
+  }
+  .ledger-metrics > div:nth-child(odd) {
+    border-left: 0;
+    padding-left: 0;
+  }
+}
+.ledger-metrics .lbl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--faint);
+  margin-bottom: 6px;
+}
+.ledger-metrics .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: var(--warn-dot);
+  flex: none;
+}
+.ledger-metrics .val {
+  font-family: var(--font-display);
+  font-size: 27px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+}
+.ledger-metrics .val .unit {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--faint);
+  margin-left: 4px;
+}
+.ledger-metrics .sub {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.ledger-metrics .sub.warn {
+  color: var(--warn);
+  font-weight: 700;
+}
+
+/* The day band: six tracks whose flex weights are the slot durations. */
+.band-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.band-head .cap {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+.day-band {
+  display: flex;
+  gap: 4px;
+}
+.day-band .track {
+  height: 22px;
+  border-radius: var(--r-seg);
+  background: var(--tint-1);
+  box-shadow: var(--sh-well);
+  overflow: hidden;
+  display: flex;
+}
+.day-band .seg {
+  height: 100%;
+}
+/* Unaccounted time is a hatch, never a flat colour — it must not read as a
+   sixth activity. */
+.day-band .seg.hatch,
+.mix .seg.hatch {
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(143, 97, 0, 0.32) 0 4px,
+    rgba(143, 97, 0, 0.1) 4px 8px
+  );
+}
+.band-ticks {
+  display: flex;
+  gap: 4px;
+  margin-top: 5px;
+}
+.band-ticks div {
+  font-size: 10.5px;
+  color: var(--faint);
+  padding-left: 6px;
+  border-left: 1px solid var(--hairline-26);
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  margin: 18px 0 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--r-swatch);
+  display: inline-block;
+  flex: none;
+}
+.legend .unaccounted {
+  color: var(--warn);
+}
+/* The legend's unaccounted swatch carries the same hatch as the band, so the
+   key and the thing it explains cannot drift apart. */
+.legend i.hatch-swatch {
+  background: repeating-linear-gradient(
+    135deg,
+    rgba(143, 97, 0, 0.32) 0 3px,
+    rgba(143, 97, 0, 0.1) 3px 6px
+  );
+}
+
+/* The ledger table. Sized to fit without horizontal scroll; the numeric cells
+   are fixed-width so the columns cannot drift as figures are typed. */
+.ledger-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.ledger-table th {
+  padding: 0 6px 8px;
+  text-align: center;
+  vertical-align: bottom;
+}
+/* The column's colour key: a filled square BESIDE the label, as the board
+   draws it, not a rule above it. Beside, it reads as "this colour means this
+   column"; above, it read as a decorative underline. The hairline border keeps
+   the two palest activities (Sleep, Travel) visible on the header tint. */
+.ledger-table th .head-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+}
+.ledger-table th .sw {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  border: 1px solid rgba(58, 31, 82, 0.12);
+  flex: none;
+}
+.ledger-table th .lbl {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-soft);
+}
+.ledger-table th.slot-col,
+.ledger-table td.slot-col {
+  text-align: left;
+  width: 190px;
+}
+.ledger-table th.mix-col,
+.ledger-table td.mix-col {
+  width: 120px;
+}
+.ledger-table td {
+  padding: 6px;
+  border-top: 1px solid var(--hairline-26);
+  text-align: center;
+}
+.ledger-table tbody tr:nth-child(odd) {
+  background: #fff;
+}
+.ledger-table tbody tr:nth-child(even) {
+  background: rgba(250, 246, 253, 0.7);
+}
+.ledger-table tr.total-row {
+  background: rgba(85, 44, 126, 0.045) !important;
+  font-weight: 700;
+}
+.ledger-table .slot-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.ledger-table .slot-name .icon {
+  font-size: 16px;
+  color: var(--faint);
+}
+.ledger-table .slot-cap {
+  font-size: 10.5px;
+  color: var(--faint);
+  margin-top: 2px;
+}
+.ledger-table .slot-chip {
+  display: inline-block;
+  margin-top: 4px;
+  border-radius: var(--r-pill);
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+}
+/* "Balanced" is a state, not an achievement. It was the only green on the
+   screen, which made a slot that merely adds up look like a success and drew
+   the eye away from the amber that actually wants attention. A purple tint says
+   the same thing at the right volume. */
+.ledger-table .slot-chip.good {
+  background: rgba(85, 44, 126, 0.1);
+  color: var(--brand-purple);
+}
+.ledger-table .slot-chip.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.ledger-table .slot-chip.risk {
+  background: var(--risk-bg);
+  color: var(--risk);
+}
+.ledger-table .slot-chip.neutral {
+  background: var(--tint-1);
+  color: var(--muted);
+}
+.ledger-table input[type='number'] {
+  width: 48px;
+  padding: 5px 4px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  border-radius: var(--r-seg);
+}
+/* Native spinners suppressed — the figures step in halves via the keyboard and
+   the arrows would step in ones. */
+.ledger-table input[type='number']::-webkit-outer-spin-button,
+.ledger-table input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.ledger-table input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.ledger-table .logged {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+.ledger-table .logged .of {
+  color: var(--faint);
+  font-weight: 400;
+}
+
+.mix {
+  display: flex;
+  height: 10px;
+  border-radius: var(--r-pill);
+  overflow: hidden;
+  background: var(--tint-1);
+  box-shadow: var(--sh-well);
+}
+.mix .seg {
+  height: 100%;
+}
+
+/* ==========================================================================
+ * English Baseline
+ * ======================================================================= */
+
+.band-dial {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.band-dial .dial {
+  width: 132px;
+  height: 132px;
+  border-radius: var(--r-pill);
+  display: grid;
+  place-items: center;
+  flex: none;
+  box-shadow: var(--sh-card);
+}
+.band-dial .dial .inner {
+  width: 108px;
+  height: 108px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.band-dial .score {
+  font-family: var(--font-display);
+  font-size: 27px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.band-dial .score .unit {
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--faint);
+}
+.band-dial .band {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--brand-purple);
+}
+
+.skill-card {
+  background: var(--card-gradient);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-card);
+  padding: 16px 18px;
+}
+.skill-card header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.skill-card header .icon {
+  font-size: 18px;
+  color: var(--purple-mid);
+}
+.skill-card header .name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  flex: 1;
+}
+.skill-card .big {
+  font-family: var(--font-display);
+  font-size: 27px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+.skill-card .big.pending {
+  color: var(--faint);
+}
+.skill-card .subrow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11.5px;
+  color: var(--muted);
+  padding: 4px 0;
+}
+.skill-card .subrow b {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+}
+
+/* ==========================================================================
+ * Mentor Meeting Log
+ * ======================================================================= */
+
+.meeting {
+  display: flex;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--hairline-26);
+}
+.meeting:last-child {
+  border-bottom: 0;
+}
+.meeting .date {
+  width: 52px;
+  flex: none;
+  text-align: center;
+}
+.meeting .date .d {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.meeting .date .m {
+  font-size: 10.5px;
+  color: var(--faint);
+}
+.meeting .body {
+  flex: 1;
+  min-width: 0;
+}
+.meeting .title {
+  font-weight: 700;
+  font-size: 12.8px;
+  color: var(--ink);
+}
+.meeting .note {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  margin: 6px 0;
+}
+.meeting .by {
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* ==========================================================================
+ * Floating agent orb + voice overlay
+ * ======================================================================= */
+
+/* The floating REEP orb (layout/agent-orb.component.ts) and the dock it opens
+   (layout/agent-dock.component.ts). The wrap is what is dragged, so the live
+   pill above the button moves with it. While the dock is open the orb is its
+   Close control; while an interview runs it pulses and carries the clock --
+   text and colour together, never the pulse alone.
+
+   THE ORB IS LIT, NOT PAINTED (2026-09-16). It was one flat --primary-gradient
+   disc inside a 4px opaque-white ring with a single soft shadow, and the three
+   things wrong with that are worth naming because each comes back on its own:
+
+     1. A FLAT GRADIENT IS A SHAPE, NOT AN OBJECT. The two radial layers below
+        sit OVER the gradient -- a specular off the upper left, where this
+        design's light comes from, and a floor darkening at the bottom -- and
+        they are what give the disc a curve. Neither is a colour: the brand
+        gradient is still `var(--primary-gradient)` and nothing else, because
+        tools/ci/check_brand_magenta.py refuses a second magenta stop anywhere
+        and rebuilding the gradient out of its stops is exactly what that check
+        exists to stop.
+     2. THE WHITE RING WAS DOING THE SHADOW'S JOB. It was there to hold the orb
+        off the lilac wash, which --sh-orb's four-step falloff now does
+        properly, over the wash and over a white card alike.
+     3. EVERY STATE MOVED THE SHADOW. The old live pulse animated box-shadow,
+        which is a paint on every frame and which fought the hover transition
+        for the same property. Live is a `::after` ring now and hover is a
+        transform, so both composite and neither can contend with the other. */
+.agent-orb-wrap {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  /* One below the dock (95): the consent dialog is a fixed full-viewport
+     backdrop INSIDE the dock's stacking context, and it must cover the orb. */
+  z-index: 94;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  touch-action: none;
+}
+.agent-orb {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border-radius: var(--r-pill);
+  border: 0;
+  /* Read bottom up: the brand gradient, a floor shade, then the specular. */
+  background:
+    radial-gradient(66% 56% at 32% 24%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 64%),
+    radial-gradient(100% 76% at 50% 118%, rgba(24, 8, 40, 0.26), rgba(24, 8, 40, 0) 56%),
+    var(--primary-gradient);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: var(--sh-orb), var(--sh-orb-rim);
+  transition:
+    box-shadow 240ms var(--ease-out),
+    transform 240ms var(--ease-spring);
+}
+.agent-orb:hover {
+  /* The orb rises and its shadow spreads together -- a lift where only the
+     shadow changes reads as the light moving rather than the object. */
+  transform: translateY(-2px);
+  box-shadow: var(--sh-orb-hover), var(--sh-orb-rim);
+}
+.agent-orb:active {
+  /* Faster than the release on purpose: a press should answer immediately and
+     spring back at leisure, which is what the two curves are for. */
+  transform: translateY(0) scale(0.94);
+  transition-duration: 90ms;
+}
+.agent-orb:focus-visible {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 5px;
+}
+.agent-orb .icon {
+  font-size: 24px;
+  /* FILLED, and heavier than body icons. An outlined glyph on a saturated
+     gradient loses its counters at 24px and reads as noise; the fill is what
+     makes the mark legible against the brightest stop. */
+  font-variation-settings:
+    'opsz' 24,
+    'wght' 500,
+    'FILL' 1,
+    'GRAD' 0;
+  transition: transform 260ms var(--ease-spring);
+}
+/* The close glyph turns in rather than cutting to it, so opening and closing
+   are one control changing state and not two buttons swapping places. */
+.agent-orb--open .icon {
+  transform: rotate(90deg);
+}
+.agent-orb--open {
+  background:
+    radial-gradient(70% 60% at 30% 20%, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, var(--ink-soft), var(--ink));
+}
+/* LIVE IS A RING, NOT A GLOW. It expands from the orb's own edge and fades,
+   which is a transform and an opacity -- both composited, neither repainting
+   the four-layer shadow underneath. It is also deliberately slow: this runs
+   for the length of an interview, and a 1.8s pulse in the corner of every
+   screen for eight minutes is an irritation rather than a status. */
+.agent-orb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid rgba(85, 44, 126, 0.5);
+  opacity: 0;
+  pointer-events: none;
+}
+.agent-orb--live::after {
+  animation: agent-orb-ping 2.6s var(--ease-out) infinite;
+}
+@keyframes agent-orb-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  70%,
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+.agent-orb__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px 5px 9px;
+  border-radius: var(--r-pill);
+  background: var(--ink);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  box-shadow:
+    0 2px 6px rgba(30, 12, 48, 0.18),
+    0 10px 22px rgba(58, 31, 82, 0.16);
+  white-space: nowrap;
+}
+/* TWO TYPE ROLES, NOT ONE STRING. "Live" is a micro-label -- uppercase,
+   tracked, dimmed -- and the clock is the DATUM, set brighter and in tabular
+   figures so the digits do not shuffle sideways as the seconds tick. Set as
+   one run at one size, a status and a number compete and the eye reads
+   neither first. */
+.agent-orb__live-word {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+.agent-orb__live-clock {
+  font-size: 0.74rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+.agent-orb__live::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7fe0a8;
+  animation: agent-orb-dot 2.6s var(--ease-out) infinite;
+}
+@keyframes agent-orb-dot {
+  0% {
+    box-shadow: 0 0 0 0 rgba(127, 224, 168, 0.5);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 6px rgba(127, 224, 168, 0);
+  }
+}
+/* The status must survive without the motion: the dot, the word and the
+   running clock all say "live" on their own, which is why nothing here is
+   carried by the animation alone. */
+@media (prefers-reduced-motion: reduce) {
+  .agent-orb,
+  .agent-orb .icon {
+    transition: none;
+  }
+  .agent-orb:hover,
+  .agent-orb:active {
+    transform: none;
+  }
+  .agent-orb--live::after,
+  .agent-orb__live::before {
+    animation: none;
+  }
+}
+
+.voice-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--voice-overlay);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #fff;
+  padding: 22px;
+  overflow: hidden;
+}
+/* Scrollbars are suppressed in here and every size is viewport-relative, so a
+   short window never produces a scrolling overlay. */
+.voice-overlay * {
+  scrollbar-width: none;
+}
+.voice-overlay ::-webkit-scrollbar {
+  display: none;
+}
+.voice-overlay .vo-top {
+  width: 100%;
+  max-width: 900px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 700;
+}
+.voice-overlay .vo-top .icon {
+  font-size: 18px;
+}
+.voice-overlay .vo-close {
+  background: none;
+  border: 0;
+  color: rgba(255, 255, 255, 0.7);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 12px;
+}
+.voice-overlay .vo-close:hover {
+  color: #fff;
+}
+.voice-overlay .vo-centre {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  width: 100%;
+}
+.voice-overlay .vo-orb {
+  width: 30vh;
+  height: 30vh;
+  max-width: 240px;
+  max-height: 240px;
+  border-radius: var(--r-pill);
+  background: radial-gradient(
+    60% 60% at 40% 32%,
+    rgba(255, 255, 255, 0.35),
+    rgba(122, 47, 158, 0.55) 60%,
+    rgba(85, 44, 126, 0.7)
+  );
+  box-shadow:
+    0 20px 60px rgba(12, 4, 22, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+.voice-overlay .vo-state {
+  font-size: 12.8px;
+  color: rgba(255, 255, 255, 0.75);
+}
+.voice-overlay .vo-quote {
+  font-size: 14px;
+  max-width: 46ch;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.waveform {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: clamp(40px, 11vh, 104px);
+}
+.waveform i {
+  width: 5px;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, #e9c9f5, #7a2f9e);
+  max-height: 100%;
+  transform-origin: center;
+  animation: rp-wave 1.2s ease-in-out infinite;
+}
+.waveform.muted-rule {
+  align-items: center;
+}
+.waveform .muted-bar {
+  width: 220px;
+  height: 4px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.22);
+}
+
+@keyframes rp-wave {
+  0%,
+  100% {
+    transform: scaleY(0.16);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes rp-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.voice-controls {
+  display: flex;
+  gap: 18px;
+  padding-bottom: 6px;
+}
+.voice-controls button {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--r-pill);
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+  box-shadow: var(--sh-voice);
+  transition:
+    background 0.14s ease,
+    transform 0.14s ease;
+}
+.voice-controls button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+.voice-controls button .icon {
+  font-size: 25px;
+}
+.voice-controls button.end {
+  background: linear-gradient(135deg, #c53a63, #ad2452);
+  border-color: transparent;
+}
+
+.voice-disclaimer {
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 52ch;
+  text-align: center;
+  margin-top: 14px;
+}
+
+/* ==========================================================================
+ * The 2026-09 design system — components
+ *
+ * docs/redesign-2026-09/01-design-system.md §4, one language for the admin
+ * console and the student portal. Everything here is a GLOBAL class, because
+ * these are used from standalone components across both consoles and
+ * AGENTS.md's rule is to reuse them rather than redefine a global inside a
+ * component.
+ *
+ * NAMES. Four of the design system's names were already taken by something
+ * else in this tree, so they are given names that say who they belong to
+ * rather than quietly stealing the existing ones:
+ *
+ *   design "Note"        -> .notice (already here, gains the accent tone)
+ *   design "Steps"       -> .wizard-steps   (.steps is the onboarding stepper)
+ *   design "Dark stage"  -> .stage-dark     (.stage is placement's KPI tile
+ *                                            and the assistant's frame)
+ *   design "icon button" -> .iconbtn        (.icon is the Material Symbols
+ *                                            glyph class; a .btn.icon would
+ *                                            render in the icon font and stay
+ *                                            invisible until it loaded)
+ *
+ * ONE PRIMARY ACTION PER VIEW. The gradient is the signal that says "this is
+ * the thing to do here", and a second one on the same screen cancels the
+ * first. CSS cannot enforce that; it is a review question on every screen.
+ * ======================================================================= */
+
+/* --- Page head: crumb -> h1 -> sub, actions right ------------------------
+   The existing .dt-header/.dt-title/.dt-sub trio already carries this on 29
+   templates, so the pattern is completed here rather than replaced: .crumb is
+   the only new element, and a screen adopts it by adding one line. */
+.crumb {
+  font-size: 11.5px;
+  color: var(--faint);
+  margin: 0 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.crumb .sep {
+  opacity: 0.55;
+}
+
+/* --- KPI ----------------------------------------------------------------
+   `.kpi` IS THE NUMERAL, not the tile it sits in. That is what every one of the
+   kit's 60-odd boards means by it — `<span class="kpi">23.5</span>` inside a
+   `.card` — and it was defined here as the card itself, which put a border and
+   a shadow around the number when the first screen used it as the boards do.
+   Nothing had consumed it yet, so the correction is free now and would not
+   have been once Phase 2 had written twenty admin screens against it.
+   
+   The tile is `.kpi-card`, below: a card whose whole job is one number —
+   eyebrow, the numeral, then the change and what it is of. The delta carries an
+   arrow AND a sign, never colour alone: the same rule as every status here. */
+.kpi {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.kpi-card {
+  background: var(--card-gradient);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-card);
+  padding: 11px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.kpi-card .kpi-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.kpi-card .num {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.kpi-card .num .unit {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  margin-left: 3px;
+}
+.kpi-card .delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+.kpi-card .delta .icon {
+  font-size: 14px;
+}
+.kpi-card .delta.good {
+  color: var(--good);
+}
+.kpi-card .delta.risk {
+  color: var(--risk);
+}
+.kpi-card .sub {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+.kpi-card .spark {
+  flex: none;
+  width: 64px;
+  height: 24px;
+  border-radius: var(--r-tile);
+  overflow: hidden;
+}
+
+/* --- Chip: the two tones the design adds, and the status dot -------------
+   .chip.accent is the "this is selected / this is ours" tone; .chip.navy is
+   the solid one for a count on a dark or busy row. .chip.dot puts a 7px dot
+   before the label so a status is shape AND text, never colour alone. */
+.chip.accent {
+  background: transparent;
+  color: var(--brand-purple);
+}
+.chip.navy {
+  /* Recoloured rather than blanked: this one was solid purple with
+     WHITE text, so dropping the fill alone would be white on white. */
+  background: transparent;
+  color: var(--brand-purple);
+}
+.chip.dot::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: var(--r-pill);
+  background: currentColor;
+  flex: none;
+}
+.chip.dot.neutral::before {
+  background: var(--st-neutral);
+}
+.chip.dot.warn::before {
+  /* The warn TEXT colour is dark enough to read; the dot is the brighter
+     amber, which is the one place --warn-dot is for. */
+  background: var(--warn-dot);
+}
+
+/* --- Buttons: the two variants the design adds --------------------------
+   secondary is the quiet default action; danger is outlined rather than
+   filled, because a filled red button on a lilac page reads as an error
+   message rather than a control. */
+.btn.secondary,
+.dt-btn.secondary {
+  background: var(--surface);
+  border-color: var(--hairline-42);
+  color: var(--ink);
+  box-shadow: var(--sh-ctrl);
+}
+.btn.secondary:hover,
+.dt-btn.secondary:hover {
+  border-color: var(--hairline-45);
+  background: var(--tint-3);
+}
+.btn.danger,
+.dt-btn.danger {
+  background: var(--surface);
+  border-color: var(--risk);
+  color: var(--risk);
+  box-shadow: var(--sh-ctrl);
+}
+.btn.danger:hover,
+.dt-btn.danger:hover {
+  background: var(--risk-bg);
+}
+.btn.sm,
+.dt-btn.sm {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+}
+.btn:disabled,
+.dt-btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.55;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* --- Select: a labelled value, not a bare dropdown ----------------------
+   The boards show the filter controls as "faint label · bold value · chevron"
+   in one 34px pill, so the toolbar reads as a sentence about what is on
+   screen rather than a row of anonymous dropdowns. */
+.select {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 34px;
+  /* Symmetric now that the `expand_more` chevron is gone: the 30px was
+     the room it sat in, and left behind it reads as a hole. */
+  padding: 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-ctrl);
+  font-size: 12.5px;
+  color: var(--ink);
+  min-width: 0;
+}
+.select .lbl {
+  color: var(--faint);
+  font-size: 11.5px;
+  white-space: nowrap;
+}
+.select .val {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.select .icon {
+  position: absolute;
+  right: 8px;
+  font-size: 18px;
+  color: var(--ink-nav);
+  pointer-events: none;
+}
+/* A real <select> laid over the pill, so the native menu and the keyboard
+   both work and only the dress is ours. */
+.select select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+/* --- Field: help, error, and the synced/locked state --------------------
+   A field the student cannot edit because it came from their record is shown
+   on tint-2 with a lock and a "Synced" chip. Read-only is not the same as
+   disabled, and the difference has to be visible: disabled means "not now",
+   synced means "this is your record, ask the office to change it". */
+.field .help {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.field .err {
+  font-size: 11.5px;
+  color: var(--risk);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.field .err .icon {
+  font-size: 14px;
+}
+.field.synced input,
+.field.synced .ctrl,
+.field.synced textarea,
+.input.synced {
+  background: var(--tint-2);
+  color: var(--ink-soft);
+  cursor: default;
+}
+.field .synced-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.field .multi,
+textarea.ctrl {
+  min-height: 56px;
+  resize: vertical;
+}
+
+/* --- Note: the accent tone the design adds ------------------------------
+   .notice already carries risk (base), info and evi. Accent is the neutral
+   "here is how this works" tone the empty states use. */
+.notice.accent {
+  background: var(--tint-1);
+  color: var(--ink-soft);
+}
+.notice.good {
+  background: var(--good-bg);
+  color: var(--good);
+}
+.notice.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+/* --- Steps: the wizard's numbered circles -------------------------------
+   NOT `.steps`: the onboarding screen already styles that name for its own
+   three-step pill row, and a global rule would leak padding and colour into
+   it. Named for the thing that has them — the Add faculty wizard. */
+.wizard-steps {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.wizard-steps .step {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.wizard-steps .step .n {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--r-pill);
+  display: inline-grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  font-weight: 700;
+  border: 1px solid var(--hairline-42);
+  color: var(--muted);
+  background: var(--surface);
+  flex: none;
+}
+.wizard-steps .step.active {
+  color: var(--ink);
+}
+.wizard-steps .step.active .n {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: var(--sh-navpill);
+}
+.wizard-steps .step.done .n {
+  background: var(--good-bg);
+  border-color: transparent;
+  color: var(--good);
+}
+.wizard-steps .sep {
+  width: 18px;
+  height: 1px;
+  background: var(--hairline-42);
+  flex: none;
+}
+
+/* --- Tabs: pill tabs, active on the gradient ---------------------------- */
+.tabs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tabs .tab {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: var(--r-pill);
+  padding: 6px 14px;
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-nav);
+  cursor: pointer;
+}
+.tabs .tab:hover {
+  background: var(--tint-2);
+  color: var(--brand-purple);
+}
+.tabs .tab.active {
+  background: var(--primary-gradient);
+  color: #fff;
+  box-shadow: var(--sh-navpill);
+}
+.tabs .tab.active:hover {
+  color: #fff;
+}
+
+/* --- Rail and tree rows -------------------------------------------------
+   The institution tree (College > Department > Course > Specialization >
+   Batch) and every "pick one of these" list. Selected is tint-1 with the
+   label in brand purple, not a filled pill: these lists are long, and a
+   gradient on a row competes with the view's one primary action. */
+.rail {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: var(--r-pill);
+  font-size: 12.5px;
+  color: var(--ink-nav);
+  background: transparent;
+  border: 0;
+  font-family: var(--font);
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  min-width: 0;
+}
+.tree-row:hover {
+  background: var(--tint-2);
+}
+.tree-row.selected {
+  background: var(--tint-1);
+  color: var(--brand-purple);
+  font-weight: 700;
+}
+.tree-row .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.tree-row .count {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+/* Depth is indentation, so the hierarchy is readable without opening a row. */
+.tree-row.depth-1 {
+  padding-left: 24px;
+}
+.tree-row.depth-2 {
+  padding-left: 38px;
+}
+.tree-row.depth-3 {
+  padding-left: 52px;
+}
+
+/* --- Avatar -------------------------------------------------------------
+   A circle with initials. The sidebar's identity card keeps its own portrait
+   frame (`.nav-profile .avatar`, a 88x106 rectangle) — that selector is more
+   specific, so this does not reach it. */
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--r-pill);
+  background: var(--tint-1);
+  color: var(--brand-purple);
+  display: inline-grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  flex: none;
+  overflow: hidden;
+}
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.avatar.lg {
+  width: 36px;
+  height: 36px;
+  font-size: 13px;
+}
+
+/* --- Data grid dress ----------------------------------------------------
+   The boards draw AG Grid's look, and the admin screens that use the real
+   library take it from shared/grid/reep-grid-theme.ts. These classes are the
+   same look for the plain tables — the student console's short tables, and
+   any admin table not worth a grid instance. .dt-table already carries the
+   header and row rules; what is added here is the furniture around it. */
+.dt-frame {
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  overflow: hidden;
+}
+.dt-gridbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--tint-3);
+  border-bottom: 1px solid var(--hairline-26);
+  flex-wrap: wrap;
+}
+.dt-quickfilter {
+  width: 240px;
+  max-width: 100%;
+  height: 30px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  padding: 0 10px;
+  font-family: var(--font);
+  font-size: 12.5px;
+  color: var(--ink);
+  box-shadow: var(--sh-well);
+}
+/* Pinned first column: an inset shadow on its right edge, so it reads as
+   floating over the scrolled columns rather than as a thicker border. */
+.dt-table th.pinned,
+.dt-table td.pinned {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface);
+  box-shadow: inset -6px 0 6px -6px rgba(58, 31, 82, 0.28);
+}
+.dt-table th.pinned {
+  background: var(--tint-3);
+}
+/* Selected row: tint plus a 3px bar down its left edge, because a tint alone
+   is not enough of a difference on a striped table. */
+.dt-table tbody tr.selected > td {
+  background: var(--tint-2);
+}
+.dt-table tbody tr.selected > td:first-child {
+  box-shadow: inset 3px 0 0 0 var(--brand-purple);
+}
+.dt-floatfilter th {
+  padding: 4px 10px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--hairline-26);
+}
+.dt-floatfilter input {
+  width: 100%;
+  height: 26px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-seg);
+  background: var(--surface);
+  padding: 0 7px;
+  font-family: var(--font);
+  font-size: 12px;
+  color: var(--ink);
+}
+.dt-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 38px;
+  padding: 0 10px;
+  background: var(--tint-3);
+  border-top: 1px solid var(--hairline-26);
+  font-size: 11.5px;
+  color: var(--muted);
+  flex-wrap: wrap;
+}
+.dt-statusbar .pager {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Dark stage ---------------------------------------------------------
+   The mock interview's stage. NOT `.stage`: placement's KPI tiles and the
+   assistant's own frame already use that name, and a global dark gradient
+   would land on both. */
+.stage-dark {
+  border-radius: var(--r-card);
+  background: linear-gradient(135deg, #1b1526, #2a1c3f 55%, #3d1f4c);
+  color: #fff;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.stage-dark .status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: var(--r-pill);
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.stage-dark .orb {
+  width: 112px;
+  height: 112px;
+  border-radius: var(--r-pill);
+  background: radial-gradient(60% 60% at 40% 32%, rgba(255, 255, 255, 0.3), rgba(85, 44, 126, 0.8));
+  border: 2px solid transparent;
+  background-origin: border-box;
+  box-shadow:
+    0 0 0 2px rgba(255, 255, 255, 0.14),
+    0 18px 44px rgba(12, 4, 22, 0.45);
+  display: grid;
+  place-items: center;
+}
+.stage-dark .caption {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.82);
+  text-align: center;
+  max-width: 46ch;
+}
+
+/* --- Badge emblem -------------------------------------------------------
+   The hexagonal shield on Skilling. Outlined lilac while a skill is only
+   available; solid brand purple with a verified seal once it is earned. The
+   shape is an SVG in the template; this is its frame and its two states. */
+.emblem {
+  width: 64px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  color: var(--seq-light);
+}
+.emblem.earned {
+  color: var(--brand-purple);
+}
+.emblem .seal {
+  position: absolute;
+  right: 2px;
+  bottom: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--r-pill);
+  background: var(--good);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  border: 2px solid var(--surface);
+}
+
+/* --- Card title row -----------------------------------------------------
+   The row every board draws at the top of a card: a title, an optional faint
+   sub-line under it, and the card's own actions pushed right.
+
+   IT WAS MISSING, AND SEVEN SCREENS FOUND OUT SEPARATELY. `.card h4` and
+   `.card > h3` above carry a bottom border the boards do not draw, so a screen
+   that wanted the board's plain title row could not use them, and each of the
+   2026-09 console screens declared its own `.card-head` + `.card-heading` in
+   its component stylesheet. The declarations agreed on everything that matters
+   -- 13.5px/700 in the display face, 12px gap, 12px below -- which is the
+   signature of a class that should have been global and was not.
+
+   check_style_duplicates.py does not police this: it compares the two GLOBAL
+   sheets against each other and never reads a component's styles. A rule can
+   therefore be copied into twenty components without any check noticing, which
+   is exactly what happened. The consolidation is by hand and stays by hand.
+
+   `align-items: flex-start` is the boards' default, so a title that wraps to
+   two lines keeps its actions level with the first. A card whose row is one
+   short line and one button may override to `center` locally -- that is a
+   deliberate one-line exception, not a second copy of the rule. */
+.card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.card-heading,
+.card-title {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+  margin: 0;
+}
+.card-sub {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--faint);
+  margin: 2px 0 0;
+  max-width: 76ch;
+}
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* A card whose whole content is a data grid: the grid draws its own frame, so
+   the card's 18px padding would show as a lilac gutter around it. 01 §4 asks
+   for padding 0 in that case. */
+.card.flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+/* --- Visually hidden ----------------------------------------------------
+   For a heading or a label that a screen reader needs and the design does not
+   draw. `display: none` and `[hidden]` would take it out of the accessibility
+   tree too, which is the opposite of the point; this keeps it rendered and
+   off-screen. Six components had declared their own copy under six names. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,256 @@
+<div class="reg-screen">
+  <div class="reg-frame">
+    <h2>Student registration</h2>
+    <div class="reg-sub">Every box marked <span class="req">*</span> is required — everything except Specialization — and so are your CV and your photo.</div>
+
+    @if (result(); as r) {
+      <!-- decided: surface the rule engine's verdict.
+
+           THE COPY FIX (B11.4), and both halves of it were on this line. It read
+           "Domain matched — auto-approved" and "Your account is active
+           immediately".
+
+           "Domain matched" named the COLLEGE'S registered domains to the reader.
+           What actually fires here is a seating rule
+           (`registration_rules.email_domain`) — a different list, a different
+           screen, and one that may be null, so the rule can match on a USN
+           pattern or a degree level alone with no domain involved at all. The
+           college's domain list is the fence that can REFUSE an auto-approval
+           (GUARD 1), which is the opposite direction.
+
+           "Active immediately" has been false since 2026-09-10: approval mints
+           the account with an unusable password sentinel and emails a setup
+           link, and the applicant must confirm the address with a six-digit code
+           and set a password before they can sign in. -->
+      @if (approved()) {
+        <div class="reg-approval ok">
+          <span class="icon" aria-hidden="true">check_circle</span>
+          <div>
+            <b>A seating rule approved your application.</b>
+            {{ r.decision_reason ?? 'A seating rule matched what you entered, so this application did not need to wait for a reviewer.' }}
+            We have emailed {{ r.email }} a setup link. Open it, confirm the address with the
+            code we send you, and choose a password — approval created your account but no
+            password, and that link is how you get one.
+          </div>
+        </div>
+      } @else {
+        <div class="reg-approval flag">
+          <span class="icon" aria-hidden="true">flag</span>
+          <div>
+            <b>Held for review.</b>
+            {{ r.decision_reason ?? 'Your registration was routed to the placement office for manual approval before the account activates.' }}
+          </div>
+        </div>
+      }
+
+      @if (r.college_name || r.department_name) {
+        <p class="reg-chain">
+          <span class="icon" aria-hidden="true">school</span>
+          {{ r.college_name }}@if (r.department_name) { · {{ r.department_name }} }@if (r.course_name) { · {{ r.course_name }} }@if (resultSpecialization(); as spec) { · {{ spec }} }@if (resultBatch(); as year) { · Batch {{ year }} }
+        </p>
+      }
+
+      <!-- Both files travelled WITH the application (2026-09-22), so there is
+           nothing left to attach and nothing to retry: an auto-approved
+           application has already moved them onto the new student's uploads,
+           which is why `documents` may be empty on a card that still says so. -->
+      <p class="reg-chain">
+        <span class="icon" aria-hidden="true">check_circle</span>
+        Your CV and photo came with the application.
+      </p>
+
+      <div style="margin-top:20px; display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="dt-btn primary" routerLink="/login">
+          Continue to sign in <span class="icon" style="font-size:16px" aria-hidden="true">arrow_forward</span>
+        </a>
+        <button type="button" class="dt-btn" (click)="reset()">Submit another</button>
+      </div>
+    } @else {
+      <!-- the application form -->
+      <form (submit)="submit($event)">
+        <label class="dropzone dropzone--live">
+          <span class="icon" aria-hidden="true">upload_file</span>
+          @if (cvFile(); as f) {
+            <strong>{{ f.name }}</strong> · {{ (f.size / 1024) | number: '1.0-0' }} KB
+          } @else if (cvReading()) {
+            Opening the file…
+          } @else {
+            Attach your CV <span class="req">*</span>
+          }
+          <span class="reg-file-hint">PDF only · up to {{ maxUploadMb }} MB</span>
+          <!-- `class="reg-file"`, NOT `hidden`. `hidden` is `display:none`,
+               which takes the input out of the focus order — and a <label> is
+               not tabbable either, so this dropzone was reachable by mouse
+               ONLY. On the public registration form that meant a keyboard-only
+               applicant could not attach their CV at all. The class hides it
+               visually while leaving it focusable; the label paints a focus
+               ring via :focus-within. -->
+          <input type="file" class="reg-file" accept="application/pdf,.pdf" required aria-describedby="reg-cv-error" (change)="onCv($event)">
+          <span class="dt-btn dropzone__btn">{{ cvFile() ? 'Change file' : 'Choose file' }}</span>
+        </label>
+        @if (cvError(); as problem) {
+          <p class="reg-file-error" id="reg-cv-error" role="alert">
+            <span class="icon" aria-hidden="true">error</span>{{ problem }}
+          </p>
+        }
+        <div class="autofill-note">
+          <span class="icon" aria-hidden="true">info</span> Your CV goes to the placement office with your application, and becomes your first resume upload once you are admitted. The form below is still yours to fill.
+        </div>
+
+        <div class="reg-grid">
+          <div class="field">
+            <label for="reg-name">Full name <span class="req">*</span></label>
+            <input id="reg-name" name="fullName" [(ngModel)]="fullName" placeholder="Your full name" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="reg-usn">USN <span class="req">*</span></label>
+            <input id="reg-usn" name="usn" [(ngModel)]="usn" placeholder="e.g. 1BG24MBA014" required>
+          </div>
+          <div class="field">
+            <label for="reg-college-email">College email <span class="req">*</span></label>
+            <input id="reg-college-email" name="collegeEmail" type="email" [(ngModel)]="collegeEmail" placeholder="you@bgscet.ac.in" autocomplete="off" required>
+          </div>
+          <div class="field">
+            <label for="reg-personal-email">Personal email <span class="req">*</span></label>
+            <input id="reg-personal-email" name="personalEmail" type="email" [(ngModel)]="personalEmail" placeholder="you@gmail.com" autocomplete="email" required>
+          </div>
+          <div class="field">
+            <label for="reg-phone">Phone <span class="req">*</span></label>
+            <input id="reg-phone" name="phone" type="tel" [(ngModel)]="phone" placeholder="+91 …" autocomplete="tel" required>
+          </div>
+          <div class="field">
+            <label for="reg-linkedin">LinkedIn profile <span class="req">*</span></label>
+            <input id="reg-linkedin" name="linkedin" [(ngModel)]="linkedin" placeholder="linkedin.com/in/your-name" autocomplete="url" required>
+          </div>
+        </div>
+
+        <div class="reg-section">Where you belong</div>
+        <div class="reg-grid">
+          <div class="field">
+            <label for="reg-college">College <span class="req">*</span></label>
+            <select id="reg-college" name="college" [value]="collegeId()" required (change)="setCollege($any($event.target).value)">
+              <option value="">Choose your college</option>
+              @for (c of hier()?.colleges ?? []; track c.id) {
+                <option [value]="c.id">{{ c.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="reg-dept">Department <span class="req">*</span></label>
+            <select id="reg-dept" name="department" [value]="departmentId()" [disabled]="!collegeId()" required (change)="setDepartment($any($event.target).value)">
+              <option value="">{{ collegeId() ? 'Choose your department' : 'Choose a college first' }}</option>
+              @for (d of departments(); track d.id) {
+                <option [value]="d.id">{{ d.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="field">
+            <label for="reg-course">Course @if (required().has('course') || courses().length) { <span class="req">*</span> }</label>
+            <select id="reg-course" name="course" [value]="courseId()" [disabled]="!departmentId() || !courses().length" [required]="courses().length > 0" (change)="setCourse($any($event.target).value)">
+              <option value="">{{ !departmentId() ? 'Choose a department first' : (courses().length ? 'Choose your course' : 'No courses listed') }}</option>
+              @for (c of courses(); track c.id) {
+                <option [value]="c.id">{{ c.code }} · {{ c.name }}</option>
+              }
+            </select>
+          </div>
+          <!-- A CHECKLIST, NOT A SELECT (2026-09-22): a student who opted for a
+               dual specialization ticks two. A fieldset with a legend so a
+               screen reader names the group, and the cap is the server's
+               `max_specializations` - the boxes past it are drawn disabled
+               rather than evicting an earlier tick. -->
+          <fieldset class="field reg-checklist">
+            <legend>Specialization @if (required().has('specialization')) { <span class="req">*</span> }</legend>
+            @if (!courseId()) {
+              <p class="reg-check-note">Choose a course first</p>
+            } @else if (!specializations().length) {
+              <p class="reg-check-note">No specializations listed</p>
+            } @else {
+              <p class="reg-check-note" id="reg-spec-note">
+                Tick one, or {{ maxSpecializations() }} if you opted for a dual specialization.
+              </p>
+              <div class="reg-check-list">
+                @for (sp of specializations(); track sp.id) {
+                  <label class="reg-check">
+                    <input
+                      type="checkbox"
+                      name="specialization"
+                      [value]="sp.id"
+                      [checked]="isPicked(sp.id)"
+                      [disabled]="!isPicked(sp.id) && picksFull()"
+                      aria-describedby="reg-spec-note"
+                      (change)="toggleSpecialization(sp.id, $any($event.target).checked)"
+                    >
+                    <span>{{ sp.name }}</span>
+                  </label>
+                }
+              </div>
+            }
+          </fieldset>
+          <div class="field">
+            <label for="reg-batch">Batch @if (batches().length) { <span class="req">*</span> }</label>
+            <!-- The YEAR and nothing else (2026-09-23): the course and the
+                 specialization are the two boxes above. `batchId()` turns
+                 the year back into a batch from the ticks. -->
+            <select id="reg-batch" name="batch" [value]="batchYearPick()" [disabled]="!departmentId() || !batches().length" [required]="batches().length > 0" (change)="setBatchYear($any($event.target).value)">
+              <option value="">{{ !departmentId() ? 'Choose a department first' : (batches().length ? 'Choose your batch' : 'No batches listed') }}</option>
+              @for (y of years(); track y.year) {
+                <option [value]="y.year" [selected]="y.year === batchYearPick()">{{ y.year }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="reg-degree">Degree level <span class="req">*</span></label>
+          <select id="reg-degree" name="degreeLevel" [(ngModel)]="degreeLevel" required>
+            <option value="PG">Post Graduate (PG)</option>
+            <option value="UG">Undergraduate (UG)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Professional photo <span class="req">*</span></label>
+          <label class="dropzone dropzone--live" style="padding:16px;">
+            <span class="icon" style="font-size:20px; margin-bottom:0" aria-hidden="true">photo_camera</span>
+            @if (photoFile(); as f) {
+              <strong>{{ f.name }}</strong> · {{ (f.size / 1024) | number: '1.0-0' }} KB
+            } @else if (photoReading()) {
+              Opening the file…
+            } @else {
+              Upload a headshot
+            }
+            <span class="reg-file-hint">PNG or JPG · up to {{ maxUploadMb }} MB</span>
+            <!-- focusable, like the CV picker above -->
+            <input type="file" class="reg-file" accept="image/png,image/jpeg,.png,.jpg,.jpeg" required aria-describedby="reg-photo-error" (change)="onPhoto($event)">
+          </label>
+          @if (photoError(); as problem) {
+            <p class="reg-file-error" id="reg-photo-error" role="alert">
+              <span class="icon" aria-hidden="true">error</span>{{ problem }}
+            </p>
+          }
+        </div>
+
+        @if (error(); as e) {
+          <!-- role="alert" because @if INSERTS this after load: without a live
+               region a screen reader announces nothing at all when submission
+               fails, so the applicant presses Submit and hears silence. 21 other
+               templates in this app already do this; the most public form in the
+               product was the one that did not. aria-hidden on the icon keeps the
+               ligature word "error" out of the announced text. -->
+          <div class="reg-approval flag" role="alert" style="margin-top:10px;">
+            <span class="icon" aria-hidden="true">error</span>
+            <div>{{ e }}</div>
+          </div>
+        }
+
+        <div style="margin-top:20px; display:flex; gap:10px; align-items:center;">
+          <button type="submit" class="dt-btn primary" [disabled]="pending() || filesReading()">
+            {{ pending() ? 'Submitting…' : 'Submit registration' }}
+            <span class="icon" style="font-size:16px" aria-hidden="true">arrow_forward</span>
+          </button>
+          <a class="reg-signin-link" routerLink="/login">Already registered? Sign in</a>
+        </div>
+      </form>
+    }
+  </div>
+</div>

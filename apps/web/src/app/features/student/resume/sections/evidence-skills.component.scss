@@ -1,0 +1,92 @@
+/* Rows for the evidence-backed skills section. Card, chip and icon come from the
+   global reep-v2 classes; only the row layout is local. */
+:host {
+  display: block;
+}
+
+.ev-count {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.ev-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--hairline-26);
+}
+.ev-row:last-child {
+  border-bottom: none;
+}
+/* Not-yet-verified rows are present for information, not for action. */
+.ev-row--muted {
+  opacity: 0.72;
+}
+
+.ev-main {
+  flex: 1;
+  min-width: 0;
+}
+.ev-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.ev-note {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.ev-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 11.5px;
+  color: var(--faint);
+  margin-top: 4px;
+}
+
+/* The include toggle: an outlined pill that fills when the skill is in. */
+.ev-include {
+  flex: none;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--good);
+  background: var(--surface);
+  color: var(--good);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ev-include--on {
+  background: var(--good);
+  color: #fff;
+}
+.ev-locked {
+  flex: none;
+  color: var(--faint);
+}
+.ev-locked .icon {
+  font-size: 17px;
+}
+
+.state-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.state-note .icon {
+  font-size: 16px;
+  color: var(--purple-mid);
+}

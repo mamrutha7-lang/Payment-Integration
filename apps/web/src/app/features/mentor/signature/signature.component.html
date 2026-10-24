@@ -1,0 +1,51 @@
+<section class="sg">
+  <header class="sg-head">
+    <h1>Signature</h1>
+    <p>
+      Upload your signature once. It is printed into every leave paper you apply on, and into the
+      Program Director block of every paper you sanction. The form itself is unchanged: signing is
+      still your name and the time, recorded against your REEP account.
+    </p>
+  </header>
+
+  @if (error()) { <p class="sg-error" role="alert">{{ error() }}</p> }
+  @if (flash()) { <p class="sg-flash" role="status">{{ flash() }}</p> }
+
+  <div class="card sg-card">
+    @if (info() === null) {
+      <p class="sg-hint">Loading…</p>
+    } @else if (info()!.present) {
+      <div class="sg-preview">
+        <img [src]="imageUrl()" alt="Your signature" />
+      </div>
+      <div class="sg-meta">
+        On file since {{ when(info()!.uploaded_at) }} · {{ size(info()!.size_bytes) }} · {{ info()!.mime_type === 'image/png' ? 'PNG' : 'JPEG' }}
+      </div>
+      <div class="sg-actions">
+        <label class="btn primary sg-file">
+          <span class="icon" aria-hidden="true">draw</span> Replace
+          <input type="file" class="sg-file__input" accept="image/png,image/jpeg" (change)="onFile($event)" [disabled]="busy()" />
+        </label>
+        @if (confirmRemove()) {
+          <span class="sg-warn">Your papers will show your name and the time only.</span>
+          <button type="button" class="btn danger" [disabled]="busy()" (click)="remove()">Yes, remove it</button>
+          <button type="button" class="btn" (click)="confirmRemove.set(false)">Keep it</button>
+        } @else {
+          <button type="button" class="btn" [disabled]="busy()" (click)="confirmRemove.set(true)">Remove…</button>
+        }
+      </div>
+    } @else {
+      <div class="sg-empty">
+        <div class="sg-empty__title">No signature on file</div>
+        <p class="sg-hint">
+          Sign on white paper with a dark pen, photograph or scan it, and upload the picture. PNG or JPEG,
+          under 2 MB. Crop it close to the signature; it is printed about 14 mm tall.
+        </p>
+        <label class="btn primary sg-file">
+          <span class="icon" aria-hidden="true">draw</span> Upload signature
+          <input type="file" class="sg-file__input" accept="image/png,image/jpeg" (change)="onFile($event)" [disabled]="busy()" />
+        </label>
+      </div>
+    }
+  </div>
+</section>

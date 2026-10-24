@@ -1,0 +1,16 @@
+{
+  "name": "reep-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Playwright end-to-end suite for REEP, linked case by case to test-management/manual-test-cases.md",
+  "scripts": {
+    "test:e2e": "playwright test",
+    "test:e2e:report": "playwright show-report",
+    "typecheck:e2e": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.4",
+    "typescript": "~6.0.2"
+  }
+}

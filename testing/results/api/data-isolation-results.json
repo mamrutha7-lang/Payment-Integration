@@ -1,0 +1,1407 @@
+{
+ "run": "424B",
+ "a": "6449dba399574ee29003b3c7368002d5",
+ "b": "05c0fecb705b4c44bb094bdaa2ab65bb",
+ "c": "1a74050565f049f6a6e700d7e827019b",
+ "upload": "0c74cf978f974dff885f8a682faf0af5",
+ "resume": "a9bf35aa258c4e4d9383cbfcbf466ca9",
+ "leave": "64b70e0dbea748239d65518009bc804a",
+ "note": "7f814c4d4f44456dbb13a4ed1d737151",
+ "results": [
+  {
+   "area": "setup",
+   "name": "records created",
+   "who": "A/FX",
+   "got": 0,
+   "expect": "",
+   "ok": true,
+   "body": "upload=0c74cf978f974dff885f8a682faf0af5 resume=a9bf35aa258c4e4d9383cbfcbf466ca9 leave=64b70e0dbea748239d65518009bc804a(201) note=7f814c4d4f44456dbb13a4ed1d737151(201 {\"id\":\"7f814c4d4f44456dbb13a4ed1d737151\",\"note_text\":\"Private note about A\",\"lin)"
+  },
+  {
+   "area": "control",
+   "name": "A reads own upload",
+   "who": "A",
+   "got": 200,
+   "expect": "200",
+   "ok": true,
+   "body": "%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n"
+  },
+  {
+   "area": "control",
+   "name": "A reads own resume",
+   "who": "A",
+   "got": 200,
+   "expect": "200",
+   "ok": true,
+   "body": "{\"id\":\"a9bf35aa258c4e4d9383cbfcbf466ca9\",\"version\":1,\"title\":\"A resume\",\"status\":\"GENERATED\",\"generated_by\":\"fallback\",\"model\":null,\"created_at\":\"2026-10-13T15:15:02.235475Z\",\"updated_at\":\"2026-10-13T"
+  },
+  {
+   "area": "control",
+   "name": "A reads own leave paper",
+   "who": "A",
+   "got": 200,
+   "expect": "200",
+   "ok": true,
+   "body": "%PDF-1.7\n%\ufffd\ufffd\ufffd\ufffd\n1 0 obj\n<<\n/Producer (REEP)\n/Title (Leave application \\055 Student 19ZRU144EF)\n>>\nendobj\n2 0 obj\n<<\n/Type /Pages\n/Count 1\n/Kids [ 4 0 R ]\n>>\nendobj\n3 0 obj\n<<\n/Type /Catalog\n/Pages 2 0 "
+  },
+  {
+   "area": "control",
+   "name": "FX reads mentee A notes",
+   "who": "FX",
+   "got": 200,
+   "expect": "200",
+   "ok": true,
+   "body": "[{\"id\":\"7f814c4d4f44456dbb13a4ed1d737151\",\"note_text\":\"Private note about A\",\"linked_action\":\"NONE\",\"title\":null,\"location\":null,\"meeting_at\":\"2026-10-13T15:15:02.268573Z\",\"created_at\":\"2026-10-13T15:"
+  },
+  {
+   "area": "control",
+   "name": "FX reads mentee A upload",
+   "who": "FX",
+   "got": 200,
+   "expect": "200",
+   "ok": true,
+   "body": "%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n"
+  },
+  {
+   "area": "student-data",
+   "name": "read A's upload file",
+   "who": "B same college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Upload not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "delete A's upload",
+   "who": "B same college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Upload not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "read A's resume",
+   "who": "B same college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "A's resume pdf",
+   "who": "B same college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "rename A's resume",
+   "who": "B same college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "regenerate A's resume",
+   "who": "B same college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "delete A's resume",
+   "who": "B same college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave paper",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Staff access required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave attachments",
+   "who": "B same college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Leave request not found.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "cancel A's leave",
+   "who": "B same college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Leave request not found.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "decide A's leave",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404, 422}",
+   "ok": true,
+   "body": "{\"detail\":\"Staff access required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave balance",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Staff access required.\"}"
+  },
+  {
+   "area": "registration",
+   "name": "A's application CV",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "registration",
+   "name": "A's application photo",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/notes",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/ledger",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/ledger/summary",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/english-baseline",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/badges",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/growth",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/skill-profile",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/interviews",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/focus",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/admin/students/A/360",
+   "who": "B same college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'View student records' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "read A's upload file",
+   "who": "C other college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Upload not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "delete A's upload",
+   "who": "C other college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Upload not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "read A's resume",
+   "who": "C other college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "A's resume pdf",
+   "who": "C other college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "rename A's resume",
+   "who": "C other college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "regenerate A's resume",
+   "who": "C other college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "delete A's resume",
+   "who": "C other college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Resume not found.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave paper",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Staff access required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave attachments",
+   "who": "C other college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Leave request not found.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "cancel A's leave",
+   "who": "C other college",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Leave request not found.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "decide A's leave",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404, 422}",
+   "ok": true,
+   "body": "{\"detail\":\"Staff access required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave balance",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Staff access required.\"}"
+  },
+  {
+   "area": "registration",
+   "name": "A's application CV",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "registration",
+   "name": "A's application photo",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/notes",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/ledger",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/ledger/summary",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/english-baseline",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/badges",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/growth",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/skill-profile",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/interviews",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/focus",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/admin/students/A/360",
+   "who": "C other college",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'View student records' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "read A's upload file",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"The student screens are open to current students only.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "delete A's upload",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"The student screens are open to current students only.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "read A's resume",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"The student screens are open to current students only.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "A's resume pdf",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"The student screens are open to current students only.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "rename A's resume",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"The student screens are open to current students only.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "regenerate A's resume",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"The student screens are open to current students only.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "delete A's resume",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"The student screens are open to current students only.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave paper",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Staff access required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave attachments",
+   "who": "alumnus",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Leave request not found.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "cancel A's leave",
+   "who": "alumnus",
+   "got": 404,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Leave request not found.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "decide A's leave",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404, 422}",
+   "ok": true,
+   "body": "{\"detail\":\"Staff access required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave balance",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Staff access required.\"}"
+  },
+  {
+   "area": "registration",
+   "name": "A's application CV",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "registration",
+   "name": "A's application photo",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/notes",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/ledger",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/ledger/summary",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/english-baseline",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/badges",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/growth",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/skill-profile",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/interviews",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/focus",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Insufficient role.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/admin/students/A/360",
+   "who": "alumnus",
+   "got": 403,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'View student records' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "read A's upload file",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "delete A's upload",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "read A's resume",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "A's resume pdf",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "rename A's resume",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "regenerate A's resume",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "delete A's resume",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave paper",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave attachments",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "cancel A's leave",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "decide A's leave",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404, 422}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "leave",
+   "name": "A's leave balance",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "registration",
+   "name": "A's application CV",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "registration",
+   "name": "A's application photo",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/notes",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/ledger",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/ledger/summary",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/english-baseline",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/badges",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/growth",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/skill-profile",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/interviews",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/mentor/students/A/focus",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "mentor-view",
+   "name": "/admin/students/A/360",
+   "who": "anonymous",
+   "got": 401,
+   "expect": "{401, 403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "student-data",
+   "name": "B's upload list excludes A's file",
+   "who": "B",
+   "got": 200,
+   "expect": "200",
+   "ok": true,
+   "body": "[{\"id\":\"9e4d66271c39475482f6401e5fe37f68\",\"kind\":\"RESUME\",\"cert_code\":null,\"title\":\"CV from application\",\"original_name\":\"cv.pdf\",\"mime_type\":\"application/pdf\",\"size_bytes\":45,\"status\":\"PENDING_REVIEW"
+  },
+  {
+   "area": "leaderboard",
+   "name": "A's board shows the other college's student",
+   "who": "A",
+   "got": 200,
+   "expect": "absent",
+   "ok": true,
+   "body": ""
+  },
+  {
+   "area": "leaderboard",
+   "name": "C's board shows the other college's student",
+   "who": "C",
+   "got": 200,
+   "expect": "absent",
+   "ok": true,
+   "body": ""
+  },
+  {
+   "area": "faculty",
+   "name": "read A /notes",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /ledger",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /ledger/summary",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /english-baseline",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /badges",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /growth",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /skill-profile",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /interviews",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /interviews/progress",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /focus",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "write a note on A",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404, 422}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "delete FX's note on A",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A's upload",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "review A's upload",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "award A a badge",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404, 422}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "assess A",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "notebook entries for A",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "A's leave paper",
+   "who": "FY other college",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Leave request not found.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "/admin/students/A/360",
+   "who": "FY other college",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'View student records' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "A's application CV",
+   "who": "FY other college",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "mentee list contains A",
+   "who": "FY other college",
+   "got": 200,
+   "expect": "absent",
+   "ok": true,
+   "body": ""
+  },
+  {
+   "area": "faculty",
+   "name": "read A /notes",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /ledger",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /ledger/summary",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /english-baseline",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /badges",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /growth",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /skill-profile",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /interviews",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /interviews/progress",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A /focus",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "write a note on A",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "{403, 404, 422}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "delete FX's note on A",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "read A's upload",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "review A's upload",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "award A a badge",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404, 422}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "assess A",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Student not in your mentor scope.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "notebook entries for A",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentor notebook' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "A's leave paper",
+   "who": "FZ same college, no mentees",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Leave request not found.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "/admin/students/A/360",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'View student records' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "A's application CV",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "faculty",
+   "name": "mentee list contains A",
+   "who": "FZ same college, no mentees",
+   "got": 403,
+   "expect": "absent",
+   "ok": true,
+   "body": ""
+  },
+  {
+   "area": "control",
+   "name": "FY sees own mentee C",
+   "who": "FY",
+   "got": 200,
+   "expect": "C present",
+   "ok": true,
+   "body": ""
+  },
+  {
+   "area": "role",
+   "name": "student GET /mentor/mentees",
+   "who": "A",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Mentee log' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "role",
+   "name": "student GET /admin/students",
+   "who": "A",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Students' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "role",
+   "name": "student GET /register/pending",
+   "who": "A",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"You do not hold the 'Registrations' capability. An administrator can grant it in Governance.\"}"
+  },
+  {
+   "area": "role",
+   "name": "student GET /admin/mail",
+   "who": "A",
+   "got": 404,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Not Found\"}"
+  },
+  {
+   "area": "role",
+   "name": "student GET /admin/audit",
+   "who": "A",
+   "got": 403,
+   "expect": "{403, 404}",
+   "ok": true,
+   "body": "{\"detail\":\"Main Admin access required.\"}"
+  },
+  {
+   "area": "session",
+   "name": "older device signed out after a new sign-in",
+   "who": "A",
+   "got": 401,
+   "expect": "401",
+   "ok": true,
+   "body": "{\"detail\":\"Sign in required.\"}"
+  },
+  {
+   "area": "session",
+   "name": "retired header present",
+   "who": "A",
+   "got": 401,
+   "expect": "X-Reep-Session: retired",
+   "ok": true,
+   "body": ""
+  }
+ ]
+}

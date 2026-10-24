@@ -1,0 +1,23 @@
+# Selenium Grid 4 for the 100-instance run on hardware that can host it.
+#   docker compose -f testing/selenium/grid/docker-compose.yml up -d --scale chrome=10
+#   SELENIUM_REMOTE_URL=http://localhost:4444 REEP_WEB=http://host.docker.internal:4200 \
+#     python testing/selenium/run_parallel.py --instances 100
+# 10 nodes x 10 sessions = 100 concurrent browsers. Each Chrome needs ~300-500 MB
+# RAM and a meaningful slice of a CPU; size the host accordingly (~40 GB / 16+ vCPU).
+services:
+  selenium-hub:
+    image: selenium/hub:4.35
+    ports: ["4442:4442", "4443:4443", "4444:4444"]
+    environment:
+      SE_SESSION_REQUEST_TIMEOUT: "600"
+  chrome:
+    image: selenium/node-chrome:4.35
+    shm_size: 2gb
+    depends_on: [selenium-hub]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    environment:
+      SE_EVENT_BUS_HOST: selenium-hub
+      SE_EVENT_BUS_PUBLISH_PORT: "4442"
+      SE_EVENT_BUS_SUBSCRIBE_PORT: "4443"
+      SE_NODE_MAX_SESSIONS: "10"
+      SE_NODE_OVERRIDE_MAX_SESSIONS: "true"

@@ -1,0 +1,157 @@
+/* The Generated Resume view leans on the global reep-v2 + reep-v2-resume classes
+ * (.main, .preview, .psec, .card, .chip, .btn, .evi-tag). Only the two-column
+ * layout, the generate bar and the markdown block spacing are local. */
+:host {
+  display: block;
+}
+
+/* frame the standalone view like the builder's .rb-shell, since the app-shell no
+   longer wraps these views in the mockup's .frame/.shell */
+.rb-view {
+  display: flex;
+  min-height: 680px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ground);
+}
+
+/* the mockup's two-column preview grid (resume ~1.55fr, side cards 1fr) */
+.prev-grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 18px;
+}
+@media (max-width: 900px) {
+  .prev-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* generate control bar above the rendered resume */
+.gen-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.gen-bar .ctrl {
+  flex: 1;
+}
+.gen-bar .btn {
+  flex: 0 0 auto;
+}
+
+/* rendered markdown blocks inside the global .preview surface */
+.preview .ptable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 4px 0 8px;
+  font-size: 12px;
+}
+.preview .ptable th,
+.preview .ptable td {
+  border: 1px solid var(--hairline);
+  padding: 4px 6px;
+  text-align: left;
+  vertical-align: top;
+}
+.preview .ptable th {
+  background: var(--tint-2);
+  font-weight: 700;
+}
+.preview .ppara {
+  margin: 6px 0;
+}
+.preview .pline {
+  display: flex;
+  gap: 8px;
+  margin: 4px 0;
+}
+.preview .pline .dot {
+  color: var(--purple-mid);
+  flex: 0 0 auto;
+}
+
+/* right-column card bodies */
+.trace {
+  font-size: 12.4px;
+  line-height: 1.8;
+  color: var(--ink-nav);
+}
+.trace-note {
+  margin-top: 10px;
+}
+.trace-hint,
+.strengthen {
+  font-size: 12.4px;
+  line-height: 1.75;
+  color: var(--ink-nav);
+}
+.evi {
+  font-size: 12.4px;
+  line-height: 1.9;
+}
+
+/* --- ATS toggle, page count and warnings above the document --- */
+.prev-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.ats-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.ats-toggle input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--purple-mid);
+}
+.page-count {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.page-count b {
+  color: var(--ink);
+}
+.warnings {
+  background: rgba(143, 97, 0, 0.1);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.warnings-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--warn);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.warning-line {
+  font-size: 13px;
+  padding: 3px 0;
+  color: var(--ink);
+}
+/* The ATS rendering: one column, a system face, no colour — what a parser sees. */
+.preview.ats {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fff;
+  color: #111;
+}
+.preview.ats h2,
+.preview.ats .psec {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #111;
+  letter-spacing: 0;
+}
+.preview.ats .psec {
+  border-color: #111;
+}

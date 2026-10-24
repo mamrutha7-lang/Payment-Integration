@@ -1,0 +1,149 @@
+<div class="dt-header">
+  <div>
+    <h1 class="dt-title">My Profile</h1>
+    <div class="dt-sub">Where you work now, and the resume the placement office can share.</div>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="feedback feedback--err" role="alert">
+    <span class="icon" aria-hidden="true">wifi_off</span>
+    <div class="feedback__body">{{ error() }}</div>
+  </div>
+} @else if (profile(); as prof) {
+  @if (editing()) {
+    <div class="card" style="padding: 16px; max-width: 640px">
+      @if (!prof.created) {
+        <h4 style="margin: 0 0 4px">Welcome back, {{ prof.name }}!</h4>
+        <p class="dt-sub" style="margin: 0 0 14px">
+          Set up your alumni profile — where you currently work and your current resume.
+        </p>
+      } @else {
+        <h4 style="margin: 0 0 14px">Edit profile</h4>
+      }
+
+      <div style="display: flex; flex-direction: column; gap: 10px">
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">
+          Company you currently work in <strong>*</strong>
+          <input type="text" placeholder="e.g. Infosys" [(ngModel)]="company" />
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">
+          Designation <span class="dt-sub">(optional)</span>
+          <input type="text" placeholder="e.g. Business Analyst" [(ngModel)]="designation" />
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">
+          Date of joining <span class="dt-sub">(optional)</span>
+          <input type="date" [(ngModel)]="joinedOn" />
+        </label>
+        <label style="display: flex; flex-direction: column; gap: 4px; font-size: 13px">
+          Graduation year <span class="dt-sub">(optional)</span>
+          <input
+            type="text"
+            inputmode="numeric"
+            placeholder="e.g. 2025"
+            [(ngModel)]="graduationYear"
+          />
+        </label>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap">
+          <button type="button" class="dt-btn" (click)="picker.click()">
+            <span class="icon" aria-hidden="true">upload_file</span>
+            {{ prof.created ? 'Replace resume' : 'Upload current resume *' }}
+          </button>
+          @if (resumeReading()) {
+            <span class="dt-sub" aria-live="polite">Opening the file…</span>
+          } @else if (pickedFile(); as file) {
+            <span class="chip good"
+              ><span class="icon" aria-hidden="true">description</span>{{ file.name }}</span
+            >
+          } @else if (prof.resume) {
+            <span class="dt-sub">Keeping: {{ prof.resume.original_name }}</span>
+          }
+          <span class="dt-sub">PDF preferred · up to 10 MB</span>
+        </div>
+        <input
+          #picker
+          type="file"
+          accept="application/pdf,image/png,image/jpeg"
+          hidden
+          (change)="onPick($event)"
+        />
+
+        @if (saveError()) {
+          <div class="feedback feedback--err" role="alert">
+            <span class="icon" aria-hidden="true">error</span>
+            <div class="feedback__body">{{ saveError() }}</div>
+          </div>
+        }
+
+        <div style="display: flex; gap: 10px">
+          <button
+            type="button"
+            class="dt-btn primary"
+            [disabled]="saving() || resumeReading()"
+            (click)="save()"
+          >
+            <span class="icon" aria-hidden="true">check</span>
+            {{ saving() ? 'Saving…' : prof.created ? 'Save changes' : 'Create my profile' }}
+          </button>
+          @if (prof.created) {
+            <button type="button" class="dt-btn" [disabled]="saving()" (click)="cancelEdit()">
+              Cancel
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="card" style="padding: 16px; max-width: 640px">
+      <div style="display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap">
+        <div>
+          <h4 style="margin: 0">{{ prof.name }}</h4>
+          <div class="dt-sub">{{ prof.email }}</div>
+        </div>
+        @if (savedFlash()) {
+          <span class="chip good"><span class="icon" aria-hidden="true">check_circle</span>Saved</span>
+        }
+      </div>
+
+      <dl
+        class="profile-facts"
+        style="margin: 14px 0; display: grid; grid-template-columns: 160px 1fr; gap: 6px 12px"
+      >
+        <dt class="dt-sub">Company</dt>
+        <dd style="margin: 0">
+          <strong>{{ prof.company }}</strong>
+        </dd>
+        <dt class="dt-sub">Designation</dt>
+        <dd style="margin: 0">{{ prof.designation || '—' }}</dd>
+        <dt class="dt-sub">Joined</dt>
+        <dd style="margin: 0">
+          {{ prof.joined_on ? (prof.joined_on | date: 'd MMM y') : '—' }}
+        </dd>
+        <dt class="dt-sub">Graduated</dt>
+        <dd style="margin: 0">{{ prof.graduation_year || '—' }}</dd>
+        <dt class="dt-sub">Resume</dt>
+        <dd style="margin: 0">
+          @if (prof.resume; as r) {
+            <a class="dt-btn" [href]="resumeUrl()" target="_blank" rel="noopener">
+              <span class="icon" aria-hidden="true">description</span>{{ r.original_name }} ·
+              {{ formatSize(r.size_bytes) }}
+            </a>
+          } @else {
+            <span class="chip warn"><span class="icon" aria-hidden="true">warning</span>No resume on file</span>
+          }
+        </dd>
+        <dt class="dt-sub">Last updated</dt>
+        <dd style="margin: 0">
+          {{ prof.updated_at ? (prof.updated_at | date: 'd MMM y, h:mm a') : '—' }}
+        </dd>
+      </dl>
+
+      <button type="button" class="dt-btn" (click)="startEdit()">
+        <span class="icon" aria-hidden="true">edit</span>Edit profile
+      </button>
+    </div>
+  }
+} @else {
+  <div class="card" style="padding: 16px">Loading your profile…</div>
+}

@@ -1,0 +1,36 @@
+# Test/development dependencies. NOT installed into any image.
+#
+# Split out of requirements.txt so `Dockerfile` ships a runtime-only environment:
+# a production API container has no reason to carry a test runner.
+#
+# Local setup:
+#   .venv/Scripts/pip install -r requirements.txt -r requirements-dev.txt
+
+-r requirements.txt
+
+pytest==9.1.1
+
+# --- the dev-only MCP surface (app/main.py, docs/redesign-2026-09/08-...) ---
+#
+# Mounted at /mcp only when ENV is a development name AND MCP_DEV_SURFACE=true,
+# so a developer's tools can call the API's read endpoints as a signed-in role
+# while building a screen against it. NOT in requirements.txt: the Dockerfile
+# installs that file, and a tool that forwards a session cookie into every
+# handler has no business in a production image. tests/test_codebase_guards.py
+# pins both halves.
+fastapi-mcp==0.4.0
+# THE SECOND PIN IS THE POINT, and without it the first one does not work.
+#
+# fastapi-mcp 0.4.0 declares `mcp>=1.12.0` with no upper bound, and the current
+# release of `mcp` is 2.x. The 2.0 line made every argument after `name`
+# keyword-only on `Server` and removed `request_context`, `list_tools` and
+# `call_tool` — all four of which fastapi_mcp/server.py uses. So a resolver
+# left to itself installs a pair that raises TypeError the moment
+# FastApiMCP(app, ...) is constructed, which is at import of the mount.
+#
+# Nothing else here caps it: google-adk and litellm both bound `mcp<2`, but
+# only inside extras this project does not install.
+#
+# 1.30.0 is the last 1.x. Its own pins intersect requirements.txt cleanly
+# (httpx <1.0, pydantic >=2.12, starlette >=0.48, uvicorn >=0.31).
+mcp==1.30.0

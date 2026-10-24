@@ -1,0 +1,262 @@
+<div class="panel" data-p="colleges">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <span>College setup</span><span class="sep">/</span><span>Colleges</span>
+      </div>
+      <h1 class="dt-title">Colleges</h1>
+      @if (state() === 'ready' && colleges().length) {
+        <div class="dt-sub">
+          {{ colleges().length | plural: 'college' }} · {{ activeCount() }} active
+        </div>
+      }
+    </div>
+    <div class="dt-toolbar">
+      <a class="btn primary" routerLink="/admin/setup">
+        <span class="icon" aria-hidden="true">add_circle</span> Set up a college
+      </a>
+    </div>
+  </div>
+
+  @if (state() === 'loading') {
+    <p class="loading-line" role="status">Loading colleges…</p>
+  }
+
+  @if (state() === 'error') {
+    <div class="notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      <div>
+        {{ loadError() }}
+        <button type="button" class="btn ghost sm retry" (click)="loadColleges()">Try again</button>
+      </div>
+    </div>
+  }
+
+  @if (state() === 'ready') {
+    @if (appointNote(); as note) {
+      <p class="note-line" role="status">
+        <span class="icon" aria-hidden="true">check_circle</span>
+        {{ note }}
+      </p>
+    }
+
+    @if (appointError(); as problem) {
+      <div class="notice" role="alert">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>{{ problem }}</div>
+      </div>
+    }
+
+    @if (deleteNote(); as note) {
+      <p class="note-line" role="status">
+        <span class="icon" aria-hidden="true">check_circle</span>
+        {{ note }}
+      </p>
+    }
+
+    @if (adminsState() === 'error') {
+      <div class="notice accent" role="status">
+        <span class="icon" aria-hidden="true">info</span>
+        <div>The college admin could not be read: {{ adminsError() }}</div>
+      </div>
+    }
+
+    <!-- ---------------------------------------------------------- Filters -->
+    <div class="filter-row">
+      <div class="seg" role="group" aria-label="Status">
+        @for (option of statusOptions; track option.value) {
+          <button
+            type="button"
+            [class.active]="statusFilter() === option.value"
+            [attr.aria-pressed]="statusFilter() === option.value"
+            (click)="setStatusFilter(option.value)"
+          >
+            {{ option.label }}
+          </button>
+        }
+      </div>
+
+      @if (campusesOnRecord().length > 1) {
+        <div class="select">
+          <span class="lbl">Campus</span>
+          <span class="val">{{ campusFilterLabel() }}</span>
+          <select aria-label="Campus" (change)="setCampusFilter($any($event.target).value)">
+            <option value="all" [selected]="campusFilter() === 'all'">All</option>
+            @for (campus of campusesOnRecord(); track campus) {
+              <option [value]="campus" [selected]="campusFilter() === campus">{{ campus }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      @if (visibleColleges().length !== colleges().length) {
+        <span class="filter-count">{{ visibleColleges().length }} of {{ colleges().length }}</span>
+      }
+    </div>
+
+    <!-- ------------------------------------------------- One card per college -->
+    <div class="college-grid">
+      @for (college of visibleColleges(); track college.id) {
+        <article class="card college-card">
+          <div class="college-head">
+            <div class="college-id">
+              <h2 class="college-title">{{ college.name }}</h2>
+              <div class="college-meta">{{ collegeSubLine(college) }}</div>
+            </div>
+            <span [class]="statusChipClass(college.status)">
+              {{ statusLabel(college.status) }}
+            </span>
+          </div>
+
+          <dl class="college-facts">
+            <div>
+              <dt>Email domains</dt>
+              <!-- No domains of its own is a REAL setting, not a gap: the
+                   deployment's provisionable_email_domains applies. A dash here
+                   would read as "this college admits nobody". -->
+              <dd [class.cell-empty]="!hasDomains(college)">{{ domainsLabel(college) }}</dd>
+            </div>
+            <div>
+              <dt>College admin</dt>
+              <dd class="admin-fact">
+                @switch (adminsState()) {
+                  @case ('ready') {
+                    @for (admin of adminsFor(college); track admin.user_id) {
+                      @let summary = adminSummary(admin);
+                      <span class="admin-cell">
+                        <span class="admin-name">{{ admin.name }}</span>
+                        <span [class]="'chip ' + summary.tone">{{ summary.label }}</span>
+                      </span>
+                    } @empty {
+                      <span class="cell-empty">Not appointed</span>
+                    }
+                    <!-- Offered only where BOTH endpoints behind it can answer:
+                         the faculty list (Main Admin) and the appointment
+                         (admin.governance). A filter, never the gate. -->
+                    @if (canAppointAdmin() && appointingCollegeId() !== college.id) {
+                      <button type="button" class="btn ghost sm" (click)="openAppoint(college)">
+                        <span class="icon" aria-hidden="true">person_add</span> Appoint
+                      </button>
+                    }
+                  }
+                  @case ('loading') {
+                    <span class="cell-empty">Reading…</span>
+                  }
+                  @default {
+                    <span class="cell-empty">Not read</span>
+                  }
+                }
+              </dd>
+            </div>
+            <div>
+              <dt>Contact</dt>
+              <dd [class.cell-empty]="!college.contact">{{ college.contact || '—' }}</dd>
+            </div>
+          </dl>
+
+          @if (appointingCollegeId() === college.id) {
+            <div class="appoint-form" [attr.aria-label]="'Appoint an admin for ' + college.name">
+              <div class="field">
+                <label [for]="'appoint-who-' + college.id">Faculty account</label>
+                <select
+                  [id]="'appoint-who-' + college.id"
+                  [disabled]="facultyLoading() || faculty().length === 0"
+                  (change)="setAppointUserId($any($event.target).value)"
+                >
+                  <option value="" [selected]="appointUserId() === ''">Choose…</option>
+                  @for (person of faculty(); track person.user_id) {
+                    <option
+                      [value]="person.user_id"
+                      [selected]="appointUserId() === person.user_id"
+                    >
+                      {{ facultyLabel(person) }}
+                    </option>
+                  }
+                </select>
+                @if (facultyError(); as problem) {
+                  <p class="err" role="alert">
+                    <span class="icon" aria-hidden="true">error</span>
+                    {{ problem }}
+                  </p>
+                } @else if (!facultyLoading() && faculty().length === 0) {
+                  <p class="help">
+                    No faculty account yet — <a routerLink="/admin/faculty">Faculty</a>.
+                  </p>
+                }
+              </div>
+              <div class="field">
+                <label [for]="'appoint-why-' + college.id"
+                  >Reason <span class="required-mark">*</span></label
+                >
+                <textarea
+                  [id]="'appoint-why-' + college.id"
+                  rows="2"
+                  [value]="appointReason()"
+                  (input)="setAppointReason($any($event.target).value)"
+                  placeholder="Why this account runs this college"
+                ></textarea>
+                <p class="help">{{ appointReasonLength() }} of {{ minReasonChars }} characters</p>
+              </div>
+              <div class="footbar">
+                <button type="button" class="btn ghost" (click)="closeAppoint()">Cancel</button>
+                <button
+                  type="button"
+                  class="btn secondary"
+                  [disabled]="!canAppoint()"
+                  (click)="appoint(college)"
+                >
+                  <span class="icon" aria-hidden="true">check</span>
+                  {{ appointBusy() ? 'Appointing…' : 'Appoint' }}
+                </button>
+              </div>
+            </div>
+          }
+
+          <div class="college-actions">
+            <a
+              class="btn secondary sm"
+              routerLink="/admin/institution"
+              [queryParams]="{ college: college.id }"
+            >
+              <span class="icon" aria-hidden="true">school</span> Open
+            </a>
+            <a
+              class="btn ghost sm"
+              routerLink="/admin/setup"
+              [queryParams]="{ college: college.id }"
+            >
+              <span class="icon" aria-hidden="true">add_circle</span> Add departments, courses,
+              batches
+            </a>
+            <!-- Main Admin only, like every delete. The dialog counts what
+                 goes, shows the server's refusal while anybody is filed
+                 under this college, and asks for the emailed code. -->
+            @if (isMainAdmin()) {
+              <button type="button" class="btn ghost sm college-delete" (click)="openDeleteDialog(college)">
+                <span class="icon" aria-hidden="true">delete</span> Delete college…
+              </button>
+            }
+          </div>
+        </article>
+      } @empty {
+        <div class="card college-empty">
+          <div class="empty">
+            <span class="icon" aria-hidden="true">apartment</span>
+            @if (colleges().length === 0) {
+              No college yet.
+            } @else {
+              No college matches this filter.
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+  @if (deletingCollege(); as target) {
+    <app-admin-delete-dialog
+      [target]="target"
+      (dismissed)="closeDeleteDialog()"
+      (done)="onDeleteDone($event)"
+    />
+  }
+</div>

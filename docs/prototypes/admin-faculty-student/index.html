@@ -1,0 +1,1076 @@
+<title>REEP Institutional Spine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,-50..200&display=swap" rel="stylesheet">
+
+<style>
+/* REEP v2 tokens — from apps/web/src/styles/reep-v2.scss. One committed theme. */
+:root{
+  --brand-purple:#552c7e; --brand-magenta:#ba2185; --purple-mid:#7a2f9e;
+  --ink:#1e1b29; --muted:#585566; --faint:#a596b3;
+  --surface:#fff; --tint-1:#efe4f6; --tint-2:#f5edfa; --tint-3:#faf6fd;
+  --hairline:rgba(160,138,178,.38); --hairline-26:rgba(160,138,178,.26);
+  --good:#137a4a; --good-bg:rgba(19,122,74,.12);
+  --warn:#8f6100; --warn-bg:rgba(217,154,0,.13);
+  --risk:#ad2452; --risk-bg:rgba(173,36,82,.1);
+  --page-wash:linear-gradient(180deg,#ece4f5 0%,#f2e7f8 45%,#fbe6f2 100%);
+  --primary-gradient:linear-gradient(120deg,#552C7E,#7a2f9e 55%,#BA2185);
+  --card-grad:linear-gradient(180deg,rgba(255,255,255,.86),rgba(245,237,250,.7));
+  --r-card:20px; --r-pill:999px;
+  --sh-card:0 10px 26px rgba(58,31,82,.13), inset 0 1px 0 #fff;
+  --font-display:'Plus Jakarta Sans',system-ui,sans-serif;
+  --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --mono:ui-monospace,'SFMono-Regular','Cascadia Mono',Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font);font-size:13px;line-height:1.45;color:var(--ink);
+  background:var(--page-wash);background-attachment:fixed;font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden}
+h1,h2,h3,h4{font-family:var(--font-display);letter-spacing:-.02em;margin:0;text-wrap:balance}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--purple-mid);outline-offset:2px}
+code{font-family:var(--mono);font-size:.9em;background:var(--tint-2);padding:1px 5px;border-radius:5px}
+.icon{font-family:'Material Symbols Rounded';font-variation-settings:'opsz' 24,'wght' 400,'FILL' 0,'GRAD' 0;
+  font-size:1.05em;line-height:1;width:1em;height:1em;overflow:hidden;display:inline-flex;
+  align-items:center;justify-content:center;vertical-align:-.16em;flex:none}
+
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+  padding:11px 20px;background:rgba(250,246,253,.93);backdrop-filter:blur(8px);border-bottom:1px solid var(--hairline)}
+.mark{display:flex;align-items:center;gap:9px;font-family:var(--font-display);font-weight:800;font-size:15px}
+.mark i{width:26px;height:26px;border-radius:8px;background:var(--primary-gradient);color:#fff;
+  display:grid;place-items:center;font-style:normal;font-size:13px}
+.proto{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--warn);background:var(--warn-bg);padding:3px 9px;border-radius:var(--r-pill)}
+.seats{display:flex;gap:4px;margin-left:auto;background:var(--tint-1);padding:4px;border-radius:var(--r-pill)}
+.seats button{border:0;background:none;padding:7px 15px;border-radius:var(--r-pill);cursor:pointer;
+  font-weight:600;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.seats button[aria-pressed="true"]{background:var(--primary-gradient);color:#fff;box-shadow:0 5px 14px rgba(85,44,126,.42)}
+.wrap{max-width:1200px;margin:0 auto;padding:22px 20px 72px}
+
+.card{background:var(--card-grad);border:1px solid var(--hairline);border-radius:var(--r-card);
+  padding:18px;box-shadow:var(--sh-card)}
+.card.plain{background:var(--surface)}
+.head{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.head h2{font-size:19px} .head h3{font-size:14.5px}
+.sub{color:var(--muted);font-size:12.5px;margin-top:4px;max-width:78ch}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--brand-purple)}
+.right{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;gap:14px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;border-bottom:1px solid var(--hairline)}
+.tabs button{border:0;background:none;padding:9px 14px;cursor:pointer;font-weight:600;color:var(--muted);
+  border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--brand-purple);border-bottom-color:var(--brand-magenta)}
+.pills{display:inline-flex;gap:3px;padding:3px;border-radius:var(--r-pill);background:rgba(160,138,178,.14);margin-bottom:14px;flex-wrap:wrap}
+.pills button{border:0;background:none;padding:6px 14px;border-radius:var(--r-pill);cursor:pointer;
+  font-size:12.5px;font-weight:700;color:var(--muted)}
+.pills button[aria-pressed="true"]{background:#fff;color:var(--brand-purple);box-shadow:0 3px 8px rgba(58,31,82,.15)}
+.pills.solid button[aria-pressed="true"]{background:var(--primary-gradient);color:#fff;box-shadow:none}
+.btn{border:1.5px solid rgba(160,138,178,.42);background:var(--surface);padding:8px 15px;border-radius:var(--r-pill);
+  cursor:pointer;font-weight:700;font-size:12.5px;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--tint-3);border-color:rgba(122,47,158,.45)}
+.btn.primary{background:var(--primary-gradient);color:#fff;border-color:var(--brand-purple);
+  box-shadow:0 8px 18px rgba(85,44,126,.28)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.danger{color:var(--risk);border-color:rgba(173,36,82,.35)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;box-shadow:none}
+.btn.sm{padding:6px 12px;font-size:11.5px}
+.iconbtn{border:0;background:none;color:var(--muted);cursor:pointer;padding:4px}
+.iconbtn.risk{color:var(--risk)}
+.chip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:var(--r-pill);
+  font-size:10.5px;font-weight:700;background:rgba(160,138,178,.16);color:var(--muted)}
+.chip.good{background:var(--good-bg);color:var(--good)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.risk{background:var(--risk-bg);color:var(--risk)}
+.chip.info{background:rgba(122,47,158,.12);color:var(--purple-mid)}
+.chip.ug{background:rgba(85,44,126,.12);color:var(--brand-purple)}
+.chip.pg{background:rgba(186,33,133,.12);color:var(--brand-magenta)}
+table{width:100%;border-collapse:collapse}
+.scroll{overflow-x:auto}
+th{text-align:left;font-size:11px;font-weight:700;color:var(--muted);padding:8px 10px;
+  background:rgba(160,138,178,.12);white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid rgba(160,138,178,.2);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.name{font-weight:700}
+.meta{color:var(--muted);font-size:11.5px}
+label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+input,select,textarea{width:100%;padding:9px 12px;border-radius:12px;border:1.5px solid rgba(160,138,178,.45);
+  background:var(--surface)}
+input[type=number]{border-radius:var(--r-pill)}
+.field{margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.empty{padding:22px;text-align:center;color:var(--faint);font-size:13px}
+.fix{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:14px;
+  background:var(--good-bg);border:1px solid rgba(19,122,74,.28);margin-bottom:16px;font-size:12.5px}
+.fix .icon{color:var(--good);margin-top:1px}
+.fix b{color:var(--good)}
+.fix.warn{background:var(--warn-bg);border-color:rgba(217,154,0,.32)}
+.fix.warn .icon,.fix.warn b{color:var(--warn)}
+.fix.risk{background:var(--risk-bg);border-color:rgba(173,36,82,.28)}
+.fix.risk .icon,.fix.risk b{color:var(--risk)}
+.dashed{background:rgba(160,138,178,.08);border:1px dashed rgba(160,138,178,.45);border-radius:16px;padding:12px 16px}
+
+.col-row{border:1px solid var(--hairline);border-radius:16px;overflow:hidden;margin-bottom:12px;background:var(--surface)}
+.col-head{display:flex;align-items:center;gap:12px;padding:13px 16px;background:var(--tint-2);cursor:pointer;border:0;width:100%;text-align:left}
+.col-head:hover{background:var(--tint-1)}
+.dept{border-top:1px solid var(--hairline-26);padding:14px 16px}
+.dept-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.batch{display:grid;grid-template-columns:1.1fr .9fr .9fr .55fr .6fr auto;gap:10px;align-items:center;
+  padding:9px 12px;border:1px solid var(--hairline-26);border-radius:12px;background:var(--tint-3);margin-bottom:7px}
+.batch .k{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);display:block}
+.archived{opacity:.55}
+
+.locked{background:linear-gradient(180deg,rgba(255,255,255,.9),rgba(245,237,250,.75));
+  border:1px solid rgba(160,138,178,.4);border-radius:18px;padding:16px 18px;box-shadow:var(--sh-card)}
+.locked dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:11px 18px;margin:0;font-size:12.5px}
+.locked dt{color:var(--muted);margin-bottom:2px}
+.locked dd{margin:0;font-weight:700}
+.locked .note{font-size:11px;color:var(--faint);margin-top:11px}
+
+.area{border:1px solid var(--hairline-26);border-radius:14px;margin-bottom:10px;overflow:hidden}
+.area-h{display:flex;align-items:center;gap:9px;padding:9px 13px;background:var(--tint-2);font-weight:700;font-size:12.5px}
+.area.sensitive .area-h{background:var(--risk-bg);color:var(--risk)}
+.cap{display:flex;gap:11px;align-items:flex-start;padding:9px 13px;border-top:1px solid var(--hairline-26);cursor:pointer}
+.cap:first-of-type{border-top:0}
+.cap input[type=checkbox]{width:16px;height:16px;margin-top:2px;flex:none;accent-color:var(--brand-purple)}
+.cap .ep{font-family:var(--mono);font-size:10.5px;color:var(--faint);display:block;margin-top:2px}
+.cap.on{background:rgba(19,122,74,.05)}
+.who{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+
+.cred{background:var(--ink);color:#fff;border-radius:14px;padding:14px 16px;margin:12px 0}
+.cred .pw{font-family:var(--mono);font-size:17px;font-weight:700;background:rgba(255,255,255,.1);
+  padding:9px 13px;border-radius:10px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:9px 0}
+.cred .hash{font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.55);word-break:break-all}
+
+/* ---- the BGSCET leave form, as shared ---- */
+.leavecard{background:var(--card-grad);border:1px solid var(--hairline);border-radius:16px;padding:13px 16px;
+  margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px}
+.leavecard:hover{border-color:rgba(122,47,158,.45)}
+.form-sheet{background:#fff;border:1px solid var(--hairline);border-radius:var(--r-card);padding:22px;box-shadow:var(--sh-card)}
+.sheet-h{text-align:center;font-family:var(--font-display);font-weight:800;margin-bottom:2px}
+.sheet-sub{text-align:center;font-size:12.5px;font-weight:700}
+.sheet-addr{text-align:center;font-size:12px;color:var(--muted);margin-bottom:14px}
+.appfor{text-align:center;font-size:13px;margin:14px 0}
+.kindchip{cursor:pointer;font-weight:700;padding:2px 4px;border-radius:6px}
+.kindchip.on{background:rgba(122,47,158,.14);color:var(--brand-purple)}
+.kindchip.off{color:var(--faint);text-decoration:line-through}
+.strike{font-size:11.5px;color:var(--faint);display:block;margin-top:4px}
+.ftable{width:100%;border-collapse:collapse;margin:12px 0;border:1px solid var(--hairline)}
+.ftable td,.ftable th{border:1px solid var(--hairline);padding:8px 10px;font-size:12.5px}
+.ftable td:first-child{width:150px;font-weight:700;background:var(--tint-3)}
+.ftable input,.ftable textarea{border:0;padding:2px 0;background:none;border-radius:0;box-shadow:none}
+.ftable input:disabled,.ftable textarea:disabled{color:var(--ink);opacity:1}
+.synced{font-size:10.5px;color:var(--good);font-weight:700}
+.sigrow{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:20px 0 8px}
+.sigbox{text-align:center}
+.sigline{border-bottom:1px solid var(--ink);min-height:34px;display:flex;align-items:flex-end;
+  justify-content:center;padding-bottom:4px;font-family:'Plus Jakarta Sans',cursive;font-size:15px;font-weight:700;color:var(--brand-purple)}
+.siglabel{font-size:11px;font-weight:700;letter-spacing:.05em;margin-top:6px;color:var(--muted)}
+.altlabel{font-weight:700;font-size:12.5px;margin:16px 0 8px}
+
+.chain{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0}
+.node{padding:9px 14px;border-radius:12px;background:var(--surface);border:1.5px solid var(--brand-purple);
+  font-weight:700;font-size:12.5px}
+.node.future{border-style:dashed;border-color:var(--faint);color:var(--faint);background:var(--tint-3)}
+.arrow{color:var(--faint);font-weight:700}
+.audit{display:grid;grid-template-columns:auto 1fr auto;gap:5px 14px;align-items:baseline;font-size:12.5px}
+.audit .when{color:var(--faint);font-size:11.5px;white-space:nowrap}
+.audit .act{font-weight:700;color:var(--brand-purple);white-space:nowrap}
+.audit-row{display:contents}
+
+.bignum{font-size:28px;font-weight:800;font-family:var(--font-display)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:60;background:var(--ink);color:#fff;
+  padding:11px 18px;border-radius:var(--r-pill);box-shadow:0 10px 30px rgba(12,4,22,.35);
+  display:flex;gap:8px;align-items:center;font-weight:600;font-size:12.5px;max-width:90vw}
+@media (prefers-reduced-motion:no-preference){.toast{animation:pop .2s ease-out}}
+@keyframes pop{from{opacity:0;transform:translate(-50%,8px)}}
+dialog{border:0;border-radius:var(--r-card);padding:0;box-shadow:0 24px 60px rgba(58,31,82,.35);
+  max-width:560px;width:94vw;max-height:88vh}
+dialog::backdrop{background:rgba(30,27,41,.5)}
+.dlg{padding:24px;max-height:86vh;overflow:auto}
+.dlg h3{font-size:17px;font-weight:800;margin-bottom:6px}
+.err{font-size:11.5px;color:var(--risk);margin:-6px 0 8px}
+@media (max-width:900px){.row2,.sigrow{grid-template-columns:1fr}.batch{grid-template-columns:1fr 1fr}
+  .grid[style*="1fr"]{grid-template-columns:1fr !important}}
+</style>
+
+
+<div style="max-width:1100px;margin:16px auto;padding:14px 18px;border:2px solid #b4341f;border-radius:8px;background:#fdeeea;color:#5a1a0e;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:14px;line-height:1.55">
+  <strong style="display:block;font-size:15px;margin-bottom:6px">PARTLY STALE &mdash; drawn before 2026-09. <code>AGENTS.md</code> is the current truth.</strong>
+  These prototypes were drawn while <strong>DIRECTOR</strong> was still a role. It was removed on <strong>2026-09-10</strong>: there is one office account, role <strong>ADMIN</strong> (the Main Admin, and <code>app.grant_access</code> permits exactly one). Faculty are <strong>MENTOR</strong> and reach a console screen only through a grant the Main Admin makes in Governance. <code>require_director</code>, <code>/api/director/*</code> and <code>features/director/</code> are all gone. The screens themselves shipped &mdash; see <code>docs/redesign-2026-09/design/admin/</code> for the boards that were built.
+</div>
+<div class="top">
+  <div class="mark"><i>R</i> REEP</div>
+  <span class="proto">Prototype · in-memory, no API</span>
+  <div class="seats" role="group" aria-label="Switch seat">
+    <button type="button" data-seat="admin" aria-pressed="true"><span class="icon">shield_person</span>Main Admin</button>
+    <button type="button" data-seat="faculty" aria-pressed="false"><span class="icon">school</span>Faculty</button>
+    <button type="button" data-seat="student" aria-pressed="false"><span class="icon">person</span>Student</button>
+  </div>
+</div>
+<div class="wrap" id="app"></div>
+<dialog id="dlg"><form method="dialog" class="dlg" id="dlgForm"></form></dialog>
+
+<script>
+const uid = p => p + Math.random().toString(36).slice(2,8);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt = d => d ? new Date(d).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+const mmss = s => Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+
+/* Bedrock closes a bidirectional stream at 8 min. 480 − 20 s handshake margin.
+   Only matters for a SINGLE question above it; the interview itself is one
+   stream per question, so the wall is not an interview ceiling. */
+const STREAM_WALL_S = 480, STREAM_MARGIN_S = 20, MAX_Q_SECONDS = STREAM_WALL_S - STREAM_MARGIN_S;
+
+const CAP_GROUPS = [
+  { area:'Students & records', icon:'group', caps:[
+    ['view_students','View assigned students & profiles','GET /api/mentor/mentees'],
+    ['view_progress','View academic & cohort progress','GET /api/director/students/{id}/weekly'],
+    ['review_resume','Review Resume Builder drafts','GET /api/director/students/{id}/resume.pdf'],
+    ['view_interview_results','View interview results (scoped)','GET /api/mentor/students/{id}/interviews']]},
+  { area:'People & assignment', icon:'manage_accounts', caps:[
+    ['assign_faculty','Assign students to faculty','POST /api/director/students/{id}/mentor'],
+    ['review_registrations','Review & decide registrations','POST /api/register/{id}/decision'],
+    ['provision_accounts','Provision accounts & issue credentials','new — no endpoint today'],
+    ['manage_faculty_records','Edit faculty designation, department, capacity','new — columns have no writer']]},
+  { area:'Programme', icon:'insights', caps:[
+    ['view_analytics','View programme analytics','GET /api/director/analytics-summary'],
+    ['manage_institution','Manage colleges, departments, batches','new — no endpoint today'],
+    ['manage_criteria','Set placement eligibility criteria','GET /api/director/criteria'],
+    ['manage_alert_rules','Configure cohort alert rules','PUT /api/director/alert-rules']]},
+  { area:'Placement', icon:'work', caps:[
+    ['manage_jobs','Post & remove job openings','POST /api/director/jobs'],
+    ['view_placement','View the placement board','GET /api/director/placement'],
+    ['approve_offers','Verify student offers','POST /api/mentor/offers/{id}/decision']]},
+  { area:'Catalogue', icon:'menu_book', caps:[
+    ['manage_catalogue','Manage courses & certifications','GET /api/director/catalogue'],
+    ['manage_approved_certs','Maintain the approved-certification catalogue','POST /api/director/approved-certifications']]},
+  { area:'Badges & skills', icon:'verified', caps:[
+    ['review_badge_evidence','Verify skill evidence','POST /api/mentor/badge-evidence/{id}/review'],
+    ['award_badges','Award a badge manually','POST /api/mentor/students/{id}/badges/{code}/award'],
+    ['revoke_badges','Revoke an awarded badge','POST /api/mentor/students/{id}/badges/{code}/revoke']]},
+  { area:'Leave', icon:'event_busy', caps:[
+    ['approve_leave','Approve staff leave requests','POST /api/leaves/{id}/decision']]},
+  { area:'Interview platform', icon:'record_voice_over', caps:[
+    ['manage_interview_config','Edit questions, specializations, time limits','POST /api/platform/admin/specializations'],
+    ['manage_recording_policy','Set the recording policy per degree','PUT /api/platform/admin/recording-policies/{degree}'],
+    ['manage_candidates','Manage interview candidates & bulk upload','POST /api/platform/admin/candidates/bulk']]},
+  { area:'Exports & audit', icon:'download', caps:[
+    ['export_data','Export students, placement and ledger CSV','GET /api/director/exports/*.csv'],
+    ['view_audit','Read the governance audit log','new — no endpoint today']]},
+  { area:'Sensitive', icon:'lock', sensitive:true, caps:[
+    ['play_interview_audio','Play interview audio recordings','ADMIN-only today — a DIRECTOR is refused'],
+    ['view_agent_metrics','View AI agent metrics','GET /api/agent/metrics']]},
+];
+const CAP_LABEL={}; CAP_GROUPS.forEach(g=>g.caps.forEach(([k,l])=>CAP_LABEL[k]=l));
+const SCOPES=[['assigned','Assigned students only','Deny by default — the scope rule 2 already enforces.'],
+  ['cohort','One batch','Everything in a single cohort, nothing outside it.'],
+  ['programme','Whole programme','Every student. Give this sparingly.']];
+const LEAVE_KINDS = ['Casual Leave','Permission','OOD','RH','LOP'];
+
+const db = {
+  colleges:[{id:'c1',name:'BGS College of Engineering and Technology',code:'BGSCET',status:'ACTIVE'},
+            {id:'c2',name:'BGS Institute of Management',code:'BGSIM',status:'ACTIVE'}],
+  departments:[{id:'d1',collegeId:'c1',name:'Master of Business Administration',status:'ACTIVE'},
+               {id:'d2',collegeId:'c1',name:'Master of Computer Applications',status:'ACTIVE'},
+               {id:'d3',collegeId:'c2',name:'Executive MBA',status:'ARCHIVED'}],
+  batches:[{id:'b1',deptId:'d1',label:'2024-26',entry:'2024-08-01',completion:'2026-07-31',capacity:60,status:'ACTIVE'},
+           {id:'b2',deptId:'d1',label:'2026-28',entry:'2026-08-01',completion:'2028-07-31',capacity:60,status:'ACTIVE'},
+           {id:'b3',deptId:'d2',label:'2026-28',entry:'2026-08-01',completion:'2028-07-31',capacity:40,status:'ACTIVE'}],
+  faculty:[{id:'f1',name:'Dr. Kavya N',email:'kavya.n@bgscet.ac.in',designation:'Associate Professor',deptId:'d1',capacity:20,focus:'Finance & Analytics',status:'ACTIVE'},
+           {id:'f2',name:'Prof. Ramesh Iyer',email:'ramesh.iyer@bgscet.ac.in',designation:'Assistant Professor',deptId:'d1',capacity:12,focus:'HR & Organisational Behaviour',status:'ACTIVE'},
+           {id:'f3',name:'Dr. Anitha S',email:'anitha.s@bgscet.ac.in',designation:'',deptId:'d2',capacity:15,focus:'',status:'ACTIVE'}],
+  students:[{id:'s1',name:'Harshitha M',usn:'1BG24MBA004',email:'harshitha.m@bgscet.ac.in',batchId:'b1',facultyId:'f1'},
+            {id:'s2',name:'Sanjana H',usn:'1BG24MBA027',email:'sanjana.h@bgscet.ac.in',batchId:'b1',facultyId:'f1'},
+            {id:'s3',name:'Imran P',usn:'1BG24MBA039',email:'imran.p@bgscet.ac.in',batchId:'b1',facultyId:'f2'},
+            {id:'s4',name:'Nikhil Rao',usn:'1BG24MCA011',email:'nikhil.rao@bgscet.ac.in',batchId:'b1',facultyId:null}],
+  registrations:[{id:'r1',name:'Deepa S',email:'deepa.s@bgscet.ac.in',usn:'1BG26MCA022',batchId:'b3',status:'PENDING'},
+                 {id:'r2',name:'Arjun Bhat',email:'arjun.b@bgscet.ac.in',usn:'1BG26MBA041',batchId:'b2',status:'PENDING'}],
+  grants:[{id:'g1',personId:'f1',cap:'view_students',scope:'assigned',cohortId:null,reason:'Assigned mentor for MBA 2024-26.',by:'Main Admin',at:'14 Aug 2026',expires:null},
+          {id:'g2',personId:'f1',cap:'review_badge_evidence',scope:'assigned',cohortId:null,reason:'Verifies certificates for her own mentees.',by:'Main Admin',at:'14 Aug 2026',expires:null}],
+  credentials:[], audit:[],
+
+  /* --- interview configuration, per the design --- */
+  specializations:{UG:[{name:'Business Analytics'},{name:'Human Resources'}],
+                   PG:[{name:'Finance'},{name:'Digital Marketing'},{name:'Human Resources'}]},
+  questions:{
+    UG:[{id:'q1',text:'Walk me through a dataset you analysed and what you changed because of it.',specialization:'Business Analytics',timeLimit:120,status:'Published'},
+        {id:'q2',text:'How would you handle a team member who consistently misses deadlines?',specialization:'Human Resources',timeLimit:90,status:'Published'}],
+    PG:[{id:'q3',text:'A client asks for a valuation on a company with negative earnings. How do you approach it?',specialization:'Finance',timeLimit:180,status:'Published'},
+        {id:'q4',text:'Design a campaign to grow enrolment by 20% on a fixed budget.',specialization:'Digital Marketing',timeLimit:150,status:'Published'},
+        {id:'q5',text:'Describe a time you resolved a conflict between two departments.',specialization:'Human Resources',timeLimit:120,status:'Draft'}]},
+  interviewConfig:{defaultDurationSec:120, retakesAllowed:1},
+  interviewTiming:{defaultSeconds:120},
+  configVersion:{UG:{version:3,state:'Live',publishedOn:'02 Sep 2026'},PG:{version:5,state:'Live',publishedOn:'28 Aug 2026'}},
+  policies:[{id:'p1',name:'Standard PG Recording',degreePath:'PG',consent:true,dualChannel:true,format:'WAV',
+             retention:'1 year (raw audio)',encryption:'AES-256 at rest + in transit',accessRoles:['Admin'],ttlMinutes:30,version:2,active:true},
+            {id:'p2',name:'UG Pilot — no capture',degreePath:'UG',consent:true,dualChannel:false,format:'WAV',
+             retention:'1 year (raw audio)',encryption:'AES-256 at rest',accessRoles:['Admin','Reviewer'],ttlMinutes:15,version:1,active:true}],
+
+  /* --- faculty leave, exactly the shared form's fields --- */
+  leaves:[
+    {id:'LV-2041',facultyId:'f1',leaveKind:'Casual Leave',appDate:'08-09-2026',date:'12-14 Sep 2026',
+     purpose:'Attending the AICTE faculty development programme at BMS College.',credit:'2 days',
+     sanctioned:'—',status:'Submitted',staffSig:'Dr. Kavya N',dirSig:'',remarks:'',altName:'Prof. Ramesh Iyer',
+     altRows:[{date:'12 Sep',staffName:'Prof. Ramesh Iyer',cls:'MBA II — Finance',time:'10:00–11:00',remarks:'Covered'},
+              {date:'13 Sep',staffName:'Dr. Anitha S',cls:'MBA II — Analytics',time:'11:15–12:15',remarks:'Covered'}]},
+    {id:'LV-2038',facultyId:'f1',leaveKind:'OOD',appDate:'21-08-2026',date:'26 Aug 2026',
+     purpose:'University valuation duty at VTU regional centre.',credit:'1 day',
+     sanctioned:'Yes',status:'Sanctioned',staffSig:'Dr. Kavya N',dirSig:'Dr. S. Prakash',remarks:'',altName:'Dr. Anitha S',
+     altRows:[{date:'26 Aug',staffName:'Dr. Anitha S',cls:'MBA I — OB',time:'09:00–10:00',remarks:'Adjusted'}]},
+    {id:'LV-2035',facultyId:'f2',leaveKind:'LOP',appDate:'02-08-2026',date:'05-06 Aug 2026',
+     purpose:'Personal.',credit:'—',sanctioned:'—',status:'Returned',staffSig:'Prof. Ramesh Iyer',dirSig:'',
+     remarks:'Please attach the alternate arrangement for the Thursday 2pm section before resubmitting.',
+     altName:'',altRows:[{date:'',staffName:'',cls:'',time:'',remarks:''}]},
+  ],
+};
+
+const dept = id => (db.departments.find(d=>d.id===id)||{}).name || '—';
+const personName = id => (db.faculty.find(f=>f.id===id)||{}).name || id;
+function institutionFor(s){ const b=db.batches.find(x=>x.id===s.batchId); if(!b) return null;
+  const d=db.departments.find(x=>x.id===b.deptId);
+  return {batch:b,dept:d,college:d&&db.colleges.find(x=>x.id===d.collegeId)}; }
+const facultyOf = s => db.faculty.find(f=>f.id===s.facultyId)||null;
+const menteeCount = f => db.students.filter(s=>s.facultyId===f.id).length;
+const grantsFor = id => db.grants.filter(g=>g.personId===id);
+const has = (id,cap) => db.grants.some(g=>g.personId===id && g.cap===cap);
+function scopeText(g){ if(g.scope==='cohort'){const b=db.batches.find(x=>x.id===g.cohortId);return 'Batch '+(b?b.label:'—');}
+  return g.scope==='programme'?'Whole programme':'Assigned students only'; }
+const leaveTone = st => ({Sanctioned:'good',Submitted:'info',Pending:'warn',Returned:'warn',Rejected:'risk',Draft:''}[st]||'');
+const leaveIcon = st => ({Sanctioned:'check_circle',Submitted:'hourglass_top',Pending:'hourglass_top',
+  Returned:'undo',Rejected:'cancel',Draft:'edit_note'}[st]||'description');
+
+const W1=['amber','cobalt','ivory','saffron','indigo','copper','jade','crimson'];
+const W2=['harbour','lantern','summit','meadow','compass','quarry','beacon','thicket'];
+const W3=['ledger','falcon','anchor','cipher','pillar','marble','ember','cavern'];
+const DENY=new Set(['student123','mentor123','director123','alumni123','admin123']);
+function makePassphrase(){ const p=a=>a[Math.floor(Math.random()*a.length)];
+  for(let i=0;i<50;i++){ const pw=`${p(W1)}-${p(W2)}-${p(W3)}-${10+Math.floor(Math.random()*89)}`;
+    if(pw.length>=12 && !DENY.has(pw.toLowerCase())) return pw; }
+  return 'amber-harbour-ledger-42'; }
+const fakeHash = pw => { let h=0; for(const c of pw) h=(h*31+c.charCodeAt(0))>>>0;
+  const x=n=>n.toString(16).padStart(8,'0');
+  return `scrypt:${x(h^0x9e3779b9)}${x(h*7>>>0)}:${x(h*13>>>0)}${x(h*17>>>0)}${x(h*19>>>0)}…`; };
+
+let seat='admin', tab='institution', openCollege='c1', viewerId='s1', facultyId='f1',
+    accessPerson='f1', facTab='students', leaveView='dash', leaveId=null,
+    ivPath='UG', ivSub='questions';
+
+function log(a,i){ db.audit.unshift({action:a,item:i,by:'Main Admin',
+  when:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}); }
+function toast(m){ document.querySelectorAll('.toast').forEach(t=>t.remove());
+  const e=document.createElement('div'); e.className='toast';
+  e.innerHTML='<span class="icon">check_circle</span>'+esc(m);
+  document.body.appendChild(e); setTimeout(()=>e.remove(),2900); }
+
+function render(){
+  document.querySelectorAll('.seats button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.seat===seat)));
+  document.getElementById('app').innerHTML = seat==='admin'?admin():seat==='faculty'?facultySeat():studentSeat();
+  wire();
+}
+
+/* ================================ ADMIN ================================== */
+function admin(){
+  const t=[['institution','Institution'],['people','People'],['access','Access'],
+           ['interviews','Interviews'],['governance','Governance'],['schema','Schema']];
+  return `<div class="head"><div><div class="eyebrow">Main Admin console</div><h2>Institutional spine</h2>
+    <div class="sub">The write layer the product does not have. Every object below can only be created by a CLI
+      or a seed today — and <code>app/seed.py</code> refuses to run on <code>ENV=prod</code>.</div></div></div>
+  <div class="tabs" role="tablist">${t.map(([k,l])=>`<button type="button" role="tab" data-tab="${k}" aria-selected="${tab===k}">${l}</button>`).join('')}</div>
+  ${tab==='institution'?institution():tab==='people'?people():tab==='access'?access():
+    tab==='interviews'?interviews():tab==='governance'?governance():schema()}`;
+}
+
+function institution(){
+  return `<div class="fix"><span class="icon">check_circle</span><span><b>Gap closed:</b> College and Department
+    are entities, and a Batch carries entry date, expected completion and capacity. In the repo there is no
+    College column anywhere.</span></div>
+  <div class="head"><h3>Colleges</h3><div class="right">
+    <button class="btn primary" data-act="addCollege"><span class="icon">add</span>Add college</button></div></div>
+  ${db.colleges.map(c=>{ const open=openCollege===c.id, ds=db.departments.filter(d=>d.collegeId===c.id);
+    return `<div class="col-row ${c.status==='ARCHIVED'?'archived':''}">
+      <button class="col-head" data-act="toggleCollege" data-id="${c.id}">
+        <span class="icon">${open?'expand_more':'chevron_right'}</span>
+        <span><span class="name">${esc(c.name)}</span><span class="meta"> · ${esc(c.code)} · ${ds.length} department${ds.length===1?'':'s'}</span></span>
+        <span class="right"><span class="chip ${c.status==='ACTIVE'?'good':'warn'}">${c.status}</span>
+        <span class="btn sm" data-act="archiveCollege" data-id="${c.id}">${c.status==='ACTIVE'?'Archive':'Restore'}</span></span></button>
+      ${open? ds.map(d=>{ const bs=db.batches.filter(b=>b.deptId===d.id);
+        return `<div class="dept ${d.status==='ARCHIVED'?'archived':''}">
+          <div class="dept-head"><span class="icon">account_tree</span><span class="name">${esc(d.name)}</span>
+            <span class="chip ${d.status==='ACTIVE'?'good':'warn'}">${d.status}</span><span class="right">
+            <button class="btn sm" data-act="archiveDept" data-id="${d.id}">${d.status==='ACTIVE'?'Archive':'Restore'}</button>
+            <button class="btn sm" data-act="addBatch" data-id="${d.id}"><span class="icon">add</span>Add batch</button></span></div>
+          ${bs.length? bs.map(b=>`<div class="batch">
+            <div><span class="k">Cohort label</span><b>${esc(b.label)}</b></div>
+            <div><span class="k">Entry date</span>${fmt(b.entry)}</div>
+            <div><span class="k">Expected completion</span>${fmt(b.completion)}</div>
+            <div><span class="k">Capacity</span>${b.capacity}</div>
+            <div><span class="k">Enrolled</span>${db.students.filter(s=>s.batchId===b.id).length}</div>
+            <div><button class="btn sm" data-act="editBatch" data-id="${b.id}">Edit</button></div></div>`).join('')
+            : `<div class="meta">No batches yet.</div>`}</div>`;
+        }).join('')+`<div class="dept"><button class="btn sm" data-act="addDept" data-id="${c.id}">
+          <span class="icon">add</span>Add department</button></div>`:''}</div>`;
+  }).join('')}`;
+}
+
+function people(){
+  const un=db.students.filter(s=>!s.facultyId);
+  return `<div class="fix"><span class="icon">check_circle</span><span><b>Gap closed:</b> approving a registration
+    <b>provisions the account and issues a credential</b>. In the repo the decision endpoint stamps a status and
+    creates nothing.</span></div>
+
+  <div class="card plain" style="margin-bottom:16px">
+    <div class="head"><div><h3>Registrations</h3><div class="sub">Approving creates the User and Student, seats
+      them in their batch, and issues a first-sign-in credential.</div></div>
+      <div class="right"><span class="chip warn">${db.registrations.filter(r=>r.status==='PENDING').length} pending</span></div></div>
+    <div class="scroll"><table><thead><tr><th>Applicant</th><th>USN</th><th>Batch</th><th>Status</th><th></th></tr></thead><tbody>
+      ${db.registrations.map(r=>{const b=db.batches.find(x=>x.id===r.batchId),d=b&&db.departments.find(x=>x.id===b.deptId);
+        return `<tr><td><span class="name">${esc(r.name)}</span><div class="meta">${esc(r.email)}</div></td>
+        <td>${esc(r.usn)}</td><td>${d?esc(d.name.split(' ').pop()):'—'} · ${b?esc(b.label):'—'}</td>
+        <td><span class="chip ${r.status==='APPROVED'?'good':r.status==='REJECTED'?'risk':'warn'}">${r.status}</span></td>
+        <td class="right">${r.status==='PENDING'
+          ? `<button class="btn primary sm" data-act="approve" data-id="${r.id}"><span class="icon">how_to_reg</span>Approve</button>
+             <button class="btn danger sm" data-act="reject" data-id="${r.id}">Reject</button>`
+          : `<button class="btn sm" data-act="reissue" data-id="${r.id}"><span class="icon">key</span>Re-issue password</button>`}</td></tr>`;
+      }).join('')}</tbody></table></div></div>
+
+  <div class="card plain" style="margin-bottom:16px">
+    <div class="head"><div><h3>Faculty</h3><div class="sub">Designation and department are <b>writable here</b> —
+      the leave form reads them as “(synced)”, and in the repo nothing has ever written them.</div></div>
+      <div class="right"><button class="btn primary" data-act="addFaculty"><span class="icon">person_add</span>Add faculty</button></div></div>
+    <div class="scroll"><table><thead><tr><th>Name</th><th>Designation</th><th>Department</th><th>Focus</th><th>Load</th><th>Access</th><th></th></tr></thead><tbody>
+      ${db.faculty.map(f=>{const n=menteeCount(f),free=f.capacity-n,gc=grantsFor(f.id).length;
+        return `<tr><td><span class="name">${esc(f.name)}</span><div class="meta">${esc(f.email)}</div></td>
+        <td>${f.designation?esc(f.designation):'<span class="chip warn">Not on record</span>'}</td>
+        <td>${esc(dept(f.deptId))}</td><td>${f.focus?esc(f.focus):'<span class="meta">—</span>'}</td>
+        <td><b>${n}</b> <span class="meta">of ${f.capacity} · ${free} free</span></td>
+        <td><span class="chip ${gc?'good':''}">${gc} granted</span></td>
+        <td class="right"><button class="btn sm" data-act="editFaculty" data-id="${f.id}"><span class="icon">edit</span>Edit</button>
+          <button class="btn sm" data-act="goAccess" data-id="${f.id}"><span class="icon">key</span>Access</button></td></tr>`;
+      }).join('')}</tbody></table></div></div>
+
+  <div class="card plain"><div class="head"><div><h3>Students</h3><div class="sub">Batch and faculty are set from
+    here. Changing the batch moves the whole institutional record, because it is read through the join.</div></div>
+    <div class="right">${un.length?`<span class="chip risk">${un.length} without faculty</span>`:`<span class="chip good">All assigned</span>`}</div></div>
+    <div class="scroll"><table><thead><tr><th>Student</th><th>USN</th><th>Batch</th><th>Faculty</th><th></th></tr></thead><tbody>
+      ${db.students.map(s=>{const i=institutionFor(s),f=facultyOf(s);
+        return `<tr><td><span class="name">${esc(s.name)}</span><div class="meta">${esc(s.email)}</div></td>
+        <td>${esc(s.usn)}</td>
+        <td><select data-act="setBatch" data-id="${s.id}">${db.batches.map(b=>{const d=db.departments.find(x=>x.id===b.deptId);
+          return `<option value="${b.id}" ${b.id===s.batchId?'selected':''}>${esc(d?d.name.split(' ').pop():'')} ${esc(b.label)}</option>`;}).join('')}</select>
+          <div class="meta">${i?esc(i.college.code):'Unseated'}</div></td>
+        <td><select data-act="setFaculty" data-id="${s.id}"><option value="">— unassigned —</option>
+          ${db.faculty.map(x=>`<option value="${x.id}" ${x.id===s.facultyId?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+          ${!f?'<div class="meta" style="color:var(--risk)">Cannot request a meeting</div>':''}</td>
+        <td class="right"><button class="btn sm" data-act="resetPw" data-id="${s.id}"><span class="icon">key</span>Reset password</button></td></tr>`;
+      }).join('')}</tbody></table></div></div>`;
+}
+
+function access(){
+  const p=db.faculty.find(f=>f.id===accessPerson)||db.faculty[0], mine=grantsFor(p.id);
+  return `<div class="fix"><span class="icon">check_circle</span><span>Everything a DIRECTOR can do in production
+    is listed below as a separate capability. Main Admin ticks the ones this person should have, at a scope, with
+    a reason. <b>Deny by default.</b></span></div>
+  <div class="card plain">
+    <div class="head"><div><h3>Access for a person</h3><div class="sub">${mine.length} of
+      ${CAP_GROUPS.reduce((n,g)=>n+g.caps.length,0)} capabilities granted. Switch to the Faculty seat to see what
+      this person can actually do.</div></div>
+      <div class="right"><select id="accessWho" style="width:auto">
+        ${db.faculty.map(f=>`<option value="${f.id}" ${f.id===p.id?'selected':''}>${esc(f.name)}</option>`).join('')}</select>
+      <button class="btn" data-act="revokeAll" ${mine.length?'':'disabled'}><span class="icon">lock</span>Revoke all</button></div></div>
+    <div class="who"><span class="chip">${esc(p.designation||'No designation')}</span>
+      <span class="chip">${esc(dept(p.deptId))}</span>
+      <span class="chip ${mine.length?'good':'risk'}">${mine.length?mine.length+' granted':'No access'}</span></div>
+    ${CAP_GROUPS.map(g=>`<div class="area ${g.sensitive?'sensitive':''}">
+      <div class="area-h"><span class="icon">${g.icon}</span>${g.area}
+        ${g.sensitive?'<span class="right"><span class="chip risk">Grant sparingly</span></span>':''}</div>
+      ${g.caps.map(([k,label,ep])=>{const on=has(p.id,k),gr=mine.find(x=>x.cap===k);
+        return `<label class="cap ${on?'on':''}"><input type="checkbox" data-act="toggleCap" data-cap="${k}" ${on?'checked':''}>
+          <span><b>${esc(label)}</b>${on&&gr?` <span class="chip good">${esc(scopeText(gr))}</span>`:''}
+          <span class="ep">${esc(ep)}</span>
+          ${on&&gr?`<span class="meta">“${esc(gr.reason)}” — ${esc(gr.by)}, ${esc(gr.at)}${gr.expires?' · expires '+fmt(gr.expires):''}</span>`:''}</span></label>`;
+      }).join('')}</div>`).join('')}</div>`;
+}
+
+/* ---------------------- INTERVIEWS (per the design) ---------------------- */
+function interviews(){
+  const cv=db.configVersion[ivPath], cfg=db.interviewConfig, qs=db.questions[ivPath];
+  const subs=[['questions','Question bank'],['specializations','Specializations'],
+              ['timelimits','Time limits'],['policy','Recording policy']];
+  return `<div class="head"><div><h3>Interview Configuration</h3>
+      <div class="sub">Question banks, specializations and time limits per degree path.</div></div></div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+    <div class="pills solid">
+      <button type="button" data-act="ivPath" data-v="UG" aria-pressed="${ivPath==='UG'}">Undergraduate</button>
+      <button type="button" data-act="ivPath" data-v="PG" aria-pressed="${ivPath==='PG'}">Postgraduate</button></div>
+    <div class="right"><span class="chip good">v${cv.version} · ${cv.state}</span>
+      <button class="btn primary" data-act="publishConfig">Publish draft to live</button></div></div>
+
+  <div class="card" style="margin-bottom:16px">
+    <div class="head" style="margin-bottom:10px"><div>
+      <h3>AI Interview Operations — Timed Interviewer</h3>
+      <div class="sub">Default per-question timer applied to new candidate sessions:
+        <b>${mmss(cfg.defaultDurationSec)}</b>. Retakes allowed: <b>${cfg.retakesAllowed}</b>.</div></div></div>
+    <div style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap">
+      <div><label>Default (sec)</label><input type="number" id="defDur" value="${cfg.defaultDurationSec}" style="width:96px"></div>
+      <button class="btn" data-act="saveDefaultDur">Save default</button>
+      <div><label>Retakes</label><input type="number" id="retakes" min="0" max="5" value="${cfg.retakesAllowed}" style="width:76px"></div>
+      <button class="btn" data-act="saveRetakes">Save retakes</button>
+    </div></div>
+
+  <div class="pills">${subs.map(([k,l])=>`<button type="button" data-act="ivSub" data-v="${k}" aria-pressed="${ivSub===k}">${l}</button>`).join('')}</div>
+
+  ${ivSub==='questions' ? `<div class="card">
+    <div class="head" style="margin-bottom:12px"><div class="right" style="margin-left:0">
+      <button class="btn primary" data-act="addQuestion">+ Add question</button></div></div>
+    <div class="scroll"><table><thead><tr><th>Question</th><th>Specialization</th><th>Time limit</th><th>Status</th><th></th></tr></thead><tbody>
+      ${qs.length? qs.map(q=>`<tr>
+        <td style="max-width:380px">${esc(q.text)}</td><td>${esc(q.specialization)}</td>
+        <td><b>${q.timeLimit}s</b> <span class="meta">${mmss(q.timeLimit)}</span>
+          ${q.timeLimit>MAX_Q_SECONDS?`<div class="chip risk">exceeds stream wall</div>`:''}</td>
+        <td><span class="chip ${q.status==='Published'?'good':''}">${q.status}</span></td>
+        <td class="right">
+          <button class="iconbtn" data-act="qPreview" data-id="${q.id}" title="Preview"><span class="icon">visibility</span></button>
+          <button class="iconbtn" data-act="qEdit" data-id="${q.id}" title="Edit"><span class="icon">edit</span></button>
+          <button class="iconbtn risk" data-act="qArchive" data-id="${q.id}" title="Archive"><span class="icon">archive</span></button></td></tr>`).join('')
+        : `<tr><td colspan="5" class="empty">No questions in this bank yet.</td></tr>`}
+    </tbody></table></div></div>` : ''}
+
+  ${ivSub==='specializations' ? `<div class="card">
+    <div class="head" style="margin-bottom:12px"><h3>Specializations — ${ivPath==='UG'?'Undergraduate':'Postgraduate'}</h3></div>
+    <div class="scroll"><table><thead><tr><th>Name</th><th>Mapped questions</th></tr></thead><tbody>
+      ${db.specializations[ivPath].map(sp=>`<tr><td class="name">${esc(sp.name)}</td>
+        <td class="meta">${qs.filter(q=>q.specialization===sp.name).length} question(s)</td></tr>`).join('')}
+    </tbody></table></div></div>` : ''}
+
+  ${ivSub==='timelimits' ? `<div class="card">
+    <div class="head" style="margin-bottom:12px"><h3>Time limits by question — ${ivPath==='UG'?'Undergraduate':'Postgraduate'}</h3></div>
+    <div class="scroll"><table><thead><tr><th>Question</th><th>Specialization</th><th>Time limit</th></tr></thead><tbody>
+      ${qs.map(q=>`<tr><td style="max-width:340px">${esc(q.text)}</td><td>${esc(q.specialization)}</td>
+        <td><b>${q.timeLimit}s</b> <span class="meta">${mmss(q.timeLimit)}</span></td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="fix" style="margin:14px 0 0"><span class="icon">check_circle</span><span>
+      <b>Total interview length is the sum of these, not 8 minutes.</b> Each question runs in its own Bedrock
+      stream, so the 8-minute wall bounds a single question — never the interview. Only a question above
+      <b>${MAX_Q_SECONDS}s</b> cannot complete in one stream.</span></div></div>` : ''}
+
+  ${ivSub==='policy' ? `<div class="head" style="margin-bottom:12px"><div><h3>Recording Policies</h3>
+      <div class="sub">Consent, capture, retention, encryption and access rules for dual-channel recordings.</div></div>
+      <div class="right"><button class="btn primary" data-act="addPolicy">+ New policy</button></div></div>
+    <div class="dashed" style="margin-bottom:14px"><b>Permanent vs temporary:</b> transcript, score, report and
+      audit history are kept permanently. Raw audio is retained for exactly 1 year from finalisation unless an
+      authorised legal/complaint hold is active on that recording.</div>
+    ${db.policies.map(p=>`<div class="card" style="margin-bottom:12px">
+      <div class="head" style="margin-bottom:0"><div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:15px;font-weight:800;font-family:var(--font-display)">${esc(p.name)}</span>
+          <span class="chip ${p.degreePath==='UG'?'ug':p.degreePath==='PG'?'pg':''}">${p.degreePath}</span>
+          ${p.active?'<span class="chip good">Active / Default</span>':''}
+          <span class="meta">v${p.version}</span></div>
+        <div class="meta" style="margin-top:6px">Consent: <b>${p.consent?'Required':'Not required'}</b> ·
+          Dual-channel: <b>${p.dualChannel?'Enabled':'Disabled'}</b> · Output: <b>${esc(p.format)}</b></div>
+        <div class="meta">Retention: <b>${esc(p.retention)}</b> · Encryption: <b>${esc(p.encryption)}</b></div>
+        <div class="meta">Access roles: <b>${esc(p.accessRoles.join(', '))}</b> · Presigned link TTL: <b>${p.ttlMinutes} min</b></div></div>
+        <div class="right"><button class="btn sm" data-act="editPolicy" data-id="${p.id}">Edit</button></div></div>
+      </div>`).join('')}` : ''}
+
+  <div class="dashed" style="margin-top:16px"><div style="font-weight:700;margin-bottom:6px">Configuration version history — ${ivPath==='UG'?'Undergraduate':'Postgraduate'}</div>
+    <div class="meta">Current: <b>v${cv.version} · ${cv.state}</b> published ${cv.publishedOn}. Older versions are
+      archived, never deleted — audit entries record every publish.</div></div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="head" style="margin-bottom:8px"><div><h3>Per-question interview timer</h3>
+      <div class="sub">Default duration applied to each question. Product default is 2:00.</div></div></div>
+    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div class="bignum">${mmss(db.interviewTiming.defaultSeconds)}</div>
+      <input type="number" id="timingDraft" min="30" max="600" value="${db.interviewTiming.defaultSeconds}" style="width:110px">
+      <span class="meta">seconds</span>
+      <button class="btn primary" data-act="saveTiming">Save default</button>
+      <button class="btn" data-act="resetTiming">Reset to 2:00</button></div></div>`;
+}
+
+function governance(){
+  return `<div class="fix"><span class="icon">check_circle</span><span><b>Gap closed:</b> every grant carries a
+    reason and every write lands in an audit anyone can read.</span></div>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="card plain"><div class="head"><h3>Live grants</h3><div class="right"><span class="chip">${db.grants.length}</span></div></div>
+      ${db.grants.length? db.grants.map(g=>`<div style="padding:9px 0;border-bottom:1px solid var(--hairline-26)">
+        <div><b>${esc(personName(g.personId))}</b> <span class="chip">${esc(CAP_LABEL[g.cap]||g.cap)}</span></div>
+        <div class="meta" style="margin-top:3px">${esc(scopeText(g))} · “${esc(g.reason)}” — ${esc(g.by)}, ${esc(g.at)}</div></div>`).join('')
+        : `<div class="empty">Nothing granted.</div>`}</div>
+    <div class="card plain"><div class="head"><h3>Audit</h3><div class="right"><span class="chip">${db.audit.length}</span></div></div>
+      ${db.audit.length? `<div class="audit">${db.audit.slice(0,16).map(a=>`<div class="audit-row">
+        <span class="act">${esc(a.action)}</span><span>${esc(a.item)}</span><span class="when">${esc(a.when)}</span></div>`).join('')}</div>`
+        : `<div class="empty">Make a change and it appears here.</div>`}</div></div>
+  ${db.credentials.length? `<div class="card plain" style="margin-top:14px">
+    <div class="head"><h3>Credentials issued</h3></div>
+    <div class="scroll"><table><thead><tr><th>Account</th><th>Issued</th><th>State</th><th></th></tr></thead><tbody>
+    ${db.credentials.map(c=>`<tr><td><span class="name">${esc(c.name)}</span><div class="meta">${esc(c.email)}</div></td>
+      <td>${esc(c.at)}</td><td><span class="chip ${c.used?'good':'warn'}">${c.used?'Viewed once':'Awaiting first sign-in'}</span></td>
+      <td class="right"><button class="btn sm" data-act="reissueId" data-id="${c.id}">Re-issue</button></td></tr>`).join('')}
+    </tbody></table></div></div>`:''}`;
+}
+
+function schema(){
+  return `<div class="card plain"><div class="head"><div><h3>The shape that admits more levels later</h3>
+    <div class="sub">Academic year, course and specialization were left out on purpose. They slot in as
+      <b>new levels</b>, not as a backfill of every student row.</div></div></div>
+    <div class="chain"><span class="node">College</span><span class="arrow">→</span>
+      <span class="node">Department</span><span class="arrow">→</span>
+      <span class="node future">Academic year</span><span class="arrow">→</span>
+      <span class="node future">Course</span><span class="arrow">→</span>
+      <span class="node future">Specialization</span><span class="arrow">→</span>
+      <span class="node">Batch</span><span class="arrow">→</span><span class="node">Student.batchId</span></div>
+    <div class="meta">Solid = built here. Dashed = the deferred levels; each costs a table and one foreign key.</div>
+    <div class="fix" style="margin-top:16px"><span class="icon">priority_high</span><span>
+      <b>The one change that unblocks everything:</b> promote <code>students.cohort_id</code> from a bare
+      <code>String</code> to a real foreign key. Until that join exists, four of the five fields on the
+      student's locked card have no data source.</span></div>
+    <div class="fix warn"><span class="icon">error</span><span><b>Do not denormalise.</b> Copying College /
+      Department / Batch / dates onto <code>students</code> is what makes the deferred levels expensive later.</span></div></div>`;
+}
+
+/* =============================== FACULTY ================================= */
+function facultySeat(){
+  const f=db.faculty.find(x=>x.id===facultyId), mine=db.students.filter(s=>s.facultyId===f.id);
+  const free=f.capacity-mine.length, gs=grantsFor(f.id), can=c=>has(f.id,c);
+  return `<div class="head"><div><div class="eyebrow">Faculty seat</div><h2>${esc(f.name)}</h2>
+      <div class="sub">${f.designation?esc(f.designation):'Designation not on record'} · ${esc(dept(f.deptId))}</div></div>
+    <div class="right"><select id="whoFaculty" style="width:auto">
+      ${db.faculty.map(x=>`<option value="${x.id}" ${x.id===f.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div></div>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-factab="students" aria-selected="${facTab==='students'}">My students</button>
+    <button type="button" role="tab" data-factab="leave" aria-selected="${facTab==='leave'}">Leave requests</button></div>
+  ${facTab==='students'? facultyStudents(f,mine,free,gs,can) : facultyLeave(f)}`;
+}
+
+function facultyStudents(f,mine,free,gs,can){
+  return `<div class="fix ${gs.length?'':'warn'}"><span class="icon">${gs.length?'key':'lock'}</span><span>
+    <b>${gs.length?'Access granted by Main Admin':'No access granted'}:</b>
+    ${gs.length? gs.map(g=>`<span class="chip good">${esc(CAP_LABEL[g.cap]||g.cap)}</span>`).join(' ')
+      : 'This seat is empty until Main Admin ticks capabilities under Access. That is deny-by-default working.'}</span></div>
+  ${can('view_students')? `<div class="card plain">
+    <div class="head"><div><h3>My students</h3><div class="sub">Rule 2: a faculty member with no group sees
+      nobody — never the whole programme.</div></div>
+      <div class="right"><span class="chip ${free<=0?'risk':free<4?'warn':'good'}">${mine.length} of ${f.capacity} · ${free} free</span></div></div>
+    ${mine.length? `<div class="scroll"><table><thead><tr><th>Student</th><th>USN</th><th>Batch</th>
+      ${can('view_progress')?'<th>Progress</th>':''}${can('review_resume')?'<th>Resume</th>':''}
+      ${can('view_interview_results')?'<th>Interview</th>':''}</tr></thead><tbody>
+      ${mine.map(s=>{const i=institutionFor(s);
+        return `<tr><td class="name">${esc(s.name)}</td><td>${esc(s.usn)}</td>
+        <td>${i?esc(i.batch.label):'—'} <span class="meta">${i?esc(i.college.code):''}</span></td>
+        ${can('view_progress')?`<td><span class="chip good">On track</span></td>`:''}
+        ${can('review_resume')?`<td><button class="btn sm">Open</button></td>`:''}
+        ${can('view_interview_results')?`<td><span class="chip">B1+ · 62</span></td>`:''}</tr>`;}).join('')}
+      </tbody></table></div>` : `<div class="empty"><b>No students assigned.</b><div class="meta" style="margin-top:6px">
+        Main Admin assigns them under People → Students.</div></div>`}</div>`
+    : `<div class="card plain"><div class="empty"><b>Student list not available.</b>
+        <div class="meta" style="margin-top:6px">Requires the <code>view_students</code> capability.</div></div></div>`}`;
+}
+
+/* ---- Leave: the shared BGSCET form, unchanged in structure and wording ---- */
+function facultyLeave(f){
+  const mine=db.leaves.filter(l=>l.facultyId===f.id);
+  if(leaveView==='dash'){
+    return `<div class="head"><div><h3>Leave requests</h3>
+        <div class="sub">The official BGSCET leave form — sign and send to Admin / Program Director.</div></div>
+      <div class="right"><button class="btn primary" data-act="newLeave"><span class="icon">add_circle</span>New leave request</button></div></div>
+      ${mine.length? mine.map(q=>`<div class="leavecard" data-act="openLeave" data-id="${q.id}">
+        <div style="flex:1"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <strong>${esc(q.id)}</strong><span class="chip">${esc(q.leaveKind)}</span></div>
+          <div class="meta" style="margin-top:3px">${esc(q.date)}</div></div>
+        <span class="chip ${leaveTone(q.status)}"><span class="icon">${leaveIcon(q.status)}</span>${esc(q.status)}</span>
+      </div>`).join('') : `<div class="empty">No leave requests yet.</div>`}`;
+  }
+  const fd=db.leaves.find(l=>l.id===leaveId);
+  if(!fd) { leaveView='dash'; return facultyLeave(f); }
+  const notEditable = !(fd.status==='Draft' || fd.status==='Returned');
+  const dis = notEditable ? 'disabled' : '';
+  return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <button class="iconbtn" data-act="backLeave" title="Back to dashboard"><span class="icon">arrow_back</span></button>
+      <div class="meta">Demo workflow — signatures shown here are simulated.</div></div>
+    ${fd.remarks? `<div class="fix warn"><span class="icon">flag</span><span>
+      <b>Returned for changes</b><div>${esc(fd.remarks)}</div></span></div>`:''}
+    <div class="form-sheet">
+      <div class="sheet-h">|| Jai Sri Gurudev ||</div>
+      <div class="sheet-sub">BGS COLLEGE OF ENGINEERING AND TECHNOLOGY,MBA</div>
+      <div class="sheet-addr">Mahalakshmipuram,Bengaluru-86.</div>
+      <div class="appfor">Application for
+        ${LEAVE_KINDS.map((k,i)=>`<span class="kindchip ${fd.leaveKind===k?'on':'off'}" data-act="setKind" data-id="${fd.id}" data-v="${esc(k)}">${esc(k)}</span>${i<LEAVE_KINDS.length-1?'<span> / </span>':''}`).join('')}
+        <span class="strike">(Strike-off, if not applicable)</span></div>
+      <div style="margin-bottom:10px">Date: <input type="text" value="${esc(fd.appDate)}" data-lf="appDate" data-id="${fd.id}" ${dis} style="width:150px;display:inline-block"></div>
+      <table class="ftable"><tbody>
+        <tr><td>Name</td><td>${esc(f.name)} <span class="synced">(synced)</span></td></tr>
+        <tr><td>Designation</td><td>${f.designation?esc(f.designation):'<span class="chip warn">Not on record</span>'} <span class="synced">(synced)</span></td></tr>
+        <tr><td>Department</td><td>${esc(dept(f.deptId))} <span class="synced">(synced)</span></td></tr>
+        <tr><td>Date</td><td><input type="text" placeholder="e.g. 12-14 Sep 2026" value="${esc(fd.date)}" data-lf="date" data-id="${fd.id}" ${dis}></td></tr>
+        <tr><td>Purpose</td><td><textarea rows="2" data-lf="purpose" data-id="${fd.id}" ${dis}>${esc(fd.purpose)}</textarea></td></tr>
+        <tr><td>Credit</td><td><input type="text" value="${esc(fd.credit)}" data-lf="credit" data-id="${fd.id}" ${dis}></td></tr>
+        <tr><td>Sanctioned</td><td>${esc(fd.sanctioned)}</td></tr>
+      </tbody></table>
+      <div class="sigrow">
+        <div class="sigbox"><div class="sigline">${fd.staffSig?esc(fd.staffSig):''}</div>
+          ${!fd.staffSig && !notEditable ? `<button class="btn sm" style="margin-top:8px" data-act="signStaff" data-id="${fd.id}"><span class="icon">draw</span>Sign</button>`:''}
+          <div class="siglabel">SIGNATURE OF STAFF</div></div>
+        <div class="sigbox"><div class="sigline">${fd.dirSig?esc(fd.dirSig):'<span class="meta" style="font-family:var(--font);font-weight:400">Awaiting</span>'}</div>
+          <div class="siglabel">PROGRAM DIRECTOR</div></div></div>
+      <div class="altlabel">Alternate Arrangements: (For Department purpose)</div>
+      <div style="margin-bottom:10px">Name: <input type="text" value="${esc(fd.altName)}" data-lf="altName" data-id="${fd.id}" ${dis} style="width:220px;display:inline-block"></div>
+      <table class="ftable"><thead><tr><th>Date</th><th>Staff Name (Alternative)</th><th>Class</th><th>Time</th><th>Remarks</th></tr></thead><tbody>
+        ${fd.altRows.map((ar,i)=>`<tr>
+          <td><input type="text" value="${esc(ar.date)}" data-alt="date" data-id="${fd.id}" data-i="${i}" ${dis}></td>
+          <td><input type="text" value="${esc(ar.staffName)}" data-alt="staffName" data-id="${fd.id}" data-i="${i}" ${dis}></td>
+          <td><input type="text" value="${esc(ar.cls)}" data-alt="cls" data-id="${fd.id}" data-i="${i}" ${dis}></td>
+          <td><input type="text" value="${esc(ar.time)}" data-alt="time" data-id="${fd.id}" data-i="${i}" ${dis}></td>
+          <td><input type="text" value="${esc(ar.remarks)}" data-alt="remarks" data-id="${fd.id}" data-i="${i}" ${dis}></td></tr>`).join('')}
+      </tbody></table>
+      <div style="margin-top:14px"><div class="sigline" style="max-width:220px">${fd.staffSig?esc(fd.staffSig):''}</div>
+        <div class="siglabel">Signature of staff.</div></div>
+    </div>
+    ${notEditable && fd.status==='Returned' ? `<div style="margin-top:14px">
+      <button class="btn" data-act="editAgain" data-id="${fd.id}"><span class="icon">edit</span>Edit &amp; resubmit</button></div>`:''}
+    ${!notEditable ? `<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn" data-act="saveDraft" data-id="${fd.id}"><span class="icon">save</span>Save draft</button>
+      ${!fd.staffSig? `<button class="btn primary" data-act="signStaff" data-id="${fd.id}"><span class="icon">draw</span>Sign &amp; submit to Program Director</button>`:''}
+      </div>`:''}`;
+}
+
+/* =============================== STUDENT ================================= */
+function studentSeat(){
+  const s=db.students.find(x=>x.id===viewerId)||db.students[0];
+  const i=institutionFor(s), f=facultyOf(s);
+  const cred=db.credentials.find(c=>c.email===s.email && !c.used);
+  return `<div class="head"><div><div class="eyebrow">Student seat</div><h2>${esc(s.name)}</h2>
+      <div class="sub">${esc(s.usn)} · ${esc(s.email)}</div></div>
+    <div class="right"><select id="whoStudent" style="width:auto">
+      ${db.students.map(x=>`<option value="${x.id}" ${x.id===s.id?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div></div>
+  ${cred? `<div class="fix warn"><span class="icon">key</span><span><b>First sign-in pending.</b> A credential was
+    issued for this account and has not been used yet.</span></div>`:''}
+  <div class="grid" style="grid-template-columns:1.05fr .95fr">
+    <div class="locked">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">
+        <span class="icon" style="color:var(--good);font-variation-settings:'FILL' 1">verified</span>
+        <span class="eyebrow">Institutional assignment — verified by Main Admin</span></div>
+      ${i? `<dl><div><dt>College</dt><dd>${esc(i.college.name)}</dd></div>
+        <div><dt>Department</dt><dd>${esc(i.dept.name)}</dd></div>
+        <div><dt>Batch</dt><dd>${esc(i.batch.label)}</dd></div>
+        <div><dt>Entry date</dt><dd>${fmt(i.batch.entry)}</dd></div>
+        <div><dt>Expected completion</dt><dd>${fmt(i.batch.completion)}</dd></div></dl>`
+        : `<div class="meta">Not seated in a batch yet.</div>`}
+      <div class="note">Locked — not editable by students. Contact your institution for corrections.</div></div>
+    <div class="card plain"><div class="head"><h3>Your faculty</h3></div>
+      ${f? `<div style="display:flex;gap:12px;align-items:center">
+        <div style="width:44px;height:44px;border-radius:50%;background:var(--primary-gradient);color:#fff;
+          display:grid;place-items:center;font-weight:800;font-family:var(--font-display)">
+          ${esc(f.name.replace(/^(Dr|Prof)\.?\s*/,'').split(' ').map(w=>w[0]).join('').slice(0,2))}</div>
+        <div><div class="name">${esc(f.name)}</div>
+          <div class="meta">${f.designation?esc(f.designation)+' · ':''}${esc(dept(f.deptId))}</div>
+          ${f.focus?`<div class="meta">Focus: ${esc(f.focus)}</div>`:''}</div></div>
+        <button class="btn primary" style="margin-top:14px;width:100%;justify-content:center" data-act="requestMeeting">
+          <span class="icon">add_comment</span>Request a meeting</button>`
+      : `<div class="empty"><b>No faculty assigned yet.</b><div class="meta" style="margin-top:6px">
+          The placement office assigns faculty. You can request a meeting once that is done.</div></div>
+        <button class="btn" style="margin-top:12px;width:100%;justify-content:center" disabled>
+          <span class="icon">add_comment</span>Request a meeting</button>`}</div></div>
+  <div class="fix" style="margin-top:16px"><span class="icon">check_circle</span><span>
+    <b>Two gaps closed here.</b> The locked card is populated <b>through the batch join</b>. And “Your faculty”
+    exists at all — across the design's 31 screens a student is never told who theirs is, yet requesting a
+    meeting <b>409s</b> without one.</span></div>`;
+}
+
+/* ============================== interaction =============================== */
+function dialog(title, sub, body, onOk, okLabel){
+  const dlg=document.getElementById('dlg'), form=document.getElementById('dlgForm');
+  form.innerHTML=`<h3>${title}</h3>${sub?`<div class="sub" style="margin-bottom:14px">${sub}</div>`:''}${body}
+    <div class="right" style="margin-top:18px"><button class="btn" value="cancel">${onOk?'Cancel':'Close'}</button>
+    ${onOk?`<button class="btn primary" value="ok">${okLabel||'Save'}</button>`:''}</div>`;
+  form.onsubmit=e=>{ if(onOk && e.submitter && e.submitter.value==='ok'){
+      const d=Object.fromEntries(new FormData(form).entries());
+      setTimeout(()=>{onOk(d); render();},0);
+    } else setTimeout(render,0); };
+  dlg.showModal();
+}
+function provision(reg){
+  const pw=makePassphrase();
+  db.students.push({id:uid('s'),name:reg.name,usn:reg.usn,email:reg.email,batchId:reg.batchId,facultyId:null});
+  issueCredential(reg.name,reg.email,pw);
+  log('Approved & provisioned',`${reg.name} — User + Student created`);
+  showCredential(reg.name,reg.email,pw,true);
+}
+function issueCredential(name,email,pw){
+  db.credentials=db.credentials.filter(c=>c.email!==email);
+  db.credentials.unshift({id:uid('cr'),name,email,at:new Date().toLocaleString('en-GB',
+    {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}),used:false});
+  log('Issued credential',email);
+}
+function showCredential(name,email,pw,provisioned){
+  dialog(provisioned?'Account provisioned':'Password re-issued',
+    'Shown once. Stored only as a scrypt hash — nobody, including Main Admin, can read it back.',
+    `<div class="cred"><div class="meta" style="color:rgba(255,255,255,.7)">${esc(name)} · ${esc(email)}</div>
+       <div class="pw"><span>${esc(pw)}</span><button type="button" class="btn sm" data-copy="${esc(pw)}">Copy</button></div>
+       <div class="hash">${esc(fakeHash(pw))}</div></div>
+     <div class="fix" style="margin-bottom:0"><span class="icon">check_circle</span><span>Four words and a number —
+       <b>${pw.length} characters</b>, clearing <code>MIN_PASSWORD_LENGTH = 12</code>, and checked against the
+       demo passwords published in AGENTS.md.</span></div>
+     <div class="fix warn" style="margin:10px 0 0"><span class="icon">info</span><span>
+       <b>In production, sign-in is Google-only.</b> A password is the dev/CI door and the break-glass account.</span></div>`, null);
+}
+function questionDialog(q){
+  const specs=db.specializations[ivPath];
+  dialog(q?'Edit question':'Add question','',
+    `<div class="field"><label>Question text</label><textarea name="text" rows="3" required>${q?esc(q.text):''}</textarea></div>
+     <div class="field"><label>Specialization</label><select name="specialization">
+       ${specs.map(sp=>`<option value="${esc(sp.name)}" ${q&&q.specialization===sp.name?'selected':''}>${esc(sp.name)}</option>`).join('')}</select></div>
+     <div class="field"><label>Time limit (seconds)</label>
+       <input type="number" name="timeLimit" min="1" value="${q?q.timeLimit:db.interviewTiming.defaultSeconds}" required>
+       <div class="meta" style="margin-top:6px">A single question above <b>${MAX_Q_SECONDS}s</b> cannot complete in
+         one Bedrock stream (8-minute wall, less the handshake margin).</div></div>
+     <label style="display:flex;align-items:center;gap:8px;font-size:13px;text-transform:none;letter-spacing:0">
+       <input type="checkbox" name="published" ${!q||q.status==='Published'?'checked':''} style="width:15px;height:15px;accent-color:var(--purple-mid)">
+       Publish immediately (otherwise saved as Draft)</label>`,
+    d=>{ const t=(d.text||'').trim(), sec=Number(d.timeLimit);
+      if(!t){toast('Question text is required.');return;}
+      if(!(sec>0)){toast('Time limit must be greater than 0.');return;}
+      if(sec>MAX_Q_SECONDS){toast(`Refused — ${sec}s exceeds the ${MAX_Q_SECONDS}s Bedrock stream wall.`);return;}
+      const row={id:q?q.id:uid('q'),text:t,specialization:d.specialization,timeLimit:sec,
+                 status:d.published?'Published':'Draft'};
+      if(q) Object.assign(q,row); else db.questions[ivPath].push(row);
+      db.configVersion[ivPath].state='Draft';
+      log(q?'Edited question':'Added question',`${ivPath} · ${t.slice(0,48)}…`);
+      toast(q?'Question updated — config is now a draft':'Question added — config is now a draft');
+    },'Save question');
+}
+function policyDialog(p){
+  dialog(p?'Edit recording policy':'New recording policy','',
+    `<div class="field"><label>Policy name</label><input name="name" value="${p?esc(p.name):''}" required></div>
+     <div class="field"><label>Degree path</label><select name="degreePath">
+       ${['UG','PG','Both'].map(v=>`<option value="${v}" ${p&&p.degreePath===v?'selected':''}>${v==='UG'?'Undergraduate':v==='PG'?'Postgraduate':'Both'}</option>`).join('')}</select></div>
+     <div class="row2">
+       <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px">
+         <input type="checkbox" name="consent" ${!p||p.consent?'checked':''} style="width:15px;height:15px;accent-color:var(--purple-mid)"> Consent required</label>
+       <label style="display:flex;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-size:13px">
+         <input type="checkbox" name="dualChannel" ${!p||p.dualChannel?'checked':''} style="width:15px;height:15px;accent-color:var(--purple-mid)"> Dual-channel capture</label></div>
+     <div class="field" style="margin-top:12px"><label>Output format</label><select name="format">
+       ${['WAV','MP3'].map(v=>`<option value="${v}" ${p&&p.format===v?'selected':''}>${v}</option>`).join('')}</select></div>
+     <div class="field"><label>Raw-audio retention</label>
+       <div class="dashed" style="border-radius:999px;padding:9px 12px">Fixed at 1 year from recording finalisation (platform-wide policy)</div></div>
+     <div class="field"><label>Encryption</label><select name="encryption">
+       ${['AES-256 at rest','AES-256 at rest + in transit'].map(v=>`<option value="${v}" ${p&&p.encryption===v?'selected':''}>${v}</option>`).join('')}</select></div>
+     <div class="field"><label>Approved access roles</label><div style="display:flex;gap:14px">
+       <label style="display:flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-size:13px">
+         <input type="checkbox" name="roleAdmin" ${!p||p.accessRoles.includes('Admin')?'checked':''} style="width:15px;height:15px;accent-color:var(--purple-mid)"> Admin</label>
+       <label style="display:flex;align-items:center;gap:7px;text-transform:none;letter-spacing:0;font-size:13px">
+         <input type="checkbox" name="roleReviewer" ${p&&p.accessRoles.includes('Reviewer')?'checked':''} style="width:15px;height:15px;accent-color:var(--purple-mid)"> Reviewer</label></div></div>
+     <div class="field"><label>Presigned-link TTL (minutes)</label>
+       <input type="number" name="ttlMinutes" value="${p?p.ttlMinutes:30}"></div>`,
+    d=>{ const roles=[d.roleAdmin&&'Admin', d.roleReviewer&&'Reviewer'].filter(Boolean);
+      const ttl=Number(d.ttlMinutes);
+      if(!(d.name||'').trim()){toast('Policy name is required.');return;}
+      if(!roles.length){toast('Select at least one access role.');return;}
+      if(!(ttl>=5 && ttl<=1440)){toast('TTL must be between 5 and 1440 minutes.');return;}
+      const row={name:d.name.trim(),degreePath:d.degreePath,consent:!!d.consent,dualChannel:!!d.dualChannel,
+        format:d.format,retention:'1 year (raw audio)',encryption:d.encryption,accessRoles:roles,ttlMinutes:ttl};
+      if(p){ Object.assign(p,row); p.version++; } else db.policies.push(Object.assign({id:uid('p'),version:1,active:false},row));
+      log(p?'Updated recording policy':'Created recording policy',row.name);
+      toast('Policy saved');
+    },'Save policy');
+}
+
+function wire(){
+  document.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;render();});
+  document.querySelectorAll('[data-factab]').forEach(b=>b.onclick=()=>{facTab=b.dataset.factab;leaveView='dash';render();});
+  const aw=document.getElementById('accessWho'); if(aw) aw.onchange=e=>{accessPerson=e.target.value;render();};
+  const wf=document.getElementById('whoFaculty'); if(wf) wf.onchange=e=>{facultyId=e.target.value;leaveView='dash';render();};
+  const ws=document.getElementById('whoStudent'); if(ws) ws.onchange=e=>{viewerId=e.target.value;render();};
+  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{
+    navigator.clipboard?.writeText(b.dataset.copy); b.textContent='Copied';});
+
+  /* leave form field edits, live into the store */
+  document.querySelectorAll('[data-lf]').forEach(el=>el.onchange=()=>{
+    const l=db.leaves.find(x=>x.id===el.dataset.id); if(l) l[el.dataset.lf]=el.value; });
+  document.querySelectorAll('[data-alt]').forEach(el=>el.onchange=()=>{
+    const l=db.leaves.find(x=>x.id===el.dataset.id); if(l) l.altRows[+el.dataset.i][el.dataset.alt]=el.value; });
+
+  document.querySelectorAll('input[data-act="toggleCap"]').forEach(cb=>cb.onchange=e=>{
+    const cap=cb.dataset.cap, p=db.faculty.find(f=>f.id===accessPerson);
+    if(!e.target.checked){ db.grants=db.grants.filter(g=>!(g.personId===p.id&&g.cap===cap));
+      log('Revoked capability',`${cap} from ${p.name}`); toast(`Revoked ${CAP_LABEL[cap]}`); render(); return; }
+    e.target.checked=false;
+    dialog(`Grant — ${esc(CAP_LABEL[cap])}`,`To <b>${esc(p.name)}</b>. Scope and reason are both required.`,
+      `<div class="field"><label>Scope</label><select name="scope" id="scopeSel">
+         ${SCOPES.map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}</select>
+         <div class="meta" id="scopeHelp" style="margin-top:5px">${SCOPES[0][2]}</div></div>
+       <div class="field" id="cohortWrap" style="display:none"><label>Which batch</label><select name="cohortId">
+         ${db.batches.map(b=>{const d=db.departments.find(x=>x.id===b.deptId);
+           return `<option value="${b.id}">${esc(d?d.name.split(' ').pop():'')} ${esc(b.label)}</option>`;}).join('')}</select></div>
+       <div class="field"><label>Reason (required)</label><textarea name="reason" rows="2" required></textarea></div>
+       <div class="field"><label>Expires (optional)</label><input type="date" name="expires"></div>`,
+      d=>{ if(!d.reason||!d.reason.trim()){toast('A reason is required');return;}
+        db.grants.unshift({id:uid('g'),personId:p.id,cap,scope:d.scope,cohortId:d.scope==='cohort'?d.cohortId:null,
+          reason:d.reason.trim(),by:'Main Admin',at:new Date().toLocaleDateString('en-GB'),expires:d.expires||null});
+        log('Granted capability',`${cap} → ${p.name} (${d.scope})`); toast(`${CAP_LABEL[cap]} granted`);
+      },'Grant');
+    const sel=document.getElementById('scopeSel');
+    if(sel) sel.onchange=ev=>{ document.getElementById('cohortWrap').style.display=ev.target.value==='cohort'?'':'none';
+      document.getElementById('scopeHelp').textContent=(SCOPES.find(s=>s[0]===ev.target.value)||SCOPES[0])[2]; };
+  });
+
+  document.querySelectorAll('select[data-act="setBatch"]').forEach(sel=>sel.onchange=e=>{
+    const s=db.students.find(x=>x.id===sel.dataset.id); s.batchId=e.target.value;
+    const i=institutionFor(s); log('Moved batch',`${s.name} → ${i?i.college.code+' '+i.batch.label:'—'}`);
+    toast(`${s.name} moved — their locked card now reads ${i?i.college.code:'—'}`); render(); });
+  document.querySelectorAll('select[data-act="setFaculty"]').forEach(sel=>sel.onchange=e=>{
+    const s=db.students.find(x=>x.id===sel.dataset.id), f=db.faculty.find(x=>x.id===e.target.value);
+    s.facultyId=e.target.value||null;
+    log(f?'Assigned faculty':'Released student',`${s.name}${f?' → '+f.name:''}`);
+    toast(f?`${s.name} can now request a meeting`:`${s.name} released to the pool`); render(); });
+
+  document.querySelectorAll('[data-act]').forEach(el=>{
+    if(el.tagName==='SELECT'||el.tagName==='INPUT') return;
+    el.onclick=ev=>{ ev.stopPropagation(); const id=el.dataset.id;
+      switch(el.dataset.act){
+        case 'toggleCollege': openCollege=openCollege===id?null:id; render(); break;
+        case 'goAccess': accessPerson=id; tab='access'; render(); break;
+        case 'ivPath': ivPath=el.dataset.v; render(); break;
+        case 'ivSub': ivSub=el.dataset.v; render(); break;
+
+        case 'addCollege': dialog('Add college','',
+          `<div class="field"><label>Name</label><input name="name" required></div>
+           <div class="field"><label>Code</label><input name="code" placeholder="BGSCET" required></div>`,
+          d=>{db.colleges.push({id:uid('c'),name:d.name,code:(d.code||'').toUpperCase(),status:'ACTIVE'});
+              log('Created college',d.name); toast('College created');}); break;
+        case 'archiveCollege':{const c=db.colleges.find(x=>x.id===id);
+          c.status=c.status==='ACTIVE'?'ARCHIVED':'ACTIVE';
+          log(c.status==='ACTIVE'?'Restored college':'Archived college',c.name);
+          toast(`${c.name} ${c.status.toLowerCase()}`); render(); break;}
+        case 'addDept': dialog('Add department','',
+          `<div class="field"><label>Name</label><input name="name" required></div>`,
+          d=>{db.departments.push({id:uid('d'),collegeId:id,name:d.name,status:'ACTIVE'});
+              log('Created department',d.name); toast('Department created');}); break;
+        case 'archiveDept':{const d=db.departments.find(x=>x.id===id);
+          d.status=d.status==='ACTIVE'?'ARCHIVED':'ACTIVE';
+          log(d.status==='ACTIVE'?'Restored department':'Archived department',d.name);
+          toast(`${d.name} ${d.status.toLowerCase()}`); render(); break;}
+        case 'addBatch': dialog('Add batch','Entry date and expected completion belong to the batch — every student seated in it reads them through the join.',
+          `<div class="field"><label>Cohort label</label><input name="label" placeholder="2026-28" required></div>
+           <div class="row2"><div class="field"><label>Entry date</label><input type="date" name="entry" required></div>
+             <div class="field"><label>Expected completion</label><input type="date" name="completion" required></div></div>
+           <div class="field"><label>Capacity</label><input type="number" name="capacity" value="60" min="1"></div>`,
+          d=>{db.batches.push({id:uid('b'),deptId:id,label:d.label,entry:d.entry,completion:d.completion,
+              capacity:+d.capacity||60,status:'ACTIVE'});
+              log('Created batch',d.label); toast('Batch created — students can be seated in it');}); break;
+        case 'editBatch':{const b=db.batches.find(x=>x.id===id);
+          dialog(`Edit batch ${esc(b.label)}`,'',
+            `<div class="field"><label>Cohort label</label><input name="label" value="${esc(b.label)}" required></div>
+             <div class="row2"><div class="field"><label>Entry date</label><input type="date" name="entry" value="${b.entry}"></div>
+               <div class="field"><label>Expected completion</label><input type="date" name="completion" value="${b.completion}"></div></div>
+             <div class="field"><label>Capacity</label><input type="number" name="capacity" value="${b.capacity}" min="1"></div>`,
+            d=>{Object.assign(b,{label:d.label,entry:d.entry,completion:d.completion,capacity:+d.capacity||b.capacity});
+                log('Updated batch',b.label); toast('Batch updated — every seated student sees it');}); break;}
+
+        case 'addFaculty': dialog('Add faculty','Creates the account and the mentor group in one step. In the repo this is CLI-only.',
+          `<div class="field"><label>Name</label><input name="name" required></div>
+           <div class="field"><label>Email</label><input name="email" type="email" required></div>
+           <div class="row2"><div class="field"><label>Designation</label><input name="designation" placeholder="Assistant Professor"></div>
+             <div class="field"><label>Department</label><select name="deptId">
+               ${db.departments.map(d=>`<option value="${d.id}">${esc(d.name)}</option>`).join('')}</select></div></div>
+           <div class="row2"><div class="field"><label>Capacity</label><input type="number" name="capacity" value="15" min="1"></div>
+             <div class="field"><label>Focus</label><input name="focus"></div></div>`,
+          d=>{const f={id:uid('f'),name:d.name,email:d.email,designation:(d.designation||'').trim(),deptId:d.deptId,
+                capacity:+d.capacity||15,focus:(d.focus||'').trim(),status:'ACTIVE'};
+              db.faculty.push(f); const pw=makePassphrase(); issueCredential(f.name,f.email,pw);
+              log('Created faculty',f.name); setTimeout(()=>showCredential(f.name,f.email,pw,true),120);},'Create'); break;
+        case 'editFaculty':{const f=db.faculty.find(x=>x.id===id);
+          dialog(`Edit ${esc(f.name)}`,'These two columns exist in the repo and have no writer at all — the leave form renders them as “(synced)” and they are blank forever.',
+            `<div class="field"><label>Designation</label><input name="designation" value="${esc(f.designation)}" placeholder="Associate Professor"></div>
+             <div class="field"><label>Department</label><select name="deptId">
+               ${db.departments.map(d=>`<option value="${d.id}" ${d.id===f.deptId?'selected':''}>${esc(d.name)}</option>`).join('')}</select></div>
+             <div class="row2"><div class="field"><label>Capacity</label><input type="number" name="capacity" value="${f.capacity}" min="1"></div>
+               <div class="field"><label>Focus</label><input name="focus" value="${esc(f.focus)}"></div></div>`,
+            d=>{Object.assign(f,{designation:(d.designation||'').trim(),deptId:d.deptId,
+                capacity:+d.capacity||f.capacity,focus:(d.focus||'').trim()});
+                log('Updated faculty record',f.name); toast('Saved — the leave form now shows it');}); break;}
+
+        case 'approve':{const r=db.registrations.find(x=>x.id===id); r.status='APPROVED'; provision(r); break;}
+        case 'reject':{const r=db.registrations.find(x=>x.id===id);
+          dialog(`Reject ${esc(r.name)}`,'A rejection needs a reason the applicant can be told.',
+            `<div class="field"><label>Reason</label><textarea name="note" rows="2" required></textarea></div>`,
+            d=>{if(!d.note||!d.note.trim()){toast('A reason is required');return;}
+                r.status='REJECTED'; log('Rejected registration',`${r.name} — ${d.note.trim()}`);
+                toast('Registration rejected');},'Reject'); break;}
+        case 'reissue':{const r=db.registrations.find(x=>x.id===id); const pw=makePassphrase();
+          issueCredential(r.name,r.email,pw); showCredential(r.name,r.email,pw,false); break;}
+        case 'reissueId':{const c=db.credentials.find(x=>x.id===id); const pw=makePassphrase();
+          issueCredential(c.name,c.email,pw); showCredential(c.name,c.email,pw,false); break;}
+        case 'resetPw':{const s=db.students.find(x=>x.id===id); const pw=makePassphrase();
+          issueCredential(s.name,s.email,pw); showCredential(s.name,s.email,pw,false); break;}
+        case 'revokeAll':{const p=db.faculty.find(f=>f.id===accessPerson), n=grantsFor(p.id).length;
+          db.grants=db.grants.filter(g=>g.personId!==p.id);
+          log('Revoked all access',`${n} capabilities from ${p.name}`);
+          toast(`All access revoked for ${p.name}`); render(); break;}
+
+        /* ---- interviews ---- */
+        case 'saveDefaultDur':{const v=Number(document.getElementById('defDur').value);
+          if(!(v>0)){toast('Default duration must be greater than 0.');break;}
+          db.interviewConfig.defaultDurationSec=v; log('Set default duration',`${v}s`);
+          toast(`Default duration set to ${mmss(v)}`); render(); break;}
+        case 'saveRetakes':{const v=Number(document.getElementById('retakes').value);
+          db.interviewConfig.retakesAllowed=Math.max(0,Math.min(5,v)); log('Set retakes',String(v));
+          toast(`Retakes set to ${db.interviewConfig.retakesAllowed}`); render(); break;}
+        case 'saveTiming':{const v=Number(document.getElementById('timingDraft').value);
+          if(!(v>=30&&v<=600)){toast('Per-question timer must be 30–600 seconds.');break;}
+          db.interviewTiming.defaultSeconds=v; log('Set per-question timer',`${v}s`);
+          toast(`Per-question timer set to ${mmss(v)}`); render(); break;}
+        case 'resetTiming': db.interviewTiming.defaultSeconds=120; log('Reset per-question timer','2:00');
+          toast('Reset to 2:00'); render(); break;
+        case 'addQuestion': questionDialog(null); break;
+        case 'qEdit': questionDialog(db.questions[ivPath].find(q=>q.id===id)); break;
+        case 'qPreview':{const q=db.questions[ivPath].find(x=>x.id===id);
+          dialog('Question preview','',
+            `<div style="background:linear-gradient(160deg,#3a1f52,#552C7E 45%,#7a2f9e 88%);color:#fff;border-radius:16px;padding:20px">
+              <div style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;opacity:.7;margin-bottom:8px">
+                Candidate view — ${ivPath==='UG'?'Undergraduate':'Postgraduate'} · ${esc(q.specialization)}</div>
+              <div style="font-size:17px;font-weight:700;line-height:1.4">${esc(q.text)}</div>
+              <div style="margin-top:14px;font-size:12.5px;opacity:.85">Time limit: ${q.timeLimit} seconds (${mmss(q.timeLimit)})</div>
+            </div>`, null); break;}
+        case 'qArchive':{const arr=db.questions[ivPath], q=arr.find(x=>x.id===id);
+          dialog('Archive question?',`This removes “${esc(q.text.slice(0,60))}…” from the live ${ivPath} bank. Question history stays in the audit trail.`,
+            '', ()=>{ db.questions[ivPath]=arr.filter(x=>x.id!==id); db.configVersion[ivPath].state='Draft';
+              log('Archived question',`${ivPath} · ${q.text.slice(0,48)}…`); toast('Question archived');},'Archive'); break;}
+        case 'publishConfig':{const cv=db.configVersion[ivPath];
+          dialog(`Publish ${ivPath} configuration?`,`This makes all questions in the ${ivPath} bank live for candidates immediately.`,
+            '', ()=>{ cv.version++; cv.state='Live';
+              cv.publishedOn=new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});
+              db.questions[ivPath].forEach(q=>q.status='Published');
+              log('Published config',`${ivPath} → v${cv.version}`); toast(`${ivPath} configuration published as v${cv.version}`);},'Publish'); break;}
+        case 'addPolicy': policyDialog(null); break;
+        case 'editPolicy': policyDialog(db.policies.find(p=>p.id===id)); break;
+
+        /* ---- leave ---- */
+        case 'openLeave': leaveId=id; leaveView='form'; render(); break;
+        case 'backLeave': leaveView='dash'; render(); break;
+        case 'newLeave':{const f=db.faculty.find(x=>x.id===facultyId);
+          const n={id:'LV-'+(2042+db.leaves.length),facultyId:f.id,leaveKind:'Casual Leave',
+            appDate:new Date().toLocaleDateString('en-GB').replace(/\//g,'-'),date:'',purpose:'',credit:'',
+            sanctioned:'—',status:'Draft',staffSig:'',dirSig:'',remarks:'',altName:'',
+            altRows:[{date:'',staffName:'',cls:'',time:'',remarks:''},{date:'',staffName:'',cls:'',time:'',remarks:''}]};
+          db.leaves.unshift(n); leaveId=n.id; leaveView='form'; toast('Draft created'); render(); break;}
+        case 'setKind':{const l=db.leaves.find(x=>x.id===id);
+          if(l.status==='Draft'||l.status==='Returned'){ l.leaveKind=el.dataset.v; render(); } break;}
+        case 'saveDraft': toast('Draft saved'); break;
+        case 'signStaff':{const l=db.leaves.find(x=>x.id===id), f=db.faculty.find(x=>x.id===facultyId);
+          dialog('Sign and submit?','Signing submits this form to the Program Director. Demo workflow — the signature is simulated.',
+            '', ()=>{ l.staffSig=f.name; l.status='Submitted'; l.remarks='';
+              log('Leave submitted',`${l.id} — ${f.name}`); toast('Signed and sent to the Program Director');},'Confirm & sign'); break;}
+        case 'editAgain':{const l=db.leaves.find(x=>x.id===id); l.status='Draft'; l.staffSig='';
+          toast('Reopened for editing'); render(); break;}
+
+        case 'requestMeeting': toast('Meeting requested with your faculty'); break;
+      }};
+  });
+}
+
+document.querySelectorAll('.seats button').forEach(b=>b.onclick=()=>{
+  seat=b.dataset.seat; if(seat==='admin') tab='institution'; if(seat==='faculty'){facTab='students';leaveView='dash';} render();});
+render();
+</script>

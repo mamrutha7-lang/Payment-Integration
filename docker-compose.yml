@@ -1,0 +1,34 @@
+services:
+  db:
+    # pgvector's PG17 image = stock Postgres 17 + the `vector` extension available
+    # to CREATE. Same PG major as the previous postgres:17-alpine, so the existing
+    # reep_pgdata volume mounts unchanged (alpine→debian is a libc/collation change
+    # only — remediated with REINDEX + REFRESH COLLATION VERSION, data preserved).
+    image: pgvector/pgvector:pg17
+    container_name: reep-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: reep
+      POSTGRES_PASSWORD: reep_dev_password
+      POSTGRES_DB: reep_dev
+    # 5433 on the host so this never collides with the PostgreSQL 17
+    # service already listening on 5432 on this machine.
+    ports:
+      - "5433:5432"
+    volumes:
+      - reep_pgdata:/var/lib/postgresql/data
+      # Creates reep_py (the database app/config.py actually uses) and the
+      # pgvector extension, replacing the manual `createdb` step. Runs only on
+      # an EMPTY data directory — an existing reep_pgdata volume keeps whatever
+      # it already has.
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      # Probe reep_py, not reep_dev: reep_dev existing proves nothing about the
+      # database the application connects to.
+      test: ["CMD-SHELL", "pg_isready -U reep -d reep_py"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  reep_pgdata:

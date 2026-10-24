@@ -1,0 +1,497 @@
+/* The landing. Cards, grids, chips and the stage rows are the global reep-v2
+ * classes; what lives here is the layout this screen alone has — the two
+ * asymmetric grids, the attendance bars, the VTU marks line chart, the
+ * academic-history cards and the readiness / recommendation rows. Nothing
+ * global is redefined. */
+
+:host {
+  display: block;
+}
+
+/* Every top-level block stacks with the handoff's 16px rhythm. */
+.grid-3,
+.grid-charts,
+.grid-wide,
+.acad,
+:host > .card {
+  margin-bottom: 16px;
+}
+:host > .card:last-child,
+:host > .grid-wide:last-child {
+  margin-bottom: 0;
+}
+
+/* One line of muted copy inside a card — the design's empty state. */
+.card-empty {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.card-empty.center {
+  text-align: center;
+  margin-top: 8px;
+}
+.card-empty a {
+  color: var(--purple-mid);
+  font-weight: 700;
+}
+
+/* --- stage cards --------------------------------------------------------- */
+.stage-rows {
+  display: flex;
+  flex-direction: column;
+}
+.stage-rows .link-row {
+  text-decoration: none;
+}
+.stage-rows .link-row .lbl {
+  font-size: 13px;
+}
+.stage-rows .link-row .icon.lead,
+.stage-rows .link-row .icon.state {
+  font-size: 17px;
+}
+/* The design draws "Not started yet" in the risk red, not the faint grey the
+   global row uses elsewhere — on a programme map an untouched module is the
+   thing worth noticing. Scoped to this screen only. */
+.link-row .icon.state.neutral,
+.stage-legend .icon.state.neutral {
+  color: var(--risk);
+}
+
+.stage-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  margin: -4px 0 18px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.stage-legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.stage-legend .icon.state {
+  font-size: 17px;
+}
+.stage-legend .icon.state.good {
+  color: var(--good);
+}
+.stage-legend .icon.state.warn {
+  color: var(--warn);
+}
+
+/* --- the two asymmetric grids ------------------------------------------- */
+.grid-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.55fr);
+  gap: 16px;
+}
+.grid-wide {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+}
+@media (max-width: 900px) {
+  .grid-charts,
+  .grid-wide {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --- attendance bars ------------------------------------------------------- */
+.att-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 4px;
+}
+.att-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.att-code {
+  flex: 0 0 auto;
+  width: 58px;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.att-track {
+  flex: 1;
+  min-width: 0;
+  height: 10px;
+  border-radius: var(--r-pill);
+  background: rgba(58, 31, 82, 0.12);
+  overflow: hidden;
+}
+.att-fill {
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, #a865c9, var(--purple-mid));
+}
+.att-pct {
+  flex: 0 0 auto;
+  min-width: 30px;
+  text-align: right;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- VTU marks line chart ---------------------------------------------------- */
+.marks {
+  display: flex;
+  gap: 6px;
+  padding-top: 14px;
+}
+.marks-axis {
+  position: relative;
+  width: 16px;
+  height: 120px;
+  flex: 0 0 auto;
+  font-size: 11px;
+  color: var(--muted);
+}
+.marks-axis span {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+}
+.marks-body {
+  flex: 1;
+  min-width: 0;
+}
+.marks-plot {
+  position: relative;
+  height: 120px;
+  border-left: 1px solid rgba(58, 31, 82, 0.22);
+}
+.marks-plot svg {
+  display: block;
+}
+.marks-grid line {
+  stroke: rgba(58, 31, 82, 0.12);
+  stroke-width: 1;
+}
+.marks-line {
+  stroke: var(--purple-mid);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.marks-pending {
+  stroke: rgba(85, 44, 126, 0.3);
+  stroke-width: 2;
+  stroke-dasharray: 4 5;
+}
+.marks-dot {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2.5px solid var(--purple-mid);
+  transform: translate(-50%, -50%);
+  box-sizing: content-box;
+}
+.marks-val {
+  position: absolute;
+  transform: translate(-50%, -24px);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.marks-labels {
+  display: flex;
+  margin-top: 6px;
+}
+.marks-labels div {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+}
+.chart-caption {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* --- academic history ------------------------------------------------------------ */
+.acad {
+  margin-bottom: 32px;
+}
+.acad-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--hairline);
+}
+.acad-title .icon {
+  font-size: 21px;
+  color: var(--purple-mid);
+}
+.acad-grid {
+  display: grid;
+  /* `min(Npx, 100%)` and not a bare `Npx`: a minmax() track whose minimum is a
+     fixed length does NOT collapse when the container is narrower than it — the
+     track keeps its minimum and the grid overflows. On a 320px handset the
+     content box inside a card is about 260px, so every one of these was wider
+     than the screen it was drawn on. `min()` caps the minimum at the container,
+     which changes nothing at any width where the track already fitted. */
+  grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.acad-empty {
+  margin-bottom: 16px;
+}
+.acad-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.acad-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px 10px;
+}
+.acad-level {
+  font-weight: 700;
+  font-size: 15px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.chip.year {
+  background: rgba(58, 31, 82, 0.06);
+  color: var(--muted);
+  font-size: 13px;
+  padding: 5px 10px;
+}
+.acad-inst {
+  font-size: 14px;
+  font-weight: 600;
+}
+.acad-board {
+  font-size: 13px;
+  color: var(--muted);
+}
+.acad-score {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 4px;
+}
+.acad-pct {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.acad-marks {
+  font-size: 13px;
+  color: var(--muted);
+}
+.acad-meta {
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.gap-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.gap-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+.gap-note {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.gap-note a {
+  color: var(--purple-mid);
+  font-weight: 700;
+}
+.gap-lines {
+  display: flex;
+  flex-direction: column;
+  margin-top: 8px;
+}
+.gap-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 13px;
+  border-top: 1px solid var(--hairline-26);
+}
+.gap-line b {
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- placement readiness ------------------------------------------------------------ */
+.readiness-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 14px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--hairline-26);
+}
+.readiness-score {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.readiness-num {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--purple-mid);
+  font-variant-numeric: tabular-nums;
+}
+.readiness-band {
+  min-width: 0;
+}
+.readiness-band .dt-sub {
+  margin-top: 6px;
+}
+.factor-list {
+  display: flex;
+  flex-direction: column;
+}
+.factor-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--hairline-26);
+}
+.factor-row:last-child {
+  border-bottom: none;
+}
+.factor-row .chip {
+  flex-shrink: 0;
+  min-width: 74px;
+  justify-content: center;
+}
+.factor-text {
+  min-width: 0;
+}
+.factor-label {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+/* --- recommendations ----------------------------------------------------------------- */
+.reco-ico {
+  color: var(--purple-mid);
+  flex-shrink: 0;
+}
+.reco-body {
+  flex: 1;
+  min-width: 0;
+}
+.reco-title {
+  font-weight: 700;
+}
+.btn.sm {
+  padding: 5px 10px;
+  font-size: 11.5px;
+  text-decoration: none;
+  cursor: pointer;
+  flex: none;
+}
+
+/* SWOC - the design's 2x2 tinted tiles under the stage cards. */
+.swoc-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.swoc-from {
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 14px;
+}
+.swoc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+@media (max-width: 640px) {
+  .swoc-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.swoc-tile {
+  border-radius: 16px;
+  padding: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+
+  b {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+  }
+  &[data-tone='good'] {
+    background: var(--good-bg, rgba(19, 122, 74, 0.1));
+    color: var(--good, #137a4a);
+  }
+  &[data-tone='risk'] {
+    background: var(--risk-bg, rgba(173, 36, 82, 0.1));
+    color: var(--risk, #ad2452);
+  }
+  &[data-tone='warn'] {
+    background: var(--warn-bg, rgba(143, 97, 0, 0.1));
+    color: var(--warn, #8f6100);
+  }
+  &[data-tone='neutral'] {
+    background: #fff;
+    color: var(--muted, #585566);
+    border: 1px solid var(--hairline, rgba(160, 138, 178, 0.42));
+  }
+}
+.swoc-empty {
+  /* Faded with opacity it measured 3.48:1 (DEF-010). The tertiary ink says
+     "nothing here yet" at a contrast that is still readable. */
+  color: var(--faint);
+  font-style: italic;
+}
+.swoc-note {
+  margin-top: 10px;
+}

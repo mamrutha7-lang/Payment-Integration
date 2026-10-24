@@ -1,0 +1,234 @@
+/* Add faculty member — this screen's layout only. Every card, chip, notice,
+   button, field, step circle and colour is the global design system in
+   apps/web/src/styles/reep-v2.scss; nothing global is redefined here.
+
+   The board is one 1000px dialog: a header, the four-step rail, a body that
+   changes per step, and a footer that always says where you are and what the
+   one action is. It is rendered as a page rather than a modal because it has
+   its own route (/admin/faculty/new) and a modal with a URL is a back button
+   that loses a half-typed form. */
+
+:host {
+  display: block;
+}
+
+/* `.head-actions` is a GLOBAL class (reep-v2.scss, beside .dt-toolbar) and is
+   deliberately NOT redefined here: it already lays the header's actions out as
+   a wrapping flex row, and a component copy of a global name is the drift this
+   repo's check_style_duplicates rule exists to stop. */
+
+/* The dialog body: one column, the footer pinned under it. */
+.wizard-card {
+  max-width: 1000px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wizard-rail {
+  list-style: none;
+  margin: 0;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--hairline-26);
+}
+
+.wizard-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px 24px;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.designation-field {
+  flex: 1 1 300px;
+}
+
+.employee-field {
+  flex: 1 1 240px;
+}
+
+/* The required star. Risk colour, because the board draws it in risk and a
+   star nobody can see is not a required marker. */
+.required-mark {
+  color: var(--risk);
+}
+
+.retry {
+  margin-left: 8px;
+}
+
+.wizard-help {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* --- "What happens next", the review list and the invite ---------------- */
+
+.next-card,
+.summary-card,
+.invite-card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.next-card {
+  margin-top: auto;
+}
+
+.next-title {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.next-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.next-step {
+  font-weight: 700;
+  font-size: 12.5px;
+  margin: 0 0 4px;
+}
+
+.next-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0;
+}
+
+.summary-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.summary-list dt {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin: 0 0 2px;
+}
+
+.summary-list dd {
+  margin: 0;
+  font-size: 12.8px;
+  color: var(--ink);
+}
+
+.plain-list {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* The activation link wraps rather than scrolls: it is read out loud and
+   pasted into a message, so every character has to be on screen. */
+.activation-link {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--ink);
+  background: var(--tint-2);
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-btn);
+  padding: 10px 12px;
+  margin: 0;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.invite-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* --- Step 3's function list -------------------------------------------- */
+
+.function-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.function-row {
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-card);
+  padding: 10px 12px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.function-name {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.function-desc {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0;
+  padding-left: 26px;
+}
+
+/* --- The footer --------------------------------------------------------- */
+
+.wizard-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 24px;
+  border-top: 1px solid var(--hairline-42);
+}
+
+.footer-position {
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* The review row's exception sentence, under its chip. It sits in a `dd` beside
+   a chip rather than in a notice because the review card's job is to be read
+   top to bottom before the one irreversible button, and a reason that moved to
+   a notice would be read as a warning about something else. */
+.external-reason {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}

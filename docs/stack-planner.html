@@ -1,0 +1,522 @@
+<title>REEP Stack Planner</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+
+<style>
+  :root {
+    --ground:      #f4f6f6;
+    --surface:     #ffffff;
+    --surface-2:   #e9eeee;
+    --ink:         #101a1d;
+    --ink-2:       #435a60;
+    --ink-3:       #6f868d;
+    --rule:        #d0dadb;
+    --accent:      #10615d;
+    --accent-soft: #dcedea;
+    --store:       #8a6410;
+    --store-soft:  #f5ead0;
+    --ext:         #6a4a8e;
+    --ext-soft:    #ece3f4;
+    --guard:       #a62f2a;
+    --guard-soft:  #f8dfdd;
+    --f-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --f-body:    'Newsreader', Georgia, serif;
+    --f-mono:    'JetBrains Mono', ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:#0c1315; --surface:#121b1e; --surface-2:#182427;
+      --ink:#e3ebeb; --ink-2:#a6babe; --ink-3:#7b9096; --rule:#26383c;
+      --accent:#5ac6bb; --accent-soft:#10312e;
+      --store:#d8a944; --store-soft:#33280e;
+      --ext:#b492d7; --ext-soft:#241a32;
+      --guard:#f18a84; --guard-soft:#381715;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:#0c1315; --surface:#121b1e; --surface-2:#182427;
+    --ink:#e3ebeb; --ink-2:#a6babe; --ink-3:#7b9096; --rule:#26383c;
+    --accent:#5ac6bb; --accent-soft:#10312e;
+    --store:#d8a944; --store-soft:#33280e;
+    --ext:#b492d7; --ext-soft:#241a32;
+    --guard:#f18a84; --guard-soft:#381715;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page { max-width: 1560px; margin: 0 auto; padding: 44px 24px 90px; }
+
+  .top { border-bottom: 2px solid var(--ink); padding-bottom: 20px; margin-bottom: 26px; }
+  .eyebrow {
+    font-family: var(--f-mono); font-size: 11px; font-weight: 500;
+    letter-spacing: .22em; text-transform: uppercase; color: var(--accent); margin: 0 0 14px;
+  }
+  h1 {
+    font-family: var(--f-display); font-weight: 800;
+    font-size: clamp(34px, 5.4vw, 62px); line-height: .96; letter-spacing: -.03em;
+    margin: 0 0 16px; text-wrap: balance;
+  }
+  .standfirst { color: var(--ink-2); max-width: 76ch; margin: 0; font-size: clamp(17px,1.7vw,19px); }
+  .standfirst strong { color: var(--ink); font-weight: 600; }
+
+  figure { margin: 0; }
+  .figframe { background: var(--surface); border: 1px solid var(--rule); padding: 16px; overflow-x: auto; }
+  figcaption {
+    font-family: var(--f-mono); font-size: 12px; line-height: 1.6; color: var(--ink-3);
+    margin-top: 14px; padding-left: 14px; border-left: 2px solid var(--accent); max-width: 100ch;
+  }
+  figcaption b { color: var(--ink-2); font-weight: 700; }
+
+  .dg { display: block; width: 100%; min-width: 1180px; height: auto; }
+  .dg text { font-family: var(--f-mono); fill: var(--ink); }
+  .t-title { font-family: var(--f-display); font-weight: 800; font-size: 34px; letter-spacing: -.02em; }
+  .t-sub   { font-size: 12px; fill: var(--ink-2); }
+  .t-col   { font-family: var(--f-display); font-weight: 700; font-size: 15px; letter-spacing: .05em; }
+  .t-role  { font-size: 10px; fill: var(--ink-3); }
+  .t-grp   { font-family: var(--f-display); font-weight: 700; font-size: 9.5px; letter-spacing: .13em; fill: var(--accent); }
+  .t-grp-g { font-family: var(--f-display); font-weight: 700; font-size: 9.5px; letter-spacing: .13em; fill: var(--guard); }
+  .t-grp-s { font-family: var(--f-display); font-weight: 700; font-size: 9.5px; letter-spacing: .13em; fill: var(--store); }
+  .t-l     { font-size: 10px; fill: var(--ink-2); }
+  .t-lg    { font-size: 10px; fill: var(--guard); }
+  .t-num   { font-family: var(--f-display); font-weight: 800; font-size: 15px; }
+  .t-leg   { font-size: 11px; fill: var(--ink-2); }
+  .t-park  { font-size: 10px; fill: var(--ink-3); }
+  .t-c     { text-anchor: middle; }
+
+  .card       { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
+  .card-store { fill: var(--surface); stroke: var(--store);  stroke-width: 2; }
+  .card-opt   { fill: var(--surface); stroke: var(--ink-3);  stroke-width: 1.6; stroke-dasharray: 7 5; }
+  .cap        { fill: var(--accent-soft); stroke: none; }
+  .cap-store  { fill: var(--store-soft);  stroke: none; }
+  .cap-opt    { fill: var(--surface-2);   stroke: none; }
+  .divider    { stroke: var(--rule); stroke-width: 1.2; }
+  .badge      { fill: none; stroke: var(--accent); stroke-width: 1.6; }
+  .badge-s    { fill: none; stroke: var(--store);  stroke-width: 1.6; }
+  .badge-o    { fill: none; stroke: var(--ink-3);  stroke-width: 1.6; }
+  .park       { fill: none; stroke: var(--ink-3); stroke-width: 1.4; stroke-dasharray: 5 5; }
+  .parkbox    { fill: var(--surface-2); stroke: var(--rule); stroke-width: 1.2; }
+  .rail       { fill: none; stroke: var(--accent); stroke-width: 2.2; marker-end: url(#pa); }
+  .mk-a       { fill: var(--accent); }
+  .sw-acc     { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 2; }
+  .sw-store   { fill: var(--store-soft);  stroke: var(--store);  stroke-width: 2; }
+  .sw-opt     { fill: none; stroke: var(--ink-3); stroke-width: 1.6; stroke-dasharray: 5 4; }
+  .sw-guard   { fill: var(--guard-soft);  stroke: var(--guard);  stroke-width: 2; }
+  .sw-park    { fill: var(--surface-2);   stroke: var(--rule);   stroke-width: 1.6; }
+
+  .howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin: 34px 0 0; }
+  .howto > div { background: var(--surface); padding: 15px 17px; }
+  .howto h5 { font-family: var(--f-display); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; margin: 0 0 7px; color: var(--accent); }
+  .howto p { margin: 0; font-size: 15px; color: var(--ink-2); }
+  .howto code { font-family: var(--f-mono); font-size: .85em; background: var(--surface-2); padding: .1em .3em; border-radius: 3px; }
+
+  footer { margin-top: 40px; border-top: 1px solid var(--rule); padding-top: 16px;
+           font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-3); line-height: 1.7; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div style="max-width:1100px;margin:16px auto;padding:14px 18px;border:2px solid #b4341f;border-radius:8px;background:#fdeeea;color:#5a1a0e;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:14px;line-height:1.55">
+  <strong style="display:block;font-size:15px;margin-bottom:6px">PARTLY STALE &mdash; drawn 2026-08. <code>AGENTS.md</code> is the current truth.</strong>
+  The diagram below still shows the <strong>LiveKit voice worker</strong> (<code>Dockerfile.voice</code>,
+  <code>voice_agent.py</code>, <code>.venv-voice</code>, <code>/api/voice/*</code>) and the
+  <strong>&ldquo;Voice worker (dependency completeness)&rdquo;</strong> CI job. Both were removed in 2026-09.
+  There is no fourth process and no second venv: the one voice experience is <code>/student/assistant</code>,
+  a WebSocket <em>inside</em> the API process speaking to Amazon Nova 2 Sonic on Bedrock, with no API key.
+  CI has five jobs &mdash; <code>api</code>, <code>pii-gate</code>, <code>api-imports</code>, <code>web</code>, <code>cdk</code>.
+  The <strong>DIRECTOR role</strong> was removed on 2026-09-10; there is one office account, role ADMIN. The labels on this sheet were corrected on 2026-10-08 to the product's words — <strong>Main Admin (role ADMIN)</strong>, the placement office; <strong>Faculty (role MENTOR)</strong>, a mentor only once assigned a mentee; <code>/api/admin</code> and <code>require_admin</code> — see <code>AGENTS.md</code> &ldquo;Who is who&rdquo;.
+</div>
+
+<div class="page">
+
+  <header class="top">
+    <p class="eyebrow">One sheet · every technology · in assembly order</p>
+    <h1>REEP Stack Planner</h1>
+    <p class="standfirst">
+      The whole stack as a single plan: <strong>six stages, left to right, in the order you actually bring
+      the system up</strong> — data, API, AI &amp; realtime, client, the optional voice process, then ship.
+      Every version is the one pinned in the repository, every gate is one that really refuses, and the
+      bottom lane holds what is present but deliberately not on the roadmap.
+    </p>
+  </header>
+
+  <figure>
+    <div class="figframe">
+      <svg class="dg" viewBox="0 0 1850 1030" role="img"
+           aria-label="A single-sheet roadmap planner of the REEP technology stack. Six stages run left to right in assembly order: data (PostgreSQL 17 with pgvector, SQLAlchemy, Alembic, seeds and retention), API (Python 3.14, FastAPI, uvicorn, identity, files and the boot and scope gates), AI and realtime (the LLM adapter and egress gate, pgvector knowledge retrieval, the OpenAI Realtime interview relay), client (Angular 22, lazy routes, the same-origin proxy, AudioWorklet audio), an optional voice worker process on Python 3.12 with the LiveKit and Groq cascade, and ship (Docker images, production compose, probes and CI). A bottom lane lists retired, never-deploy, tombstoned and frozen parts of the repository.">
+
+        <defs>
+          <marker id="pa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <polygon class="mk-a" points="0,1 10,5 0,9" />
+          </marker>
+        </defs>
+
+        <!-- ============ HEADER ============ -->
+        <text class="t-title" x="30" y="52">REEP — THE WHOLE STACK, IN ASSEMBLY ORDER</text>
+        <text class="t-sub" x="30" y="80">Angular 22 SPA · Python 3.14 / FastAPI · PostgreSQL 17 + pgvector · OpenAI Realtime relay in-process · optional LiveKit voice worker on Python 3.12</text>
+        <text class="t-sub" x="30" y="100">Follow the arrows: nothing in a later stage runs until the earlier one is up. Versions are as pinned; gates are refusals, not warnings.</text>
+
+        <!-- legend -->
+        <rect class="sw-acc"   x="1240" y="24" width="22" height="14" />
+        <text class="t-leg" x="1270" y="35">required now</text>
+        <rect class="sw-store" x="1400" y="24" width="22" height="14" />
+        <text class="t-leg" x="1430" y="35">data at rest</text>
+        <rect class="sw-opt"   x="1560" y="24" width="22" height="14" />
+        <text class="t-leg" x="1590" y="35">optional</text>
+        <rect class="sw-guard" x="1240" y="58" width="22" height="14" />
+        <text class="t-leg" x="1270" y="69">a gate that refuses</text>
+        <rect class="sw-park"  x="1470" y="58" width="22" height="14" />
+        <text class="t-leg" x="1500" y="69">parked / retired</text>
+        <text class="t-park" x="1240" y="98">Each stage card lists what you install, what it</text>
+        <text class="t-park" x="1240" y="113">exposes, and the one thing that bites people.</text>
+
+        <!-- ============ RAIL ARROWS ============ -->
+        <path class="rail" d="M302,182 H330" />
+        <path class="rail" d="M606,182 H634" />
+        <path class="rail" d="M910,182 H938" />
+        <path class="rail" d="M1214,182 H1242" />
+        <path class="rail" d="M1518,182 H1546" />
+
+        <!-- ============ STAGE 1 — DATA ============ -->
+        <rect class="card-store" x="30" y="150" width="270" height="672" />
+        <rect class="cap-store"  x="32" y="152" width="266" height="60" />
+        <rect class="badge-s" x="42" y="162" width="26" height="26" />
+        <text class="t-num t-c" x="55" y="181" style="fill:var(--store)">1</text>
+        <text class="t-col" x="78" y="181" style="fill:var(--store)">DATA</text>
+        <text class="t-role" x="44" y="203">bring this up first — nothing runs without it</text>
+        <line class="divider" x1="32" y1="212" x2="298" y2="212" />
+
+        <text class="t-grp-s" x="44" y="246">SERVER</text>
+        <text class="t-l" x="44" y="264">pgvector/pgvector:pg17</text>
+        <text class="t-l" x="44" y="279">container reep-postgres</text>
+        <text class="t-l" x="44" y="294">host 5433 → 5432 (never 5432)</text>
+        <text class="t-l" x="44" y="309">database reep_py · volume reep_pgdata</text>
+        <text class="t-l" x="44" y="324">initdb: CREATE EXTENSION vector</text>
+        <text class="t-l" x="44" y="339">healthcheck pg_isready -d reep_py</text>
+
+        <text class="t-grp-s" x="44" y="363">SCHEMA</text>
+        <text class="t-l" x="44" y="381">SQLAlchemy 2.0.52 — models/ is truth</text>
+        <text class="t-l" x="44" y="396">each module in models/__init__.py</text>
+        <text class="t-l" x="44" y="411">Alembic 1.19.1 · 42 migrations</text>
+        <text class="t-l" x="44" y="426">python -m alembic upgrade head</text>
+        <text class="t-l" x="44" y="441">55 tables</text>
+
+        <text class="t-grp-s" x="44" y="465">ENUM TRAPS</text>
+        <text class="t-l" x="44" y="483">new column ⇒ CREATE TYPE first</text>
+        <text class="t-l" x="44" y="498">new table + old enum ⇒ create_type=False</text>
+        <text class="t-l" x="44" y="513">two columns ⇒ one Enum instance</text>
+
+        <text class="t-grp-s" x="44" y="537">SEEDS</text>
+        <text class="t-lg" x="44" y="555">app.seed — REFUSES on ENV=prod</text>
+        <text class="t-l" x="44" y="570">app.seed_kb — prod-safe, KB only</text>
+        <text class="t-l" x="44" y="585">app.seed_roster — USN → email</text>
+        <text class="t-l" x="44" y="600">app.grant_access — one login, one row</text>
+
+        <text class="t-grp-s" x="44" y="624">RETENTION</text>
+        <text class="t-l" x="44" y="642">purge_expired: soft → redact → hard</text>
+        <text class="t-l" x="44" y="657">interview records: 180-day clock</text>
+        <text class="t-l" x="44" y="672">orphan sweep on every boot</text>
+
+        <text class="t-grp-g" x="44" y="696">WATCH OUT</text>
+        <text class="t-l" x="44" y="714">initdb runs ONLY on an empty volume</text>
+        <text class="t-l" x="44" y="729">existing reep_pgdata keeps what it has</text>
+        <text class="t-l" x="44" y="744">run the two statements by hand once</text>
+
+        <!-- ============ STAGE 2 — API ============ -->
+        <rect class="card" x="334" y="150" width="270" height="672" />
+        <rect class="cap"  x="336" y="152" width="266" height="60" />
+        <rect class="badge" x="346" y="162" width="26" height="26" />
+        <text class="t-num t-c" x="359" y="181" style="fill:var(--accent)">2</text>
+        <text class="t-col" x="382" y="181" style="fill:var(--accent)">API</text>
+        <text class="t-role" x="348" y="203">the only process that holds credentials</text>
+        <line class="divider" x1="336" y1="212" x2="602" y2="212" />
+
+        <text class="t-grp" x="348" y="246">RUNTIME</text>
+        <text class="t-l" x="348" y="264">python:3.14-slim · USER 10001</text>
+        <text class="t-l" x="348" y="279">FastAPI 0.141.1</text>
+        <text class="t-l" x="348" y="294">uvicorn[standard] 0.52.3 · port 3300</text>
+        <text class="t-l" x="348" y="309">--proxy-headers · graceful 110 s</text>
+        <text class="t-l" x="348" y="324">Pydantic 2.13.4 + settings 2.15.0</text>
+        <text class="t-l" x="348" y="339">psycopg[binary] 3.3.4</text>
+
+        <text class="t-grp" x="348" y="363">SURFACE — ALL UNDER /api</text>
+        <text class="t-l" x="348" y="381">auth · student (43) · mentor · admin</text>
+        <text class="t-l" x="348" y="396">leaves · register · agent · voice</text>
+        <text class="t-l" x="348" y="411">interview + records (auto-discovered)</text>
+        <text class="t-l" x="348" y="426">/health liveness · /ready readiness</text>
+        <text class="t-l" x="348" y="441">/docs off in prod unless DOCS_ENABLED</text>
+
+        <text class="t-grp" x="348" y="465">IDENTITY</text>
+        <text class="t-l" x="348" y="483">Google OIDC only — pyjwt[crypto] 2.13.0</text>
+        <text class="t-l" x="348" y="498">cryptography 50.0.0 · httpx 0.28.1</text>
+        <text class="t-l" x="348" y="513">scrypt 16384/8/1/64 · HS256 12 h</text>
+        <text class="t-l" x="348" y="528">reep_session httpOnly (+Secure in prod)</text>
+        <text class="t-l" x="348" y="543">token_version revocation · 60 s cache</text>
+
+        <text class="t-grp" x="348" y="567">FILES &amp; MAIL</text>
+        <text class="t-l" x="348" y="585">document_store: magic bytes, random name</text>
+        <text class="t-l" x="348" y="600">PDF / PNG / JPEG only, ≤ 10 MB</text>
+        <text class="t-l" x="348" y="615">reportlab 5.0.0 — local PDF, no network</text>
+        <text class="t-l" x="348" y="630">mailer: unique dedupe_key, send-once</text>
+        <text class="t-l" x="348" y="645">python-multipart 0.0.32</text>
+
+        <text class="t-grp-g" x="348" y="669">GATES THAT REFUSE</text>
+        <text class="t-lg" x="348" y="687">production_boot_failures() → no bind</text>
+        <text class="t-lg" x="348" y="702">password login 403 outside dev allowlist</text>
+        <text class="t-lg" x="348" y="717">require_mentor admits staff, not a scope</text>
+        <text class="t-lg" x="348" y="732">MENTOR with no group ⇒ NOBODY</text>
+
+        <text class="t-grp-g" x="348" y="756">WATCH OUT</text>
+        <text class="t-l" x="348" y="774">--reload wedges a stale worker (Windows)</text>
+        <text class="t-l" x="348" y="789">kill 3300 and restart after edits</text>
+
+        <!-- ============ STAGE 3 — AI & REALTIME ============ -->
+        <rect class="card" x="638" y="150" width="270" height="672" />
+        <rect class="cap"  x="640" y="152" width="266" height="60" />
+        <rect class="badge" x="650" y="162" width="26" height="26" />
+        <text class="t-num t-c" x="663" y="181" style="fill:var(--accent)">3</text>
+        <text class="t-col" x="686" y="181" style="fill:var(--accent)">AI &amp; REALTIME</text>
+        <text class="t-role" x="652" y="203">inside the API process — not a fifth one</text>
+        <line class="divider" x1="640" y1="212" x2="906" y2="212" />
+
+        <text class="t-grp" x="652" y="246">ADAPTER</text>
+        <text class="t-l" x="652" y="264">app/ai/llm.py — OpenAI-compatible</text>
+        <text class="t-l" x="652" y="279">sakana → groq → mistral → openrouter</text>
+        <text class="t-l" x="652" y="294">→ gemini → cohere · first key wins</text>
+        <text class="t-l" x="652" y="309">or explicit LLM_BASE_URL + MODEL + KEY</text>
+
+        <text class="t-grp-g" x="652" y="333">GATE — RULE 1</text>
+        <text class="t-lg" x="652" y="351">student_data_egress_allowed(base_url)</text>
+        <text class="t-lg" x="652" y="366">loopback always · remote needs the flag</text>
+        <text class="t-lg" x="652" y="381">refused ⇒ resume built deterministically</text>
+
+        <text class="t-grp" x="652" y="405">KNOWLEDGE</text>
+        <text class="t-l" x="652" y="423">pgvector 0.5.0 · dimensionless vector</text>
+        <text class="t-l" x="652" y="438">0.5 · cosine + 0.5 · ts_rank</text>
+        <text class="t-l" x="652" y="453">cosine distance floor 0.32</text>
+        <text class="t-l" x="652" y="468">mistral-embed · none ⇒ full-text only</text>
+
+        <text class="t-grp" x="652" y="492">INTERVIEW RELAY</text>
+        <text class="t-l" x="652" y="510">websockets 15.0.1 — a pin, not a bound</text>
+        <text class="t-l" x="652" y="525">wss api.openai.com/v1/realtime</text>
+        <text class="t-l" x="652" y="540">PCM16 LE mono 24 kHz, both ways</text>
+        <text class="t-l" x="652" y="555">create_response=false · ONE call site</text>
+        <text class="t-l" x="652" y="570">hr / dm / ba / fa + 4-phase machine</text>
+        <text class="t-l" x="652" y="585">close codes 4001–4014</text>
+        <text class="t-lg" x="652" y="600">consent: 4013 fails closed, 4014 open</text>
+        <text class="t-lg" x="652" y="615">audio OFF — two independent switches</text>
+
+        <text class="t-grp" x="652" y="639">RETAINED FOR ROLLBACK</text>
+        <text class="t-l" x="652" y="657">google-adk 2.7.0 · litellm 1.96.2</text>
+        <text class="t-l" x="652" y="672">orchestrator behind /api/agent/ask</text>
+        <text class="t-l" x="652" y="687">Ollama gemma3:12b · num_ctx 16384</text>
+
+        <text class="t-grp-g" x="652" y="711">WATCH OUT</text>
+        <text class="t-l" x="652" y="729">a 2nd response.create site kills the</text>
+        <text class="t-l" x="652" y="744">invariant — and no test will notice</text>
+
+        <!-- ============ STAGE 4 — CLIENT ============ -->
+        <rect class="card" x="942" y="150" width="270" height="672" />
+        <rect class="cap"  x="944" y="152" width="266" height="60" />
+        <rect class="badge" x="954" y="162" width="26" height="26" />
+        <text class="t-num t-c" x="967" y="181" style="fill:var(--accent)">4</text>
+        <text class="t-col" x="990" y="181" style="fill:var(--accent)">CLIENT</text>
+        <text class="t-role" x="956" y="203">same-origin over /api, or the cookie is lost</text>
+        <line class="divider" x1="944" y1="212" x2="1210" y2="212" />
+
+        <text class="t-grp" x="956" y="246">TOOLCHAIN</text>
+        <text class="t-l" x="956" y="264">Node 22 · npm 11.16.0</text>
+        <text class="t-l" x="956" y="279">Angular 22.1 · @angular/build (esbuild)</text>
+        <text class="t-l" x="956" y="294">TypeScript ~6.0.2 · SCSS</text>
+        <text class="t-l" x="956" y="309">ng serve :4200</text>
+
+        <text class="t-grp" x="956" y="333">ARCHITECTURE</text>
+        <text class="t-l" x="956" y="351">standalone components, no NgModules</text>
+        <text class="t-l" x="956" y="366">signals + ReactiveForms</text>
+        <text class="t-l" x="956" y="381">lazy loadComponent on every route</text>
+        <text class="t-l" x="956" y="396">~142 kB initial (was 1.23 MB eager)</text>
+        <text class="t-l" x="956" y="411">budget: warn 250 kB / error 400 kB</text>
+
+        <text class="t-grp" x="956" y="435">TRANSPORT</text>
+        <text class="t-l" x="956" y="453">apiBase = '/api'</text>
+        <text class="t-l" x="956" y="468">fetch(..., credentials: 'include')</text>
+        <text class="t-l" x="956" y="483">proxy /api → 3300 · ws: true</text>
+        <text class="t-l" x="956" y="498">prod: TLS proxy or the cookie is lost</text>
+
+        <text class="t-grp" x="956" y="522">UI</text>
+        <text class="t-l" x="956" y="540">styles/reep-v2.scss — global classes</text>
+        <text class="t-l" x="956" y="555">.card .dt-table .chip .dense-*</text>
+        <text class="t-l" x="956" y="570">status = text + colour, never colour</text>
+        <text class="t-l" x="956" y="585">apexcharts 6.8 · ng-apexcharts 3.0</text>
+        <text class="t-l" x="956" y="600">rxjs 7.8 · livekit-client 2.21</text>
+
+        <text class="t-grp" x="956" y="624">AUDIO</text>
+        <text class="t-l" x="956" y="642">AudioWorklet 'pcm-recorder'</text>
+        <text class="t-l" x="956" y="657">44.1k → 24k · 20 ms chunks</text>
+        <text class="t-l" x="956" y="672">AudioContext playback @ 24 kHz</text>
+
+        <text class="t-grp" x="956" y="696">CHECKS</text>
+        <text class="t-l" x="956" y="714">vitest 4 · jsdom 28 · prettier 3.8</text>
+
+        <text class="t-grp-g" x="956" y="738">WATCH OUT</text>
+        <text class="t-l" x="956" y="756">one `component:` re-eagers the bundle</text>
+        <text class="t-l" x="956" y="771">only ng build catches it</text>
+
+        <!-- ============ STAGE 5 — VOICE (OPTIONAL) ============ -->
+        <rect class="card-opt" x="1246" y="150" width="270" height="672" />
+        <rect class="cap-opt"  x="1248" y="152" width="266" height="60" />
+        <rect class="badge-o" x="1258" y="162" width="26" height="26" />
+        <text class="t-num t-c" x="1271" y="181" style="fill:var(--ink-3)">5</text>
+        <text class="t-col" x="1294" y="181" style="fill:var(--ink-2)">VOICE — OPTIONAL</text>
+        <text class="t-role" x="1260" y="203">a fourth process, its own Python, its own venv</text>
+        <line class="divider" x1="1248" y1="212" x2="1514" y2="212" />
+
+        <text class="t-grp" x="1260" y="246">WHY IT IS SEPARATE</text>
+        <text class="t-l" x="1260" y="264">livekit-agents needs Python &lt; 3.15</text>
+        <text class="t-l" x="1260" y="279">py -3.12 -m venv .venv-voice</text>
+        <text class="t-l" x="1260" y="294">Dockerfile.voice — python:3.12-slim</text>
+        <text class="t-l" x="1260" y="309">reads the SAME apps/api-py/.env</text>
+
+        <text class="t-grp" x="1260" y="333">PACKAGES</text>
+        <text class="t-l" x="1260" y="351">livekit-agents 1.6.10</text>
+        <text class="t-l" x="1260" y="366">livekit-plugins-groq 1.6.10</text>
+        <text class="t-l" x="1260" y="381">livekit-plugins-silero 1.6.10</text>
+        <text class="t-l" x="1260" y="396">noise-cancellation 0.3.0</text>
+        <text class="t-l" x="1260" y="411">edge-tts 7.2.8 — opt-in, warned</text>
+
+        <text class="t-grp" x="1260" y="435">CASCADE — NOT SPEECH-TO-SPEECH</text>
+        <text class="t-l" x="1260" y="453">BVC noise cancellation</text>
+        <text class="t-l" x="1260" y="468">Silero VAD — local, no key</text>
+        <text class="t-l" x="1260" y="483">Groq whisper-large-v3-turbo</text>
+        <text class="t-l" x="1260" y="498">Groq llama-3.3-70b-versatile</text>
+        <text class="t-l" x="1260" y="513">Groq TTS (VOICE_TTS default)</text>
+
+        <text class="t-grp" x="1260" y="537">WIRING</text>
+        <text class="t-l" x="1260" y="555">stdlib urllib only · no DB driver</text>
+        <text class="t-l" x="1260" y="570">heartbeat ~15 s → /api/voice/heartbeat</text>
+        <text class="t-l" x="1260" y="585">turns → /api/voice/transcript</text>
+        <text class="t-l" x="1260" y="600">REEP_API_URL = http://api:3300</text>
+        <text class="t-lg" x="1260" y="615">VOICE_WORKER_SECRET must MATCH</text>
+
+        <text class="t-grp" x="1260" y="639">STATE TODAY</text>
+        <text class="t-l" x="1260" y="657">no UI caller — the rollback path</text>
+        <text class="t-l" x="1260" y="672">409 no worker · 503 no keys</text>
+        <text class="t-l" x="1260" y="687">runbook: group messages by channel</text>
+
+        <text class="t-grp-g" x="1260" y="711">WATCH OUT</text>
+        <text class="t-l" x="1260" y="729">a secret mismatch loses every turn</text>
+        <text class="t-l" x="1260" y="744">and the call still sounds perfect</text>
+
+        <!-- ============ STAGE 6 — SHIP ============ -->
+        <rect class="card" x="1550" y="150" width="270" height="672" />
+        <rect class="cap"  x="1552" y="152" width="266" height="60" />
+        <rect class="badge" x="1562" y="162" width="26" height="26" />
+        <text class="t-num t-c" x="1575" y="181" style="fill:var(--accent)">6</text>
+        <text class="t-col" x="1598" y="181" style="fill:var(--accent)">SHIP</text>
+        <text class="t-role" x="1564" y="203">images, compose, probes, CI</text>
+        <line class="divider" x1="1552" y1="212" x2="1818" y2="212" />
+
+        <text class="t-grp" x="1564" y="246">IMAGES</text>
+        <text class="t-l" x="1564" y="264">Dockerfile — python:3.14-slim</text>
+        <text class="t-l" x="1564" y="279">runtime deps only — no pytest</text>
+        <text class="t-l" x="1564" y="294">Dockerfile.voice — python:3.12-slim</text>
+
+        <text class="t-grp" x="1564" y="318">COMPOSE (PROD)</text>
+        <text class="t-l" x="1564" y="336">db — no published port</text>
+        <text class="t-l" x="1564" y="351">migrate — runs ONCE, its own unit</text>
+        <text class="t-l" x="1564" y="366">api — waits for migrate completed</text>
+        <text class="t-l" x="1564" y="381">voice-worker — service-name URL</text>
+        <text class="t-l" x="1564" y="396">volumes reep_pgdata + reep_uploads</text>
+        <text class="t-l" x="1564" y="411">${VAR:?set VAR} — fail loudly</text>
+
+        <text class="t-grp" x="1564" y="435">PROBES</text>
+        <text class="t-l" x="1564" y="453">healthcheck = /health (liveness)</text>
+        <text class="t-l" x="1564" y="468">never /ready — a blip restarts all</text>
+        <text class="t-l" x="1564" y="483">stop_grace 120 s api · 960 s worker</text>
+
+        <text class="t-grp" x="1564" y="507">CI — THREE JOBS</text>
+        <text class="t-l" x="1564" y="525">api: pgvector svc + REEP_REQUIRE_DB=1</text>
+        <text class="t-l" x="1564" y="540">worker-imports: clean 3.12 env</text>
+        <text class="t-l" x="1564" y="555">web: tsc + vitest + ng build budget</text>
+        <text class="t-l" x="1564" y="570">28 pytest modules</text>
+
+        <text class="t-grp-g" x="1564" y="594">PROD FLIPS</text>
+        <text class="t-lg" x="1564" y="612">ENV=prod ⇒ Secure cookie, needs TLS</text>
+        <text class="t-lg" x="1564" y="627">AUTH_SECRET ≥ 32 chars, not the repo's</text>
+        <text class="t-lg" x="1564" y="642">DOCS_ENABLED off</text>
+        <text class="t-lg" x="1564" y="657">VOICE_WORKER_SECRET required</text>
+
+        <text class="t-grp-g" x="1564" y="681">WATCH OUT</text>
+        <text class="t-l" x="1564" y="699">no TLS ⇒ the cookie is dropped</text>
+        <text class="t-l" x="1564" y="714">login 'succeeds', app acts logged-out</text>
+
+        <!-- ============ PARKED LANE ============ -->
+        <rect class="park" x="30" y="852" width="1790" height="138" />
+        <text class="t-col" x="44" y="878" style="fill:var(--ink-3)">NOT ON THE ROADMAP — present in the repo, deliberately</text>
+
+        <rect class="parkbox" x="44" y="890" width="420" height="86" />
+        <text class="t-grp" x="58" y="910" style="fill:var(--ink-3)">RETIRED — DELETED, IGNORE ANY REFERENCE</text>
+        <text class="t-park" x="58" y="930">Next.js · React · NestJS · Prisma · server-only</text>
+        <text class="t-park" x="58" y="946">apps/api — the whole previous stack</text>
+        <text class="t-park" x="58" y="962">migrated away; nothing here still runs</text>
+
+        <rect class="parkbox" x="490" y="890" width="420" height="86" />
+        <text class="t-grp-g" x="504" y="910">NEVER DEPLOY</text>
+        <text class="t-park" x="504" y="930">apps/interview-realtime — standalone prototype, deleted 2026-09</text>
+        <text class="t-park" x="504" y="946">no authentication, no database: anyone reaching</text>
+        <text class="t-park" x="504" y="962">the port opens a billed Realtime session</text>
+
+        <rect class="parkbox" x="936" y="890" width="420" height="86" />
+        <text class="t-grp" x="950" y="910" style="fill:var(--ink-3)">TOMBSTONE — DO NOT USE</text>
+        <text class="t-park" x="950" y="930">app/memory.py — no importers anywhere</text>
+        <text class="t-park" x="950" y="946">opened its own session and bypassed every</text>
+        <text class="t-park" x="950" y="962">ownership rule in app/conversations.py</text>
+
+        <rect class="parkbox" x="1382" y="890" width="420" height="86" />
+        <text class="t-grp" x="1396" y="910" style="fill:var(--ink-3)">FROZEN — SAYS SO, RATHER THAN READING ZERO</text>
+        <text class="t-park" x="1396" y="930">agent_runs · AGENT_RUNS_COLLECTED = False</text>
+        <text class="t-park" x="1396" y="946">/api/agent/feedback 404s, metrics collected:false</text>
+        <text class="t-park" x="1396" y="962">flip the constant back to True on rollback</text>
+      </svg>
+    </div>
+    <figcaption>
+      <b>One sheet, six stages, read left to right.</b> The arrows are a dependency order, not decoration: the
+      API cannot boot without stage 1, the client is unusable without stage 2, and stage 5 is skippable
+      entirely — the dashed border says so. Red text marks the places that <em>refuse</em> rather than warn,
+      and every stage ends with the failure that actually catches people out on that stage.
+    </figcaption>
+  </figure>
+
+  <div class="howto">
+    <div>
+      <h5>The four commands</h5>
+      <p><code>docker compose up -d</code> → <code>alembic upgrade head</code> → <code>uvicorn app.main:app --port 3300</code> → <code>npx ng serve</code>. Stage 5 only if you need voice.</p>
+    </div>
+    <div>
+      <h5>Where the ports are</h5>
+      <p>Postgres <code>5433</code> on the host, API <code>3300</code>, web <code>4200</code> proxying <code>/api</code> straight through. Nothing else listens.</p>
+    </div>
+    <div>
+      <h5>Two rules that outrank the plan</h5>
+      <p>Student PII never reaches a remote model unbidden, and staff scope is decided by role — a MENTOR with no group sees nobody, never the whole programme.</p>
+    </div>
+    <div>
+      <h5>Deeper detail</h5>
+      <p>This sheet is the plan. <code>docs/architecture.md</code> and the blueprint page carry the sequence diagrams, the close-code table and the full configuration surface.</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>
+      REEP Stack Planner · compiled from <code>apps/api-py</code>, <code>apps/web</code>,
+      <code>docker-compose*.yml</code>, <code>requirements*.txt</code>, <code>package.json</code> and
+      <code>.github/workflows/ci.yml</code>.
+    </p>
+  </footer>
+</div>

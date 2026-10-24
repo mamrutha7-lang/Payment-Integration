@@ -1,0 +1,271 @@
+/* Faculty leave. The dashboard uses the global card/chip/btn classes; the form
+   sheet itself comes from the shared partial, so it renders identically here and
+   in the approver's queue. */
+@use '../../../../styles/leave-sheet';
+:host {
+  display: block;
+}
+
+.req-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: border-color 0.14s ease;
+}
+.req-card:hover {
+  border-color: rgba(122, 47, 158, 0.45);
+}
+.req-main {
+  min-width: 0;
+}
+.req-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.req-top strong {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.req-kind {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+.lv-lede {
+  max-width: 70ch;
+}
+.lv-empty {
+  color: var(--muted);
+  font-size: 13px;
+}
+.lv-back {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--hairline-42);
+  background: var(--surface);
+  color: var(--brand-purple);
+}
+
+/* The application date under the strike-off line, and the in-slot Sign. */
+.app-date {
+  font-size: 13px;
+  margin-top: 10px;
+}
+.app-date-val {
+  display: inline-block;
+  min-width: 140px;
+  border-bottom: 1px solid #999;
+  padding: 1px 3px;
+}
+.sig-btn {
+  padding: 8px 13px;
+  font-size: 12.5px;
+}
+.sig-btn .icon {
+  font-size: 15px;
+}
+.req-dates {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+.form-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.form-bar-note {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.remarks {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(173, 36, 82, 0.07);
+  border: 1px solid rgba(173, 36, 82, 0.22);
+  color: #8f2a48;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+.remarks .icon {
+  font-size: 17px;
+  flex: none;
+}
+
+.add-row {
+  margin-top: 8px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.form-hint {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.state-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.state-note .icon {
+  font-size: 16px;
+  color: var(--purple-mid);
+}
+.state-note.risk {
+  color: var(--risk);
+}
+.state-note.risk .icon {
+  color: var(--risk);
+}
+
+/* The download link in the bar above a signed request; the form is untouched. */
+.paper-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  text-decoration: none;
+}
+
+/* --- Phase 4: the three things that sit AROUND the form ------------------ */
+/* Nothing here touches `.sheet` or any of its rules. The document is what it
+   was; these are the covering note, the filing clerk and the colleague's
+   answer, drawn beside it. */
+
+.cover-head {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  margin: 22px 0 8px;
+}
+
+.cover-card {
+  cursor: default;
+}
+
+.cover-what {
+  color: var(--muted);
+}
+
+.attach-block {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attach-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.attach-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.attach-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.attach-meta {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+/* INVISIBLE BUT FOCUSABLE — signature.component.scss's rule, for the same
+   reason. `hidden` is `display: none`, which takes the input out of the focus
+   order, and a <label> is not tabbable either: the picker would be mouse-only,
+   which is the bug the 2026-09-10 audit found on /mentor/signature and on the
+   public /register. Geometry, never display. */
+.lv-file__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* The ring has to be visible on the label, or the focusable invisible input
+   is a keyboard trap: focus lands somewhere with nothing drawn. */
+.lv-file:focus-within {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+}
+
+.btn.danger {
+  background: var(--risk-bg);
+  color: var(--risk);
+  border-color: transparent;
+}
+
+/* The allowance card (B10.2). A READ beside the list, never a cell on the
+   sheet — see the component docstring. */
+
+.lv-balance {
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lv-balance-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.lv-balance-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.lv-balance-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.lv-balance-kind {
+  font-weight: 600;
+  min-width: 96px;
+}

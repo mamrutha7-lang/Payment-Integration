@@ -1,0 +1,402 @@
+@if (!canSit()) {
+  <p class="room-err" role="status">Mock interviews are a student feature.</p>
+}
+
+@if (isRehearsal()) {
+  <p class="rehearsal" role="status">
+    <span class="icon" aria-hidden="true">visibility_off</span>
+    Rehearsal. You are the Main Admin: the interview runs exactly as a student's does, and
+    nothing from it is stored — no transcript, no report, no recording.
+  </p>
+}
+
+@if (!secureContext) {
+  <p class="room-err" role="alert">
+    REEP must be open over HTTPS (or from localhost) before the microphone can be used. This is the
+    usual cause when the dev server is opened from a phone by IP address.
+  </p>
+}
+
+<!--
+  The interview terms. Shown before the first interview under the CURRENT terms,
+  and again whenever the server's version string moves — the grant is scoped to a
+  version server-side, so an old yes cannot carry a student past new copy.
+
+  ACCEPTING WRITES A ROW (POST /api/interview/consent) AND THE INTERVIEW DOES NOT
+  START UNTIL IT DOES. THE THREE SCOPES ARE THE COLLEGE'S (B6.1), SO THIS PANEL
+  STATES THEM AND DOES NOT OFFER THEM. The copy is DERIVED from `policy()`
+  wherever the answer can change, and falls back to the wording that was true
+  before the table existed when the card has not loaded — which is also the
+  answer the server gives a college that has configured nothing.
+-->
+@if (showConsent()) {
+  <div
+    class="consent"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="consent-title"
+    aria-describedby="consent-body"
+  >
+    <div
+      #consentCard
+      class="consent__card"
+      tabindex="-1"
+      (keydown.escape)="cancelConsent()"
+      (keydown.tab)="trapConsentTab($event)"
+      (keydown.shift.tab)="trapConsentTab($event)"
+    >
+      <h2 id="consent-title" class="consent__title">Before you start</h2>
+      <div id="consent-body" class="consent__body">
+        <h3 class="consent__sub">1. The interviewer hears you live</h3>
+        <p>
+          While the interview is running, your microphone audio is streamed to
+          {{ consentProvider() }} so it can hear you and reply. Nothing from your student record —
+          marks, attendance, USN, resume — is sent with it, and the interviewer cannot look any of
+          it up. Your own words are the only thing that leaves this machine.
+        </p>
+        <p class="consent__warn">
+          Please don't say marks, medical information, passwords or other sensitive details out
+          loud.
+        </p>
+
+        <h3 class="consent__sub">2. What your college keeps</h3>
+        @if (policy(); as card) {
+          @if (card.policy.store_transcript) {
+            <p>
+              A written transcript of the interview — your answers and the interviewer's questions —
+              is stored on the college's server as part of your interview record, together with an
+              AI-generated practice score. Your mentor and the placement office can read it.
+              <strong>Clearing your conversation does not delete the interview record</strong>;
+              ask the placement cell to remove it. It is deleted automatically after
+              {{ card.policy.retention_days }} days.
+            </p>
+          } @else {
+            <p>
+              Your college has chosen <strong>not to keep a transcript</strong> of this interview.
+              Your answers are not written down anywhere afterwards. The practice score IS kept —
+              it is what you and your mentor read — and it quotes nobody. It is deleted
+              automatically after {{ card.policy.retention_days }} days.
+            </p>
+          }
+
+          <h3 class="consent__sub">3. A recording of your voice</h3>
+          @if (card.policy.store_audio) {
+            <p>
+              Your college records this interview. The audio of your answers is saved on the
+              college's server next to the transcript, and <strong>staff review it</strong> — your
+              mentor and the placement office can listen to it. It is deleted on the same
+              {{ card.policy.retention_days }}-day clock. Recording also has to be switched on by
+              whoever runs this deployment, so your <strong>Mock interviews</strong> screen marks
+              each interview that actually has one — the policy is not the same fact as audio kept,
+              and only that screen can tell you which happened.
+              @if (card.recording_enabled_on_server === false) {
+                <strong>Recording is switched off on this server today</strong>, so nothing is
+                captured until whoever runs it turns it on.
+              }
+            </p>
+          } @else {
+            <p>
+              Your college does <strong>not</strong> record these interviews. No audio of your voice
+              is kept after the call ends.
+            </p>
+          }
+
+          <h3 class="consent__sub">4. How many, and how long</h3>
+          <p>
+            You have <strong>{{ card.usage.completed }} of {{ card.usage.daily_cap }}</strong>
+            practice interviews used in the last 24 hours, and each one runs for up to
+            {{ minutesOf(card.policy.time_limit_seconds) }} minutes. An interview that drops out
+            does not cost you one of them.
+          </p>
+        } @else {
+          <p>
+            A written transcript of the interview — your answers and the interviewer's questions —
+            is stored on the college's server as part of your interview record, together with an
+            AI-generated practice score. Your mentor and the placement office can read it.
+            <strong>Clearing your conversation does not delete the interview record</strong>; ask
+            the placement cell to remove it. It is deleted automatically after 180 days.
+          </p>
+        }
+      </div>
+
+      @if (consentError()) {
+        <p class="consent__error" role="alert">{{ consentError() }}</p>
+      }
+
+      <p class="consent__grant">
+        Choosing “I agree” records on the college's server that you were shown this. What is kept
+        is your college's decision, not a setting on this page — if you would rather it were
+        different, that is a conversation with the placement cell.
+      </p>
+
+      <div class="consent__actions">
+        <button type="button" class="btn" [disabled]="consentBusy()" (click)="cancelConsent()">
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn primary"
+          [disabled]="consentBusy()"
+          (click)="acceptConsent()"
+        >
+          {{ consentBusy() ? 'Recording your consent…' : 'I agree — start the interview' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (!showConsent() && consentError()) {
+  <p class="room-err" role="alert">{{ consentError() }}</p>
+}
+
+@if (notice(); as banner) {
+  <div
+    class="banner"
+    [attr.data-tone]="banner.tone"
+    [attr.role]="banner.tone === 'error' ? 'alert' : 'status'"
+  >
+    <span class="banner__text">{{ banner.text }}</span>
+    <button type="button" class="link-btn banner__dismiss" (click)="dismissNotice()">
+      Dismiss
+    </button>
+  </div>
+}
+
+<!--
+  THE STAGE. The design system's dark stage (01-design-system.md §1): one dark
+  card with the interviewer's briefing at the top, the orb and the status in
+  the middle, the round's four stages as a stepper, and the controls at the
+  foot. Everything a person needs mid-answer is on it; the transcript and the
+  report sit below.
+-->
+<section class="stage" [attr.data-state]="state()" aria-label="Interview">
+  <header class="stage__head">
+    <div class="who">
+      <span class="who__avatar" aria-hidden="true">
+        <span class="icon">record_voice_over</span>
+      </span>
+      <span class="who__text">
+        <span class="who__title">{{ briefing().interviewer }}</span>
+        <span class="who__sub">{{ briefing().round }} · Tier-1 MNC campus bar</span>
+      </span>
+    </div>
+
+    <!-- The arc. The relay names the phase; before it does, nothing is lit. -->
+    <ol class="steps" aria-label="Interview stages">
+      @for (step of steps(); track step.key) {
+        <li
+          class="steps__item"
+          [attr.data-status]="step.status"
+          [attr.aria-current]="step.status === 'current' ? 'step' : null"
+        >
+          <span class="steps__dot" aria-hidden="true"></span>
+          <span class="steps__label">{{ step.label }}</span>
+        </li>
+      }
+    </ol>
+
+    @if (active()) {
+      <span
+        class="stage__clock"
+        [class.stage__clock--warn]="clockWarning()"
+        aria-label="Session duration"
+      >
+        <time>{{ clockLabel() }}</time>
+        <span class="stage__cap"> / {{ capLabel() }}</span>
+      </span>
+    }
+  </header>
+
+  <div class="stage__centre">
+    <!--
+      The orb. Its parent already carries `.rvz-overlay`, so VoiceVisualizer
+      ADOPTS it rather than wrapping the canvas in a full-screen overlay; the
+      stylesheet then lays it out inline at `.orb.rvz-overlay`. Decoration only —
+      every word of status lives in the pill and caption beneath it.
+    -->
+    <div class="orb rvz-overlay" aria-hidden="true">
+      <canvas #orbCanvas class="orb__canvas"></canvas>
+    </div>
+
+    <div class="stage__status" [attr.data-state]="state()" role="status" aria-live="polite">
+      <span class="stage__dot"></span>
+      <span class="stage__label">{{ statusLabel() }}</span>
+    </div>
+
+    <!--
+      THE LIVE CAPTION. The interviewer's newest words, large, where the eye
+      already is — a student answering does not look down at a transcript. It
+      is the same text the transcript keeps; nothing is shown here that is not
+      kept there.
+    -->
+    @if (active() && caption(); as line) {
+      <p class="caption" [class.caption--partial]="line.partial">{{ line.text }}</p>
+    } @else {
+      <p class="stage__caption">{{ statusCaption() }}</p>
+    }
+
+    @if (showWait()) {
+      <div class="wait" role="status">
+        <span class="wait__bar" aria-hidden="true"><span class="wait__fill"></span></span>
+        <span class="wait__text"
+          >{{ thinkingHint() }}
+          <span class="wait__secs" aria-hidden="true">{{ thinkingSeconds() }}s</span></span
+        >
+      </div>
+    }
+  </div>
+
+  <footer class="stage__foot">
+    @if (!active()) {
+      <!-- The round picker — radio behaviour on plain buttons. Only while
+           idle; a live interview's row is fixed. -->
+      @if (canSit()) {
+        <div class="picker" role="radiogroup" aria-label="Interview round">
+          @for (spec of specializationOptions; track spec.label) {
+            <button
+              type="button"
+              class="picker__pill"
+              role="radio"
+              [attr.aria-checked]="selectedSpecialization() === spec.key"
+              [class.picker__pill--active]="selectedSpecialization() === spec.key"
+              [title]="spec.label"
+              (click)="pick(spec.key)"
+            >
+              {{ spec.short }}
+            </button>
+          }
+        </div>
+        <p class="picker__blurb">{{ briefing().blurb }}</p>
+        <!-- Speaker or earphones: decides whether the echo gate holds the
+             microphone while the interviewer is audible (audio-route.ts). -->
+        <div class="route" role="radiogroup" aria-label="Where you hear the interviewer">
+          <button
+            type="button"
+            class="picker__pill"
+            role="radio"
+            [attr.aria-checked]="audioRoute() === 'speaker'"
+            [class.picker__pill--active]="audioRoute() === 'speaker'"
+            (click)="chooseRoute('speaker')"
+          >
+            Speaker
+          </button>
+          <button
+            type="button"
+            class="picker__pill"
+            role="radio"
+            [attr.aria-checked]="audioRoute() === 'earphones'"
+            [class.picker__pill--active]="audioRoute() === 'earphones'"
+            (click)="chooseRoute('earphones')"
+          >
+            Earphones
+          </button>
+        </div>
+      }
+
+      <div class="stage__controls">
+        <button
+          type="button"
+          class="cta cta--start"
+          [disabled]="!canStart()"
+          (click)="toggle()"
+        >
+          <span class="icon" aria-hidden="true">mic</span>
+          Start interview
+        </button>
+        @if (isStudent() && consent()) {
+          <span class="terms">
+            <span class="icon" aria-hidden="true">verified_user</span>
+            Terms accepted {{ consentGrantedLabel() }} · recording {{ recordingLabel() }}
+            <button type="button" class="link-btn" (click)="openConsent()">Read again</button>
+          </span>
+        }
+      </div>
+    } @else {
+      <div class="stage__controls stage__controls--live">
+        <span class="meter" aria-label="Microphone level">
+          <span class="icon meter__icon" aria-hidden="true">mic</span>
+          <span
+            class="meter__track"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            [attr.aria-valuenow]="micPercent()"
+          >
+            <span class="meter__fill" [style.width.%]="micPercent()"></span>
+          </span>
+        </span>
+        @if (liveSpecialization(); as specLabel) {
+          <span class="live-track">{{ specLabel }}</span>
+        }
+        <!-- Switchable mid-interview: plugging earphones in should stop the
+             gate at once, without an End and a new Start. -->
+        <div class="route route--live" role="radiogroup" aria-label="Where you hear the interviewer">
+          <button
+            type="button"
+            class="picker__pill"
+            role="radio"
+            [attr.aria-checked]="audioRoute() === 'speaker'"
+            [class.picker__pill--active]="audioRoute() === 'speaker'"
+            (click)="chooseRoute('speaker')"
+          >
+            Speaker
+          </button>
+          <button
+            type="button"
+            class="picker__pill"
+            role="radio"
+            [attr.aria-checked]="audioRoute() === 'earphones'"
+            [class.picker__pill--active]="audioRoute() === 'earphones'"
+            (click)="chooseRoute('earphones')"
+          >
+            Earphones
+          </button>
+        </div>
+        <button type="button" class="cta cta--end" aria-pressed="true" (click)="toggle()">
+          <span class="icon" aria-hidden="true">stop</span>
+          End interview
+        </button>
+      </div>
+    }
+  </footer>
+</section>
+
+<!--
+  The scorecard, the moment the relay sends it — which is immediately BEFORE it
+  closes the socket, so this is the one place it is guaranteed to exist even if
+  the `interview_evaluations` row failed to write. The durable copy is on
+  /student/interviews. The card carries its own calibration copy; do not add a
+  score, a grade or a congratulation around it here.
+-->
+@if (reportView(); as view) {
+  <section class="report" aria-label="Practice report">
+    <interview-report-card [view]="view" />
+    @if (isRehearsal()) {
+      <p class="report__link">Rehearsal — this report is not saved anywhere.</p>
+    } @else {
+      <p class="report__link">
+        Saved to <a class="room-link" routerLink="/student/interviews">your past interviews</a> with
+        the full transcript.
+      </p>
+    }
+  </section>
+}
+
+<section class="tscript" aria-label="Interview transcript">
+  <h2 class="tscript__title">Transcript</h2>
+  <div #transcript class="tscript__log" role="log" aria-live="polite">
+    @if (lines().length === 0) {
+      <p class="tscript__empty">The live transcript appears here as you and the interviewer speak.</p>
+    } @else {
+      @for (line of lines(); track line.key) {
+        <p class="tline" [attr.data-role]="line.role" [class.tline--partial]="line.partial">
+          <span class="tline__who">{{
+            line.role === 'interviewer' ? 'Interviewer' : line.role === 'you' ? 'You' : 'Session'
+          }}</span>
+          <span class="tline__text">{{ line.text }}</span>
+        </p>
+      }
+    }
+  </div>
+</section>

@@ -1,0 +1,177 @@
+<div class="panel" data-p="admin-mail">
+  <div class="dt-header">
+    <div>
+      <h1 class="dt-title">Email delivery</h1>
+      <div class="dt-sub">
+        Every message REEP has tried to send. <strong>Sent</strong> means the provider accepted
+        it, not that it arrived — use the check below to ask whether an address can receive
+        anything at all.
+      </div>
+    </div>
+  </div>
+
+  <!-- ------------------------------------------------ the suppression check -->
+  <div class="card">
+    <h2 class="dt-title sm">Can this address receive mail?</h2>
+    <form class="filters" (submit)="$event.preventDefault(); check()">
+      <label class="sr-only" for="mail-probe">Email address</label>
+      <input
+        id="mail-probe"
+        class="ctrl grow"
+        type="email"
+        inputmode="email"
+        autocomplete="off"
+        [placeholder]="ownAddress"
+        [value]="probeAddress()"
+        (input)="probeAddress.set($any($event.target).value)"
+      />
+      <button type="submit" class="btn primary" [disabled]="probing() || !probeAddress().trim()">
+        <span class="icon" aria-hidden="true">search</span>{{ probing() ? 'Checking…' : 'Check' }}
+      </button>
+    </form>
+
+    @if (probeError(); as problem) {
+      <div class="notice risk" role="alert">
+        <span class="icon" aria-hidden="true">error</span><div>{{ problem }}</div>
+      </div>
+    }
+
+    @if (probe(); as answer) {
+      @if (!answer.checked) {
+        <div class="notice warn" role="status">
+          <span class="icon" aria-hidden="true">warning</span>
+          <div>
+            <strong>Not checked.</strong> The provider could not be asked about
+            {{ answer.email }} — no mail transport on this deployment, or the task cannot read
+            the suppression list. This is not the same as “the address is fine”.
+          </div>
+        </div>
+      } @else if (answer.suppressed) {
+        <div class="notice risk" role="status">
+          <span class="icon" aria-hidden="true">error</span>
+          <div>
+            <strong>Suppressed since {{ answer.since }} ({{ answer.reason }}).</strong>
+            Nothing REEP sends reaches {{ answer.email }}. Every code and every link to this
+            address is accepted by the provider and delivered nowhere.
+          </div>
+        </div>
+        <div class="footbar">
+          <button type="button" class="btn" [disabled]="lifting()" (click)="lift()">
+            <span class="icon" aria-hidden="true">delete</span>
+            {{ lifting() ? 'Removing…' : 'Remove from the suppression list' }}
+          </button>
+        </div>
+      } @else {
+        <div class="notice good" role="status">
+          <span class="icon" aria-hidden="true">check</span>
+          <div>
+            <strong>Deliverable.</strong> {{ answer.email }} is not suppressed. If a code is still
+            missing, it left REEP — check the row below, then the student’s spam folder.
+          </div>
+        </div>
+      }
+    }
+
+    @if (lifted(); as address) {
+      <p class="dt-sub" role="status">
+        {{ address }} was removed from the suppression list. Ask the student to request the code
+        again. If the mailbox is still dead the provider will suppress it once more.
+      </p>
+    }
+  </div>
+
+  <!-- --------------------------------------------------------- the mail log -->
+  <div class="card">
+    <h2 class="dt-title sm">Recent messages</h2>
+    <form class="filters" (submit)="$event.preventDefault(); load()">
+      <label class="sr-only" for="mail-recipient">Recipient starts with</label>
+      <input
+        id="mail-recipient"
+        class="ctrl grow"
+        type="text"
+        placeholder="Recipient starts with…"
+        autocomplete="off"
+        [value]="recipient()"
+        (input)="recipient.set($any($event.target).value)"
+      />
+      <label class="sr-only" for="mail-kind">Kind</label>
+      <input
+        id="mail-kind"
+        class="ctrl"
+        type="text"
+        placeholder="Kind, e.g. onboarding-code"
+        autocomplete="off"
+        [value]="kind()"
+        (input)="kind.set($any($event.target).value)"
+      />
+      <label class="inline-check">
+        <input
+          type="checkbox"
+          [checked]="failedOnly()"
+          (change)="failedOnly.set($any($event.target).checked)"
+        />
+        Failed only
+      </label>
+      <button type="submit" class="btn primary" [disabled]="loading()">
+        <span class="icon" aria-hidden="true">search</span>{{ loading() ? 'Loading…' : 'Show' }}
+      </button>
+    </form>
+
+    @if (error(); as problem) {
+      <div class="notice risk" role="alert">
+        <span class="icon" aria-hidden="true">error</span><div>{{ problem }}</div>
+      </div>
+    }
+
+    @if (loaded() && rows().length === 0) {
+      <div class="notice" role="status">
+        <span class="icon" aria-hidden="true">info</span>
+        <div>No messages match. With no filters, an empty list means REEP has sent nothing.</div>
+      </div>
+    }
+
+    @if (rows().length) {
+      <p class="dt-sub" role="status">
+        {{ rows().length }} shown, {{ failures() }} failed.
+      </p>
+      <table class="dt-table">
+        <thead>
+          <tr>
+            <th scope="col">When</th>
+            <th scope="col">Kind</th>
+            <th scope="col">To</th>
+            <th scope="col">Status</th>
+            <th scope="col">Detail</th>
+            <th scope="col"><span class="sr-only">Check the address</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.id) {
+            <tr>
+              <td>{{ row.sent_at | date: 'd MMM y, HH:mm' }}</td>
+              <td>{{ row.kind }}</td>
+              <td>{{ row.recipient }}</td>
+              <td>
+                @if (row.status === 'FAILED') {
+                  <span class="chip risk">
+                    <span class="icon" aria-hidden="true">error</span>Failed
+                  </span>
+                } @else if (row.status === 'SUPPRESSED') {
+                  <span class="chip neutral">Not sent</span>
+                } @else {
+                  <span class="chip good">Accepted</span>
+                }
+              </td>
+              <td>{{ row.error ?? '—' }}</td>
+              <td>
+                <button type="button" class="btn sm" (click)="checkRow(row.recipient)">
+                  <span class="icon" aria-hidden="true">mail</span>Check
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+</div>

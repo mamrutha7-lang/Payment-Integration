@@ -1,0 +1,59 @@
+.fa-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.fa-field {
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.fa-wide {
+  grid-column: 1 / -1;
+}
+
+.fa-target {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+
+  legend {
+    font-weight: 600;
+    font-size: 13px;
+    padding: 0;
+    margin-bottom: 6px;
+  }
+}
+
+.fa-results {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  max-height: 260px;
+  overflow-y: auto;
+
+  li {
+    padding: 8px 4px;
+    border-bottom: 1px solid var(--hairline);
+  }
+}
+
+.fa-meta {
+  display: block;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.fa-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

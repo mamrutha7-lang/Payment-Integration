@@ -1,0 +1,135 @@
+/* Signature. Colours from the reep-v2 tokens; `.card`, `.btn`, `.icon` are
+ * global. Everything scoped is prefixed `sg-`. */
+
+.sg {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.sg-head {
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin: 0 0 6px;
+  }
+  p {
+    margin: 0;
+    max-width: 70ch;
+    color: var(--muted);
+    font-size: 14.5px;
+  }
+}
+
+.sg-error {
+  color: var(--risk);
+  background: var(--risk-bg);
+  border-radius: 10px;
+  padding: 10px 13px;
+  margin: 0;
+  font-size: 13.5px;
+}
+
+.sg-flash {
+  color: var(--good);
+  background: var(--good-bg);
+  border-radius: 10px;
+  padding: 10px 13px;
+  margin: 0;
+  font-size: 13.5px;
+}
+
+.sg-hint {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.sg-warn {
+  font-size: 13px;
+  color: var(--risk);
+  font-weight: 600;
+}
+
+.sg-card {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* The picture, on the paper it will be printed on. */
+.sg-preview {
+  background: #fff;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 18px;
+  display: flex;
+  justify-content: center;
+
+  img {
+    max-height: 120px;
+    max-width: 100%;
+    object-fit: contain;
+  }
+}
+
+.sg-meta {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.sg-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.sg-file {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.sg-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.sg-empty__title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+}
+
+.btn.danger {
+  background: var(--risk-bg);
+  color: var(--risk);
+  border-color: transparent;
+}
+
+/* INVISIBLE BUT FOCUSABLE. With `hidden` (display:none) the input left the
+   focus order, and a <label> is not tabbable, so the only keyboard-reachable
+   control on this screen was "Remove…" — a keyboard user could DELETE their
+   signature but never upload one. Geometry, not display:none. */
+.sg-file__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Focus has to be visible, or the focusable input is a trap. */
+.sg-file:focus-within {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+}

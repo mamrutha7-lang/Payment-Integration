@@ -1,0 +1,48 @@
+/* The shell's own chrome. Every frame token — .appbar, .desktop-nav,
+   .nav-profile, .desktop-main and the account menu — lives globally in
+   src/styles/reep-v2.scss, because AGENTS.md's rule is that the design system
+   is global classes and a component does not redefine them.
+
+   What is left here is one rule that exists for a specificity reason. */
+
+:host {
+  display: block;
+}
+
+/* The two links inside the student's identity card. */
+.nav-profile .nav-profile__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+/* The "View profile" link inside the student's identity card. Scoped as
+   `.nav-profile &` so it beats the global `.desktop-nav a` nav-row rule in
+   reep-v2.scss (0,1,1) — a bare `.nav-profile__link` (0,1,0) would lose and the
+   link would paint as a full-width nav pill inside the card. */
+.nav-profile .nav-profile__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 2px 0 0;
+  padding: 3px 10px;
+  width: auto;
+  border-radius: var(--r-pill);
+  background: var(--tint-1);
+  color: var(--brand-purple);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+
+  .icon {
+    font-size: 14px;
+  }
+
+  &:hover,
+  &.active {
+    background: var(--brand-purple);
+    color: #fff;
+  }
+}

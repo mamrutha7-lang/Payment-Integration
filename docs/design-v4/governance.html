@@ -1,0 +1,567 @@
+<title>REEP Governance Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,-50..200&display=swap">
+
+<style>
+  :root{
+    --brand:#7a2f9e;--brand-deep:#552C7E;--brand-ink:#3a1f52;--magenta:#BA2185;
+    --ink:#1E1B29;--muted:#585566;--faint:#a596b3;--hairline:#e3d6ee;
+    --surface:rgba(255,255,255,.72);--solid:#fdfbfe;
+    --wash-1:#ece4f5;--wash-2:#f2e7f8;--wash-3:#fbe6f2;
+    --ok:#137a4a;--ok-bg:#e4f4ec;--warn:#8f6100;--warn-bg:#fdf1da;
+    --risk:#ad2452;--risk-bg:#fce8ee;--radius:14px;
+    --font-display:'Plus Jakarta Sans',system-ui,sans-serif;
+    --font:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  }
+  body{margin:0;background:linear-gradient(180deg,var(--wash-1) 0%,var(--wash-2) 45%,var(--wash-3) 100%);
+       background-attachment:fixed;color:var(--ink);font-family:var(--font);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .icon{font-family:'Material Symbols Rounded';font-size:1em;line-height:1;width:1em;height:1em;display:inline-flex;
+        align-items:center;justify-content:center;overflow:hidden;vertical-align:-.15em;flex:none}
+  .shell{max-width:1180px;margin:0 auto;padding:28px 24px 72px}
+  .masthead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .wordmark{font-family:var(--font-display);font-weight:800;font-size:20px;letter-spacing:-.02em;color:var(--brand-deep)}
+  .crumb{font-size:13px;color:var(--muted)} .crumb .sep{color:var(--faint)}
+  h1{font-family:var(--font-display);font-weight:800;font-size:clamp(28px,4vw,38px);letter-spacing:-.025em;
+     margin:10px 0 8px;text-wrap:balance;color:var(--brand-ink)}
+  .standfirst{max-width:68ch;color:var(--muted);font-size:15px;margin:0 0 24px}
+  code{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;background:rgba(255,255,255,.8);
+       padding:1px 5px;border-radius:5px;color:var(--brand-deep)}
+
+  .rule-note{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;
+    background:linear-gradient(90deg,rgba(122,47,158,.09),rgba(186,33,133,.05));border:1px solid var(--hairline);
+    border-left:3px solid var(--brand);border-radius:var(--radius);padding:16px 18px;margin-bottom:26px}
+  .rule-note .icon{color:var(--brand);font-size:22px;margin-top:1px}
+  .rule-note h2{font-family:var(--font-display);font-size:14px;font-weight:700;margin:0 0 4px;color:var(--brand-deep)}
+  .rule-note p{margin:0 0 7px;font-size:14px;color:var(--muted);max-width:82ch}
+  .rule-note p:last-child{margin-bottom:0}
+
+  .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:26px}
+  .stat{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);padding:15px 17px;
+        display:flex;flex-direction:column;gap:3px}
+  .stat .k{font-family:var(--font-display);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+  .stat .v{font-family:var(--font-display);font-size:28px;font-weight:800;letter-spacing:-.02em;color:var(--brand-ink);font-variant-numeric:tabular-nums}
+  .stat .sub{font-size:12.5px;color:var(--muted)}
+  .stat.attention{border-color:#f0cf9a;background:linear-gradient(var(--warn-bg),var(--solid))}
+  .stat.attention .v{color:var(--warn)}
+  .stat.danger{border-color:#e5b3c3;background:linear-gradient(var(--risk-bg),var(--solid))}
+  .stat.danger .v{color:var(--risk)}
+
+  .panel{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);padding:20px 22px;backdrop-filter:blur(6px)}
+  .panel>header{display:flex;align-items:center;gap:9px;margin-bottom:4px;flex-wrap:wrap}
+  .panel h2{font-family:var(--font-display);font-size:16px;font-weight:700;margin:0;letter-spacing:-.01em;color:var(--brand-ink)}
+  .panel header .icon{color:var(--brand);font-size:19px}
+  .panel .hint{font-size:13px;color:var(--muted);margin:0 0 16px;max-width:76ch}
+  .section-gap{margin-top:20px}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .badge-b{font-family:var(--font-display);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+    padding:3px 8px;border-radius:999px;background:rgba(122,47,158,.1);color:var(--brand-deep);margin-left:auto}
+
+  /* segmented control */
+  .seg{display:inline-flex;background:rgba(122,47,158,.08);border-radius:9px;padding:3px;gap:3px;margin-bottom:15px}
+  .seg label{position:relative;cursor:pointer}
+  .seg input{position:absolute;opacity:0;inset:0;cursor:pointer}
+  .seg span{display:block;font-family:var(--font-display);font-size:12.5px;font-weight:700;padding:6px 14px;border-radius:7px;color:var(--brand-deep)}
+  .seg input:checked+span{background:#fff;box-shadow:0 1px 2px rgba(85,44,126,.16)}
+  .seg input:focus-visible+span{outline:2px solid var(--brand);outline-offset:2px}
+
+  .pickers{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .fieldset-label{font-family:var(--font-display);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px}
+  .selcount{font-size:11px;color:var(--brand-deep);background:rgba(122,47,158,.1);padding:2px 8px;border-radius:999px;
+            letter-spacing:0;text-transform:none;font-weight:700}
+  .people{max-height:214px;overflow-y:auto;border:1px solid var(--hairline);border-radius:10px;background:var(--solid)}
+  .person{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border-bottom:1px solid var(--hairline);cursor:pointer}
+  .person:last-child{border-bottom:0} .person:hover{background:rgba(122,47,158,.045)}
+  .person input{margin-top:3px;accent-color:var(--brand);flex:none}
+  .person .n{font-weight:600;font-size:13.5px;display:block} .person .d{font-size:12px;color:var(--muted)}
+  .person .r{margin-left:auto;font-size:11.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .hidden{display:none}
+
+  select,input[type=date],textarea{font-family:var(--font);font-size:14px;color:var(--ink);background:var(--solid);
+    border:1px solid var(--hairline);border-radius:9px;padding:9px 11px;width:100%}
+  textarea{resize:vertical;min-height:64px;line-height:1.45}
+  select:focus-visible,input:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+  optgroup{font-family:var(--font-display);font-weight:700;color:var(--brand-deep)}
+  .field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+  .field>label{font-family:var(--font-display);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--muted);display:flex;align-items:center;gap:6px}
+  .req{color:var(--risk);font-weight:700;letter-spacing:0;text-transform:none;font-size:11px}
+  .counter{font-size:12px;color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+
+  .reach{background:rgba(255,255,255,.62);border:1px dashed var(--faint);border-radius:10px;padding:12px 14px;
+         font-size:13px;color:var(--muted);margin:14px 0}
+  .reach strong{color:var(--brand-deep);font-weight:600}
+  .reach.wide{border-color:#e0a9bd;background:var(--risk-bg);color:#7d1a3b}
+  .reach.wide strong{color:var(--risk)}
+  .btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{font-family:var(--font-display);font-size:13.5px;font-weight:700;border-radius:9px;padding:10px 18px;
+       border:1px solid transparent;cursor:pointer}
+  .btn-primary{background:linear-gradient(135deg,var(--brand),var(--magenta));color:#fff;box-shadow:0 1px 2px rgba(85,44,126,.28)}
+  .btn-danger{background:linear-gradient(135deg,#b3274f,#8f1b3d);color:#fff}
+  .btn:disabled{background:#cfc2da;color:#f3eef7;cursor:not-allowed;box-shadow:none}
+  .btn-ghost{background:transparent;border-color:var(--hairline);color:var(--brand-deep)}
+  .blocked{font-size:12.5px;color:var(--risk);display:flex;align-items:center;gap:5px}
+
+  /* hierarchy ladder */
+  .ladder{display:flex;flex-direction:column;gap:0;border:1px solid var(--hairline);border-radius:10px;
+          background:var(--solid);overflow:hidden;margin-bottom:14px}
+  .rung{display:flex;align-items:center;gap:11px;padding:10px 13px;border-bottom:1px solid var(--hairline);cursor:pointer}
+  .rung:last-child{border-bottom:0}
+  .rung:hover{background:rgba(122,47,158,.045)}
+  .rung input{accent-color:var(--brand);flex:none}
+  .rung .lvl{font-family:var(--font-display);font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--faint);width:96px;flex:none}
+  .rung .nm{font-size:13.5px;font-weight:500;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rung .ct{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .rung[data-depth="1"] .nm{padding-left:12px} .rung[data-depth="2"] .nm{padding-left:24px}
+  .rung[data-depth="3"] .nm{padding-left:36px} .rung[data-depth="4"] .nm{padding-left:48px}
+  .rung input:checked~.nm{font-weight:700;color:var(--brand-deep)}
+
+  /* catalogue */
+  .cat-group{margin-top:16px} .cat-group:first-of-type{margin-top:4px}
+  .cat-head{display:flex;align-items:baseline;gap:9px;margin-bottom:8px}
+  .cat-head h3{font-family:var(--font-display);font-size:13px;font-weight:700;margin:0;color:var(--brand-deep);
+    text-transform:uppercase;letter-spacing:.06em}
+  .cat-head .n{font-size:12px;color:var(--faint)}
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(262px,1fr));gap:8px}
+  .capcard{background:var(--solid);border:1px solid var(--hairline);border-radius:11px;padding:11px 13px;
+    display:flex;flex-direction:column;gap:5px}
+  .capcard.wide-scope{border-left:3px solid var(--risk)}
+  .capcard.pii{border-left:3px solid var(--warn)}
+  .capcard.student{border-left:3px solid var(--brand)}
+  .capcard .t{font-weight:600;font-size:13.5px;line-height:1.35}
+  .capcard .k{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:var(--faint)}
+  .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+  .tag{font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;display:inline-flex;align-items:center;gap:3px}
+  .tag .icon{font-size:12px}
+  .tag.scoped{background:var(--ok-bg);color:var(--ok)}
+  .tag.programme{background:var(--risk-bg);color:var(--risk)}
+  .tag.pii{background:var(--warn-bg);color:var(--warn)}
+  .tag.feat{background:rgba(122,47,158,.1);color:var(--brand-deep)}
+
+  .group{padding:13px 0;border-top:1px solid var(--hairline)}
+  .group:first-of-type{border-top:0;padding-top:2px}
+  .group .top{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+  .group .name{font-family:var(--font-display);font-weight:700;font-size:14.5px}
+  .group .count{font-size:12.5px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .caps{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  .cap{font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;background:rgba(122,47,158,.09);
+       color:var(--brand-deep);border:1px solid rgba(122,47,158,.18)}
+
+  .audit-wrap{overflow-x:auto;margin-top:2px}
+  table{border-collapse:collapse;width:100%;min-width:790px;font-size:13.5px}
+  th{font-family:var(--font-display);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
+     color:var(--muted);text-align:left;padding:0 12px 9px 0;border-bottom:1px solid var(--hairline);white-space:nowrap}
+  td{padding:12px 12px 12px 0;border-bottom:1px solid var(--hairline);vertical-align:top}
+  tbody tr:last-child td{border-bottom:0}
+  td.when{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+  td .reason{color:var(--muted);font-size:13px;display:block;margin-top:3px;max-width:48ch}
+  .actor{font-weight:600}
+  .pill{font-family:var(--font-display);font-size:11px;font-weight:700;letter-spacing:.04em;padding:3px 9px;
+        border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}
+  .pill .icon{font-size:13px}
+  .pill.grant{background:var(--ok-bg);color:var(--ok)}
+  .pill.revoke{background:var(--risk-bg);color:var(--risk)}
+  .pill.expire{background:var(--warn-bg);color:var(--warn)}
+  .pill.off{background:#eee6f4;color:var(--brand-deep)}
+  .fanout{font-size:11.5px;color:var(--muted);white-space:nowrap}
+  .foot{margin-top:32px;padding-top:16px;border-top:1px solid var(--hairline);font-size:12.5px;color:var(--muted);
+        display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  @media (max-width:980px){.strip{grid-template-columns:repeat(2,1fr)}.cols,.pickers{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+</style>
+
+<div class="shell">
+  <div class="masthead"><span class="wordmark">REEP</span><span class="crumb">Main Admin <span class="sep">/</span> Governance</span></div>
+  <h1>Governance</h1>
+  <p class="standfirst">
+    Two instruments, deliberately separate. <strong>Faculty access</strong> grants a capability to a person
+    or a group — nobody has it until you say so. <strong>Student features</strong> are on for everyone by
+    default and switched off down the hierarchy: a whole specialization, one batch, or a single student.
+  </p>
+
+  <div class="rule-note">
+    <span class="icon" aria-hidden="true">shield_lock</span>
+    <div>
+      <h2>Why the two are not one setting</h2>
+      <p>
+        Faculty access is <strong style="color:var(--ok)">deny by default</strong>. A capability is checked
+        <em>after</em> the mentor-group rule, so granting <code>student.interviews</code> reaches only students
+        already in that mentor's group. Except the
+        <strong style="color:var(--risk)">programme-wide</strong> ones — analytics, exports, the hierarchy —
+        which have no group to narrow to and hand over the whole college.
+      </p>
+      <p>
+        Student features are <strong style="color:var(--brand-deep)">allow by default</strong>. Switching the
+        voice interviewer off for a specialization is not a permission, it is availability, and the most
+        specific rule wins: a batch-level switch overrides its specialization, and a single student overrides
+        their batch.
+      </p>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="stat"><span class="k">Capabilities in force</span><span class="v">37</span><span class="sub">12 faculty, 3 groups</span></div>
+    <div class="stat danger"><span class="k">Programme-wide held</span><span class="v">5</span><span class="sub">review each one</span></div>
+    <div class="stat attention"><span class="k">Features switched off</span><span class="v">3</span><span class="sub">1 spec, 1 batch, 1 student</span></div>
+    <div class="stat"><span class="k">Expiring in 30 days</span><span class="v">4</span><span class="sub">before 08 Oct</span></div>
+  </div>
+
+  <!-- =============== A. FACULTY ACCESS =============== -->
+  <section class="panel">
+    <header>
+      <span class="icon" aria-hidden="true">key</span><h2>Faculty access</h2>
+      <span class="badge-b">Deny by default</span>
+    </header>
+    <p class="hint">Grant a capability to named individuals, or to an access group so every current and future member inherits it.</p>
+
+    <div class="seg" role="radiogroup" aria-label="Grant to">
+      <label><input type="radio" name="mode" value="ind" checked><span>Individuals</span></label>
+      <label><input type="radio" name="mode" value="grp"><span>Access group</span></label>
+    </div>
+
+    <div class="pickers">
+      <div>
+        <div class="fieldset-label"><span id="reclabel">Recipients</span><span class="selcount" id="selcount">2 selected</span></div>
+        <div class="people" id="people">
+          <label class="person"><input type="checkbox" checked><span><span class="n">Dr. Anitha R</span><span class="d">Dept. of CSE — Mentor</span></span><span class="r">26 mentees</span></label>
+          <label class="person"><input type="checkbox" checked><span><span class="n">Prof. Suhas Bhat</span><span class="d">Dept. of CSE — Placement Coordinator</span></span><span class="r">11 mentees</span></label>
+          <label class="person"><input type="checkbox"><span><span class="n">Prof. Kiran Kumar S</span><span class="d">Dept. of ISE — Mentor</span></span><span class="r">23 mentees</span></label>
+          <label class="person"><input type="checkbox"><span><span class="n">Dr. Meghana Rao</span><span class="d">Dept. of Mechanical — Mentor</span></span><span class="r">18 mentees</span></label>
+          <label class="person"><input type="checkbox"><span><span class="n">Dr. Lakshmi Narayan</span><span class="d">Dept. of ECE — Mentor</span></span><span class="r">4 mentees</span></label>
+          <label class="person"><input type="checkbox"><span><span class="n">Prof. Harini Venkatesh</span><span class="d">Dept. of ISE — Head of Department</span></span><span class="r">0 mentees</span></label>
+        </div>
+        <div class="people hidden" id="groups">
+          <label class="person"><input type="checkbox" checked><span><span class="n">Placement Coordinators</span><span class="d">Inherited by every member, now and later</span></span><span class="r">4 faculty</span></label>
+          <label class="person"><input type="checkbox"><span><span class="n">Resume Reviewers — 2026 batch</span><span class="d">Inherited by every member, now and later</span></span><span class="r">6 faculty</span></label>
+          <label class="person"><input type="checkbox"><span><span class="n">Department Heads</span><span class="d">Inherited by every member, now and later</span></span><span class="r">5 faculty</span></label>
+        </div>
+      </div>
+
+      <div>
+        <div class="field">
+          <label for="cap">Capability</label>
+          <select id="cap">
+            <optgroup label="Student records — scoped to the holder's group">
+              <option data-scope="scoped" data-reach="profiles and USNs">Profile &amp; USN</option>
+              <option data-scope="scoped" data-reach="marks and attendance">Academic records</option>
+              <option data-scope="scoped" data-reach="skilling progress and badges">Skilling &amp; badges</option>
+              <option data-scope="scoped" data-reach="uploaded certificates">Documents &amp; uploads</option>
+              <option data-scope="scoped" data-reach="resume drafts">Resume Builder drafts</option>
+              <option data-scope="scoped" data-reach="interview scorecards">Interview results</option>
+              <option data-scope="scoped" data-reach="English baseline scores">English baseline</option>
+              <option data-scope="scoped" data-reach="time allocation ledgers">Time allocation ledger</option>
+              <option data-scope="scoped" data-reach="meeting notes">Mentor meeting log</option>
+              <option data-scope="scoped" data-reach="job applications">Job applications</option>
+            </optgroup>
+            <optgroup label="Faculty tools">
+              <option data-scope="scoped" data-reach="the mentee log">Mentee log</option>
+              <option data-scope="scoped" data-reach="the mentor notebook">Mentor notebook</option>
+              <option data-scope="scoped" data-reach="the verification queue">Verify skills &amp; evidence</option>
+              <option data-scope="scoped" data-reach="leave approvals">Approve leave</option>
+              <option data-scope="scoped" data-reach="the REEP Agent">REEP Agent</option>
+            </optgroup>
+            <optgroup label="Programme-wide — cannot be narrowed">
+              <option data-scope="wide" data-reach="analytics for every cohort" selected>Analytics</option>
+              <option data-scope="wide" data-reach="CSV exports of every student record">Exports</option>
+              <option data-scope="wide" data-reach="the institution hierarchy">Institution hierarchy</option>
+              <option data-scope="wide" data-reach="the registration queue">Registrations</option>
+              <option data-scope="wide" data-reach="the certification catalogue">Approved certifications</option>
+              <option data-scope="wide" data-reach="the jobs sheet">Jobs sheet</option>
+              <option data-scope="wide" data-reach="placement outcomes">Placement</option>
+              <option data-scope="wide" data-reach="mentor and student assignment">Mentors &amp; students</option>
+              <option data-scope="wide" data-reach="interview audio recordings">Interview audio</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="field"><label for="expiry">Expires</label><input id="expiry" type="date" value="2026-12-31"></div>
+      </div>
+    </div>
+
+    <div class="reach" id="reach"></div>
+
+    <div class="field">
+      <label for="reason">Reason <span class="req">— required</span></label>
+      <textarea id="reason" placeholder="Why these people need this, in a sentence someone can audit in a year."></textarea>
+      <span class="counter" id="count">0 characters — minimum 20</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="grant" disabled>Grant access</button>
+      <button class="btn btn-ghost">Save selection as a group</button>
+      <span class="blocked" id="blocked"><span class="icon" aria-hidden="true">error</span> A reason is required</span>
+    </div>
+  </section>
+
+  <!-- =============== B. STUDENT FEATURES =============== -->
+  <section class="panel section-gap">
+    <header>
+      <span class="icon" aria-hidden="true">toggle_off</span><h2>Student feature availability</h2>
+      <span class="badge-b">Allow by default</span>
+    </header>
+    <p class="hint">
+      Switch a feature off for a whole specialization, a single batch, or one student. The most specific
+      rule wins — a student-level switch overrides their batch, which overrides its specialization.
+    </p>
+
+    <div class="pickers">
+      <div>
+        <div class="field">
+          <label for="feat">Feature</label>
+          <select id="feat">
+            <option data-k="student.assistant" selected>Voice interviewer (Mock Interview)</option>
+            <option data-k="student.agent">REEP Agent (chat)</option>
+            <option data-k="student.resume">Resume Builder</option>
+            <option data-k="student.english">English baseline test</option>
+            <option data-k="student.jobs">Jobs feed &amp; applications</option>
+            <option data-k="student.leaderboards">Leaderboards</option>
+            <option data-k="student.uploads">Document uploads</option>
+            <option data-k="student.time_log">Time allocation ledger</option>
+            <option data-k="student.skilling">Skilling &amp; badges</option>
+            <option data-k="student.certifications">Certifications</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="freason">Reason <span class="req">— required</span></label>
+          <textarea id="freason" placeholder="Why this is being switched off, and when it should come back."></textarea>
+          <span class="counter" id="fcount">0 characters — minimum 20</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-danger" id="disable" disabled>Switch off</button>
+          <button class="btn btn-ghost">Re-enable</button>
+          <span class="blocked" id="fblocked"><span class="icon" aria-hidden="true">error</span> A reason is required</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="fieldset-label"><span>Apply at</span><span class="selcount" id="lvlpill">Specialization</span></div>
+        <div class="ladder" id="ladder" role="radiogroup" aria-label="Apply at">
+          <label class="rung" data-depth="0"><input type="radio" name="lvl" value="college" data-n="1284" data-label="B.G.S. College of Engineering &amp; Technology" data-lvl="College"><span class="lvl">College</span><span class="nm">B.G.S. College of Engineering &amp; Technology</span><span class="ct">1,284 students</span></label>
+          <label class="rung" data-depth="1"><input type="radio" name="lvl" value="dept" data-n="412" data-label="Dept. of Computer Science &amp; Engineering" data-lvl="Department"><span class="lvl">Department</span><span class="nm">Computer Science &amp; Engineering</span><span class="ct">412 students</span></label>
+          <label class="rung" data-depth="2"><input type="radio" name="lvl" value="course" data-n="248" data-label="B.E. Computer Science" data-lvl="Course"><span class="lvl">Course</span><span class="nm">B.E. Computer Science</span><span class="ct">248 students</span></label>
+          <label class="rung" data-depth="3"><input type="radio" name="lvl" value="spec" data-n="86" data-label="AI &amp; Machine Learning" data-lvl="Specialization" checked><span class="lvl">Specialization</span><span class="nm">AI &amp; Machine Learning</span><span class="ct">86 students</span></label>
+          <label class="rung" data-depth="4"><input type="radio" name="lvl" value="batch" data-n="42" data-label="1MP25MDM — 2026 batch" data-lvl="Batch"><span class="lvl">Batch</span><span class="nm">1MP25MDM — 2026 batch</span><span class="ct">42 students</span></label>
+          <label class="rung" data-depth="4"><input type="radio" name="lvl" value="student" data-n="1" data-label="Kavya Suresh — 1MP25MDM07" data-lvl="Student"><span class="lvl">Student</span><span class="nm">Kavya Suresh — 1MP25MDM07</span><span class="ct">1 student</span></label>
+        </div>
+        <div class="reach" id="freach"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============== catalogue =============== -->
+  <section class="panel section-gap">
+    <header><span class="icon" aria-hidden="true">apps</span><h2>Capability catalogue</h2></header>
+    <p class="hint">One entry per screen in REEP. Green scopes to the holder's mentor group; red is programme-wide; amber carries a student's personal record; purple is a student-facing feature you switch off rather than grant.</p>
+
+    <div class="cat-group">
+      <div class="cat-head"><h3>Student records — faculty grants</h3><span class="n">10</span></div>
+      <div class="cat-grid">
+        <div class="capcard pii"><span class="t">Profile &amp; USN</span><span class="k">student.profile</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span><span class="tag pii">Personal record</span></span></div>
+        <div class="capcard pii"><span class="t">Academic records</span><span class="k">student.records</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span><span class="tag pii">Marks, attendance</span></span></div>
+        <div class="capcard"><span class="t">Skilling &amp; badges</span><span class="k">student.skilling</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span></span></div>
+        <div class="capcard pii"><span class="t">Documents &amp; uploads</span><span class="k">student.uploads</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span><span class="tag pii">Certificates</span></span></div>
+        <div class="capcard pii"><span class="t">Resume Builder drafts</span><span class="k">student.resume</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span><span class="tag pii">Personal record</span></span></div>
+        <div class="capcard pii"><span class="t">Interview results</span><span class="k">student.interviews</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span><span class="tag pii">Transcripts</span></span></div>
+        <div class="capcard"><span class="t">English baseline</span><span class="k">student.english</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span></span></div>
+        <div class="capcard"><span class="t">Time allocation ledger</span><span class="k">student.time_log</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span></span></div>
+        <div class="capcard"><span class="t">Mentor meeting log</span><span class="k">student.mentor_log</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span></span></div>
+        <div class="capcard"><span class="t">Job applications</span><span class="k">student.jobs</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span></span></div>
+      </div>
+    </div>
+
+    <div class="cat-group">
+      <div class="cat-head"><h3>Faculty tools</h3><span class="n">6</span></div>
+      <div class="cat-grid">
+        <div class="capcard"><span class="t">Mentee log</span><span class="k">mentor.mentees</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span></span></div>
+        <div class="capcard"><span class="t">Mentor notebook</span><span class="k">mentor.notebook</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span></span></div>
+        <div class="capcard"><span class="t">Verify skills &amp; evidence</span><span class="k">mentor.verifications</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span></span></div>
+        <div class="capcard pii"><span class="t">Approve leave</span><span class="k">mentor.leave_approve</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span><span class="tag pii">Reasons are personal</span></span></div>
+        <div class="capcard"><span class="t">Own upskilling shelf</span><span class="k">mentor.upskilling</span><span class="tags"><span class="tag scoped"><span class="icon">person</span>Self only</span></span></div>
+        <div class="capcard"><span class="t">REEP Agent</span><span class="k">mentor.agent</span><span class="tags"><span class="tag scoped"><span class="icon">group</span>Your group</span></span></div>
+      </div>
+    </div>
+
+    <div class="cat-group">
+      <div class="cat-head"><h3>Programme-wide</h3><span class="n">9 — each hands over the whole college</span></div>
+      <div class="cat-grid">
+        <div class="capcard wide-scope"><span class="t">Analytics</span><span class="k">admin.analytics</span><span class="tags"><span class="tag programme"><span class="icon">public</span>Programme-wide</span></span></div>
+        <div class="capcard wide-scope"><span class="t">Exports</span><span class="k">admin.exports</span><span class="tags"><span class="tag programme"><span class="icon">public</span>Programme-wide</span><span class="tag pii">Bulk personal data</span></span></div>
+        <div class="capcard wide-scope"><span class="t">Institution hierarchy</span><span class="k">admin.institution</span><span class="tags"><span class="tag programme"><span class="icon">public</span>Programme-wide</span></span></div>
+        <div class="capcard wide-scope"><span class="t">Registrations</span><span class="k">admin.registrations</span><span class="tags"><span class="tag programme"><span class="icon">public</span>Programme-wide</span><span class="tag pii">Provisions accounts</span></span></div>
+        <div class="capcard wide-scope"><span class="t">Approved certifications</span><span class="k">admin.catalogue</span><span class="tags"><span class="tag programme"><span class="icon">public</span>Programme-wide</span></span></div>
+        <div class="capcard wide-scope"><span class="t">Jobs sheet</span><span class="k">admin.jobs</span><span class="tags"><span class="tag programme"><span class="icon">public</span>Programme-wide</span></span></div>
+        <div class="capcard wide-scope"><span class="t">Placement</span><span class="k">admin.placement</span><span class="tags"><span class="tag programme"><span class="icon">public</span>Programme-wide</span></span></div>
+        <div class="capcard wide-scope"><span class="t">Mentors &amp; students</span><span class="k">admin.mentors</span><span class="tags"><span class="tag programme"><span class="icon">public</span>Programme-wide</span><span class="tag pii">Reassigns groups</span></span></div>
+        <div class="capcard wide-scope"><span class="t">Interview audio</span><span class="k">admin.interview_audio</span><span class="tags"><span class="tag programme"><span class="icon">public</span>Programme-wide</span><span class="tag pii">Student voice</span></span></div>
+      </div>
+    </div>
+
+    <div class="cat-group">
+      <div class="cat-head"><h3>Student features — switched off, not granted</h3><span class="n">10</span></div>
+      <div class="cat-grid">
+        <div class="capcard student"><span class="t">Voice interviewer</span><span class="k">student.assistant</span><span class="tags"><span class="tag feat"><span class="icon">graphic_eq</span>College → student</span></span></div>
+        <div class="capcard student"><span class="t">REEP Agent (chat)</span><span class="k">student.agent</span><span class="tags"><span class="tag feat"><span class="icon">forum</span>College → student</span></span></div>
+        <div class="capcard student"><span class="t">Resume Builder</span><span class="k">student.resume</span><span class="tags"><span class="tag feat"><span class="icon">description</span>College → student</span></span></div>
+        <div class="capcard student"><span class="t">English baseline test</span><span class="k">student.english</span><span class="tags"><span class="tag feat"><span class="icon">translate</span>College → student</span></span></div>
+        <div class="capcard student"><span class="t">Jobs feed</span><span class="k">student.jobs</span><span class="tags"><span class="tag feat"><span class="icon">work</span>College → student</span></span></div>
+        <div class="capcard student"><span class="t">Leaderboards</span><span class="k">student.leaderboards</span><span class="tags"><span class="tag feat"><span class="icon">leaderboard</span>College → student</span></span></div>
+        <div class="capcard student"><span class="t">Document uploads</span><span class="k">student.uploads</span><span class="tags"><span class="tag feat"><span class="icon">upload_file</span>College → student</span></span></div>
+        <div class="capcard student"><span class="t">Time allocation ledger</span><span class="k">student.time_log</span><span class="tags"><span class="tag feat"><span class="icon">schedule</span>College → student</span></span></div>
+        <div class="capcard student"><span class="t">Skilling &amp; badges</span><span class="k">student.skilling</span><span class="tags"><span class="tag feat"><span class="icon">workspace_premium</span>College → student</span></span></div>
+        <div class="capcard student"><span class="t">Certifications</span><span class="k">student.certifications</span><span class="tags"><span class="tag feat"><span class="icon">verified</span>College → student</span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cols section-gap">
+    <section class="panel">
+      <header><span class="icon" aria-hidden="true">groups</span><h2>Access groups</h2></header>
+      <p class="hint">Group-level capability. Every current and future member inherits it; membership changes audit like grants.</p>
+      <div class="group"><div class="top"><span class="name">Placement Coordinators</span><span class="count">4 faculty</span></div>
+        <div class="caps"><span class="cap">Profile &amp; USN</span><span class="cap">Interview results</span><span class="cap">Job applications</span><span class="cap">Jobs sheet</span></div></div>
+      <div class="group"><div class="top"><span class="name">Resume Reviewers — 2026 batch</span><span class="count">6 faculty</span></div>
+        <div class="caps"><span class="cap">Resume Builder drafts</span><span class="cap">Profile &amp; USN</span><span class="cap">Verify skills &amp; evidence</span></div></div>
+      <div class="group"><div class="top"><span class="name">Department Heads</span><span class="count">5 faculty</span></div>
+        <div class="caps"><span class="cap">Analytics</span><span class="cap">Academic records</span><span class="cap">Approve leave</span></div></div>
+      <div class="btn-row" style="margin-top:15px"><button class="btn btn-ghost">Create access group</button></div>
+    </section>
+
+    <section class="panel">
+      <header><span class="icon" aria-hidden="true">toggle_off</span><h2>Features currently off</h2></header>
+      <p class="hint">Active overrides, most specific first. Each shows who switched it off and when it lapses.</p>
+      <div class="group"><div class="top"><span class="name">Voice interviewer</span><span class="count">1 student</span></div>
+        <div class="caps"><span class="cap">Kavya Suresh — 1MP25MDM07</span></div>
+        <p class="hint" style="margin:7px 0 0">Medical accommodation; re-enable on return, reviewed 01 Nov.</p></div>
+      <div class="group"><div class="top"><span class="name">Leaderboards</span><span class="count">42 students</span></div>
+        <div class="caps"><span class="cap">Batch — 1MP25MDM 2026</span></div>
+        <p class="hint" style="margin:7px 0 0">Class-teacher request during internals; back after 20 Sep.</p></div>
+      <div class="group"><div class="top"><span class="name">Voice interviewer</span><span class="count">86 students</span></div>
+        <div class="caps"><span class="cap">Specialization — AI &amp; Machine Learning</span></div>
+        <p class="hint" style="margin:7px 0 0">Bedrock concurrency capped at 2 streams; piloting with Business Analytics first.</p></div>
+    </section>
+  </div>
+
+  <!-- =============== audit =============== -->
+  <section class="panel section-gap">
+    <header><span class="icon" aria-hidden="true">history</span><h2>Audit trail</h2></header>
+    <p class="hint">Grants, revocations, lapses and feature switches, with the reason recorded at the time. A batch writes one row per subject. Append-only.</p>
+    <div class="audit-wrap">
+      <table>
+        <thead><tr><th>When</th><th>Action</th><th>What</th><th>Applied to</th><th>By</th></tr></thead>
+        <tbody>
+          <tr><td class="when">08 Sep, 10:22</td>
+            <td><span class="pill off"><span class="icon" aria-hidden="true">toggle_off</span>Switched off</span><br><span class="fanout">86 students</span></td>
+            <td>Voice interviewer<span class="reason">Bedrock concurrency is capped at 2 streams; piloting with Business Analytics first so the AI &amp; ML cohort is not queued behind it.</span></td>
+            <td>Specialization — AI &amp; ML</td><td class="actor">B B Darshan</td></tr>
+          <tr><td class="when">08 Sep, 09:14</td>
+            <td><span class="pill grant"><span class="icon" aria-hidden="true">public</span>Granted</span><br><span class="fanout">batch of 4</span></td>
+            <td>Analytics <span class="tag programme" style="margin-left:4px">Programme-wide</span><span class="reason">December placement review; the four of them are presenting cohort readiness to the management committee.</span></td>
+            <td>Dr. Anitha R <span class="fanout">+3 others</span></td><td class="actor">B B Darshan</td></tr>
+          <tr><td class="when">07 Sep, 15:38</td>
+            <td><span class="pill off"><span class="icon" aria-hidden="true">person_off</span>Switched off</span></td>
+            <td>Voice interviewer<span class="reason">Medical accommodation requested through the mentor; re-enable on return, reviewed 01 Nov.</span></td>
+            <td>Student — Kavya Suresh</td><td class="actor">B B Darshan</td></tr>
+          <tr><td class="when">06 Sep, 17:02</td>
+            <td><span class="pill grant"><span class="icon" aria-hidden="true">group_add</span>Granted to group</span><br><span class="fanout">5 faculty inherit</span></td>
+            <td>Academic records<span class="reason">HoDs need marks and attendance for the NAAC submission due in November.</span></td>
+            <td>Group — Department Heads</td><td class="actor">B B Darshan</td></tr>
+          <tr><td class="when">05 Sep, 16:41</td>
+            <td><span class="pill revoke"><span class="icon" aria-hidden="true">remove</span>Revoked</span></td>
+            <td>Resume Builder drafts<span class="reason">Moved off the placement cell to full-time teaching from this semester.</span></td>
+            <td>Dr. Ramesh Gowda</td><td class="actor">B B Darshan</td></tr>
+          <tr><td class="when">31 Aug, 08:52</td>
+            <td><span class="pill expire"><span class="icon" aria-hidden="true">schedule</span>Lapsed</span></td>
+            <td>Exports <span class="tag programme" style="margin-left:4px">Programme-wide</span><span class="reason">Expiry set at grant time for the 2025-26 audit window. Not renewed.</span></td>
+            <td>Prof. Kiran Kumar S</td><td class="actor">System</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="foot">
+    <span>Design reference — not a live console. Capability keys map one-to-one onto REEP's routes.</span>
+    <span>Rule 2 (mentor scope) applies first, always.</span>
+  </div>
+</div>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var MIN = 20;
+
+  /* ---------- A. faculty access ---------- */
+  var people = $('people'), groups = $('groups'), selcount = $('selcount'), reclabel = $('reclabel');
+  var cap = $('cap'), reach = $('reach'), reason = $('reason'), grant = $('grant'),
+      blocked = $('blocked'), count = $('count');
+
+  function modeIsGroup() { return document.querySelector('input[name=mode]:checked').value === 'grp'; }
+  function activeList() { return modeIsGroup() ? groups : people; }
+  function chosen() { return activeList().querySelectorAll('input:checked').length; }
+
+  function paintReach() {
+    var n = chosen(), opt = cap.options[cap.selectedIndex], wide = opt.dataset.scope === 'wide';
+    var noun = modeIsGroup()
+      ? (n === 1 ? '1 access group' : n + ' access groups')
+      : (n === 1 ? '1 faculty member' : n + ' faculty members');
+    reach.className = 'reach' + (wide ? ' wide' : '');
+    if (!n) { reach.innerHTML = 'Select at least one recipient.'; return; }
+    var inherit = modeIsGroup() ? ' Every current and future member inherits it.' : '';
+    reach.innerHTML = wide
+      ? '<strong>Programme-wide.</strong> ' + noun + ' would reach ' + opt.dataset.reach +
+        ' for <strong>every student in the college</strong> — the mentor-group rule does not narrow this one.' + inherit
+      : '<strong>Scoped.</strong> ' + noun + ' would reach ' + opt.dataset.reach +
+        ' for <strong>students already in their own mentor group</strong>, and no one else.' + inherit;
+  }
+
+  function syncA() {
+    var grp = modeIsGroup();
+    people.classList.toggle('hidden', grp);
+    groups.classList.toggle('hidden', !grp);
+    reclabel.textContent = grp ? 'Access groups' : 'Recipients';
+    var n = chosen();
+    selcount.textContent = n + ' selected';
+    var len = reason.value.trim().length;
+    count.textContent = len + ' character' + (len === 1 ? '' : 's') + (len >= MIN ? '' : ' — minimum ' + MIN);
+    var ok = len >= MIN && n > 0;
+    grant.disabled = !ok;
+    grant.textContent = n > 1 ? 'Grant access to ' + n + (grp ? ' groups' : ' people') : 'Grant access';
+    blocked.style.visibility = ok ? 'hidden' : 'visible';
+    blocked.lastChild.textContent = n === 0 ? ' Select at least one recipient' : ' A reason is required';
+    paintReach();
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=mode]'), function (r) {
+    r.addEventListener('change', syncA);
+  });
+  people.addEventListener('change', syncA);
+  groups.addEventListener('change', syncA);
+  cap.addEventListener('change', syncA);
+  reason.addEventListener('input', syncA);
+
+  /* ---------- B. student features ---------- */
+  var feat = $('feat'), ladder = $('ladder'), lvlpill = $('lvlpill'), freach = $('freach'),
+      freason = $('freason'), disable = $('disable'), fblocked = $('fblocked'), fcount = $('fcount');
+
+  function syncB() {
+    var r = ladder.querySelector('input:checked');
+    var n = parseInt(r.dataset.n, 10);
+    var wide = n > 200;
+    lvlpill.textContent = r.dataset.lvl;
+    freach.className = 'reach' + (wide ? ' wide' : '');
+    freach.innerHTML = '<strong>' + feat.options[feat.selectedIndex].text + '</strong> would be switched off for <strong>' +
+      n.toLocaleString() + (n === 1 ? ' student' : ' students') + '</strong> — ' + r.dataset.lvl.toLowerCase() +
+      ' &ldquo;' + r.dataset.label + '&rdquo;. A more specific override still wins over this one.';
+    var len = freason.value.trim().length;
+    fcount.textContent = len + ' character' + (len === 1 ? '' : 's') + (len >= MIN ? '' : ' — minimum ' + MIN);
+    disable.disabled = len < MIN;
+    disable.textContent = 'Switch off for ' + n.toLocaleString() + (n === 1 ? ' student' : ' students');
+    fblocked.style.visibility = len >= MIN ? 'hidden' : 'visible';
+  }
+
+  ladder.addEventListener('change', syncB);
+  feat.addEventListener('change', syncB);
+  freason.addEventListener('input', syncB);
+
+  syncA(); syncB();
+})();
+</script>

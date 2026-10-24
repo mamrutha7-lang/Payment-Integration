@@ -1,0 +1,8 @@
+# Keep the docker build context to sources. node_modules here is the HOST's
+# (native binaries for the wrong platform than the node:alpine build stage),
+# dist/ and .angular/ are stale build outputs — the Dockerfile installs and
+# builds its own of all three. Without this file the context upload alone is
+# hundreds of megabytes per build.
+node_modules
+dist
+.angular

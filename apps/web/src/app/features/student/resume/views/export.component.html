@@ -1,0 +1,213 @@
+<div class="rb-view">
+  <section class="main">
+    <div class="main-head">
+      <div>
+        <h2>Export &amp; share</h2>
+        <div class="sub">Your saved versions, and what leaves REEP when you send one.</div>
+      </div>
+      <div class="head-actions">
+        <button type="button" class="btn" (click)="navigate.emit('preview')">
+          <span class="icon" aria-hidden="true">visibility</span> Back to preview
+        </button>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="card">
+        <h3 class="versions-title">All Resumes</h3>
+
+        @if (versionsError(); as err) {
+          <div class="state-note"><span class="icon" aria-hidden="true">error</span>{{ err }}</div>
+        } @else if (versions() === null) {
+          <div class="state-note"><span class="icon" aria-hidden="true">hourglass_empty</span>Loading your resumes…</div>
+        } @else if (versions()!.length === 0) {
+          <div class="state-note">
+            <span class="icon" aria-hidden="true">info</span>
+            No resumes generated yet — generate one in <b>Preview</b> and it appears here.
+          </div>
+          <button type="button" class="btn primary" (click)="navigate.emit('preview')">
+            <span class="icon" aria-hidden="true">auto_awesome</span> Generate your first resume
+          </button>
+        } @else {
+          @if (actionError(); as err) {
+            <div class="state-note" role="alert">
+              <span class="icon" aria-hidden="true">error</span>{{ err }}
+            </div>
+          }
+          @for (v of versions()!; track v.id) {
+            <div class="version" [class.version--on]="selectedId() === v.id">
+              <div class="version-body">
+                @if (renamingId() === v.id) {
+                  <form class="rename" (submit)="$event.preventDefault(); saveRename(v)">
+                    <label class="sr-only" [attr.for]="'rename-' + v.id">Resume name</label>
+                    <input
+                      [id]="'rename-' + v.id"
+                      type="text"
+                      maxlength="120"
+                      [value]="renameText()"
+                      (input)="renameText.set($any($event.target).value)"
+                    />
+                    <button type="submit" class="btn primary" [disabled]="busyId() === v.id">
+                      Save
+                    </button>
+                    <button type="button" class="btn" (click)="cancelRename()">Cancel</button>
+                  </form>
+                } @else {
+                  <div class="version-name">
+                    {{ v.title }}
+                    @if (selectedId() === v.id) {
+                      <span class="chip good"><span class="icon" aria-hidden="true">check</span>Selected</span>
+                    }
+                    @if (isFinal(v)) {
+                      <span class="chip neutral"><span class="icon" aria-hidden="true">lock</span>Finalised</span>
+                    }
+                    @if (!v.template) {
+                      <span class="chip warn">Older layout · regenerate</span>
+                    }
+                  </div>
+                }
+                <div class="version-meta">
+                  {{ versionLabel(v) }}
+                  @if (v.target_role) {
+                    · For {{ v.target_role }}
+                  }
+                  @if (v.updated_at || v.created_at) {
+                    · Updated {{ (v.updated_at || v.created_at) | date: 'd MMM y' }}
+                  }
+                </div>
+                <div class="version-actions">
+                  <button
+                    type="button"
+                    class="link-btn"
+                    [disabled]="busyId() === v.id"
+                    (click)="startRename(v)"
+                  >
+                    <span class="icon" aria-hidden="true">edit</span> Rename
+                  </button>
+                  <button
+                    type="button"
+                    class="link-btn"
+                    [disabled]="busyId() === v.id || isFinal(v)"
+                    (click)="regenerate(v)"
+                  >
+                    <span class="icon" aria-hidden="true">refresh</span> Regenerate
+                  </button>
+                  <button
+                    type="button"
+                    class="link-btn"
+                    [disabled]="busyId() === v.id"
+                    (click)="toggleFinal(v)"
+                  >
+                    <span class="icon" aria-hidden="true">{{ isFinal(v) ? 'lock_open' : 'lock' }}</span>
+                    {{ isFinal(v) ? 'Unlock' : 'Finalise' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="link-btn danger"
+                    [disabled]="busyId() === v.id || isFinal(v)"
+                    (click)="remove(v)"
+                  >
+                    <span class="icon" aria-hidden="true">delete</span>
+                    {{ confirmDeleteId() === v.id ? 'Press again to delete' : 'Delete' }}
+                  </button>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="btn use-btn"
+                [class.primary]="selectedId() !== v.id"
+                [disabled]="selectedId() === v.id"
+                (click)="use(v)"
+              >
+                {{ selectedId() === v.id ? 'In use' : 'Use for application' }}
+              </button>
+            </div>
+          }
+        }
+
+        @if (job(); as j) {
+          <div class="share-target">
+            <span class="icon" aria-hidden="true">work</span>
+            <div>
+              Sending for <b>{{ j.title }}</b> · {{ j.company }}
+              @if (j.location) {
+                · {{ j.location }}
+              }
+              @if (!j.eligible) {
+                <div class="share-warn">
+                  You are not yet eligible for this posting, so an application may not be
+                  considered. You can still keep a tailored copy.
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <label class="opt-row">
+          <input
+            type="checkbox"
+            [checked]="proofAppendix()"
+            (change)="proofAppendix.set($any($event.target).checked)"
+          />
+          <span>
+            Include an evidence appendix
+            <small>
+              Binds the {{ proofCount() }} certificate(s) behind your included verified skills onto
+              the end of the PDF. Off by default — the resume itself stays clean.
+            </small>
+          </span>
+        </label>
+
+        <label class="opt-row">
+          <input
+            type="checkbox"
+            [checked]="consented()"
+            (change)="consented.set($any($event.target).checked)"
+          />
+          <span>
+            I confirm this resume shares only what I intend recruiters to see.
+            <small>
+              Your name, contact details, academic record and included verified skills
+              @if (proofAppendix()) {
+                , along with your certificate files,
+              }
+              go with it.
+            </small>
+          </span>
+        </label>
+
+        <div class="export-row">
+          <button
+            type="button"
+            class="btn primary export-btn"
+            [disabled]="!canExport()"
+            (click)="exportPdf()"
+          >
+            <span class="icon" aria-hidden="true">download</span> Export &amp; share
+          </button>
+          @if (!consented()) {
+            <span class="opt-hint">Tick the confirmation above to enable this.</span>
+          } @else if (!selected()) {
+            <span class="opt-hint">Generate a resume first — there is nothing to export yet.</span>
+          }
+        </div>
+
+        @if (exported()) {
+          <div class="share-done">
+            <span class="icon" aria-hidden="true">check_circle</span>
+            <div>
+              Your PDF opened in a new tab.
+              @if (job(); as j) {
+                Attaching it to the <b>{{ j.title }}</b> application is not wired to an endpoint
+                yet, so send it through the posting's own link — nothing has left REEP on your
+                behalf.
+              } @else {
+                Nothing has left REEP on your behalf — you choose where it goes.
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,139 @@
+Schemathesis v4.28.0
+━━━━━━━━━━━━━━━━━━━━
+
+
+ ✅  Loaded specification from http://localhost:3300/openapi.json (in 0.50s)    
+
+     Base URL:         http://localhost:3300/                                   
+     Specification:    Open API 3.1.0                                           
+     Operations:       34 selected / 370 total                                  
+
+
+ ✅  API capabilities:                                                          
+
+     Supports NULL byte in headers:                            ✘                
+     Accepts backslash and control characters in URL paths:    ✓                
+
+ ⏭   Examples (in 0.02s)                                                        
+                                                                                
+     ⏭  34 skipped                                                              
+
+ ❌  Coverage (in 0.92s)                                                        
+                                                                                
+     ✅ 33 passed  ❌  1 failed                                                 
+
+ ❌  Fuzzing (in 1.43s)                                                         
+                                                                                
+     ✅ 31 passed  ❌  3 failed                                                 
+
+=================================== FAILURES ===================================
+_____________________ GET /api/student/badges/leaderboards _____________________
+1. Test Case ID: o97Zj6
+
+- Response violates schema
+
+    "Unknown view." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Unknown view."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Unknown view."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/badges/leaderboards?track=HR&view=%C2%92'
+    
+    st replay o97Zj6
+
+________________________ GET /api/student/leaderboards _________________________
+1. Test Case ID: H0Cjjg
+
+- Response violates schema
+
+    "Unknown board. One of: overall, certificates, skills, vtu, streak, mocks." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Unknown board. One of: overall, certificates, skills, vtu, streak, mocks."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Unknown board. One of: overall, certificates, skills, vtu, streak, mocks."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/leaderboards?board=__main__'
+    
+    st replay H0Cjjg
+
+___________________ GET /api/student/resume/{resume_id}/pdf ____________________
+1. Test Case ID: tobQSP
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Resume not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/resume/0/pdf?appendix=false'
+    
+    st replay tobQSP
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 34/370
+  Tested: 34
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ Response violates schema: 2
+  ❌ Undocumented HTTP status code: 1
+
+Test cases:
+  308 generated, 3 found 3 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis/student/junit-20260929T211302Z.xml
+  - NDJSON: results/api/schemathesis/student/ndjson-20260929T211302Z.ndjson
+
+Seed: 94225391140300339650436948815064464451
+
+============================= 3 failures in 2.72s ==============================

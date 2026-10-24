@@ -1,0 +1,182 @@
+<div class="panel" data-p="leaderboards">
+  <p class="crumb">Leaderboards</p>
+  <div class="dt-header">
+    <div>
+      <h1 class="dt-title">Leaderboards</h1>
+      <!-- WHO this ranks against, in the server's words: the batch, or the
+           department while unseated, or nobody yet. Three different
+           situations that used to render as one empty table. -->
+      <div class="dt-sub" [class.lb-scope--unseated]="scope() !== 'batch'">
+        @if (scope() === 'batch') {
+          <span class="icon" aria-hidden="true">groups</span>
+        } @else {
+          <span class="icon" aria-hidden="true">info</span>
+        }
+        {{ scopeLine() }}
+      </div>
+    </div>
+  </div>
+
+  @if (visibilityMsg(); as msg) {
+    <div class="lb-note lb-note--feedback" role="status">
+      <span class="icon" aria-hidden="true">{{ savingVisibility() ? 'hourglass_top' : 'check_circle' }}</span>
+      <span>{{ msg }}</span>
+    </div>
+  }
+
+  <div class="tabs lb-tabs" role="tablist" aria-label="Choose a leaderboard">
+    @for (t of tabs; track t.key) {
+      <button
+        type="button"
+        class="tab"
+        role="tab"
+        [class.active]="active() === t.key"
+        [attr.aria-selected]="active() === t.key"
+        (click)="setTab(t.key)"
+      >
+        {{ t.label }}
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="card lb-empty">
+      <span class="icon" aria-hidden="true">hourglass_top</span>
+      <div>
+        <div class="lb-empty__title">Loading the {{ activeLabel() }} board…</div>
+      </div>
+    </div>
+  } @else if (optedOut()) {
+    <div class="card lb-empty">
+      <span class="icon" aria-hidden="true">visibility_off</span>
+      <div>
+        <div class="lb-empty__title">You’re hidden from the leaderboards</div>
+        <div class="dt-sub">
+          You don’t appear on any board and, in turn, you don’t see peer rankings.
+        </div>
+        <button
+          type="button"
+          class="btn primary lb-rejoin"
+          [disabled]="savingVisibility()"
+          (click)="setHidden(false)"
+        >
+          <span class="icon" aria-hidden="true">visibility</span>
+          {{ savingVisibility() ? 'Updating…' : 'Take part again' }}
+        </button>
+        <div class="lb-privacy-note">
+          <span class="icon" aria-hidden="true">shield_person</span>
+          <span>
+            Your mentors and placement staff can always see your records — the opt-out only hides
+            you from classmates on these boards.
+          </span>
+        </div>
+      </div>
+    </div>
+  } @else if (error()) {
+    <div class="card lb-empty">
+      <span class="icon" aria-hidden="true">error</span>
+      <div>
+        <div class="lb-empty__title">{{ error() }}</div>
+      </div>
+    </div>
+  } @else {
+    <!-- OWN RANK — prominent, batch-aware, encouraging -->
+    <div class="lb-me-card" [class.lb-me-card--unranked]="!ownStanding().ranked">
+      <div class="lb-me-card__rank">
+        @if (ownStanding().ranked) {
+          <span class="lb-me-card__num">{{ myRow()!.rank }}</span>
+          <span class="lb-me-card__of">of {{ cohortSize() }}</span>
+        } @else {
+          <span class="icon" aria-hidden="true">emoji_events</span>
+        }
+      </div>
+      <div class="lb-me-card__body">
+        <div class="lb-me-card__headline">{{ ownStanding().headline }}</div>
+        <div class="lb-me-card__hint">{{ ownStanding().encouragement }}</div>
+      </div>
+      @if (ownStanding().ranked) {
+        <span class="lb-me-card__val">{{ myRow()!.value_label }}</span>
+      }
+    </div>
+
+    <!-- SCORING + REFRESH explainer -->
+    <div class="lb-note" role="note">
+      <span class="icon" aria-hidden="true">info</span>
+      <span>{{ explainer() }}</span>
+    </div>
+
+    @if (rows().length === 0) {
+      <div class="card lb-empty">
+        <span class="icon" aria-hidden="true">leaderboard</span>
+        <div>
+          <div class="lb-empty__title">No ranking yet</div>
+          <div class="dt-sub">{{ emptyLine() }}</div>
+        </div>
+      </div>
+    } @else {
+      <div class="card lb-table-card">
+        <table class="dt-table lb-table">
+          <thead>
+            <tr>
+              <th class="lb-col-rank">Rank</th>
+              <th>Student</th>
+              <th class="lb-col-of">Ranked</th>
+              <th class="lb-col-val">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of rows(); track row.student_id) {
+              <tr [class.me]="row.is_me">
+                <td class="lb-col-rank"><span class="lb-rank">{{ row.rank }}</span></td>
+                <td>
+                  <span class="lb-name">
+                    <span class="lb-avatar" aria-hidden="true">{{ row.initials }}</span>
+                    {{ row.name }}
+                    @if (row.is_me) {
+                      <span class="chip accent lb-you">You</span>
+                    }
+                  </span>
+                </td>
+                <td class="lb-col-of">of {{ cohortSize() }}</td>
+                <td class="lb-col-val">{{ row.value_label }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+
+    <!-- THE REST OF THE BATCH: classmates with nothing on this board yet. Not
+         ranked (no number, no confident zero), but on the screen by name, so a
+         fresh batch reads as a batch rather than as an empty room. -->
+    @if (unranked().length > 0) {
+      <div class="card lb-unranked">
+        <div class="lb-unranked__head">
+          <div>
+            <div class="lb-unranked__title">
+              <span class="icon" aria-hidden="true">group</span>
+              Not ranked on this board yet
+            </div>
+            <div class="dt-sub">
+              {{ unrankedTotal() }} of {{ classmates() }} classmates · {{ activeTab().first }}
+            </div>
+          </div>
+        </div>
+        <ul class="lb-unranked__list">
+          @for (p of unranked(); track p.student_id) {
+            <li [class.me]="p.is_me">
+              <span class="lb-avatar" aria-hidden="true">{{ p.initials }}</span>
+              <span class="lb-unranked__name">{{ p.name }}</span>
+              @if (p.is_me) {
+                <span class="chip accent lb-you">You</span>
+              }
+            </li>
+          }
+          @if (unrankedTotal() > unranked().length) {
+            <li class="lb-unranked__more">+{{ unrankedTotal() - unranked().length }} more</li>
+          }
+        </ul>
+      </div>
+    }
+  }
+</div>

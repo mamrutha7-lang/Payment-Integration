@@ -1,0 +1,498 @@
+<div class="panel" data-p="faculty-new">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <span>People</span><span class="sep">/</span><a routerLink="/admin/faculty">Faculty</a
+        ><span class="sep">/</span><span>Add faculty member</span>
+      </div>
+      <h1 class="dt-title">Add faculty member</h1>
+      <p class="dt-sub">Every faculty login belongs to a college and a department before it exists.</p>
+    </div>
+    <div class="head-actions">
+      <a class="btn secondary" routerLink="/admin/faculty">
+        <span class="icon" aria-hidden="true">arrow_back</span>
+        Back to faculty
+      </a>
+    </div>
+  </div>
+
+  <div class="card wizard-card">
+    <ol class="wizard-steps wizard-rail" aria-label="Add faculty member: three steps">
+      @for (wizardStep of steps; track wizardStep.number) {
+        <li
+          class="step"
+          [class.active]="stepState(wizardStep.number) === 'active'"
+          [class.done]="stepState(wizardStep.number) === 'done'"
+          [attr.aria-current]="stepState(wizardStep.number) === 'active' ? 'step' : null"
+        >
+          <span class="n">{{ wizardStep.number }}</span>
+          <span>{{ wizardStep.label }}</span>
+        </li>
+        @if (!$last) {
+          <li class="sep" aria-hidden="true"></li>
+        }
+      }
+    </ol>
+
+    <!-- ---------------------------------------------- 1 · Institution -->
+    @if (step() === 1) {
+      <section class="wizard-body" aria-label="Step 1: institution">
+        @if (collegesState() === 'loading') {
+          <p class="empty" role="status">Loading colleges…</p>
+        }
+
+        @if (collegesError(); as message) {
+          <div class="notice" role="alert">
+            <span class="icon" aria-hidden="true">error</span>
+            <div>
+              {{ message }}
+              <button class="btn ghost sm retry" type="button" (click)="loadColleges()">
+                <span class="icon" aria-hidden="true">sync</span>
+                Try again
+              </button>
+            </div>
+          </div>
+        }
+
+        @if (showValidation() && !institutionFieldsAreOnScreen()) {
+          <div class="notice" role="alert">
+            <span class="icon" aria-hidden="true">warning</span>
+            <div>
+              A college and a department are required, and neither can be chosen until the list
+              above loads. Nothing was created.
+            </div>
+          </div>
+        }
+
+        @if (collegesState() === 'ready') {
+          @if (colleges().length === 0) {
+            <div class="notice accent" role="status">
+              <span class="icon" aria-hidden="true">apartment</span>
+              <div>
+                No college exists on this deployment yet, so there is nowhere to file a faculty
+                member. Add one on
+                <a routerLink="/admin/institution">College structure</a> first.
+              </div>
+            </div>
+          } @else {
+            <div class="field">
+              <label for="faculty-college">College <span class="required-mark">*</span></label>
+              <select
+                id="faculty-college"
+                [value]="draft().collegeId"
+                [attr.aria-invalid]="showValidation() && !collegeIsChosen() ? 'true' : null"
+                (change)="selectCollege($any($event.target).value)"
+              >
+                <option value="" [selected]="draft().collegeId === ''">Select a college</option>
+                @for (college of colleges(); track college.id) {
+                  <option [value]="college.id" [selected]="college.id === draft().collegeId">
+                    {{ college.code }} · {{ college.name }}{{ archivedSuffix(college.status) }}
+                  </option>
+                }
+              </select>
+              @if (showValidation() && !collegeIsChosen()) {
+                <p class="err" role="alert">
+                  <span class="icon" aria-hidden="true">warning</span>
+                  Choose the college this person teaches in.
+                </p>
+              }
+            </div>
+
+            <div class="field">
+              <label for="faculty-department">Department <span class="required-mark">*</span></label>
+              <select
+                id="faculty-department"
+                [value]="draft().departmentId"
+                [disabled]="!collegeIsChosen() || departments().length === 0"
+                [attr.aria-invalid]="showValidation() && !departmentIsChosen() ? 'true' : null"
+                (change)="selectDepartment($any($event.target).value)"
+              >
+                <option value="" [selected]="draft().departmentId === ''">
+                  {{ collegeIsChosen() ? 'Select a department' : 'Select a college first' }}
+                </option>
+                @for (department of departments(); track department.id) {
+                  <option [value]="department.id" [selected]="department.id === draft().departmentId">
+                    {{ department.code }} · {{ department.name }}{{ archivedSuffix(department.status) }}
+                  </option>
+                }
+              </select>
+
+              @if (departmentsState() === 'loading') {
+                <p class="help" role="status">Loading this college’s departments…</p>
+              }
+              @if (showValidation() && !departmentIsChosen()) {
+                <p class="err" role="alert">
+                  <span class="icon" aria-hidden="true">warning</span>
+                  {{ departmentRequiredMessage }}
+                </p>
+              }
+              <p class="help">A faculty account must belong to a department.</p>
+            </div>
+
+            @if (departmentsError(); as message) {
+              <div class="notice" role="alert">
+                <span class="icon" aria-hidden="true">error</span>
+                <div>{{ message }}</div>
+              </div>
+            }
+
+            @if (archivedPlacementChosen()) {
+              <div class="notice warn" role="status">
+                <span class="icon" aria-hidden="true">warning</span>
+                <div>
+                  This college or department is <strong>archived</strong>. The account can still be
+                  filed there — the API accepts it — but the office has closed that department.
+                  Un-archive it on <a routerLink="/admin/institution">College structure</a>, or
+                  choose a current one.
+                </div>
+              </div>
+            }
+
+            @if (collegeHasNoDepartments()) {
+              <div class="notice warn" role="status">
+                <span class="icon" aria-hidden="true">warning</span>
+                <div>
+                  This college has no departments yet. Add one on
+                  <a routerLink="/admin/institution">College structure</a>, then come back —
+                  a faculty member cannot be filed under a college alone.
+                </div>
+              </div>
+            }
+
+            <div class="field-row">
+              <div class="field designation-field">
+                <label for="faculty-designation">Designation</label>
+                <input
+                  id="faculty-designation"
+                  [value]="draft().designation"
+                  (input)="setDesignation($any($event.target).value)"
+                  placeholder="e.g. Assistant Professor"
+                  autocomplete="off"
+                />
+                <p class="help">Printed on the college’s leave form beside their signature.</p>
+              </div>
+            </div>
+
+            <div class="card next-card">
+              <h2 class="next-title">What happens next</h2>
+              <div class="next-grid">
+                <div>
+                  <p class="next-step">2 · Identity</p>
+                  <p class="next-desc">
+                    Name and official email. The address is what they sign in with, and it must be
+                    on a domain this college admits — or be allowed through with a written reason.
+                  </p>
+                </div>
+                <div>
+                  <p class="next-step">3 · Functions</p>
+                  <p class="next-desc">
+                    Mentor is granted when the Main Admin assigns their first student. Every other
+                    function is a scoped grant made in Who can do what.
+                  </p>
+                </div>
+                <div>
+                  <p class="next-step">4 · Invite</p>
+                  <p class="next-desc">
+                    The server emails the activation link when a mail transport is configured. When
+                    it is not, the link is shown here once, to hand over.
+                  </p>
+                </div>
+              </div>
+            </div>
+          }
+        }
+      </section>
+    }
+
+    <!-- -------------------------------------------------- 2 · Identity -->
+    @if (step() === 2) {
+      <section class="wizard-body" aria-label="Step 2: identity">
+        <div class="field">
+          <label for="faculty-name">Full name <span class="required-mark">*</span></label>
+          <input
+            id="faculty-name"
+            [value]="draft().name"
+            [attr.aria-invalid]="showValidation() && !nameIsGiven() ? 'true' : null"
+            (input)="setName($any($event.target).value)"
+            placeholder="As it should appear on the leave form"
+            autocomplete="off"
+          />
+          @if (showValidation() && !nameIsGiven()) {
+            <p class="err" role="alert">
+              <span class="icon" aria-hidden="true">warning</span>
+              A name is required.
+            </p>
+          }
+        </div>
+
+        <div class="field">
+          <label for="faculty-email">College email <span class="required-mark">*</span></label>
+          <input
+            id="faculty-email"
+            type="email"
+            [value]="draft().email"
+            [attr.aria-invalid]="showValidation() && !emailLooksLikeAnAddress() ? 'true' : null"
+            (input)="setEmail($any($event.target).value)"
+            placeholder="name@bgscet.ac.in"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          @if (showValidation() && !emailLooksLikeAnAddress()) {
+            <p class="err" role="alert">
+              <span class="icon" aria-hidden="true">warning</span>
+              Type a full email address — this is the address they sign in with.
+            </p>
+          }
+          <p class="help">Must not already be on another account.</p>
+          @if (collegeDomains().length > 0) {
+            <p class="help">
+              {{ selectedCollege()?.code }} admits addresses on
+              <strong>{{ collegeDomains().join(', ') }}</strong>.
+            </p>
+          } @else {
+            <p class="help">{{ selectedCollege()?.code }} has no domains of its own, so the deployment’s list applies.</p>
+          }
+        </div>
+
+        @if (addressLooksOffCollegeDomain()) {
+          <div class="notice warn" role="status">
+            <span class="icon" aria-hidden="true">shield_person</span>
+            <div>
+              <strong>{{ emailDomain() }}</strong> is not one of this college’s domains ({{ collegeDomains().join(', ') }}). Tick the box below and give a reason to allow it.
+            </div>
+          </div>
+        }
+
+        <div class="field">
+          <label class="check" for="faculty-allow-external">
+            <input
+              id="faculty-allow-external"
+              type="checkbox"
+              [checked]="draft().allowExternal"
+              (change)="setAllowExternal($any($event.target).checked)"
+            />
+            <span>Allow an address outside the college domain</span>
+          </label>
+          <p class="help">For a visiting lecturer on a personal address. The reason is recorded.</p>
+        </div>
+
+        @if (draft().allowExternal) {
+          <div class="field">
+            <label for="faculty-external-reason">
+              Why this address is outside the college domain <span class="required-mark">*</span>
+            </label>
+            <textarea
+              id="faculty-external-reason"
+              class="multi"
+              [value]="draft().externalReason"
+              [attr.aria-invalid]="showValidation() && externalReasonIsMissing() ? 'true' : null"
+              (input)="setExternalReason($any($event.target).value)"
+              placeholder="e.g. Visiting lecturer for the Elevate module, Sep–Dec; no college address issued."
+            ></textarea>
+            @if (showValidation() && externalReasonIsMissing()) {
+              <p class="err" role="alert">
+                <span class="icon" aria-hidden="true">warning</span>
+                {{ externalReasonRequiredMessage }}
+              </p>
+            }
+            <p class="help">Recorded on the account.</p>
+          </div>
+        }
+
+        <div class="card summary-card">
+          <h2 class="next-title">Filed under</h2>
+          <dl class="summary-list">
+            <div>
+              <dt>College</dt>
+              <dd>
+                {{ selectedCollege()?.code }} · {{ selectedCollege()?.name
+                }}{{ archivedSuffix(selectedCollege()?.status) }}
+              </dd>
+            </div>
+            <div>
+              <dt>Department</dt>
+              <dd>
+                {{ selectedDepartment()?.code }} · {{ selectedDepartment()?.name
+                }}{{ archivedSuffix(selectedDepartment()?.status) }}
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    }
+
+    <!-- ---------------------------------------------------- 3 · Invite -->
+    @if (step() === 3) {
+      <section class="wizard-body" aria-label="Step 3: invite">
+        @if (created(); as account) {
+          <div class="notice good" role="status">
+            <span class="icon" aria-hidden="true">check_circle</span>
+            <div>
+              <strong>{{ account.name }}</strong> now has a Faculty account on
+              {{ account.email }}. Nothing can sign in to it until they redeem the invitation and
+              set their own password.
+            </div>
+          </div>
+
+          <div class="card invite-card">
+            <h2 class="next-title">The invitation</h2>
+
+            @if (account.emailed) {
+              <div class="notice good" role="status">
+                <span class="icon" aria-hidden="true">mail</span>
+                <div>
+                  <strong>The sign-in link was emailed</strong> to {{ account.email }} and expires in {{ account.expires_in_hours | plural: 'hour' }}. If it never arrives, make a new one on the <a routerLink="/admin/faculty">Faculty</a> screen.
+                </div>
+              </div>
+            } @else {
+              <div class="notice warn" role="status">
+                <span class="icon" aria-hidden="true">warning</span>
+                <div>
+                  <strong>No mail was sent.</strong> The link below is the only way {{ account.name }} gets in — hand it over yourself. It expires in {{ account.expires_in_hours | plural: 'hour' }} and is shown once.
+                </div>
+              </div>
+
+              <p class="activation-link">{{ account.activation_link }}</p>
+
+              <div class="invite-actions">
+                <button
+                  class="btn secondary"
+                  type="button"
+                  aria-label="Copy the activation link to the clipboard"
+                  (click)="copyActivationLink()"
+                >
+                  <span class="icon" aria-hidden="true">content_copy</span>
+                  Copy link
+                </button>
+              </div>
+
+              @if (copyMessage(); as message) {
+                <p class="wizard-help" role="status">{{ message }}</p>
+              }
+            }
+          </div>
+
+          <div class="card summary-card">
+            <h2 class="next-title">What this account can do today</h2>
+            <ul class="plain-list">
+              <li>Sign in, once the link is redeemed and a password is set.</li>
+              <li>Nothing else: no mentees, no console screens, no functions.</li>
+              <li>
+                Give it work on <a routerLink="/admin/mentors">Assign faculty</a> (students) or in
+                <a routerLink="/admin/governance">Who can do what</a> (a console screen).
+              </li>
+            </ul>
+          </div>
+        } @else {
+          <div class="notice accent">
+            <span class="icon" aria-hidden="true">mail</span>
+            <div>
+              Creating the account makes a sign-in link. It is emailed when this deployment can
+              send mail; otherwise the link is shown once, on the next screen, for you to hand over.
+            </div>
+          </div>
+
+          <div class="card summary-card">
+            <h2 class="next-title">Review</h2>
+            <dl class="summary-list">
+              <div>
+                <dt>Name</dt>
+                <dd>{{ draft().name.trim() }}</dd>
+              </div>
+              <div>
+                <dt>College email</dt>
+                <dd>{{ draft().email.trim().toLowerCase() }}</dd>
+              </div>
+              <div>
+                <dt>College</dt>
+                <dd>
+                {{ selectedCollege()?.code }} · {{ selectedCollege()?.name
+                }}{{ archivedSuffix(selectedCollege()?.status) }}
+              </dd>
+              </div>
+              <div>
+                <dt>Department</dt>
+                <dd>
+                {{ selectedDepartment()?.code }} · {{ selectedDepartment()?.name
+                }}{{ archivedSuffix(selectedDepartment()?.status) }}
+              </dd>
+              </div>
+              <div>
+                <dt>Designation</dt>
+                <dd>{{ draft().designation.trim() || '—' }}</dd>
+              </div>
+              <div>
+                <dt>Outside the college domain</dt>
+                <dd>
+                  @if (draft().allowExternal) {
+                    <span class="chip dot warn">Allowed deliberately</span>
+                    <span class="external-reason">{{ draft().externalReason.trim() || '—' }}</span>
+                  } @else {
+                    —
+                  }
+                </dd>
+              </div>
+              <div>
+                <dt>Role</dt>
+                <dd><span class="chip dot neutral">Faculty · no functions</span></dd>
+              </div>
+            </dl>
+          </div>
+
+          @if (createError(); as message) {
+            <div class="notice" role="alert">
+              <span class="icon" aria-hidden="true">error</span>
+              <div>{{ message }}</div>
+            </div>
+          }
+
+          @if (saving()) {
+            <p class="wizard-help" role="status">Creating the account…</p>
+          }
+        }
+      </section>
+    }
+
+    <!-- ---------------------------------------------------- the footer -->
+    <div class="wizard-footer">
+      <span class="footer-position">{{ stepPosition() }}</span>
+
+      <div class="footer-actions">
+        @if (accountExists()) {
+          <button class="btn secondary" type="button" (click)="startAnotherFacultyMember()">
+            <span class="icon" aria-hidden="true">person_add</span>
+            Add another
+          </button>
+          <a class="btn primary" routerLink="/admin/faculty">
+            <span class="icon" aria-hidden="true">check</span>
+            Done
+          </a>
+        } @else {
+          <a class="btn secondary" routerLink="/admin/faculty">Cancel</a>
+          @if (step() > 1) {
+            <button class="btn secondary" type="button" (click)="goToPreviousStep()">
+              <span class="icon" aria-hidden="true">arrow_back</span>
+              Back
+            </button>
+          }
+          @if (step() < lastStep) {
+            <button class="btn primary" type="button" (click)="continueToNextStep()">
+              Continue
+              <span class="icon" aria-hidden="true">arrow_forward</span>
+            </button>
+          } @else {
+            <button
+              class="btn primary"
+              type="button"
+              [disabled]="saving() || !readyToCreate()"
+              (click)="createFacultyAccount()"
+            >
+              <span class="icon" aria-hidden="true">person_add</span>
+              {{ saving() ? 'Creating…' : 'Create account & invite' }}
+            </button>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</div>

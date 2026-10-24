@@ -1,0 +1,251 @@
+<!--
+  The page head this screen did not have. It had no <h1> at all — the 2026-09
+  audit counted 29 of 38 screens in that state, and this is one of them fixed:
+  a screen reader landing here was given the four step buttons and no title.
+
+  The four steps of the flow, in order: write it, aim it, read it, send it.
+  Numbered because the sequence is the guidance — the three tabs this replaced
+  named three places and left the student to guess the order. They sit in the
+  head, to the right of the title, as the board draws them.
+-->
+<p class="crumb">Documents <span class="sep">/</span> Resume Builder</p>
+<div class="dt-header rb-header">
+  <div>
+    <h1 class="dt-title">Resume Builder</h1>
+    <p class="dt-sub">Build the content, tailor it to an opportunity, preview, then export and share.</p>
+  </div>
+  <div class="wizard-steps rb-steps">
+    <button type="button" class="step" [class.active]="flowStep() === 'build'" (click)="go('build')">
+      <span class="n">1</span>Build content
+    </button>
+    <button type="button" class="step" [class.active]="flowStep() === 'tailor'" (click)="go('tailor')">
+      <span class="n">2</span>Tailor to opportunity
+    </button>
+    <button type="button" class="step" [class.active]="flowStep() === 'preview'" (click)="go('preview')">
+      <span class="n">3</span>Preview
+    </button>
+    <button type="button" class="step" [class.active]="flowStep() === 'export'" (click)="go('export')">
+      <span class="n">4</span>Export &amp; share
+    </button>
+  </div>
+</div>
+
+<!-- The goal. Every step below reads it, so it stays visible on all four. -->
+<div class="rb-goal">
+  <label>
+    <span class="goal-lbl">Target role</span>
+    <select [value]="goalSvc.goal().role" (change)="goalSvc.setRole($any($event.target).value)">
+      <option value="">Not set</option>
+      @for (r of goalSvc.roleOptions(); track r) {
+        <option [value]="r">{{ r }}</option>
+      }
+    </select>
+  </label>
+  <label>
+    <span class="goal-lbl">Location</span>
+    <select
+      [value]="goalSvc.goal().location"
+      (change)="goalSvc.setLocation($any($event.target).value)"
+    >
+      <option value="">Any</option>
+      @for (l of goalSvc.locationOptions(); track l) {
+        <option [value]="l">{{ l }}</option>
+      }
+    </select>
+  </label>
+  <label class="goal-opp">
+    <span class="goal-lbl">Selected opportunity</span>
+    <select
+      [value]="goalSvc.goal().opportunityId"
+      (change)="goalSvc.setOpportunity($any($event.target).value)"
+    >
+      <option value="">Not chosen</option>
+      @for (j of goalSvc.jobs() ?? []; track j.id) {
+        <option [value]="j.id">
+          {{ j.company }} — {{ j.title }}
+          @if (j.location) {
+            · {{ j.location }}
+          }
+        </option>
+      }
+    </select>
+  </label>
+  <!-- Match and eligibility together: a score alone would read as permission. -->
+  <span class="goal-match goal-match--{{ goalSvc.matchTone() }}">{{ goalSvc.matchLabel() }}</span>
+</div>
+
+@switch (flowStep()) {
+  @case ('tailor') {
+    <rb-tailor (navigate)="go($event)" />
+  }
+  @case ('preview') {
+    <rb-preview (navigate)="go($event === 'builder' ? 'build' : 'export')" />
+  }
+  @case ('export') {
+    <rb-export (navigate)="go($event)" />
+  }
+  @default {
+    <!-- BUILD CONTENT: left stepper + main column -->
+    <div class="rb-shell">
+      <aside class="stepper">
+        <div class="completeness">
+          <div class="top">
+            <span class="lbl">Profile complete</span>
+            <span class="pct">{{ svc.completeness() }}%</span>
+          </div>
+          <div class="meter"><i [style.width.%]="svc.completeness()"></i></div>
+          <small>
+            A resume can be generated at any time, but <b>70%+</b> produces a materially stronger
+            document.
+          </small>
+        </div>
+
+        <!-- One click brings in everything REEP already holds verified, so the
+             student never retypes what a mentor has already confirmed. -->
+        <button type="button" class="import-btn" (click)="importVerified()">
+          <span class="icon" aria-hidden="true">sync</span> Import verified record
+        </button>
+        @if (importedCount() !== null) {
+          <div class="import-done">
+            @if (importedCount()! > 0) {
+              {{ importedCount() }} verified skill(s) added ✓
+            } @else {
+              Everything verified is already included ✓
+            }
+          </div>
+        }
+
+        @for (group of groups; track group.name) {
+          <div class="step-group">{{ group.name }}</div>
+          @for (s of group.steps; track s.key) {
+            <div class="step-item" [class.active]="step() === s.key" (click)="goToStep(s.key)">
+              <span
+                class="step-dot"
+                [class.done]="stepStates()[s.key] === 'done'"
+                [class.partial]="stepStates()[s.key] === 'partial'"
+                [attr.title]="stepHint(s.key)"
+              ></span>
+              {{ s.label }}
+            </div>
+          }
+        }
+      </aside>
+
+      <section class="main">
+        <div class="main-head">
+          <div>
+            <h2>{{ current().title }}</h2>
+            <div class="sub">{{ current().sub }}</div>
+          </div>
+          <div class="head-actions">
+            <button type="button" class="btn" (click)="go('export')">
+              <span class="icon" aria-hidden="true">folder_open</span> All Resumes
+            </button>
+            <button type="button" class="btn primary" (click)="go('preview')">
+              <span class="icon" aria-hidden="true">auto_awesome</span> Generate Resume
+            </button>
+          </div>
+        </div>
+
+        <div class="body">
+          @switch (step()) {
+            @case ('basic') {
+              <rb-basic />
+            }
+            @case ('contact') {
+              <rb-contact />
+            }
+            @case ('family') {
+              <rb-family />
+            }
+            @case ('education') {
+              <rb-education />
+            }
+            @case ('attachments') {
+              <rb-attachments />
+            }
+            @case ('evidence_skills') {
+              <rb-evidence-skills />
+            }
+            @case ('experience') {
+              <rb-experience />
+            }
+            @case ('internship') {
+              <rb-internship />
+            }
+            @case ('projects') {
+              <rb-projects />
+            }
+            @case ('publications') {
+              <rb-publications />
+            }
+            @case ('seminars') {
+              <rb-seminars />
+            }
+            @case ('certifications') {
+              <rb-certifications />
+            }
+            @case ('por') {
+              <rb-por />
+            }
+            @case ('other') {
+              <rb-other />
+            }
+            @case ('references') {
+              <rb-references />
+            }
+            @case ('policy') {
+              <rb-policy />
+            }
+          }
+        </div>
+
+        <div class="footbar">
+          <div class="save-state">
+            <!-- STATUS = text + colour together; the chip tone and label move as one. -->
+            @switch (saveState()) {
+              @case ('saving') {
+                <span class="chip neutral save-chip">
+                  <span class="icon spin" aria-hidden="true">progress_activity</span> Saving…
+                </span>
+              }
+              @case ('unsaved') {
+                <span class="chip warn save-chip">
+                  <span class="icon" aria-hidden="true">edit</span> Unsaved changes
+                </span>
+              }
+              @case ('saved') {
+                <span class="chip good save-chip">
+                  <span class="icon" aria-hidden="true">check_circle</span> {{ savedLabel() }}
+                </span>
+              }
+              @default {
+                <span class="chip neutral save-chip">
+                  <span class="icon" aria-hidden="true">history</span> Not saved yet
+                </span>
+              }
+            }
+            <span class="foot-note">Changes are versioned &amp; autosaved</span>
+          </div>
+          <div class="foot-actions">
+            <!-- READ-ONLY MIRRORS GET NO SAVE BUTTON. Education's said "Update &
+                 request approval" and called the ordinary save: one PUT of the
+                 resume draft, no approval, nobody told. The request it promised
+                 now lives inside the section, next to the figures it is about. -->
+            @if (readOnlyStep()) {
+              <span class="foot-note">
+                <span class="icon" aria-hidden="true">lock</span>
+                Imported from your university record — nothing to save here.
+              </span>
+            } @else {
+              <button type="button" class="btn primary" [disabled]="svc.saving()" (click)="save()">
+                <span class="icon" aria-hidden="true">save</span>
+                {{ svc.saving() ? 'Saving…' : 'Save section' }}
+              </button>
+            }
+          </div>
+        </div>
+      </section>
+    </div>
+  }
+}

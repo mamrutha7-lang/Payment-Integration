@@ -1,0 +1,487 @@
+<div class="panel" data-p="faculty">
+  <div class="dt-header">
+    <div>
+      <div class="crumb"><span>People</span><span class="sep">/</span><span>Faculty</span></div>
+      <h1 class="dt-title">Faculty</h1>
+      <div class="dt-sub">{{ summaryLine() }}</div>
+    </div>
+    <div class="dt-toolbar">
+      <!-- The destination exists now: Governance grew the queue B2.4 feeds, and
+           `?tab=review` opens it directly rather than landing the admin on that
+           screen's front page to hunt for the tab. -->
+      <a
+        class="btn secondary"
+        routerLink="/admin/governance"
+        [queryParams]="{ tab: 'review' }"
+      >
+        <span class="icon" aria-hidden="true">pending_actions</span> Review expiring access
+      </a>
+      <a class="btn primary" routerLink="/admin/faculty/new">
+        <span class="icon" aria-hidden="true">person_add</span> Add faculty
+      </a>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>{{ error() }}
+    </div>
+  }
+  @if (flash()) {
+    <div class="notice good" role="status">
+      <span class="icon" aria-hidden="true">check_circle</span>{{ flash() }}
+    </div>
+  }
+
+  <!-- The board's filter row. All four narrow WHAT IS ALREADY LOADED, each
+       reading a field the faculty row already carries: the list endpoint takes
+       one parameter and none of these is it, so a refetch would fetch the same
+       rows back. -->
+  <div class="filters">
+    <div class="select">
+      <span class="lbl">College</span>
+      <span class="val">{{ collegeFilterLabel() }}</span>
+      <select aria-label="College" (change)="setCollegeFilter(selectValue($event))">
+        <option value="" [selected]="collegeFilter() === ''">All colleges</option>
+        @for (college of colleges(); track college.id) {
+          <option [value]="college.id" [selected]="college.id === collegeFilter()">{{ college.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">Department</span>
+      <span class="val">{{ departmentFilterLabel() }}</span>
+      <select aria-label="Department" (change)="setDepartmentFilter(selectValue($event))">
+        <option value="" [selected]="departmentFilter() === ''">All departments</option>
+        @for (department of departmentOptions(); track department.id) {
+          <option [value]="department.id" [selected]="department.id === departmentFilter()">{{ department.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Function is the mentor group and says so in its options: HOD, placement
+         officer and verifier are capability grants and are not on this row.
+         It greys out when the assignment list was refused, because filtering on
+         a fact nobody could read would quietly hide people. -->
+    <div class="select" [class.is-muted]="!mentorGroupsAreReadable()">
+      <span class="lbl">Mentor group</span>
+      <span class="val">{{ functionFilterLabel() }}</span>
+      <select
+        aria-label="Mentor group"
+        [disabled]="!mentorGroupsAreReadable()"
+        [title]="mentorGroupsAreReadable() ? '' : 'The mentor assignment list could not be read with this account’s access.'"
+        (change)="setFunctionFilter(selectValue($event))"
+      >
+        <option value="" [selected]="functionFilter() === ''">All</option>
+        <option value="mentor" [selected]="functionFilter() === 'mentor'">Mentor</option>
+        <option value="none" [selected]="functionFilter() === 'none'">No mentor group</option>
+      </select>
+    </div>
+
+    <!-- Two values, not the board's three: nothing reports whether an account
+         has redeemed its activation link, so there is no honest "Invited". -->
+    <div class="select">
+      <span class="lbl">Status</span>
+      <span class="val">{{ statusFilterLabel() }}</span>
+      <select aria-label="Status" (change)="setStatusFilter(selectValue($event))">
+        <option value="" [selected]="statusFilter() === ''">All</option>
+        <option value="active" [selected]="statusFilter() === 'active'">Active</option>
+        <option value="disabled" [selected]="statusFilter() === 'disabled'">Disabled</option>
+        <option value="removed" [selected]="statusFilter() === 'removed'">Removed · off the roster, record kept</option>
+      </select>
+    </div>
+
+    <a class="btn ghost filters-end" routerLink="/admin/mentors">
+      <span class="icon" aria-hidden="true">diversity_3</span> Assign students
+    </a>
+  </div>
+
+  <!-- Only once the reads have finished, and only when the DIRECTORY itself was
+       readable: mentorGroups() is null before the first response too, and a
+       warning that flashes on every load is a warning nobody reads. -->
+  @if (!isLoading() && !directoryRefused() && !mentorGroupsAreReadable()) {
+    <div class="notice warn" role="status">
+      <span class="icon" aria-hidden="true">warning</span>
+      The mentor groups could not be read with this account’s access, so Mentor group reads
+      “{{ notReadable }}”.
+    </div>
+  }
+
+  <div class="directory">
+    <!-- ---------------------------------------------------------- grid -->
+    <div class="dt-frame directory-grid">
+      <div class="dt-gridbar">
+        <input
+          class="dt-quickfilter"
+          type="search"
+          placeholder="Quick filter…"
+          aria-label="Search faculty by name, email, department or designation"
+          (input)="onQuickFilterInput($event)"
+        />
+
+        <button
+          type="button"
+          class="btn secondary sm"
+          [disabled]="!canDisableSelection()"
+          [title]="disableHint()"
+          (click)="openDisableDialogForSelection()"
+        >
+          <span class="icon" aria-hidden="true">block</span>
+          Disable
+        </button>
+
+        <span class="gridbar-end">
+          <button
+            type="button"
+            class="btn secondary sm"
+            [attr.aria-expanded]="columnsPanelOpen()"
+            aria-label="Choose which columns are shown"
+            (click)="toggleColumnsPanel()"
+          >
+            <span class="icon" aria-hidden="true">table_rows</span>
+          </button>
+          <button
+            type="button"
+            class="btn secondary sm"
+            [attr.aria-pressed]="isCompact()"
+            aria-label="Toggle compact rows"
+            (click)="toggleDensity()"
+          >
+            <span class="icon" aria-hidden="true">tune</span>
+          </button>
+        </span>
+
+        @if (columnsPanelOpen()) {
+          <div class="columns-panel">
+            <div class="columns-panel__title">Columns</div>
+            @for (column of toggleableColumns; track column.id) {
+              <label class="columns-panel__row">
+                <input type="checkbox" [checked]="isColumnVisible(column.id)" (change)="toggleColumn(column.id)" />
+                <span>{{ column.label }}</span>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      @if (isLoading()) {
+        <p class="directory-state" role="status">Loading…</p>
+      } @else {
+        <!-- Mounted once and never torn down: an @if around the grid destroys
+             the GridApi the toolbar and the status bar hold, so the empty case
+             is main's own words in the no-rows overlay instead. -->
+        <ag-grid-angular
+          class="directory-ag"
+          [theme]="gridTheme"
+          [rowData]="visibleRows()"
+          [columnDefs]="columns"
+          [defaultColDef]="defaultColumn"
+          [rowSelection]="rowSelection"
+          [selectionColumnDef]="selectionColumn"
+          [overlayNoRowsTemplate]="emptyOverlay()"
+          [getRowId]="rowId"
+          [quickFilterText]="quickFilter()"
+          [rowHeight]="rowHeight()"
+          [pagination]="true"
+          [paginationPageSize]="pageSize()"
+          [suppressPaginationPanel]="true"
+          [suppressCellFocus]="true"
+          (gridReady)="onGridReady($event)"
+          (selectionChanged)="onSelectionChanged()"
+          (paginationChanged)="onPaginationChanged()"
+          (cellClicked)="onCellClicked($event)"
+        />
+      }
+
+      <div class="dt-statusbar">
+        <span>Rows: <b>{{ filteredRowCount() }}</b></span>
+        <span>Selected: <b>{{ selectedCount() }}</b></span>
+        <span class="pager">
+          <label class="pagesize">
+            <span>Page size</span>
+            <select aria-label="Rows per page" (change)="setPageSize(numberValue($event))">
+              @for (size of pageSizes; track size) {
+                <option [value]="size" [selected]="size === pageSize()">{{ size }}</option>
+              }
+            </select>
+          </label>
+          <span>{{ rowRangeLabel() }}</span>
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="isFirstPage()"
+            aria-label="Previous page"
+            (click)="goToPreviousPage()"
+          >
+            <span class="icon" aria-hidden="true">chevron_left</span>
+          </button>
+          <span>{{ pagerLabel() }}</span>
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="isLastPage()"
+            aria-label="Next page"
+            (click)="goToNextPage()"
+          >
+            <span class="icon" aria-hidden="true">chevron_right</span>
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <!-- -------------------------------------------------- the 380px drawer -->
+    @if (openFaculty(); as faculty) {
+      <aside class="drawer" aria-label="Faculty member">
+        <div class="drawer-head">
+          <span class="avatar lg">{{ faculty.initials }}</span>
+          <div class="drawer-who">
+            <div class="drawer-name">{{ faculty.name }}</div>
+            <div class="drawer-sub">{{ openFacultyIdentityLine() }}</div>
+          </div>
+          <button type="button" class="btn ghost sm" aria-label="Close this panel" (click)="closeDrawer()">
+            <span class="icon" aria-hidden="true">close</span>
+          </button>
+        </div>
+
+        <div class="tabs">
+          <button type="button" class="tab" [class.active]="activeTab() === 'profile'" (click)="showTab('profile')">Profile</button>
+          <button type="button" class="tab" [class.active]="activeTab() === 'functions'" (click)="showTab('functions')">Access</button>
+          <button type="button" class="tab" [class.active]="activeTab() === 'sessions'" (click)="showTab('sessions')">Sessions</button>
+        </div>
+
+        <div class="drawer-body">
+          <!-- Outside the tab switch: an offboarded account is a fact about the
+               whole record, not about one pane of it. -->
+          @if (faculty.isDisabled) {
+            <div class="notice" role="status">
+              <span class="icon" aria-hidden="true">block</span>
+              {{ openFacultyStatusLine() }}
+            </div>
+          }
+
+          @switch (activeTab()) {
+            @case ('profile') {
+              <div class="field">
+                <label for="faculty-name">Name</label>
+                <input
+                  id="faculty-name"
+                  class="ctrl"
+                  type="text"
+                  [value]="draft().name"
+                  (input)="setDraftName(inputValue($event))"
+                />
+                <span class="help">Printed on the college’s leave form and shown to their mentees.</span>
+              </div>
+
+              <div class="field">
+                <label for="faculty-email">Official email</label>
+                <input
+                  id="faculty-email"
+                  class="ctrl"
+                  type="email"
+                  [value]="draft().email"
+                  (input)="setDraftEmail(inputValue($event))"
+                />
+                <span class="help">
+                  How Google sign-in finds this account. Changing it signs every device out at once.
+                </span>
+              </div>
+
+              <!-- B3.2's escape hatch, shown only once the address has actually
+                   changed: while it has not, neither control can affect the
+                   request, and the server refuses the tick without a reason. -->
+              @if (emailChanged()) {
+                <div class="field">
+                  <label class="inline-check">
+                    <input
+                      type="checkbox"
+                      [checked]="draft().allowExternal"
+                      (change)="setDraftAllowExternal(checkboxValue($event))"
+                    />
+                    <span>This address is outside the college’s domains</span>
+                  </label>
+                  <span class="help">Leave it clear unless it is deliberate.</span>
+                </div>
+
+                @if (draft().allowExternal) {
+                  <div class="field">
+                    <label for="faculty-external-reason">Why this address</label>
+                    <input
+                      id="faculty-external-reason"
+                      class="ctrl"
+                      type="text"
+                      placeholder="e.g. Visiting lecturer, no college address"
+                      [value]="draft().externalReason"
+                      (input)="setDraftExternalReason(inputValue($event))"
+                    />
+                    <span class="help">Required, and recorded on the audit trail against this account.</span>
+                  </div>
+                }
+              }
+
+              <div class="field synced">
+                <label for="faculty-college">College</label>
+                <input
+                  id="faculty-college"
+                  class="ctrl"
+                  type="text"
+                  disabled
+                  [value]="faculty.collegeName ?? 'Not filed'"
+                />
+                <span class="help">Derived from the department below — a college is never stored on the account.</span>
+              </div>
+
+              <div class="field">
+                <label for="faculty-department">Department</label>
+                <select id="faculty-department" class="ctrl" (change)="setDraftDepartment(selectValue($event))">
+                  <option value="" [selected]="draft().departmentId === ''">Not filed</option>
+                  @for (department of departmentPickerOptions(); track department.id) {
+                    <option [value]="department.id" [selected]="department.id === draft().departmentId">{{ department.label }}</option>
+                  }
+                </select>
+                <span class="help">Filing a faculty member is what makes “who teaches in…” answerable.</span>
+              </div>
+
+              <div class="field">
+                <label for="faculty-designation">Designation</label>
+                <input
+                  id="faculty-designation"
+                  class="ctrl"
+                  type="text"
+                  placeholder="e.g. Associate Professor"
+                  [value]="draft().designation"
+                  (input)="setDraftDesignation(inputValue($event))"
+                />
+                <span class="help">Printed on the college’s leave form beside their name.</span>
+              </div>
+
+              <button type="button" class="btn secondary" [disabled]="!canSaveProfile()" (click)="saveProfile()">
+                <span class="icon" aria-hidden="true">save</span> Save changes
+              </button>
+            }
+
+            @case ('functions') {
+              <div class="drawer-card card">
+                <h2 class="card-heading">Mentor</h2>
+                <p class="drawer-line">{{ openFacultyMenteeLine() }}</p>
+                <a class="btn ghost sm" routerLink="/admin/mentors">
+                  <span class="icon" aria-hidden="true">diversity_3</span> Assign students
+                </a>
+              </div>
+
+              <div class="notice accent">
+                <span class="icon" aria-hidden="true">info</span>
+                <div>
+                  Access is given on <a routerLink="/admin/governance">Who can do what</a>.
+                </div>
+              </div>
+            }
+
+            @case ('sessions') {
+              <div class="drawer-card card">
+                <h2 class="card-heading">Activation link</h2>
+                <p class="drawer-line">A new link replaces every older one.</p>
+                @if (faculty.isDisabled) {
+                  <p class="drawer-line faint-line">This account is disabled, so a link cannot be used until it is enabled again.</p>
+                }
+                <button type="button" class="btn secondary" [disabled]="busy()" (click)="mintActivationLink()">
+                  <span class="icon" aria-hidden="true">link</span> Make a sign-in link
+                </button>
+
+                @if (activationLink(); as minted) {
+                  <div class="minted" role="status">
+                    <div class="field">
+                      <label for="faculty-activation-link">Hand this over</label>
+                      <input id="faculty-activation-link" class="ctrl" type="text" readonly [value]="minted.link" />
+                    </div>
+                    <div class="minted-actions">
+                      <button type="button" class="btn secondary sm" (click)="copyActivationLink()">
+                        <span class="icon" aria-hidden="true">content_copy</span> Copy
+                      </button>
+                      <span class="chip">Expires in {{ minted.expires_in_hours }} h</span>
+                      @if (minted.emailed) {
+                        <span class="chip good">Emailed as well</span>
+                      } @else {
+                        <span class="chip warn">Mail is off — read it out</span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div class="drawer-card card">
+                <h2 class="card-heading">Sessions</h2>
+                <p class="drawer-line">Signs this account out of every device. Nothing else changes.</p>
+                <button type="button" class="btn secondary" [disabled]="busy()" (click)="signOutEverywhere()">
+                  <span class="icon" aria-hidden="true">logout</span> Sign out everywhere
+                </button>
+              </div>
+
+              <p class="drawer-line faint-line">An admin never sets a password; an active account uses “Forgot password”.</p>
+
+            }
+
+          }
+        </div>
+
+        <div class="drawer-foot">
+          <!-- A REMOVED account has one act here, the one that undoes it;
+               everything else on this foot is for an account on the roster. -->
+          @if (faculty.isRemoved) {
+            <button type="button" class="btn secondary" [disabled]="busy()" (click)="restoreAccount()">
+              <span class="icon" aria-hidden="true">undo</span> Restore to the roster
+            </button>
+          } @else {
+            <button type="button" class="btn secondary" [disabled]="busy()" (click)="signOutEverywhere()">
+              <span class="icon" aria-hidden="true">logout</span> Sign out everywhere
+            </button>
+            <!-- One button, two directions. An account that is already disabled
+                 has no second offboarding to offer, and the only act the office
+                 wants on it is the one that undoes the first. -->
+            @if (faculty.isDisabled) {
+              <button type="button" class="btn secondary" [disabled]="busy()" (click)="enableAccount()">
+                <span class="icon" aria-hidden="true">lock_open</span> Enable account
+              </button>
+            } @else {
+              <button type="button" class="btn secondary" (click)="openDisableDialog(faculty.userId)">
+                <span class="icon" aria-hidden="true">block</span> Disable account
+              </button>
+            }
+            <!-- Remove (record kept) or delete for good (2026-09-16): the
+                 shared dialog asks which, and asks for the emailed code
+                 before anything permanent. -->
+            <button type="button" class="btn danger" [disabled]="busy()" (click)="openDeleteDialog(faculty.userId)">
+              <span class="icon" aria-hidden="true">person_remove</span> Remove or delete…
+            </button>
+          }
+        </div>
+      </aside>
+    } @else {
+      <aside class="drawer drawer--empty">
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">person</span>
+          <div>
+            Pick a faculty member.
+          </div>
+        </div>
+      </aside>
+    }
+  </div>
+
+  @if (disablingFaculty(); as faculty) {
+    <app-disable-faculty-dialog
+      [faculty]="faculty"
+      (dismissed)="closeDisableDialog()"
+      (accountDisabled)="onDisabled($event)"
+    />
+  }
+
+  @if (deletingFaculty(); as target) {
+    <app-admin-delete-dialog
+      [target]="target"
+      (dismissed)="closeDeleteDialog()"
+      (done)="onDeleteDone($event)"
+    />
+  }
+</div>

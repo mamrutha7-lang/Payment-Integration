@@ -1,0 +1,174 @@
+# Pre-commit hooks for REEP.
+#
+# THIS FILE IS THE FAST COPY. IT IS NOT THE AUTHORITY.
+#
+# Three separate reasons, and every one of them is why nothing in this repository
+# may ever be defended by a hook alone:
+#
+#   1. Hooks live in `.git/hooks/`, and `.git/` is not cloned. A fresh clone has
+#      this file and no hooks. Nothing runs until somebody types
+#      `pre-commit install`, and nothing anywhere reminds them to.
+#   2. `git commit --no-verify` skips every hook here, silently, with no record
+#      in the commit and nothing for a reviewer to notice.
+#   3. `pre-commit autoupdate` and a stale local cache mean two developers can be
+#      running different versions of the same rule on the same diff.
+#
+# What this file buys is SPEED: two seconds on a laptop instead of four minutes
+# waiting for CI, or four weeks until the thing reaches a student. That is worth
+# having. It is not worth trusting. Every hook below is meant to be mirrored by a
+# CI step that cannot be skipped -- and as of this commit that mirror does NOT
+# exist yet: .github/workflows/ci.yml has four jobs ("API (FastAPI + Postgres)",
+# "API (dependency completeness)", "Voice worker (dependency completeness)",
+# "Web (Angular)") and none of them runs gitleaks, checks line endings, or reads
+# a commit message. Until the hygiene job lands, everything here is advisory in
+# the strict sense: the only thing standing behind it is the developer choosing
+# not to type `--no-verify`.
+#
+# INSTALL (both hook types -- the commit-msg one is not installed by default):
+#     pip install pre-commit
+#     pre-commit install --install-hooks -t pre-commit -t commit-msg
+#
+# `default_install_hook_types` below makes the bare `pre-commit install` do the
+# same thing, because the failure mode of forgetting `-t commit-msg` is a
+# conventional-commit hook that is configured, believed to be running, and never
+# invoked once.
+
+default_install_hook_types: [pre-commit, commit-msg]
+
+# Every `rev` here is pinned to an exact tag, never a branch. It is the same
+# argument AGENTS.md makes for `==` pins in requirements.txt: a floating ref
+# means a rebuild months later resolves a rule set nobody has run against this
+# tree, and a scanner that changes its mind on its own is a scanner whose red is
+# indistinguishable from noise.
+repos:
+  # ---------------------------------------------------------------------------
+  # Secrets. The one hook here that guards something unrecoverable.
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.18.4
+    hooks:
+      - id: gitleaks
+        name: gitleaks (REEP's own secret shapes)
+        # --config is passed explicitly rather than relying on gitleaks finding
+        # .gitleaks.toml by itself, because "it picked up the wrong config" and
+        # "it found nothing" look identical from the outside.
+        #
+        # WHY A LOCAL RULES FILE. GitHub's push protection already blocks
+        # PROVIDER secrets at the server, which is a stronger control than
+        # anything on a laptop. It does not know REEP's own shapes: AUTH_SECRET
+        # is `secrets.token_hex(32)`, a bare 64-hex string matching no vendor
+        # format. Whoever holds it can forge a {"role":"DIRECTOR"} session cookie
+        # and read every student's marks, attendance and USN with no login and no
+        # database row involved -- and on a public repo there is no un-pushing
+        # it, only rotation, which signs every live session out. See the header
+        # of .gitleaks.toml for the rules and every allowlist entry's reason.
+        args: ["--config", ".gitleaks.toml"]
+
+  # ---------------------------------------------------------------------------
+  # Commit message shape.
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.4.0
+    hooks:
+      - id: conventional-pre-commit
+        name: "conventional commit subject (type: subject)"
+        stages: [commit-msg]
+        # THE TYPE LIST IS MEASURED, NOT CHOSEN. These nine are exactly the
+        # types that appear in this repository's history -- `git log --oneline
+        # --all | grep -oE '^[a-z]+(\([^)]*\))?!?:'` yields feat, docs, fix,
+        # infra, security, ci, refactor, chore, test and nothing else. Adding
+        # `perf`, `build` or `style` from the Conventional Commits sample list
+        # would invent vocabulary the project does not use; omitting `infra` or
+        # `security`, both of which this repo uses and the sample list does not
+        # contain, would reject real commits from the first day.
+        #
+        # It checks the SUBJECT only. The four-beat BODY that CONTRIBUTING.md
+        # asks for -- symptom, mechanism, why this fix and not the obvious
+        # alternative, what was deliberately not done -- cannot be checked by a
+        # regex, and pretending otherwise would be the worse failure: AGENTS.md's
+        # rules were written out of those bodies, and a hook that passes a
+        # well-typed one-liner teaches the author that the subject was the part
+        # that mattered.
+        args:
+          - feat
+          - fix
+          - docs
+          - refactor
+          - chore
+          - ci
+          - infra
+          - security
+          - test
+
+  # ---------------------------------------------------------------------------
+  # File hygiene. Cheap, boring, and each one is here because of a specific
+  # failure this repository can name.
+  # ---------------------------------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: end-of-file-fixer
+        name: end every file with exactly one newline
+        # A missing trailing newline turns the next edit of that file into a
+        # two-line diff -- the last line deleted and re-added -- and review
+        # attention spent on that is review attention not spent on the change.
+        # This repo has already spent commits on indentation and formatting
+        # ("Fix indentation in test cases for consistency", "Fix indentation and
+        # formatting in redesign.py"); the cheapest fix is to stop generating
+        # the diffs.
+
+      - id: mixed-line-ending
+        name: normalise line endings to LF
+        args: ["--fix=lf"]
+        # Development happens on Windows and CI runs on ubuntu-latest, and the
+        # gap between those two is not cosmetic. `tools/fonts/fetch-fonts.sh`
+        # acquiring a CRLF shebang dies on the runner with
+        # `bad interpreter: /usr/bin/env bash^M`, which reads to everyone as a
+        # missing binary rather than as a line ending. Eight .py files are
+        # already committed CRLF -- measured, not guessed. Grepping HEAD's
+        # *.py blobs for a carriage return names all eight: app/config.py,
+        # app/interview_local.py, app/interview_relay.py, app/routers/interview.py,
+        # app/routers/interview_records.py, tests/test_interview_local.py,
+        # tests/test_interview_write_path.py and tools/cascade/bench.py. This
+        # hook does not retro-fix those; it stops the ninth, on the files a
+        # developer actually stages.
+        #
+        # NOT THE REAL CONTROL. Line endings are decided at CHECKOUT, by
+        # .gitattributes. The root .gitattributes covers `*.sh`/`*.bash` (LF)
+        # and `*.ps1` (CRLF) and deliberately stops there -- it carries no
+        # global `* text=auto`, because 29 tracked files are stored CRLF in the
+        # index and a global rule would renormalise all of them on the next
+        # `git add`. So for every OTHER file type this hook is the only thing
+        # acting, and it fixes what passes through it and nothing else: a file
+        # that arrives CRLF and is never staged stays CRLF forever.
+        #
+        # .ps1 is excluded on purpose. PowerShell scripts are a Windows artefact
+        # and the conventional .gitattributes rule for them is `eol=crlf`; a hook
+        # rewriting them to LF would fight that rule the day it is written.
+        exclude: '\.ps1$'
+
+      - id: check-merge-conflict
+        name: refuse conflict markers
+        # `<<<<<<<` committed into a source file is a syntax error at best and,
+        # in a .md or a .yml, a silently wrong document. It costs nothing to
+        # catch here and it is embarrassing to catch in review.
+
+      - id: check-added-large-files
+        name: refuse an unexpectedly large NEW file
+        # `apps/api-py/.venv-voice/` carries roughly half a gigabyte of wheels
+        # (onnxruntime, the livekit audio stack) and the api-py .gitignore says
+        # in its own comment that a single `git add -A` once would have committed
+        # them. .gitignore is the control; this is the second line, for the file
+        # nobody thought to ignore -- a model blob, a database dump, a wheel.
+        #
+        # 1024 kB, not the 500 kB default, and the number is measured: the
+        # largest tracked file in the repository is
+        # docs/diagrams/reep-tech-stack-a3.png at 941,685 bytes. A 500 kB
+        # threshold would reject the next regenerated architecture diagram, and
+        # a hook that is red on arrival for a legitimate file is a hook that gets
+        # its threshold raised in anger or removed. 1024 kB clears everything
+        # that legitimately lives here and stops everything that does not.
+        #
+        # It checks files being ADDED, not modified, so re-exporting an existing
+        # diagram is not affected.
+        args: ["--maxkb=1024"]

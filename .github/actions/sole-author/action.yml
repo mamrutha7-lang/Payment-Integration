@@ -1,0 +1,38 @@
+# Every commit an agent makes in this repository is authored and committed by
+# Darshan Gowda B B, and carries no co-author or session trailer. That is the
+# owner's rule, and it is enforced here rather than asked for in a prompt.
+#
+# Two halves, both deterministic:
+#   1. GIT_AUTHOR_* / GIT_COMMITTER_* go into GITHUB_ENV, so every later step
+#      (the Claude action included) commits as the owner. Git reads these
+#      variables ahead of `git config`, so the action setting its own bot
+#      identity with `git config user.name` changes nothing.
+#   2. A global commit-msg hook deletes Co-authored-by, Claude-Session and
+#      "Generated with" lines, because claude-code-action's built-in prompt
+#      tells the model to add a Co-authored-by trailer.
+#
+# Use it as the step right after actions/checkout in every agent workflow that
+# can commit (claude.yml, agent-triage.yml, agent-maintenance.yml).
+
+name: Sole author
+description: Commit as Darshan Gowda B B, with no co-author or session trailers.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        {
+          echo "GIT_AUTHOR_NAME=Darshan Gowda B B"
+          echo "GIT_AUTHOR_EMAIL=bdarshan5@bgscet.ac.in"
+          echo "GIT_COMMITTER_NAME=Darshan Gowda B B"
+          echo "GIT_COMMITTER_EMAIL=bdarshan5@bgscet.ac.in"
+        } >> "$GITHUB_ENV"
+        hooks="$RUNNER_TEMP/sole-author-hooks"
+        mkdir -p "$hooks"
+        cat > "$hooks/commit-msg" <<'HOOK'
+        #!/usr/bin/env bash
+        # Strip attribution trailers; the owner is the only author.
+        sed -i -E '/^[[:space:]]*(Co-authored-by|Claude-Session):/Id; /Generated with \[?Claude/Id' "$1"
+        HOOK
+        chmod +x "$hooks/commit-msg"
+        git config --global core.hooksPath "$hooks"

@@ -1,0 +1,119 @@
+# Glyphs the SUBSET must carry that collect-icon-names.py cannot find.
+#
+# icon-names.txt is GENERATED: the collector rewrites it from the glyph names
+# it can see in apps/web/src templates and in the API's SLOT_ICON / SKILL_ICON /
+# STATUS_GLYPH constants. That is the right default -- a glyph nobody renders
+# should not be paid for in font bytes -- but it cannot cover two cases, and
+# both fail SILENTLY, as a blank space where an icon should be:
+#
+#   1. A glyph the design system requires which no template has reached yet.
+#      docs/redesign-2026-09/01-design-system.md §6 names the icon vocabulary
+#      for the whole redesign; the screens that use it arrive in Phases 1-4.
+#      Without this file each of those phases would have to remember to
+#      regenerate the font, and the first one that forgot would ship a screen
+#      with holes in it.
+#
+#   2. A real glyph whose NAME is also an ordinary word, so the collector's
+#      denylist (NOT_GLYPHS) throws it away. `block` and `key` are both: the
+#      denylist is there to stop `display: block` and dictionary keys becoming
+#      font requests, and it cannot tell those from the icons. `block` was
+#      already used at six sites -- the practice report's "refused" chip, the
+#      interview list, the jobs board twice, the resume policy section and the
+#      profile -- and rendered as nothing at all in every one of them.
+#
+# One name per line. Comments and blank lines are ignored. Adding a name here
+# costs a few hundred bytes in the subset; leaving one out costs an invisible
+# control on somebody's screen.
+#
+# Regenerate after editing:
+#   python3 tools/fonts/collect-icon-names.py && tools/fonts/fetch-fonts.sh
+
+# --- denylisted by the collector, but real icons the app renders today ------
+block
+key
+
+# --- 01-design-system.md §6, the redesign's icon vocabulary -----------------
+add
+apartment
+bedtime
+bolt
+calendar_today
+check_circle
+chevron_left
+chevron_right
+content_copy
+delete
+description
+download
+edit
+error
+event_note
+filter_list
+flag
+group
+history
+home
+hourglass_top
+info
+leaderboard
+lock
+logout
+mic
+pending
+person
+schedule
+school
+search
+send
+shield_person
+stop
+thumb_down
+thumb_up
+tune
+upload
+verified
+visibility
+wb_twilight
+work
+
+# --- the 2026-09 shell: app bar, account menu and the console's sidebar -----
+# Every one of these is in apps/web/src/app/layout/app-shell.component.html,
+# so the collector finds them too. They are listed for the same reason the
+# §6 block is: if the shell is ever restructured, the font must not quietly
+# lose the glyphs the console depends on.
+admin_panel_settings
+draw
+edit_note
+event_available
+expand_more
+groups
+help
+how_to_reg
+insights
+menu_book
+notifications
+pending_actions
+rate_review
+smart_toy
+trending_down
+trending_up
+workspace_premium
+
+# --- Phase 1, Skilling's badge emblems (2026-09) -------------------------
+# One glyph per badge category, drawn inside the hexagon. `groups`,
+# `insights` and `lightbulb` the scanner already finds elsewhere; `settings`
+# is only ever used inside an emblem, which is a CSS background context the
+# template scanner cannot see, so it is declared here.
+settings
+
+# --- Phase 4b, the "Not measured" readiness chip (2026-09) ---------------
+# `remove` is the em-dash glyph on a factor the API reports `measured: false`
+# for — a check nobody has imported data for yet. It is chosen in TypeScript
+# (`features/student/home/home.component.ts::factorChip`) rather than written
+# in a template, so `collect-icon-names.py` cannot find it: it scans
+# templates. It happens to be in icon-names.txt today because another screen
+# spells it out, and the day that screen changes this chip would render blank.
+remove
+# `payments` -- the student sidebar's Fees row (layout/app-shell.component.ts),
+# written as an `icon:` property in TypeScript rather than a template.
+payments

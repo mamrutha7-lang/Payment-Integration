@@ -1,0 +1,54 @@
+# HR — Human Resources
+# Track code: hr   Interviewer: an empathetic yet compliant CHRO (voice: kiara)
+# Paste into Main Admin -> Interview questions -> HR -> Add many.
+# Frameworks the persona already carries: STAR, behavioural competencies,
+# labour law, conflict resolution, talent acquisition.
+
+# ---------------------------------------------------------------- opening --
+[opening] Tell me about yourself, and why you chose Human Resources over the other specialisations available to you.
+[opening] Walk me through your resume in two minutes, stopping at the one experience you would most like me to ask about.
+[opening] What does a good day look like for an HR professional, in your own words?
+[opening] Which part of HR interests you most today: talent acquisition, employee relations, compensation, or learning and development, and why that one?
+[opening] What do you know about how our HR function is organised, and what made you apply to us specifically?
+
+# ---------------------------------------------------------------- probing --
+[probing] Tell me about a time you resolved a disagreement between two people who both believed they were right. What did you actually say to each of them?
+[probing] Describe a situation where you had to deliver news somebody did not want to hear. How did you prepare for that conversation?
+[probing] Give me an example of a time you influenced a decision without holding any authority over the people involved.
+[probing] Tell me about a deadline you missed. What did you tell the people depending on you, and when did you tell them?
+[probing] Describe a team project where one member was not contributing. What did you do before escalating, and when did you decide to escalate?
+[probing] Walk me through how you would screen two hundred applications for a single entry-level role in a week.
+[probing] A hiring manager insists on a candidate who failed your structured interview. How do you handle that conversation?
+[probing] What is the difference between recruitment and talent acquisition, and why does that difference matter to a company's cost per hire?
+[probing] How would you measure whether an onboarding programme is working, three months after a new joiner starts?
+[probing] An employee resigns and names their manager as the reason in the exit interview. What do you do with that information?
+[probing] What would you include in a structured interview scorecard, and why is a structured interview fairer than an unstructured one?
+[probing] Explain the difference between an employee and an independent contractor, and why misclassifying one is expensive for the employer.
+[probing] What is the purpose of a probation period, and what should a manager be doing during it that they usually are not?
+[probing] How would you explain a CTC breakup to a fresher who only wants to know their monthly take-home?
+[probing] Tell me about a time you received feedback that was hard to hear. What did you change afterwards?
+[probing] How do you keep a candidate engaged during a four-week gap between their final round and the offer letter?
+[probing] What signals in an exit interview would make you escalate to leadership rather than file the form?
+[probing] Describe how you would run a stay interview with a high performer who has not asked to leave.
+
+# -------------------------------------------------------------- deep_dive --
+[deep_dive] Walk me through how you would handle a sexual harassment claim involving a top-performing executive, from the moment it reaches your desk.
+[deep_dive] Under the POSH Act, who sits on an Internal Committee, and what is your obligation if the complainant asks you to keep the matter informal?
+[deep_dive] A manager asks you to put an employee on a performance improvement plan two weeks before their maternity leave begins. How do you respond, and on what grounds?
+[deep_dive] You discover during a background check that a candidate who has already signed an offer misrepresented their last salary. Take me through your decision.
+[deep_dive] The company must reduce headcount by fifteen percent. Design the process, and tell me which parts of it you would refuse to compromise on.
+[deep_dive] Two employees in the same role, same grade, same performance band, are paid twelve percent apart. One has found out. What do you do?
+[deep_dive] An anonymous complaint alleges that a senior leader is favouring candidates from their own former employer in hiring. How do you investigate without confirming the rumour?
+[deep_dive] Your engagement survey scores drop nine points in one quarter and the CEO wants a plan by Friday. What do you look at first, and what do you refuse to promise?
+[deep_dive] How would you design a compensation structure for a sales team that rewards revenue without encouraging people to discount away the margin?
+[deep_dive] An employee is underperforming because of a health condition they have disclosed to you and asked you not to share with their manager. How do you proceed?
+[deep_dive] Attrition in one department is thirty-four percent against a company average of eleven. Give me your diagnostic sequence, and say what data you would need at each step.
+[deep_dive] You are asked to implement a return-to-office mandate that you believe will cost the company its best engineers. What do you do, and what do you say publicly once it is decided?
+[deep_dive] A union representative requests a meeting about shift rostering. You have never dealt with a union. Walk me through your first week.
+[deep_dive] How would you build a diversity hiring target that changes who gets hired without lowering the bar or creating a legal exposure?
+
+# ---------------------------------------------------------------- wrap_up --
+[wrap_up] What is the one thing about this role you are least sure you could do on day one?
+[wrap_up] If I spoke to someone who worked alongside you last year, what would they say you were difficult about?
+[wrap_up] Where do you want your HR career to be in five years, and what is the next step that actually gets you there?
+[wrap_up] What questions do you have for us about the team, the role, or the company?

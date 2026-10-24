@@ -1,0 +1,221 @@
+/**
+ * Screen-specific tweaks only. The frame, fields, dropzones, buttons and
+ * approval banners are all global `.reg-*` / `.field` / `.dropzone` / `.dt-btn`
+ * classes from styles/reep-v2.scss — not redefined here. This file only centres
+ * the standalone (no-shell) frame on the page and styles the one extra link the
+ * mockup did not carry.
+ */
+
+:host {
+  display: block;
+}
+
+.reg-screen {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 48px 16px;
+  background: var(--tint-3);
+}
+
+.reg-signin-link {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* The live upload zones are <label>s so a click anywhere opens the picker —
+ * but a label is inline by default, which lets the global .dropzone's dashed
+ * border wrap only the inline boxes. Make it the centred block column the
+ * global rule assumes. A modifier, not a redefinition of the global. */
+.dropzone--live {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+  text-align: center;
+
+  .icon {
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  strong {
+    overflow-wrap: anywhere;
+  }
+}
+
+.dropzone__btn {
+  margin-top: 4px;
+}
+
+/* Breathing room between the CV note and the first field label. */
+.autofill-note {
+  margin-bottom: 14px;
+}
+
+/* The "Where you belong" pickers. */
+.reg-section {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 18px 0 8px;
+}
+
+.req {
+  color: var(--risk);
+  font-weight: 700;
+}
+
+/* The Specialization checklist (2026-09-22). A <fieldset> so the group has a
+   name for a screen reader; the browser's fieldset chrome is reset so it sits
+   in the grid like the <select> it replaced. The legend carries `.field label`'s
+   four rules by hand because it is not a <label> and the global cannot reach
+   it; the tick rows are body text, NOT the label style the `.field label`
+   global would give a <label> here, and the override below is what stops it. */
+.reg-checklist {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+
+  legend {
+    padding: 0;
+    margin-bottom: 5px;
+    font-family: var(--font-display);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--ink-soft);
+  }
+}
+
+.reg-check-note {
+  margin: 0 0 6px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.reg-check-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+}
+
+/* One tick row. The row is the tap target (min-height 36px at every width),
+   and the whole label toggles the box. */
+.reg-checklist .reg-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  font-family: var(--font);
+  font-size: 12.8px;
+  font-weight: 500;
+  letter-spacing: 0;
+  color: var(--ink);
+  cursor: pointer;
+
+  input {
+    width: auto;
+    margin: 0;
+    accent-color: var(--brand-purple);
+    cursor: pointer;
+  }
+
+  input:disabled {
+    cursor: default;
+  }
+}
+
+/* A box past the cap: the row reads as unavailable, not just the box. `:has()`
+   is Selectors 4, so it stands in rules of its own — grouped with a plain
+   selector, a parser that cannot read it would drop the plain one too, and
+   the native disabled box is the fallback that still says it. */
+.reg-checklist .reg-check:has(input:disabled) {
+  cursor: default;
+}
+
+.reg-checklist .reg-check:has(input:disabled) span {
+  color: var(--muted);
+}
+
+/* The accepted format and size, on the dropzone itself. A rule the applicant
+   meets only as a refusal after picking a file is a rule stated too late. */
+.reg-file-hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* Why the last picked file was refused: under the picker, announced. */
+.reg-file-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 6px 0 0;
+  font-size: 12.5px;
+  color: var(--risk);
+
+  .icon {
+    font-size: 16px;
+  }
+}
+
+.reg-chain {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0 0;
+  font-size: 13.5px;
+  color: var(--ink);
+
+  .icon {
+    font-size: 18px;
+    color: var(--brand-purple);
+  }
+}
+
+/* A file input that is INVISIBLE BUT FOCUSABLE. `hidden` (display:none) took
+   these two pickers out of the focus order, and since a <label> is not tabbable
+   either, the CV and headshot dropzones were mouse-only on the one form the
+   public uses. Geometry rather than display:none keeps the input in the tab
+   order; the label below shows where focus is. */
+.reg-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Keyboard focus has to be VISIBLE or the focusable input above is a trap:
+   the caret is inside a 1px box nobody can see. */
+.dropzone:focus-within {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+}
+
+/* Tap target at phone width (2026-09-22): the "Already registered? Sign in" link, 140x36.
+   Block padding and not a min-height, because this is an inline link inside a
+   sentence — padding grows the hit area the thumb gets without moving the
+   words around it. Mobile only; the desktop link is unchanged. */
+@media (max-width: 760px) {
+  .reg-signin-link {
+    padding-block: 13px;
+  }
+}

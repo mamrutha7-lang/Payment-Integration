@@ -1,0 +1,509 @@
+/* Registrations — this screen's LAYOUT only.
+ *
+ * `.panel` `.card` `.chip` `.btn` `.select` `.field` `.ctrl` `.notice` `.tabs`
+ * `.eyebrow` `.crumb` `.avatar` `.icon` `.dt-header` `.dt-title` `.dt-sub`
+ * `.dt-toolbar` `.dt-frame` `.dt-gridbar` `.dt-quickfilter` `.dt-statusbar`
+ * `.dt-table` are global (styles/reep-v2.scss) and are used as they are.
+ *
+ * What is here is the shape of this board: the filter row, the grid beside its
+ * 380px decision panel, the grid bar's Columns popover, and the Seating rules
+ * dialog. `.check` is already a global (a checkbox row), so the panel's
+ * verdict rows are `.panel-check` — a name that belongs to this screen rather
+ * than a second meaning for somebody else's class.
+ *
+ * reep-v2.scss still has no dialog vocabulary; the Seating rules dialog wears
+ * the same chrome the batch dialogs on Students & batches wear, written here
+ * rather than promoted to a global, because a global class is the design
+ * system's to add. That gap is reported, not filled from here.
+ */
+
+:host {
+  display: block;
+}
+
+/* --- tabs and the board's filter row ------------------------------------- */
+
+.queue-tabs {
+  margin-bottom: 12px;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.filters .select {
+  max-width: 230px;
+}
+
+.filters .batch-select {
+  max-width: 280px;
+}
+
+/* A filter whose answer needs an unmerged endpoint. The directive disables the
+   real <select> inside — which is what takes it out of the tab order and stops
+   the menu — and this dims the pill it is laid over, so the row does not read
+   as four live filters one of which silently ignores you. */
+.filters .filter-pending {
+  opacity: 0.55;
+}
+
+/* The board's faint line at the right of the filter row. It is derived from
+   the seating rules that are actually on record — never a sentence about a
+   domain or a USN pattern this deployment may not have. */
+.filters-note {
+  margin-left: auto;
+  max-width: 46ch;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.queue-flash {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.queue-flash .undo {
+  margin-left: auto;
+}
+
+/* --- the grid beside its 380px panel ------------------------------------- */
+
+.queue {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.queue-grid {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* The grid bar has to be able to hold the Columns popover. */
+  position: relative;
+}
+
+.queue-ag {
+  display: block;
+  width: 100%;
+  height: clamp(360px, calc(100vh - 400px), 720px);
+}
+
+/* Loading sits where the grid would, in main's own words; the empty and the
+   filtered-empty states are the grid's no-rows overlay. */
+.queue-state {
+  margin: 0;
+  padding: 28px 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.gridbar-end {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --- the Columns popover -------------------------------------------------
+   AG Grid's own side panel is an Enterprise feature; this is the Community
+   equivalent of the board's Columns tab, driven by setColumnsVisible. */
+.columns-panel {
+  position: absolute;
+  top: 46px;
+  right: 10px;
+  z-index: 5;
+  width: 200px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-card);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.columns-panel__title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin-bottom: 2px;
+}
+
+.columns-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+/* --- the status bar's page-size control ---------------------------------- */
+
+.pagesize {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagesize select {
+  height: 24px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-seg);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 11.5px;
+  color: var(--ink);
+  padding: 0 4px;
+}
+
+/* --- the decision panel --------------------------------------------------- */
+
+.queue-panel {
+  width: 380px;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  max-height: clamp(440px, calc(100vh - 300px), 820px);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.panel-who {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.panel-name {
+  font-weight: 700;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.panel-meta {
+  font-size: 12px;
+  color: var(--faint);
+  overflow-wrap: anywhere;
+}
+
+.panel-facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+  margin: 0;
+  font-size: 12.5px;
+}
+
+.panel-facts dt {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.panel-facts dd {
+  margin: 2px 0 0;
+  overflow-wrap: anywhere;
+}
+
+/* The USN correction box (2026-10-16) takes the whole row while it is open. */
+.usn-fact--editing {
+  grid-column: 1 / -1;
+}
+
+.usn-edit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.usn-edit .ctrl {
+  flex: 1 1 140px;
+  width: auto;
+  min-width: 0;
+  text-transform: uppercase;
+}
+
+.usn-correct {
+  display: flex;
+  margin-top: 4px;
+}
+
+.panel-checks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.panel-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.panel-check .icon {
+  font-size: 17px;
+  color: var(--muted);
+}
+
+.panel-check--good .icon {
+  color: var(--good);
+}
+
+.panel-check--warn .icon {
+  color: var(--warn);
+}
+
+/* The server's "blocked": Approve will refuse this application. Colour is
+   never the only signal — the headline says what will refuse it and a notice
+   under the list says so again in words (01 §4). */
+.panel-check--risk .icon {
+  color: var(--risk);
+}
+
+/* The decided tabs, where `checks` comes back null. Said in words rather than
+   drawn as an empty list: "no checklist" and "nothing to report" are opposite
+   facts and a blank space reads as the second one. */
+.checks-none {
+  margin: 0;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+/* The hold note (B11.2). A block of its own rather than another `.panel-check`
+   row: it is not a verdict about the decision, it is a colleague's sentence,
+   and it is the only place in the product that sentence is ever read. */
+.panel-hold {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--tint-3);
+}
+
+.panel-hold .hold-note {
+  margin: 0;
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+.panel-hold .hold-meta {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.check-headline {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.check-detail {
+  font-size: 11.5px;
+  color: var(--faint);
+  overflow-wrap: anywhere;
+}
+
+/* The record of the student a check names: who already holds this USN. */
+.check-link {
+  display: inline-block;
+  margin-top: 2px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 0;
+}
+
+.panel-empty .icon {
+  font-size: 26px;
+  color: var(--brand-purple);
+}
+
+.panel-empty p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* The decision sits at the bottom of the panel, as the board draws it. */
+.panel-decision {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panel-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* --- the Seating rules dialog -------------------------------------------- */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(30, 27, 41, 0.42);
+}
+
+.dialog {
+  width: 760px;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: 0 24px 60px rgba(58, 31, 82, 0.3);
+}
+
+.dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.dialog-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.dialog-sub {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  max-width: 62ch;
+}
+
+.dialog-body {
+  padding: 16px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dialog-foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 24px 20px;
+  border-top: 1px solid var(--hairline);
+}
+
+/* ----------------------------------------------- the seating-rules editor */
+/* B11.3. Local names only: `.field` and `.ctrl` are the global controls the
+   decision panel already uses, and everything below is layout around them. */
+
+/* `flex: none`: `overflow-x` makes this a scroll container, so as a child of
+   the `.dialog-body` column its minimum height is 0 and a short window squeezed
+   the rules table rather than scrolling the body. */
+.rules-scroll {
+  flex: none;
+  overflow-x: auto;
+}
+
+.rules-scope,
+.rules-foot {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  max-width: 72ch;
+}
+
+.rule-actions {
+  white-space: nowrap;
+
+  .btn {
+    margin-right: 4px;
+  }
+}
+
+.rule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rule-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 16px;
+
+  .wide {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .rule-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.field-help {
+  display: block;
+  margin-top: 4px;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.rule-switch {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--tint-1);
+  cursor: pointer;
+
+  input {
+    margin-top: 2px;
+    flex: none;
+  }
+
+  b {
+    display: block;
+    font-size: 13px;
+  }
+}

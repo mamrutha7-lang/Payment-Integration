@@ -1,0 +1,399 @@
+// The v2 palette + shared classes (.card, .chip, .dt-table, .dense-grid,
+// .dense-stat, .dt-header) live in the global reep-v2 sheets. Scoped here: the
+// record layout, the handoff's flatter stat tiles and tinted results table
+// (both differ from the global defaults on this one screen), and the attendance
+// meter with its tone variants, which the global sheet doesn't define.
+:host {
+  display: block;
+}
+
+.c-note {
+  color: var(--muted);
+}
+
+// --- section framing -------------------------------------------------------
+.rec-section {
+  margin-bottom: 32px;
+}
+
+.rec-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(160, 138, 178, 0.35);
+}
+
+.rec-h .icon {
+  font-size: 21px;
+  color: var(--purple-mid);
+}
+
+.rec-h-sub {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// The headline strip: four flat tinted tiles, quieter than the global
+// .dense-stat card so the semester cards below stay the loudest thing.
+.rec-stats {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 26px;
+}
+.rec-stats .dense-stat {
+  background: var(--tint-2);
+  border: 1px solid var(--hairline-42);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: none;
+}
+.rec-stats .dense-stat .lbl {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin: 0;
+}
+.rec-stats .dense-stat .val {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 4px;
+}
+@media (max-width: 900px) {
+  .rec-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// --- semester results ------------------------------------------------------
+.sem-card {
+  margin-bottom: 16px;
+}
+
+.sem-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.sem-name {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.sem-meta {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+// Tables scroll inside their own container on narrow screens.
+.rec-scroll {
+  overflow-x: auto;
+}
+
+// The results table is a tinted, rounded block on this screen — the handoff
+// draws VTU marks as a sheet inside the semester card rather than as ruled
+// rows on the card itself. `border-collapse: separate` is what lets the radius
+// clip; a collapsed table ignores it.
+.rec-scroll .dt-table {
+  margin-bottom: 0;
+  min-width: 560px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--tint-2);
+  border: 1px solid var(--hairline-42);
+  border-radius: 16px;
+  overflow: hidden;
+  font-size: 13px;
+}
+.rec-scroll .dt-table th {
+  padding: 9px 13px;
+  background: var(--tint-1);
+  color: var(--muted);
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  border-bottom: 0;
+}
+.rec-scroll .dt-table td {
+  padding: 9px 13px;
+  border-top: 1px solid rgba(58, 31, 82, 0.12);
+  border-bottom: 0;
+  color: var(--ink);
+}
+.rec-scroll .dt-table tbody tr:nth-child(even) {
+  background: transparent;
+}
+
+.rec-empty-row {
+  color: var(--faint);
+  text-align: center;
+}
+
+// --- attendance meter (global sheet has no tone variants) ------------------
+.meter {
+  height: 10px;
+  border-radius: 6px;
+  background: var(--hairline);
+  overflow: hidden;
+  box-shadow: var(--sh-well);
+}
+
+.meter.sm {
+  height: 8px;
+}
+
+.meter__fill {
+  height: 100%;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--magenta-mid), var(--purple-mid));
+  transition: width 0.3s ease;
+}
+
+.meter__fill.good {
+  background: var(--good);
+}
+.meter__fill.warn {
+  background: var(--warn);
+}
+.meter__fill.risk {
+  background: var(--risk);
+}
+
+.att-overall-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.att-lbl {
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.att-big {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-top: 2px;
+}
+
+.att-fine {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.att-courses {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(58, 31, 82, 0.12);
+}
+
+.att-courses-h {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.att-course {
+  display: grid;
+  grid-template-columns: 120px 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.att-course-code {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.att-course-fig {
+  font-size: 13px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.att-course-chip {
+  min-width: 66px;
+  justify-content: center;
+}
+
+// --- academic history ------------------------------------------------------
+.qual-grid {
+  display: grid;
+  /* `min(Npx, 100%)` and not a bare `Npx`: a minmax() track whose minimum is a
+     fixed length does NOT collapse when the container is narrower than it — the
+     track keeps its minimum and the grid overflows. On a 320px handset the
+     content box inside a card is about 260px, so every one of these was wider
+     than the screen it was drawn on. `min()` caps the minimum at the container,
+     which changes nothing at any width where the track already fitted. */
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.qual-card {
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.qual-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.qual-level {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.qual-inst {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.qual-line {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.qual-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+
+.qual-marks {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.qual-pct {
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.qual-raw {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gap-card {
+  margin-bottom: 0;
+}
+
+.gap-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.gap-title {
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+.gap-grid {
+  margin-top: 14px;
+  margin-bottom: 0;
+}
+
+.gap-unit {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.gap-none {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .att-course {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'code chip'
+      'meter meter'
+      'fig fig';
+  }
+  .att-course-code {
+    grid-area: code;
+  }
+  .att-course-chip {
+    grid-area: chip;
+  }
+  .att-course .meter {
+    grid-area: meter;
+  }
+  .att-course-fig {
+    grid-area: fig;
+  }
+}
+
+/* The "Subject-by-subject progress" link to /student/courses, inline in the
+   subtitle. Inline-flex so the icon sits on the text baseline rather than
+   pushing the line height. */
+.rec-courses-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  color: var(--brand-purple);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+
+  .icon {
+    font-size: 15px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/* Tap target at phone width (2026-09-22): Records' "Subject-by-subject progress" link, 208x18.
+   Block padding and not a min-height, because this is an inline link inside a
+   sentence — padding grows the hit area the thumb gets without moving the
+   words around it. Mobile only; the desktop link is unchanged. */
+@media (max-width: 760px) {
+  .rec-courses-link {
+    padding-block: 13px;
+  }
+}

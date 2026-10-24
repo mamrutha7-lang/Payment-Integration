@@ -1,0 +1,1217 @@
+<div class="panel" data-p="catalogue">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <span>College setup</span><span class="sep">/</span><span>Catalogue</span>
+      </div>
+      <h1 class="dt-title">Catalogue</h1>
+      <div class="dt-sub">Subjects, certificates, badges and stage rules.</div>
+    </div>
+    <div class="dt-toolbar">
+      <button type="button" class="btn secondary" (click)="toggleImport()">
+        <span class="icon" aria-hidden="true">upload_file</span>
+        {{ importOpen() ? 'Close import' : 'Import subjects' }}
+      </button>
+      @if (!certificationsAreMainAdminOnly()) {
+        @if (formOpen()) {
+          <button type="button" class="btn secondary" (click)="closeForm()">
+            <span class="icon" aria-hidden="true">close</span>Cancel
+          </button>
+        } @else {
+          <button type="button" class="btn primary" (click)="openForm()">
+            <span class="icon" aria-hidden="true">add</span>Add certification
+          </button>
+        }
+      }
+    </div>
+  </div>
+
+  <div role="alert">
+    @if (error()) {
+      <div class="notice cat-note">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>{{ error() }}</div>
+      </div>
+    }
+  </div>
+  <div role="status">
+    @if (loading()) {
+      <div class="notice info cat-note">
+        <span class="icon" aria-hidden="true">hourglass_empty</span>
+        <div>Loading the catalogue…</div>
+      </div>
+    }
+    @if (flash()) {
+      <div class="notice good cat-note">
+        <span class="icon" aria-hidden="true">check</span>
+        <div>{{ flash() }}</div>
+      </div>
+    }
+  </div>
+
+  <div class="tabs cat-tabs" role="tablist" aria-label="Catalogue sections">
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.active]="tab() === 'subjects'"
+      [attr.aria-selected]="tab() === 'subjects'"
+      (click)="setTab('subjects')"
+    >
+      Subjects
+      @if (subjects(); as rows) {
+        <span class="cat-tab-count">· {{ rows.length }}</span>
+      }
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.active]="tab() === 'badges'"
+      [attr.aria-selected]="tab() === 'badges'"
+      (click)="setTab('badges')"
+    >
+      Certifications ↔ badges
+      @if (badges().length) {
+        <span class="cat-tab-count">· {{ badges().length }}</span>
+      }
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.active]="tab() === 'stages'"
+      [attr.aria-selected]="tab() === 'stages'"
+      (click)="setTab('stages')"
+    >
+      Stage rules
+    </button>
+    <button
+      type="button"
+      role="tab"
+      class="tab"
+      [class.active]="tab() === 'tracks'"
+      [attr.aria-selected]="tab() === 'tracks'"
+      (click)="setTab('tracks')"
+    >
+      Interview tracks
+      @if (tracks(); as rows) {
+        <span class="cat-tab-count">· {{ rows.length }}</span>
+      }
+    </button>
+  </div>
+
+  <!-- Scope (B13). A certification carries `college_id` / `course_id`, and
+       BOTH NULL IS PROGRAMME-WIDE — so neither pill hides a programme-wide
+       row, which is the same reading `list_approved_certifications` gives
+       `?course_id=`. The college list is learned from the course rows rather
+       than fetched: `GET /admin/colleges` is `admin.institution`, a different
+       function from this screen's. -->
+  <div class="cat-filters">
+    <span class="select cat-select">
+      <span class="lbl">College</span>
+      <span class="val">{{ collegeFilterLabel() }}</span>
+      <select
+        aria-label="Scope the catalogue to a college"
+        [value]="collegeFilter()"
+        (change)="setCollegeFilter($any($event.target).value)"
+      >
+        <option value="">All colleges</option>
+        @for (college of collegeOptions(); track college.id) {
+          <option [value]="college.id" [selected]="college.id === collegeFilter()">
+            {{ college.name }}
+          </option>
+        }
+      </select>
+    </span>
+    <span class="select cat-select">
+      <span class="lbl">Course</span>
+      <span class="val">{{ courseFilterLabel() }}</span>
+      <select
+        aria-label="Scope the catalogue to a course"
+        [value]="courseFilter()"
+        (change)="courseFilter.set($any($event.target).value)"
+      >
+        <option value="">All courses</option>
+        @for (course of courseOptions(); track course.id) {
+          <option [value]="course.id" [selected]="course.id === courseFilter()">
+            {{ course.code }} — {{ course.name }}
+          </option>
+        }
+      </select>
+    </span>
+    @if (tab() === 'badges') {
+      <span class="select cat-select">
+        <span class="lbl">Skill area</span>
+        <span class="val">{{ skillAreaLabel() }}</span>
+        <select
+          aria-label="Filter badges by skill area"
+          [value]="skillArea()"
+          (change)="skillArea.set($any($event.target).value)"
+        >
+          <option value="ALL" [selected]="skillArea() === 'ALL'">All</option>
+          @for (area of skillAreas(); track area.value) {
+            <option [value]="area.value" [selected]="area.value === skillArea()">
+              {{ area.label }}
+            </option>
+          }
+        </select>
+      </span>
+      <span class="select cat-select">
+        <span class="lbl">Certifications</span>
+        <span class="val">
+          @switch (mapping()) {
+            @case ('MAPPED') {
+              Mapped
+            }
+            @case ('UNMAPPED') {
+              None mapped
+            }
+            @default {
+              All
+            }
+          }
+        </span>
+        <select
+          aria-label="Filter badges by whether certifications are mapped to them"
+          [value]="mapping()"
+          (change)="mapping.set($any($event.target).value)"
+        >
+          <option value="ALL" [selected]="mapping() === 'ALL'">All</option>
+          <option value="MAPPED" [selected]="mapping() === 'MAPPED'">Mapped</option>
+          <option value="UNMAPPED" [selected]="mapping() === 'UNMAPPED'">None mapped</option>
+        </select>
+      </span>
+    }
+    <span class="cat-filters-note">
+      @if (scopeIsNarrowed()) {
+        Narrowed — programme-wide rows are still shown, because they apply here too.
+      } @else {
+        Every college and course, programme-wide rows included.
+      }
+    </span>
+  </div>
+
+  <!-- B13: the subject import. `POST /admin/catalogue/subjects/import`, whose
+       `dry_run` DEFAULTS TO TRUE on the server — the only write in this
+       router that does, because its input is a file somebody exported from a
+       spreadsheet. The panel follows it: nothing is written until a dry run
+       has reported and the office has read it. -->
+  @if (importOpen()) {
+    <div class="card cat-form">
+      <h2 class="cat-card-title">Import subjects</h2>
+      <p class="cat-help">
+        A CSV with these columns, in any order:
+        <span class="cat-mono">{{ subjectImportColumns }}</span
+        >. A subject code is global across the deployment, so this is a programme-wide change and a
+        scoped grant is refused.
+      </p>
+
+      <div class="cat-import-pick">
+        <!-- Hidden with GEOMETRY, never `display:none`/`hidden`: that takes the
+             input out of the focus order and makes the picker mouse-only. The
+             label carries the focus ring through :focus-within. -->
+        <label class="cat-filelabel" for="subject-csv">
+          <span class="icon" aria-hidden="true">upload_file</span>
+          Choose a CSV
+          <input
+            id="subject-csv"
+            class="cat-fileinput"
+            type="file"
+            accept=".csv,text/csv"
+            (change)="pickImportFile($event)"
+          />
+        </label>
+        <span class="cat-filename">{{ importFileName() ?? 'No file chosen' }}</span>
+      </div>
+
+      <div role="alert">
+        @if (importError()) {
+          <div class="notice cat-note">
+            <span class="icon" aria-hidden="true">error</span>
+            <div>{{ importError() }}</div>
+          </div>
+        }
+      </div>
+
+      @if (importResult(); as report) {
+        <div class="notice cat-note" [class.good]="report.errors === 0" role="status">
+          <span class="icon" aria-hidden="true">{{ report.errors ? 'error' : 'check' }}</span>
+          <div>
+            <strong>{{ report.dry_run ? 'Dry run' : 'Imported' }}</strong> ·
+            {{ report.created }} to add, {{ report.updated }} to update,
+            {{ report.errors }} in error.
+            @if (report.dry_run && report.errors === 0) {
+              Nothing has been written yet.
+            }
+          </div>
+        </div>
+        @if (report.rows.length) {
+          <div class="cat-scroll">
+            <table class="dt-table">
+              <caption class="sr-only">Every row of the file, in file order</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Line</th>
+                  <th scope="col">Code</th>
+                  <th scope="col">Outcome</th>
+                  <th scope="col">Detail</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of report.rows; track row.line) {
+                  <tr>
+                    <td class="tabular">{{ row.line }}</td>
+                    <td>{{ row.code || '—' }}</td>
+                    <td>
+                      <span
+                        class="chip dot"
+                        [class.risk]="row.outcome === 'error'"
+                        [class.good]="row.outcome === 'create'"
+                        [class.warn]="row.outcome === 'update'"
+                        >{{ row.outcome }}</span
+                      >
+                    </td>
+                    <td>{{ row.detail ?? '' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
+
+      <div class="footbar">
+        <button type="button" class="btn ghost" (click)="toggleImport()">Cancel</button>
+        <button
+          type="button"
+          class="btn secondary"
+          (click)="runImport(true)"
+          [disabled]="importBusy() || !importFileName()"
+        >
+          <span class="icon" aria-hidden="true">visibility</span>
+          {{ importBusy() ? 'Reading…' : 'Check first' }}
+        </button>
+        <button
+          type="button"
+          class="btn primary"
+          (click)="runImport(false)"
+          [disabled]="importBusy() || !importResult()?.dry_run"
+          title="Press Check first."
+        >
+          <span class="icon" aria-hidden="true">check</span>Import
+        </button>
+      </div>
+    </div>
+  }
+
+  @switch (tab()) {
+    <!-- ---------------------------------------------------------------- -->
+    @case ('subjects') {
+      <div role="tabpanel" aria-label="Subjects">
+        <div class="dt-frame">
+          <div class="dt-gridbar">
+            <input
+              type="search"
+              class="dt-quickfilter"
+              placeholder="Search subjects…"
+              aria-label="Search subjects by code, name or dimension"
+              [value]="query()"
+              (input)="query.set($any($event.target).value)"
+            />
+            <span class="cat-gridbar-note">
+              Edited as a whole sheet — "Import subjects", above.
+            </span>
+          </div>
+          <div class="cat-scroll">
+            <table class="dt-table cat-table">
+              <thead>
+                <tr>
+                  <th class="pinned">Subject</th>
+                  <th>Dimension</th>
+                  <th>Stage</th>
+                  <th class="num">Semester</th>
+                  <th class="num">Hours</th>
+                  <th class="num">Enrolled</th>
+                  <th class="num">Fee (₹)</th>
+                  <th>Evidence path</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (subject of visibleSubjects(); track subject.code) {
+                  <tr>
+                    <td class="pinned">
+                      <strong>{{ subject.code }} · {{ subject.name }}</strong>
+                      <div class="cat-meta">
+                        {{ dimensionLabel(subject.model_type) }} ·
+                        {{ subject.duration_weeks | plural: 'week' }}
+                      </div>
+                    </td>
+                    <td>{{ dimensionLabel(subject.dimension) }}</td>
+                    <td>{{ stageLabel(subject.stage) }}</td>
+                    <td class="num">{{ subject.semester }}</td>
+                    <td
+                      class="num"
+                      [title]="
+                        subject.teaching_hours +
+                        ' h taught · ' +
+                        subject.self_learning_hours_required +
+                        ' h self-study'
+                      "
+                    >
+                      {{ subjectHours(subject) }}
+                    </td>
+                    <td class="num">{{ subject.enrolled }}</td>
+                    <td class="num">
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        class="cat-fee"
+                        placeholder="Free"
+                        [value]="subject.fee_paise ? subject.fee_paise / 100 : ''"
+                        [attr.aria-label]="'Enrolment fee in rupees for ' + subject.code"
+                        (change)="saveFee(subject, $any($event.target))"
+                      />
+                    </td>
+                    <td>
+                      @if (subject.certifications.length) {
+                        <span class="chip good" [title]="subject.certifications.length + ' mapped'">
+                          {{ subject.certifications.length | plural: 'certification' }}
+                        </span>
+                      } @else {
+                        <span class="chip warn">None mapped</span>
+                      }
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="8">
+                      @if (loadFailed()) {
+                        <div class="empty">
+                          <span class="icon" aria-hidden="true">error</span>
+                          The catalogue could not be read — this is not an empty catalogue.
+                        </div>
+                      } @else if (subjects()) {
+                        <div class="empty">
+                          <span class="icon" aria-hidden="true">table_rows</span>
+                          @if (query().trim()) {
+                            No subject matches “{{ query() }}”.
+                          } @else {
+                            No courses in the catalogue yet.
+                          }
+                        </div>
+                      } @else {
+                        <div class="empty">
+                          <span class="icon" aria-hidden="true">hourglass_empty</span>
+                          Loading the catalogue…
+                        </div>
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="dt-statusbar">
+            <span
+              >Subjects: <b>{{ visibleSubjects().length }}</b></span
+            >
+            @if (subjects(); as rows) {
+              <span
+                >Of <b>{{ rows.length }}</b> in the programme</span
+              >
+            }
+          </div>
+        </div>
+        <p class="cat-foot">
+          A subject carries a code, a stage, a dimension, a semester and a delivery model, which is
+          more than a form on this screen could ask for without inventing an answer — so the
+          curriculum is maintained as a CSV through “Import subjects”, dry run first. A subject
+          code is global across the deployment, so an import is a programme-wide change.
+        </p>
+      </div>
+    }
+
+    <!-- ---------------------------------------------------------------- -->
+    @case ('badges') {
+      <div role="tabpanel" aria-label="Certifications and badges">
+        <div class="notice accent cat-note">
+          <span class="icon" aria-hidden="true">lock</span>
+          <div>
+            Badges cannot be added or edited here. This screen decides which certifications count towards each.
+          </div>
+        </div>
+
+        @if (certificationsAreMainAdminOnly()) {
+          <div class="notice accent cat-note">
+            <span class="icon" aria-hidden="true">shield_person</span>
+            <div>
+              The approved certification list refused this account, so the mapping below reads as
+              empty. The badges themselves are shown in full.
+            </div>
+          </div>
+        } @else if (loadFailed()) {
+          <!-- The error notice at the top of the screen carries the sentence;
+               what must not appear here is "no approved certifications yet",
+               which is a claim about the data nobody could read. -->
+        } @else if (certifications(); as rows) {
+          @if (rows.length === 0) {
+            <div class="notice accent cat-note">
+              <span class="icon" aria-hidden="true">info</span>
+              <div>No approved certifications yet — add the first one with “Add certification”.</div>
+            </div>
+          }
+        }
+
+        @if (formOpen()) {
+          <div class="card cat-form">
+            <h2 class="cat-card-title">New certification</h2>
+            <div class="cat-form-grid">
+              <div class="field">
+                <label for="certification-name">Certification</label>
+                <input
+                  id="certification-name"
+                  type="text"
+                  class="ctrl"
+                  placeholder="e.g. Microsoft PL-300"
+                  [value]="formName()"
+                  (input)="formName.set($any($event.target).value)"
+                />
+              </div>
+              <div class="field">
+                <label for="certification-provider">Provider</label>
+                <input
+                  id="certification-provider"
+                  type="text"
+                  class="ctrl"
+                  placeholder="e.g. Microsoft"
+                  [value]="formProvider()"
+                  (input)="formProvider.set($any($event.target).value)"
+                />
+              </div>
+              <div class="field">
+                <label for="certification-badge">Badge it counts towards</label>
+                <select
+                  id="certification-badge"
+                  class="ctrl"
+                  [value]="formBadgeCode()"
+                  (change)="formBadgeCode.set($any($event.target).value)"
+                >
+                  @for (badge of badges(); track badge.code) {
+                    <option [value]="badge.code" [selected]="badge.code === formBadgeCode()">
+                      {{ badge.name }} · {{ badge.points }} pts
+                    </option>
+                  }
+                </select>
+              </div>
+              <div class="field">
+                <label for="certification-scope">Applies to</label>
+                <select
+                  id="certification-scope"
+                  class="ctrl"
+                  [value]="formCourseId()"
+                  (change)="formCourseId.set($any($event.target).value)"
+                >
+                  <option value="">Every college and course</option>
+                  @for (course of courseOptions(); track course.id) {
+                    <option [value]="course.id" [selected]="course.id === formCourseId()">
+                      {{ course.code }} — {{ course.name }}
+                      @if (course.college) {
+                        · {{ course.college }}
+                      }
+                    </option>
+                  }
+                </select>
+                <span class="help">The college follows the course.</span>
+              </div>
+              <div class="field">
+                <label for="certification-url"
+                  >Link <span class="cat-optional">(optional)</span></label
+                >
+                <input
+                  id="certification-url"
+                  type="url"
+                  class="ctrl"
+                  placeholder="https://…"
+                  [value]="formUrl()"
+                  (input)="formUrl.set($any($event.target).value)"
+                />
+              </div>
+            </div>
+            <div class="cat-form-foot">
+              <button
+                type="button"
+                class="btn primary"
+                [disabled]="saving()"
+                (click)="addCertification()"
+              >
+                <span class="icon" aria-hidden="true">add</span>Add to catalogue
+              </button>
+              @if (formBadge(); as badge) {
+                <span class="cat-derived">
+                  Category {{ badge.category_label }} · {{ badge.points | plural: 'point' }} ·
+                  {{ stageLabel(badge.stage) }} stage — read off the badge, never typed.
+                </span>
+              }
+            </div>
+            <div role="alert">
+              @if (formError()) {
+                <div class="notice cat-note">
+                  <span class="icon" aria-hidden="true">error</span>
+                  <div>{{ formError() }}</div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="cat-body">
+          <div class="cat-main">
+            <div class="dt-frame">
+              <div class="dt-gridbar">
+                <input
+                  type="search"
+                  class="dt-quickfilter"
+                  placeholder="Search badges…"
+                  aria-label="Search badges and the certifications mapped to them"
+                  [value]="query()"
+                  (input)="query.set($any($event.target).value)"
+                />
+                <button type="button" class="btn secondary sm" (click)="toggleCopy()">
+                  <span class="icon" aria-hidden="true">content_copy</span>
+                  {{ copyOpen() ? 'Close copy' : 'Copy to course…' }}
+                </button>
+              </div>
+              @if (copyOpen()) {
+                <!-- B13's copy. `POST /admin/catalogue/copy
+                     {from_course, to_course, parts[]}` — the endpoint's settled
+                     shape, so the board's two-step (college, then course) is
+                     ONE FLAT SEARCHABLE LIST here: every row carries its
+                     college's name, and the needle matches it. -->
+                <div class="cat-copy">
+                  <h3 class="cat-card-title">Copy a catalogue between programmes</h3>
+                  <p class="cat-help">
+                    Additive and never overwriting: a row the destination already has is skipped
+                    and counted. The dry run says how many of each before anything is written.
+                  </p>
+
+                  @if (courses(); as rows) {
+                    @if (rows.length < 2) {
+                      <div class="notice accent cat-note">
+                        <span class="icon" aria-hidden="true">info</span>
+                        <div>
+                          A copy needs two programmes and this account reaches
+                          {{ rows.length }}. Courses are added in
+                          <a routerLink="/admin/institution">College structure</a>.
+                        </div>
+                      </div>
+                    }
+                  } @else {
+                    <div class="notice cat-note" role="alert">
+                      <span class="icon" aria-hidden="true">error</span>
+                      <div>
+                        The programme list could not be read, so there is nothing to copy between.
+                        Reload the screen to try again.
+                      </div>
+                    </div>
+                  }
+
+                  <input
+                    type="search"
+                    class="dt-quickfilter"
+                    placeholder="Find a programme — code, name, department or college…"
+                    aria-label="Search programmes across every college"
+                    [value]="copyQuery()"
+                    (input)="copyQuery.set($any($event.target).value)"
+                  />
+
+                  <div class="cat-copy-pair">
+                    <div class="field">
+                      <label for="copy-from">Copy from</label>
+                      <select
+                        id="copy-from"
+                        class="ctrl"
+                        [value]="copyFrom()"
+                        (change)="copyFrom.set($any($event.target).value)"
+                      >
+                        <option value="">Choose a programme…</option>
+                        @for (course of copyCandidates(); track course.id) {
+                          <option [value]="course.id" [selected]="course.id === copyFrom()">
+                            {{ course.code }} — {{ course.name }}
+                            @if (course.college) {
+                              · {{ course.college }}
+                            }
+                          </option>
+                        }
+                      </select>
+                      @if (copyFrom()) {
+                        <span class="help">{{ copyCourseLine(sourceCourse()!) }}</span>
+                      }
+                    </div>
+                    <div class="field">
+                      <label for="copy-to">Copy into</label>
+                      <select
+                        id="copy-to"
+                        class="ctrl"
+                        [value]="copyTo()"
+                        (change)="copyTo.set($any($event.target).value)"
+                      >
+                        <option value="">Choose a programme…</option>
+                        @for (course of copyCandidates(); track course.id) {
+                          <option [value]="course.id" [selected]="course.id === copyTo()">
+                            {{ course.code }} — {{ course.name }}
+                            @if (course.college) {
+                              · {{ course.college }}
+                            }
+                          </option>
+                        }
+                      </select>
+                      @if (copyTo()) {
+                        <span class="help">{{ copyCourseLine(destinationCourse()!) }}</span>
+                      }
+                    </div>
+                  </div>
+
+                  <fieldset class="cat-copy-parts">
+                    <legend>What to copy</legend>
+                    @for (part of copyParts; track part.key) {
+                      <label class="check">
+                        <input
+                          type="checkbox"
+                          [checked]="copyPartIsOn(part.key)"
+                          (change)="toggleCopyPart(part.key)"
+                        />
+                        <span>{{ part.label }}</span>
+                        <span class="help">{{ part.help }}</span>
+                      </label>
+                    }
+                  </fieldset>
+
+                  <div role="alert">
+                    @if (copyError()) {
+                      <div class="notice cat-note">
+                        <span class="icon" aria-hidden="true">error</span>
+                        <div>{{ copyError() }}</div>
+                      </div>
+                    }
+                  </div>
+
+                  @if (copyPreview(); as preview) {
+                    <div class="notice cat-note" role="status" [class.good]="!preview.dry_run">
+                      <span class="icon" aria-hidden="true">{{
+                        preview.dry_run ? 'visibility' : 'check'
+                      }}</span>
+                      <div>
+                        <strong>{{ preview.dry_run ? 'Dry run' : 'Copied' }}</strong> ·
+                        @for (part of preview.parts; track part.part) {
+                          {{ part.part }}: {{ part.copied }} copied, {{ part.skipped }} already
+                          there{{ $last ? '' : ' · ' }}
+                        }
+                        @if (preview.dry_run) {
+                          — nothing has been written.
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <div class="footbar">
+                    <button type="button" class="btn ghost" (click)="toggleCopy()">Cancel</button>
+                    <button
+                      type="button"
+                      class="btn secondary"
+                      (click)="runCopy(true)"
+                      [disabled]="copyBusy() || !canRunCopy()"
+                    >
+                      <span class="icon" aria-hidden="true">visibility</span>
+                      {{ copyBusy() ? 'Counting…' : 'Check first' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn primary"
+                      (click)="runCopy(false)"
+                      [disabled]="copyBusy() || !canRunCopy() || !copyPreview()?.dry_run"
+                      title="Press Check first."
+                    >
+                      <span class="icon" aria-hidden="true">content_copy</span>Copy
+                    </button>
+                  </div>
+                </div>
+              }
+
+              <div class="cat-scroll">
+                <table class="dt-table cat-table">
+                  <thead>
+                    <tr>
+                      <th class="pinned">Badge</th>
+                      <th>Skill area</th>
+                      <th>Certifications</th>
+                      <th>Verifier</th>
+                      <th class="num">Claims</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (badge of visibleBadges(); track badge.code) {
+                      <tr [class.selected]="selectedBadgeCode() === badge.code">
+                        <td class="pinned">
+                          <button
+                            type="button"
+                            class="cat-rowname"
+                            [attr.aria-pressed]="selectedBadgeCode() === badge.code"
+                            (click)="selectBadge(badge.code)"
+                          >
+                            <span class="cat-rowname-title">{{ badge.name }}</span>
+                            <span class="cat-rowcode">{{ badge.code }}</span>
+                          </button>
+                        </td>
+                        <td>{{ badge.category_label }}</td>
+                        <td>
+                          @if (activeCertificationsFor(badge.code).length) {
+                            <span class="cat-chips">
+                              @for (
+                                certification of chipCertificationsFor(badge.code);
+                                track certification.id
+                              ) {
+                                <span class="chip accent" [title]="certification.provider">{{
+                                  certification.name
+                                }}</span>
+                              }
+                              @if (extraCertificationCount(badge.code) > 0) {
+                                <span class="chip neutral"
+                                  >+{{ extraCertificationCount(badge.code) }}</span
+                                >
+                              }
+                            </span>
+                          } @else {
+                            <span class="chip warn">None mapped</span>
+                          }
+                        </td>
+                        <td>
+                          <span class="chip accent" [title]="verifierExplanation(badge)">{{
+                            verifierLabel(badge)
+                          }}</span>
+                        </td>
+                        <td class="num">{{ claimsFor(badge.code) }}</td>
+                        <td>
+                          <span
+                            class="chip dot good"
+                            title="Every badge in the code-defined catalogue is live."
+                            >Active</span
+                          >
+                        </td>
+                      </tr>
+                    } @empty {
+                      <tr>
+                        <td colspan="6">
+                          <div class="empty">
+                            <span class="icon" aria-hidden="true">workspace_premium</span>
+                            @if (badges().length) {
+                              No badge matches these filters.
+                            } @else if (loading()) {
+                              Loading the badge catalogue…
+                            } @else {
+                              The badge catalogue could not be read.
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+              <div class="dt-statusbar">
+                <span
+                  >Badges: <b>{{ visibleBadges().length }}</b> of <b>{{ badges().length }}</b></span
+                >
+                <span
+                  >Certifications mapped: <b>{{ activeCertifications().length }}</b></span
+                >
+                @if (removedCertifications().length) {
+                  <span
+                    >Removed: <b>{{ removedCertifications().length }}</b></span
+                  >
+                }
+                @if (selectedBadge(); as badge) {
+                  <span
+                    >Selected: <b>{{ badge.name }}</b></span
+                  >
+                }
+              </div>
+            </div>
+          </div>
+
+          @if (selectedBadge(); as badge) {
+            <aside class="card cat-drawer" aria-label="Badge detail">
+              <div class="cat-drawer-head">
+                <h2 class="cat-card-title">Badge · {{ badge.name }}</h2>
+                <button
+                  type="button"
+                  class="iconbtn"
+                  aria-label="Close badge detail"
+                  (click)="closeDrawer()"
+                >
+                  <span class="icon" aria-hidden="true">close</span>
+                </button>
+              </div>
+
+              <div class="cat-drawer-row">
+                <div class="field synced">
+                  <label>Code</label>
+                  <div class="ctrl">{{ badge.code }}</div>
+                </div>
+                <div class="field synced">
+                  <label>Skill area</label>
+                  <div class="ctrl">{{ badge.category_label }}</div>
+                </div>
+              </div>
+              <div class="cat-drawer-row">
+                <div class="field synced">
+                  <label>Stage</label>
+                  <div class="ctrl">{{ stageLabel(badge.stage) }}</div>
+                </div>
+                <div class="field synced">
+                  <label>Points</label>
+                  <div class="ctrl">{{ badge.points }}</div>
+                </div>
+              </div>
+
+              <div class="cat-drawer-section">
+                <h3 class="cat-card-title">Accepted certifications</h3>
+                @for (certification of selectedBadgeCertifications(); track certification.id) {
+                  <div class="cat-cert" [class.is-removed]="!certification.active">
+                    <div class="cat-cert-text">
+                      <div class="cat-cert-name">
+                        @if (certification.url) {
+                          <a [href]="certification.url" target="_blank" rel="noopener">{{
+                            certification.name
+                          }}</a>
+                        } @else {
+                          {{ certification.name }}
+                        }
+                      </div>
+                      <div class="cat-meta">
+                        {{ certification.provider }} ·
+                        {{ certification.claims | plural: 'claim' }} ·
+                        <!-- `scope_label` is the server's own sentence and says
+                             "Programme-wide" rather than leaving a blank: a
+                             blank in a scope column reads as "not set yet" on a
+                             row whose scope IS set, and set wide. -->
+                        <span class="chip dot neutral">{{ certification.scope_label }}</span>
+                        @if (!certification.active) {
+                          · <span class="chip neutral">Removed</span>
+                        }
+                      </div>
+                    </div>
+                    @if (certification.active) {
+                      <button
+                        type="button"
+                        class="btn danger sm"
+                        [disabled]="busyCertificationId() === certification.id"
+                        [attr.aria-label]="'Remove ' + certification.name + ' from the catalogue'"
+                        (click)="setCertificationActive(certification, false)"
+                      >
+                        Remove
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="btn secondary sm"
+                        [disabled]="busyCertificationId() === certification.id"
+                        [attr.aria-label]="'Restore ' + certification.name + ' to the catalogue'"
+                        (click)="setCertificationActive(certification, true)"
+                      >
+                        <span class="icon" aria-hidden="true">undo</span>Restore
+                      </button>
+                    }
+                  </div>
+                } @empty {
+                  <p class="cat-help">
+                    Nothing is mapped to this badge yet, so no student can claim it with a
+                    certificate.
+                  </p>
+                }
+                @if (!certificationsAreMainAdminOnly()) {
+                  <button type="button" class="btn ghost sm" (click)="openForm(badge.code)">
+                    <span class="icon" aria-hidden="true">add</span>Add certification
+                  </button>
+                }
+                <p class="cat-help">{{ verifierExplanation(badge) }}</p>
+              </div>
+
+              <div class="field synced">
+                <label>Evidence rule</label>
+                <div class="ctrl">
+                  @if (badgeIsAwarded(badge)) {
+                    Staff award · no evidence accepted
+                  } @else if (selectedBadgeEvidenceRules().length) {
+                    @for (rule of selectedBadgeEvidenceRules(); track rule) {
+                      {{ evidenceRuleLabel(rule) }}{{ $last ? '' : ' · ' }}
+                    }
+                  } @else {
+                    No certifications mapped yet
+                  }
+                </div>
+              </div>
+
+              <div class="field synced">
+                <label>Scope</label>
+                <div class="ctrl">Programme-wide · every college and course</div>
+              </div>
+
+              <div class="card cat-usedby">
+                <h3 class="cat-card-title">Used by</h3>
+                <div class="notice accent cat-note">
+                  <span class="icon" aria-hidden="true">info</span>
+                  <div>
+                    Which semester sits in which stage is on the
+                    <button type="button" class="cat-linkish" (click)="setTab('stages')">
+                      Stage rules
+                    </button>
+                    tab.
+                  </div>
+                </div>
+              </div>
+
+              <p class="cat-help cat-drawer-foot">
+                <span class="icon" aria-hidden="true">lock</span>
+                The badge itself — name, code, skill area, points — is defined in code (<span
+                  class="cat-mono"
+                  >models/badge.py</span
+                >) and cannot be edited or retired from this screen.
+              </p>
+            </aside>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ---------------------------------------------------------------- -->
+    @case ('stages') {
+      <div role="tabpanel" aria-label="Stage rules">
+        <div class="card">
+          <div class="card-head">
+            <div>
+              <div class="card-title">Stage rules</div>
+              <div class="dt-sub">semester N of this programme is Reboot, Excel, Excel-Adv or Elevate</div>
+            </div>
+          </div>
+
+          <p class="cat-help">
+            Promoting a batch changes a student's stage only where a rule names one.
+          </p>
+
+          <div role="alert">
+            @if (stageError()) {
+              <div class="notice cat-note">
+                <span class="icon" aria-hidden="true">error</span>
+                <div>{{ stageError() }}</div>
+              </div>
+            }
+          </div>
+
+          <div class="cat-stage-form">
+            <div class="field">
+              <label for="stage-course">Programme</label>
+              <select
+                id="stage-course"
+                class="ctrl"
+                [value]="stageRuleCourse()"
+                (change)="stageRuleCourse.set($any($event.target).value)"
+              >
+                <option value="">Choose a programme…</option>
+                @for (course of courseOptions(); track course.id) {
+                  <option [value]="course.id" [selected]="course.id === stageRuleCourse()">
+                    {{ course.code }} — {{ course.name }}
+                    @if (course.college) {
+                      · {{ course.college }}
+                    }
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="field narrow">
+              <label for="stage-semester">Semester</label>
+              <input
+                id="stage-semester"
+                type="number"
+                min="1"
+                max="20"
+                [value]="stageRuleSemester()"
+                (input)="stageRuleSemester.set(+$any($event.target).value)"
+              />
+            </div>
+            <div class="field narrow">
+              <label for="stage-stage">Stage</label>
+              <select
+                id="stage-stage"
+                class="ctrl"
+                [value]="stageRuleStage()"
+                (change)="stageRuleStage.set($any($event.target).value)"
+              >
+                @for (stage of stageValues; track stage) {
+                  <option [value]="stage" [selected]="stage === stageRuleStage()">
+                    {{ stageLabel(stage) }}
+                  </option>
+                }
+              </select>
+            </div>
+            <button
+              type="button"
+              class="btn secondary"
+              (click)="saveStageRule()"
+              [disabled]="stageBusy() || !stageRuleCourse()"
+            >
+              <span class="icon" aria-hidden="true">save</span>
+              {{ stageBusy() ? 'Saving…' : 'Set rule' }}
+            </button>
+          </div>
+
+          @if (stageRules() === null) {
+            <div class="notice accent cat-note">
+              <span class="icon" aria-hidden="true">info</span>
+              <div>
+                The stage rules have not been read — this is not "there are none". Reload the
+                screen to try again.
+              </div>
+            </div>
+          } @else if (visibleStageRules().length === 0) {
+            <div class="empty">
+              <span class="icon" aria-hidden="true">flag</span>
+              @if (stageRuleCourse()) {
+                No stage rule on {{ courseLabel(stageRuleCourse()) }} yet. Promotion will move its
+                semester and leave every student's stage alone.
+              } @else {
+                No stage rules are on record on any programme this account reaches.
+              }
+            </div>
+          } @else {
+            <div class="cat-scroll">
+              <table class="dt-table">
+                <caption class="sr-only">Stage rules, by semester</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Programme</th>
+                    <th scope="col">Semester</th>
+                    <th scope="col">Stage</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (rule of visibleStageRules(); track rule.id) {
+                    <tr>
+                      <td>{{ courseLabel(rule.course_id) }}</td>
+                      <td class="tabular">{{ rule.semester }}</td>
+                      <td><span class="chip accent">{{ stageLabel(rule.stage) }}</span></td>
+                      <td>
+                        <button
+                          type="button"
+                          class="btn ghost sm"
+                          (click)="deleteStageRule(rule)"
+                          [disabled]="stageBusy()"
+                          [attr.aria-label]="
+                            'Remove the rule for semester ' +
+                            rule.semester +
+                            ' of ' +
+                            courseLabel(rule.course_id)
+                          "
+                        >
+                          <span class="icon" aria-hidden="true">delete</span>Remove
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- ---------------------------------------------------------------- -->
+    @case ('tracks') {
+      <div role="tabpanel" aria-label="Interview tracks">
+        @if (tracksNeedQuestionBank()) {
+          <div class="card">
+            <div class="notice accent cat-note">
+              <span class="icon" aria-hidden="true">info</span>
+              <div>
+                This account cannot open Interview questions. Ask the Main Admin for access in
+                Who can do what.
+              </div>
+            </div>
+          </div>
+        } @else if (tracks(); as trackRows) {
+          <div class="dt-frame">
+            <div class="cat-scroll">
+              <table class="dt-table cat-table">
+                <thead>
+                  <tr>
+                    <th class="pinned">Track</th>
+                    <th>Key</th>
+                    <th>Phases</th>
+                    <th class="num">Questions</th>
+                    <th class="num">In use</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (interviewTrack of trackRows; track interviewTrack.key) {
+                    <tr>
+                      <td class="pinned">
+                        <strong>{{ interviewTrack.label }}</strong>
+                      </td>
+                      <td class="cat-mono">{{ interviewTrack.key }}</td>
+                      <td>{{ interviewTrack.phases.join(' · ') }}</td>
+                      <td class="num">{{ interviewTrack.count }}</td>
+                      <td class="num">{{ interviewTrack.enabled_count }}</td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="5">
+                        <div class="empty">
+                          <span class="icon" aria-hidden="true">record_voice_over</span>
+                          No interview tracks are configured.
+                        </div>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <div class="dt-statusbar">
+              <span
+                >Tracks: <b>{{ trackRows.length }}</b></span
+              >
+            </div>
+          </div>
+          <div class="notice accent cat-note">
+            <span class="icon" aria-hidden="true">info</span>
+            <div>
+              Read-only here. Tracks are edited on Interview questions.
+            </div>
+          </div>
+        } @else if (tracksFailed()) {
+          <div class="card">
+            <div class="empty">
+              <span class="icon" aria-hidden="true">error</span>
+              The interview tracks could not be read.
+            </div>
+            <div class="cat-retry">
+              <button type="button" class="btn secondary sm" (click)="retryTracks()">
+                <span class="icon" aria-hidden="true">sync</span>Try again
+              </button>
+            </div>
+          </div>
+        } @else {
+          <div class="card">
+            <div class="empty">
+              <span class="icon" aria-hidden="true">hourglass_empty</span>
+              Loading the interview tracks…
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

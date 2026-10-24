@@ -1,0 +1,434 @@
+/* Who can do what — this screen's LAYOUT only (redesigned 2026-10-16).
+ *
+ * `.panel` `.card` `.chip` `.btn` `.seg` `.field` `.ctrl` `.notice` `.eyebrow`
+ * `.crumb` `.icon` `.dt-header` `.dt-title` `.dt-sub` `.dt-toolbar` `.dt-table`
+ * `.selected` `.sr-only` `.loading-line` are global (styles/reep-v2.scss) and
+ * are used as they are. Every rule below is on a `gv-*` class this screen
+ * owns, or on an element inside one.
+ */
+
+:host {
+  display: block;
+}
+
+.gv-note {
+  margin-bottom: 12px;
+}
+
+.gv-grow {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* An anchor dressed as a button keeps no underline on hover. */
+.gv-link,
+.gv-link:hover {
+  text-decoration: none;
+}
+
+/* --- the four tabs --------------------------------------------------------- */
+
+.gv-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+  padding: 4px;
+  border-radius: var(--r-btn);
+  background: var(--tint-2);
+  border: 1px solid var(--hairline-26);
+}
+
+.gv-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: var(--r-tile);
+  background: transparent;
+  color: var(--ink-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.gv-tab .icon {
+  font-size: 18px;
+}
+.gv-tab:hover {
+  background: var(--tint-1);
+}
+.gv-tab.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--sh-ctrl);
+}
+.gv-tab:focus-visible {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+}
+
+.gv-count {
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+  background: var(--tint-1);
+  color: var(--ink-soft);
+  font-size: 11.5px;
+  text-align: center;
+}
+.gv-count.hot {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+/* --- shared bits ----------------------------------------------------------- */
+
+.gv-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.gv-sub {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gv-who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.gv-name {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.gv-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gv-avatar {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tint-1);
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.gv-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 12px;
+}
+
+.gv-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.gv-blocked {
+  margin: 0;
+  font-size: 12px;
+  color: var(--warn);
+}
+
+.gv-empty {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.gv-empty-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--muted);
+}
+
+.gv-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 12px;
+}
+
+.gv-spaced {
+  margin-top: 18px;
+}
+
+/* --- the reason box -------------------------------------------------------- */
+
+.gv-action {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gv-action-list {
+  margin: 0;
+  padding-left: 18px;
+  max-height: 180px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+.gv-action-list li {
+  margin: 2px 0;
+}
+.gv-action-list .gv-sub {
+  margin-left: 4px;
+}
+
+/* --- give access ----------------------------------------------------------- */
+
+.gv-give {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.gv-step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--hairline-26);
+}
+
+.gv-step-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.gv-n {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--brand-purple);
+  color: var(--surface);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.gv-picked {
+  margin-left: auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.gv-seg {
+  width: auto;
+}
+
+.gv-pickbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.gv-search {
+  flex: 1 1 220px;
+  max-width: 360px;
+}
+
+.gv-picklist {
+  list-style: none;
+  margin: 0;
+  padding: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-tile);
+  background: var(--surface);
+}
+
+.gv-pick,
+.gv-choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--r-icon);
+  cursor: pointer;
+  font-size: 13px;
+}
+.gv-pick:hover,
+.gv-choice:hover {
+  background: var(--tint-3);
+}
+.gv-pick.on,
+.gv-choice.on {
+  background: var(--tint-2);
+}
+.gv-pick .gv-who,
+.gv-choice .gv-who {
+  flex: 1 1 auto;
+}
+
+.gv-choices {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.gv-choices legend {
+  margin-bottom: 6px;
+}
+
+.gv-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  gap: 6px;
+}
+.gv-choice {
+  border: 1px solid var(--hairline-26);
+  background: var(--surface);
+}
+
+/* --- who has access -------------------------------------------------------- */
+
+.gv-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.gv-filter {
+  width: auto;
+  max-width: 280px;
+}
+
+.gv-fact {
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gv-selbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.gv-holder {
+  margin-bottom: 12px;
+}
+
+.gv-holder-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.gv-check {
+  display: inline-flex;
+  align-items: center;
+}
+
+.gv-scroll {
+  overflow-x: auto;
+}
+
+.gv-table {
+  width: 100%;
+}
+.gv-table th,
+.gv-table td {
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.gv-tick {
+  width: 32px;
+}
+.gv-nums {
+  font-variant-numeric: tabular-nums;
+}
+.gv-reason {
+  white-space: normal;
+  min-width: 220px;
+  max-width: 420px;
+}
+.gv-rowactions {
+  text-align: right;
+}
+.gv-rowactions .btn + .btn {
+  margin-left: 4px;
+}
+
+/* --- groups ---------------------------------------------------------------- */
+
+.gv-board {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.gv-grouplist {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gv-side {
+  flex: 0 0 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gv-members {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+}
+.gv-members li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px solid var(--hairline-26);
+}
+
+@media (max-width: 1100px) {
+  .gv-board {
+    flex-direction: column;
+  }
+  .gv-side {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}

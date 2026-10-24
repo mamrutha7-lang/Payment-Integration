@@ -1,0 +1,346 @@
+/* Student feature switches — this screen's LAYOUT only.
+ *
+ * `.panel` `.card` `.chip` `.btn` `.select` `.field` `.ctrl` `.help` `.err`
+ * `.notice` `.tabs` `.tab` `.crumb` `.icon` `.tree-row` `.dt-header`
+ * `.dt-title` `.dt-sub` `.dt-toolbar` `.dt-frame` `.dt-statusbar` `.dt-table`
+ * `.pinned` `.selected` are global (styles/reep-v2.scss) and are used exactly
+ * as they are. Nothing here redefines one: every rule below is on an `fs-*`
+ * class this screen owns, or on an element inside one.
+ *
+ * What is here is the shape of this board: the filter row, the switches grid
+ * beside its 380px override panel, and the list of rules in force inside it.
+ */
+
+:host {
+  display: block;
+}
+
+/* --- page furniture ------------------------------------------------------ */
+
+.fs-note {
+  margin-bottom: 12px;
+}
+
+.fs-tabs {
+  margin-bottom: 12px;
+}
+
+/* A tab that navigates rather than switching panes. `.tab` is a button's
+   dress; an anchor needs the underline taken off on hover, which `a:hover`
+   would otherwise leave in place. */
+.fs-tablink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.fs-tablink:hover {
+  text-decoration: none;
+}
+.fs-tablink .icon {
+  font-size: 14px;
+}
+
+/* A key, a header name or an endpoint path, set apart from the prose around
+   it without a second font file. */
+.fs-code {
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Roboto Mono', monospace;
+  font-size: 11.5px;
+}
+
+/* --- the board's filter row ---------------------------------------------- */
+
+.fs-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.fs-scope-filter,
+.fs-enforcement-filter {
+  max-width: 260px;
+}
+
+/* Not a filter at all: the server decides which colleges this account reaches
+   and takes no college parameter. The native `disabled` on the <select> inside
+   takes it out of the tab order and stops the menu; this dims the pill laid
+   over it, so the row does not read as three live filters one of which silently
+   ignores you. The reason is on the control's title and, in visible text, in
+   the notice below the row. */
+.fs-filter-locked {
+  opacity: 0.55;
+}
+
+.fs-filters-note {
+  margin-left: auto;
+  max-width: 52ch;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+/* --- the grid beside its 380px panel ------------------------------------- */
+
+.fs-board {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.fs-grid-frame {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.fs-grid-scroll {
+  overflow-x: auto;
+}
+
+.fs-panel {
+  flex: 0 0 380px;
+  width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (max-width: 1180px) {
+  .fs-board {
+    flex-direction: column;
+  }
+  .fs-panel {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+}
+
+/* --- the switches table -------------------------------------------------- */
+
+.fs-table {
+  width: 100%;
+}
+.fs-table th,
+.fs-table td {
+  white-space: nowrap;
+}
+
+.fs-feature-col {
+  min-width: 240px;
+}
+.fs-scope-col {
+  min-width: 200px;
+}
+.fs-enforcement-col {
+  min-width: 230px;
+}
+
+/* The row's own control. A whole-row click is not reachable from a keyboard,
+   so the feature name IS the button that selects it — one tab stop per row,
+   named by the feature, with its pressed state announced. */
+.fs-rowpick {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+.fs-feature-name {
+  font-weight: 600;
+}
+.fs-key {
+  font-family: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', 'Roboto Mono', monospace;
+  font-size: 11px;
+  color: var(--faint);
+}
+
+.fs-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.fs-empty {
+  color: var(--muted);
+  font-size: 12.8px;
+}
+
+.fs-pagesize {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.fs-pagesize select {
+  height: 26px;
+  padding: 0 5px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-seg);
+  background: var(--surface);
+  font: inherit;
+  font-size: 11.5px;
+  color: var(--ink);
+}
+
+/* --- the override panel -------------------------------------------------- */
+
+.fs-card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.fs-subhead {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin: 2px 0 0;
+}
+
+.fs-required {
+  color: var(--risk);
+}
+
+.fs-pair {
+  display: flex;
+  gap: 10px;
+}
+.fs-pair > .field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.fs-search {
+  display: flex;
+  gap: 6px;
+}
+.fs-search input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.fs-results {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+/* The blast radius, in the API's own numbers: a governance screen that does
+   not show who a rule reaches is how a whole college gets switched off. */
+.fs-reach {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.fs-rules {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fs-rule {
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-control);
+  padding: 9px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+/* An expired rule is kept on screen — it is the audit trail — and drawn back,
+   so a live rule and a spent one are never read as the same thing. */
+.fs-rule.lapsed {
+  border-style: dashed;
+}
+.fs-rule.lapsed .fs-rule-target {
+  color: var(--muted);
+}
+
+.fs-rule.editing {
+  border-color: var(--brand-purple);
+  background: var(--tint-1);
+}
+
+.fs-rule-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+.fs-rule-target {
+  font-weight: 600;
+  font-size: 12.5px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fs-rule-meta {
+  font-size: 11px;
+  color: var(--faint);
+}
+.fs-rule-reason {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+
+/* The sentence the STUDENT sees, set apart from the office's reason above it
+   so the two are never read as one paragraph. */
+.fs-rule-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+.fs-rule-message .icon {
+  font-size: 13px;
+  color: var(--faint);
+}
+/* "Nobody is told anything" is a true statement about a rule, not a quotation
+   from it, and is drawn back so it is not mistaken for one. */
+.fs-rule-message.quiet {
+  color: var(--faint);
+  font-style: italic;
+}
+.fs-rule-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+}
+.fs-rule-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.fs-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 2px;
+}
+
+.fs-blocked {
+  margin: 0;
+  text-align: right;
+  font-size: 11.5px;
+  color: var(--muted);
+}

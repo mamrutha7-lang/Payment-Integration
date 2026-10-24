@@ -1,0 +1,58 @@
+# DM — Digital Marketing
+# Track code: dm   Interviewer: a growth-oriented, data-driven CMO (voice: tiffany)
+# Paste into Main Admin -> Interview questions -> Digital Marketing -> Add many.
+# Frameworks the persona already carries: CAC/LTV, ROAS, SEO/SEM, A/B testing,
+# funnel optimisation, brand positioning. The track also carries the 22MDM23
+# syllabus, so the questions below follow its five modules and expect the
+# metric arithmetic to be done out loud.
+
+# ---------------------------------------------------------------- opening --
+[opening] Tell me about yourself and what pulled you towards digital marketing rather than traditional marketing.
+[opening] Walk me through a campaign, a page or an account you have worked on, and the one number you were judged by.
+[opening] Which channel do you understand best today — search, social, display or organic — and how did you learn it?
+[opening] Name a brand whose digital marketing you think is genuinely good, and tell me what they are doing that their competitors are not.
+[opening] What do you read or follow to keep up, and what is one thing you changed your mind about in the last year?
+
+# ---------------------------------------------------------------- probing --
+[probing] Explain the P-O-E-M framework, and give me one example of each from a brand you know.
+[probing] What is the difference between digital and traditional marketing beyond the channel, and where is traditional still the better buy?
+[probing] Take me through the structure of a digital marketing plan for a new direct-to-consumer brand with a twenty lakh rupee budget.
+[probing] A campaign has ten thousand impressions, two hundred and fifty clicks and a spend of five thousand rupees. Give me the CTR, the CPC and the CPM.
+[probing] Spend is eighty thousand rupees, conversions are sixty-four, and attributed revenue is three lakh twenty thousand. Give me the cost per conversion and the ROAS, and tell me whether you would scale it.
+[probing] Explain CAC and LTV, and tell me what an LTV to CAC ratio of one point two actually means for the business.
+[probing] What is Ad Rank, and why can a lower bid win a higher position?
+[probing] Walk me through how you would do keyword research for a company selling refurbished laptops.
+[probing] What makes a landing page relevant in the eyes of the ad platform, and what makes it convert for the human?
+[probing] Explain the difference between on-page and off-page SEO, and which one you would fix first on a site with good content and no traffic.
+[probing] What are long-tail keywords, and why would you build a content strategy around them rather than around head terms?
+[probing] Explain how a search engine crawls, indexes and ranks a page, and where most sites break that chain.
+[probing] What is remarketing, when does it stop working, and how would you cap it?
+[probing] Explain programmatic buying to someone who has only ever bought media directly.
+[probing] Organic social reach keeps falling. How do you decide what still belongs on organic and what moves to paid?
+[probing] How would you choose between Instagram, LinkedIn and YouTube for a B2B software product?
+[probing] How would you evaluate an influencer before paying them, and what would you put in the contract?
+[probing] What is user-generated content worth to a brand, and what is the risk of building a campaign on it?
+[probing] Which web analytics metrics would you put on a weekly dashboard for a founder, and which would you deliberately leave off?
+[probing] Design an A/B test for a checkout page. What is the hypothesis, the metric, and how long do you run it?
+
+# -------------------------------------------------------------- deep_dive --
+[deep_dive] Our CAC has increased by forty percent on Meta ads this quarter. Give me your step-by-step diagnostic framework.
+[deep_dive] ROAS is up and revenue is flat. Explain how both can be true, and tell me which one you would report to the board.
+[deep_dive] Organic traffic dropped thirty percent overnight and nothing was deployed. Walk me through your first six hours.
+[deep_dive] You have twelve lakh rupees for a quarter and a target of eight thousand new paying customers. Allocate the budget across channels and defend the split.
+[deep_dive] Your A/B test shows a nine percent lift after three days and your manager wants to ship it. What do you say?
+[deep_dive] A performance agency reports a four times ROAS on last-click attribution. How would you find out whether they are actually creating demand or harvesting it?
+[deep_dive] The funnel converts well at the top and collapses between add-to-cart and payment. Take me through how you would find the cause without guessing.
+[deep_dive] The CEO wants to cut the brand budget entirely and put everything into performance. Make the argument against it in numbers, not adjectives.
+[deep_dive] You are launching in a market where your brand has no awareness and your competitor owns every head keyword. What is your first ninety days?
+[deep_dive] Two channels each claim the same conversion. Explain how you would build an attribution model you could actually defend in a budget meeting.
+[deep_dive] A display campaign is delivering a very high CTR and almost no conversions. Give me three hypotheses and how you would test each one.
+[deep_dive] How would you measure the revenue impact of an SEO investment that will not pay off for nine months, to a CFO who wants a number this quarter?
+[deep_dive] Your mobile app has good install numbers and terrible day-thirty retention. Whose problem is that, and what would you do about it as the marketing lead?
+[deep_dive] Design the measurement plan for a campaign that runs on YouTube, search and offline print at the same time.
+
+# ---------------------------------------------------------------- wrap_up --
+[wrap_up] Which of the channels we discussed would you be least comfortable owning on your own, and what would you do about that?
+[wrap_up] If you joined on Monday, what would you want to see in the first week before proposing anything?
+[wrap_up] Where do you want to be specialised in three years — growth, brand, or analytics — and why?
+[wrap_up] What questions do you have for us about the team, the budget, or how success is measured here?

@@ -1,0 +1,168 @@
+<div class="panel">
+  <div class="dt-header">
+    <div>
+      <h1 class="dt-title">Jobs</h1>
+      <div class="dt-sub">Updated weekly · auto alert emailed to matching students</div>
+    </div>
+  </div>
+
+  <!-- The three filters sit above every state, so a student can set them while
+       the board loads and they survive an empty result. -->
+  <div class="filter-row">
+    <label class="filt">
+      <span>Eligibility</span>
+      <select class="ctrl" [ngModel]="filterElig()" (ngModelChange)="filterElig.set($event)">
+        <option value="all">All</option>
+        <option value="eligible">Eligible</option>
+        <option value="ineligible">Not eligible</option>
+      </select>
+    </label>
+    <label class="filt">
+      <span>Location</span>
+      <select
+        class="ctrl"
+        [ngModel]="filterLocation()"
+        (ngModelChange)="filterLocation.set($event)"
+      >
+        <option value="all">All locations</option>
+        @for (loc of locations(); track loc) {
+          <option [value]="loc">{{ loc }}</option>
+        }
+      </select>
+    </label>
+    <label class="filt">
+      <span>Deadline</span>
+      <select
+        class="ctrl"
+        [ngModel]="filterDeadline()"
+        (ngModelChange)="filterDeadline.set($event)"
+      >
+        <option value="all">All</option>
+        <option value="soon">Closing soon (≤7 days)</option>
+        <option value="open">Open</option>
+      </select>
+    </label>
+    @if (anyFilter()) {
+      <button type="button" class="btn sm clear" (click)="clearFilters()">
+        <span class="icon" aria-hidden="true">close</span>Clear
+      </button>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="card"><div class="card-line">Loading opportunities…</div></div>
+  } @else if (error()) {
+    <div class="card">
+      <h4>Board unavailable</h4>
+      <div class="card-line">{{ error() }}</div>
+    </div>
+  } @else if (jobs().length === 0) {
+    <div class="card"><div class="card-line center">No roles on the board yet.</div></div>
+  } @else {
+    <!-- One table of every posting: Role · Location · Eligibility · Skill match ·
+         Status · Action. An ineligible row is tinted AND names its reason in the
+         Status column — never colour alone, never a bare "not eligible". -->
+    <div class="jobs-frame">
+      <table class="jobs-table">
+        <thead>
+          <tr>
+            <th>Role</th>
+            <th>Location</th>
+            <th>Eligibility</th>
+            <th>Skill match</th>
+            <th>Status</th>
+            <th class="col-action">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of opportunityRows(); track row.id) {
+            @let dl = deadline(row);
+            <tr [class.ineligible]="!row.eligible">
+              <td>
+                <div class="role-title">{{ row.title }}</div>
+                <div class="dt-sub">{{ row.company }}</div>
+              </td>
+              <td>
+                <div class="loc">
+                  <span class="icon" aria-hidden="true">place</span>
+                  {{ row.location ?? 'Not specified' }}
+                </div>
+                @if (row.closes_on) {
+                  <div class="closes" [class.risk]="dl.tone === 'risk'" [class.warn]="dl.tone === 'warn'">
+                    {{ dl.label }}
+                  </div>
+                }
+              </td>
+              <td>
+                @if (row.eligible) {
+                  <span class="chip good"
+                    ><span class="icon" aria-hidden="true">verified</span>Eligible</span
+                  >
+                } @else {
+                  <span class="chip risk"
+                    ><span class="icon" aria-hidden="true">block</span>Not eligible</span
+                  >
+                }
+              </td>
+              <td>
+                <div class="match">
+                  <span class="match-bar">
+                    <span
+                      class="match-fill {{ matchTone(row.match_percent) }}"
+                      [style.width.%]="row.match_percent"
+                    ></span>
+                  </span>
+                  <span class="match-val">{{ row.match_percent | number: '1.0-0' }}%</span>
+                </div>
+              </td>
+              <td>
+                @if (!row.eligible && row.reasons.length) {
+                  <div class="why" [attr.title]="row.reasons.join('; ')">
+                    <span class="icon" aria-hidden="true">info</span>{{ row.reasons[0] }}
+                  </div>
+                } @else if (row.applied) {
+                  <span class="chip good"
+                    ><span class="icon" aria-hidden="true">check_circle</span>Applied</span
+                  >
+                } @else {
+                  <span class="chip neutral"
+                    ><span class="icon" aria-hidden="true">radio_button_unchecked</span>Not
+                    applied</span
+                  >
+                }
+              </td>
+              <td class="col-action">
+                @if (row.applied) {
+                  <button type="button" class="btn sm" disabled>
+                    <span class="icon" aria-hidden="true">check</span>Applied
+                  </button>
+                } @else if (dl.closed) {
+                  <button type="button" class="btn sm" disabled>
+                    <span class="icon" aria-hidden="true">event_busy</span>Closed
+                  </button>
+                } @else if (!row.eligible) {
+                  <button
+                    type="button"
+                    class="btn sm"
+                    disabled
+                    [attr.title]="row.reasons.join('; ')"
+                  >
+                    <span class="icon" aria-hidden="true">block</span>Not eligible
+                  </button>
+                } @else {
+                  <button type="button" class="btn primary sm" (click)="apply(row)">
+                    <span class="icon" aria-hidden="true">open_in_new</span>Apply
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr class="empty-row">
+              <td colspan="6">No roles match these filters.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

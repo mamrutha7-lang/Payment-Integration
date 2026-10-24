@@ -1,0 +1,170 @@
+/* Placement analytics — this screen's LAYOUT only.
+ *
+ * .panel .card .kpi-card .kpi .chip .btn .select .notice .dt-header .dt-title
+ * .dt-sub .dt-toolbar .dt-quickfilter .crumb .avatar .card-head .card-heading
+ * .card-sub .card-actions are global (styles/reep-v2.scss) and are used as they
+ * are. What is here is the shape of this board: the filter row, the six-tile
+ * strip, the chart frame, the two columns under it and the alert rows.
+ */
+:host {
+  display: block;
+}
+
+/* --- the board's filter row --------------------------------------------- */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+/* A filter NOTHING can narrow. The <select> inside carries a plain `disabled`
+   and the reason in its `title` — no phase number, because no task adds a
+   cohort, course or track parameter to the analytics endpoints. This dims the
+   pill it sits in so the row reads as "not available" at a glance rather than
+   leaving three live-looking pills that do nothing. */
+.filter-pending {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* The sentence at the end of the filter row: what the deltas are measured
+   against, or that the window is still being counted. */
+.filter-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.filter-note .icon {
+  font-size: 15px;
+  color: var(--purple-mid);
+}
+
+/* --- the KPI tiles ------------------------------------------------------- */
+/* Seven, not six: `/admin/analytics/kpis` answers highest CTC beside median,
+   and the strip draws what the server sends rather than a fixed list — a tile
+   dropped here would be a figure the office is told does not exist. */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 10px;
+}
+@media (max-width: 1440px) {
+  .kpi-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (max-width: 1080px) {
+  .kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+/* The one tile drawn while the strip has nothing in it: it spans the row so an
+   empty strip reads as one statement rather than as six blank cards. */
+.kpi-card--wide {
+  grid-column: 1 / -1;
+}
+
+.panel > .notice {
+  margin-bottom: 10px;
+}
+
+/* --- the one composite chart --------------------------------------------- */
+.chart-card {
+  padding: 14px;
+  margin-bottom: 10px;
+}
+.chart-card .notice {
+  margin-bottom: 10px;
+}
+.health-chart {
+  width: 100%;
+  height: 320px;
+  min-height: 260px;
+}
+/* One sentence per series the server could not fully measure. The chip carries
+   the series name and its state in words; the paragraph is the server's own
+   reason, which is why it is not restated here. */
+.series-note {
+  align-items: flex-start;
+  gap: 8px;
+}
+.series-note .chip {
+  flex: none;
+}
+
+/* --- mentor load beside the alert feed, as the board splits them ---------- */
+.board-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+@media (max-width: 1080px) {
+  .board-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-card,
+.alerts-card {
+  padding: 14px;
+}
+.grid-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.mentor-grid {
+  display: block;
+  width: 100%;
+}
+
+/* --- the alert feed ------------------------------------------------------ */
+.alert-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.alert-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 0;
+  border-top: 1px solid var(--hairline-26);
+  min-width: 0;
+}
+.alert-text {
+  font-size: 12.5px;
+  line-height: 1.3;
+  color: var(--ink);
+  min-width: 0;
+}
+.alert-meta {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+/* --- loading and progress lines ------------------------------------------ */
+.state-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.state-note .icon {
+  font-size: 16px;
+  color: var(--purple-mid);
+}

@@ -1,0 +1,296 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 1680 1188">
+<defs>
+<marker id="a-1d4ed8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1d4ed8"/></marker>
+<marker id="a-0f766e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0f766e"/></marker>
+<marker id="a-6d28d9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6d28d9"/></marker>
+<marker id="a-b45309" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b45309"/></marker>
+<marker id="a-be123c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#be123c"/></marker>
+<marker id="a-0369a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0369a1"/></marker>
+<marker id="a-334155" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#334155"/></marker>
+<marker id="a-111827" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#111827"/></marker>
+<marker id="a-475569" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#475569"/></marker>
+<marker id="a-64748b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker>
+</defs>
+<rect width="1680" height="1188" fill="#ffffff"/>
+<text x="22" y="50" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="31" font-weight="800" fill="#111827" text-anchor="start">REEP — Technology Stack &amp; Interaction Map</text>
+<text x="22" y="72" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14" font-weight="500" fill="#475569" text-anchor="start">Which technologies are in play, and exactly what travels between them</text>
+<text x="1658" y="34" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#475569" text-anchor="end">Angular 22.1 · TypeScript 6.0 · FastAPI 0.141 · Python 3.14 · SQLAlchemy 2.0 · PostgreSQL 17</text>
+<text x="1658" y="52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#475569" text-anchor="end">61 tables · 44 migrations · 19 student routes · 34 lazy chunks · 609 backend tests</text>
+<text x="1658" y="70" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#64748b" text-anchor="end">Print A3 landscape (420 × 297 mm) at 100 % scale, no margins</text>
+<line x1="22" y1="86" x2="1658" y2="86" stroke="#111827" stroke-width="2"/>
+<rect x="22" y="112" width="398" height="894" rx="12" fill="#f8fafc" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="7 4"/>
+<rect x="36" y="99" width="292" height="26" rx="13" fill="#1d4ed8"/>
+<text x="46" y="117" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">A · CLIENT RUNTIME — the browser tab</text>
+<rect x="40" y="152" width="362" height="122" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M49 152 H393 A9 9 0 0 1 402 161 V178 H40 V161 A9 9 0 0 1 49 152 Z" fill="#1d4ed8"/>
+<text x="51" y="170" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">ANGULAR 22.1 · TYPESCRIPT 6.0</text>
+<text x="51" y="194" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Standalone components — no NgModules anywhere</text>
+<text x="51" y="207" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="start">Signals hold state; RxJS 7.8 only where HttpClient needs it</text>
+<text x="51" y="220" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Router: every route is loadComponent() ⇒ its own chunk</text>
+<text x="51" y="233" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">ReactiveForms + FormsModule(ngModel) per screen</text>
+<text x="51" y="246" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">app-shell picks one of three navs from the session role</text>
+<text x="51" y="259" font-family="'DejaVu Sans Mono', 'SF Mono', Menlo, Consolas, monospace" font-size="9.4" font-weight="400" fill="#475569" text-anchor="start">apps/web/src/app/{core,layout,features}</text>
+<rect x="40" y="286" width="362" height="110" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M49 286 H393 A9 9 0 0 1 402 295 V312 H40 V295 A9 9 0 0 1 49 286 Z" fill="#1d4ed8"/>
+<text x="51" y="304" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">SCREEN MAP</text>
+<text x="51" y="328" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">/student/* — 19 routes (badges, ledger, jobs, resume, …)</text>
+<text x="51" y="341" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">/mentor/* — Faculty (MENTOR): mentees · leave · upskilling</text>
+<text x="51" y="354" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">/admin/* — Main Admin (ADMIN): setup · people · exports</text>
+<text x="51" y="367" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">/alumni · /alumni/jobs · /login · /register</text>
+<text x="51" y="380" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="start">'' → homeRedirectGuard sends each role to its own home</text>
+<rect x="40" y="408" width="362" height="122" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M49 408 H393 A9 9 0 0 1 402 417 V434 H40 V417 A9 9 0 0 1 49 408 Z" fill="#1d4ed8"/>
+<text x="51" y="426" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">PLATFORM APIs THE SCREENS USE</text>
+<text x="51" y="450" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">fetch(url, {credentials:'include'}) — the house pattern</text>
+<text x="51" y="463" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">FormData for uploads (certificates, resumes, photos)</text>
+<text x="51" y="476" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">WebSocket + AudioWorklet — the live mock interview</text>
+<text x="51" y="489" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">MediaDevices.getUserMedia → 24 kHz mono PCM16</text>
+<text x="51" y="502" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Blob + anchor for PDF reports and CSV exports</text>
+<text x="51" y="515" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#475569" text-anchor="start">No token in JS: the session cookie is httpOnly</text>
+<rect x="40" y="542" width="362" height="110" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M49 542 H393 A9 9 0 0 1 402 551 V568 H40 V551 A9 9 0 0 1 49 542 Z" fill="#1d4ed8"/>
+<text x="51" y="560" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">DESIGN SYSTEM &amp; ASSETS</text>
+<text x="51" y="584" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">reep-v2.scss — global classes (.card .chip .dt-table)</text>
+<text x="51" y="597" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">One committed theme · status is text + colour, never colour</text>
+<text x="51" y="610" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Self-hosted fonts; Material Symbols SUBSET (144 kB not 5.2 MB)</text>
+<text x="51" y="623" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="start">.icon stays hidden until FontFace reports itself loaded</text>
+<text x="51" y="636" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">apexcharts / ng-apexcharts on the analytics screens</text>
+<rect x="40" y="664" width="362" height="110" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M49 664 H393 A9 9 0 0 1 402 673 V690 H40 V673 A9 9 0 0 1 49 664 Z" fill="#1d4ed8"/>
+<text x="51" y="682" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">BUILD &amp; CLIENT TELEMETRY</text>
+<text x="51" y="706" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">@angular/build 22.1 (esbuild) → dist/web/browser</text>
+<text x="51" y="719" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#475569" text-anchor="start">172 kB initial · 34 lazy chunks · budgets enforced in CI</text>
+<text x="51" y="732" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Static files are served by CloudFront + S3, not by the API</text>
+<text x="51" y="745" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">@sentry/angular 10.71 — dynamic import, only when a DSN is set</text>
+<text x="51" y="758" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">vitest 4 + jsdom 28 for client unit tests</text>
+<rect x="40" y="786" width="362" height="98" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M49 786 H393 A9 9 0 0 1 402 795 V812 H40 V795 A9 9 0 0 1 49 786 Z" fill="#1d4ed8"/>
+<text x="51" y="804" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">WHAT THE CLIENT NEVER DOES</text>
+<text x="51" y="828" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="start">Never reads the session cookie — it cannot</text>
+<text x="51" y="841" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#1d4ed8" text-anchor="start">Never calls a model directly; all AI goes through /api</text>
+<text x="51" y="854" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Never holds another student's row — scoping is server-side</text>
+<text x="51" y="867" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Its role check drives navigation only, never authorisation</text>
+<rect x="40" y="896" width="362" height="56" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M49 896 H393 A9 9 0 0 1 402 905 V922 H40 V905 A9 9 0 0 1 49 896 Z" fill="#1d4ed8"/>
+<text x="51" y="914" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">RETAINED IN THE CLIENT</text>
+<text x="51" y="938" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">livekit-client 2.21 — the voice rollback path, no UI caller</text>
+<rect x="560" y="112" width="460" height="894" rx="12" fill="#f8fafc" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="7 4"/>
+<rect x="574" y="99" width="353" height="26" rx="13" fill="#6d28d9"/>
+<text x="584" y="117" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">B · API PROCESS — one request, top to bottom</text>
+<rect x="578" y="152" width="424" height="78" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M587 152 H993 A9 9 0 0 1 1002 161 V176 H578 V161 A9 9 0 0 1 587 152 Z" fill="#6d28d9"/>
+<text x="589" y="168" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">1. UVICORN 0.52.3 — ASGI SERVER</text>
+<text x="589" y="192" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">uvloop + httptools · HTTP/1.1 and WebSocket on :3300</text>
+<text x="589" y="204.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#6d28d9" text-anchor="start">Sync `def` endpoints run in a 40-thread pool — which is what</text>
+<text x="589" y="217.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">keeps the event loop free for live interview audio</text>
+<rect x="578" y="256" width="424" height="78" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M587 256 H993 A9 9 0 0 1 1002 265 V280 H578 V265 A9 9 0 0 1 587 256 Z" fill="#6d28d9"/>
+<text x="589" y="272" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">2. STARLETTE MIDDLEWARE — IN ORDER</text>
+<text x="589" y="296" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">CORSMiddleware — one explicit origin, credentials allowed</text>
+<text x="589" y="308.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#6d28d9" text-anchor="start">RequestTraceMiddleware — mints or keeps X-Request-ID, tags</text>
+<text x="589" y="321.20000000000005" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Sentry, echoes the header, prints one access line</text>
+<rect x="578" y="360" width="424" height="78" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M587 360 H993 A9 9 0 0 1 1002 369 V384 H578 V369 A9 9 0 0 1 587 360 Z" fill="#6d28d9"/>
+<text x="589" y="376" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">3. FASTAPI 0.141.1 — ROUTING &amp; DI</text>
+<text x="589" y="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">One APIRouter per domain, all mounted under /api</text>
+<text x="589" y="412.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Depends(get_current_session) on every protected route</text>
+<text x="589" y="425.20000000000005" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">response_model=… ⇒ the response shape is the contract</text>
+<rect x="578" y="464" width="424" height="92" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M587 464 H993 A9 9 0 0 1 1002 473 V488 H578 V473 A9 9 0 0 1 587 464 Z" fill="#6d28d9"/>
+<text x="589" y="480" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">4. IDENTITY &amp; SESSION</text>
+<text x="589" y="504" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">PyJWT 2.13 HS256 verify over the reep_session cookie</text>
+<text x="589" y="516.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Claims: userId · email · name · role · studentId? · mentorId?</text>
+<text x="589" y="529.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">token_version compared on the way in ⇒ logout can revoke</text>
+<text x="589" y="541.8000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#475569" text-anchor="start">Password path (dev/CI only): scrypt N=16384 r=8 p=1 dklen=64</text>
+<rect x="578" y="582" width="424" height="78" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M587 582 H993 A9 9 0 0 1 1002 591 V606 H578 V591 A9 9 0 0 1 587 582 Z" fill="#6d28d9"/>
+<text x="589" y="598" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">5. SCOPE GATES — THE TWO RULES, IN CODE</text>
+<text x="589" y="622" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">_require_student · require_mentor · require_admin</text>
+<text x="589" y="634.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#6d28d9" text-anchor="start">_assert_can_access_student — ONE implementation, imported</text>
+<text x="589" y="647.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Out-of-scope ids flatten to 404, never 403 (no membership oracle)</text>
+<rect x="578" y="686" width="424" height="78" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M587 686 H993 A9 9 0 0 1 1002 695 V710 H578 V695 A9 9 0 0 1 587 686 Z" fill="#6d28d9"/>
+<text x="589" y="702" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">6. PYDANTIC 2.13 — VALIDATION &amp; SETTINGS</text>
+<text x="589" y="726" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Bodies parsed, coerced and rejected at the edge</text>
+<text x="589" y="738.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">pydantic-settings 2.15 loads .env into one Settings object</text>
+<text x="589" y="751.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#6d28d9" text-anchor="start">Settings also owns the production boot refusal</text>
+<rect x="578" y="790" width="424" height="78" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M587 790 H993 A9 9 0 0 1 1002 799 V814 H578 V799 A9 9 0 0 1 587 790 Z" fill="#6d28d9"/>
+<text x="589" y="806" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">7. SERVICE LAYER — WHERE THE WORK HAPPENS</text>
+<text x="589" y="830" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">document_store · ai/llm · knowledge · conversations · retention</text>
+<text x="589" y="842.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">interview_relay · interview_audio · redaction · ratelimit</text>
+<text x="589" y="855.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">resume_pdf / english_report — ReportLab 5.0, strictly local</text>
+<rect x="578" y="894" width="424" height="92" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M587 894 H993 A9 9 0 0 1 1002 903 V918 H578 V903 A9 9 0 0 1 587 894 Z" fill="#6d28d9"/>
+<text x="589" y="910" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">8. PERSISTENCE — SQLALCHEMY 2.0.52</text>
+<text x="589" y="934" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Session per request via Depends(get_db)</text>
+<text x="589" y="946.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">2.0-style select(); models are the schema's source of truth</text>
+<text x="589" y="959.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">psycopg 3.3.4 binary protocol · pool_pre_ping, sized by settings</text>
+<text x="589" y="971.8000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Alembic 1.19 owns DDL — one head, hand-written enum steps</text>
+<polyline points="790,232 790,253" fill="none" stroke="#6d28d9" stroke-width="2.2" marker-end="url(#a-6d28d9)" stroke-linejoin="round"/>
+<polyline points="790,336 790,357" fill="none" stroke="#6d28d9" stroke-width="2.2" marker-end="url(#a-6d28d9)" stroke-linejoin="round"/>
+<polyline points="790,440 790,461" fill="none" stroke="#6d28d9" stroke-width="2.2" marker-end="url(#a-6d28d9)" stroke-linejoin="round"/>
+<polyline points="790,558 790,579" fill="none" stroke="#6d28d9" stroke-width="2.2" marker-end="url(#a-6d28d9)" stroke-linejoin="round"/>
+<polyline points="790,662 790,683" fill="none" stroke="#6d28d9" stroke-width="2.2" marker-end="url(#a-6d28d9)" stroke-linejoin="round"/>
+<polyline points="790,766 790,787" fill="none" stroke="#6d28d9" stroke-width="2.2" marker-end="url(#a-6d28d9)" stroke-linejoin="round"/>
+<polyline points="790,870 790,891" fill="none" stroke="#6d28d9" stroke-width="2.2" marker-end="url(#a-6d28d9)" stroke-linejoin="round"/>
+<rect x="1190" y="112" width="468" height="894" rx="12" fill="#f8fafc" stroke="#334155" stroke-width="1.6" stroke-dasharray="7 4"/>
+<rect x="1204" y="99" width="285" height="26" rx="13" fill="#334155"/>
+<text x="1214" y="117" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">C · DATA STORES &amp; EXTERNAL SERVICES</text>
+<rect x="1208" y="152" width="432" height="100" rx="9" fill="#ffffff" stroke="#334155" stroke-width="1.7"/>
+<path d="M1217 152 H1631 A9 9 0 0 1 1640 161 V178 H1208 V161 A9 9 0 0 1 1217 152 Z" fill="#334155"/>
+<text x="1219" y="170" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">GOOGLE IDENTITY</text>
+<text x="1219" y="194" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">accounts.google.com — the only sign-in door in production</text>
+<text x="1219" y="207" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Server-side code exchange, then RS256 verify against JWKS</text>
+<text x="1219" y="220" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#334155" text-anchor="start">A verified email with no users row is refused — no JIT signup</text>
+<text x="1219" y="233" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">users.google_sub pins the row to one Google account</text>
+<rect x="1208" y="264" width="432" height="106" rx="9" fill="#ffffff" stroke="#be123c" stroke-width="1.7"/>
+<path d="M1217 264 H1631 A9 9 0 0 1 1640 273 V290 H1208 V273 A9 9 0 0 1 1217 264 Z" fill="#be123c"/>
+<text x="1219" y="282" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">OPENAI REALTIME API</text>
+<text x="1219" y="306" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">wss://api.openai.com/v1/realtime — model set per environment</text>
+<text x="1219" y="319" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Server-to-server: the browser never sees this key</text>
+<text x="1219" y="332" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Up: PCM16 frames · Down: audio deltas + transcript events</text>
+<text x="1219" y="345" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#be123c" text-anchor="start">The relay owns turn-taking — exactly one response.create site</text>
+<text x="1219" y="358" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Consent check and the phase machine live on this socket</text>
+<rect x="1208" y="382" width="432" height="94" rx="9" fill="#ffffff" stroke="#be123c" stroke-width="1.7"/>
+<path d="M1217 382 H1631 A9 9 0 0 1 1640 391 V408 H1208 V391 A9 9 0 0 1 1217 382 Z" fill="#be123c"/>
+<text x="1219" y="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">AMAZON BEDROCK — NOVA</text>
+<text x="1219" y="424" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">bedrock-runtime · converse / converse_stream (boto3 1.43)</text>
+<text x="1219" y="437" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">apac.amazon.nova-pro-v1:0 — an inference profile, per region</text>
+<text x="1219" y="450" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#be123c" text-anchor="start">Credentials are the IAM task role — no API key exists</text>
+<text x="1219" y="463" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Mapped at the edge: system → system[], turns → content[]</text>
+<rect x="1208" y="488" width="432" height="94" rx="9" fill="#ffffff" stroke="#be123c" stroke-width="1.7"/>
+<path d="M1217 488 H1631 A9 9 0 0 1 1640 497 V514 H1208 V497 A9 9 0 0 1 1217 488 Z" fill="#be123c"/>
+<text x="1219" y="506" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">OPENAI-COMPATIBLE PROVIDERS</text>
+<text x="1219" y="530" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">One adapter, many targets: Groq · Mistral · OpenRouter ·</text>
+<text x="1219" y="543" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Gemini · Cohere · Sakana · a local Ollama / LM Studio</text>
+<text x="1219" y="556" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">POST /chat/completions, plus SSE streaming, over httpx 0.28</text>
+<text x="1219" y="569" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#be123c" text-anchor="start">Loopback is always allowed; anything remote needs the flag</text>
+<rect x="1208" y="594" width="432" height="80" rx="9" fill="#ffffff" stroke="#0369a1" stroke-width="1.7"/>
+<path d="M1217 594 H1631 A9 9 0 0 1 1640 603 V620 H1208 V603 A9 9 0 0 1 1217 594 Z" fill="#0369a1"/>
+<text x="1219" y="612" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">SENTRY</text>
+<text x="1219" y="636" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">One org, two projects — api (Python SDK) and web</text>
+<text x="1219" y="649" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Errors AND performance traces · send_default_pii = False</text>
+<text x="1219" y="662" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Joined to the raw logs by the request_id tag</text>
+<rect x="1208" y="686" width="432" height="94" rx="9" fill="#ffffff" stroke="#b45309" stroke-width="1.7"/>
+<path d="M1217 686 H1631 A9 9 0 0 1 1640 695 V712 H1208 V695 A9 9 0 0 1 1217 686 Z" fill="#b45309"/>
+<text x="1219" y="704" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">FILE STORE — EFS in production</text>
+<text x="1219" y="728" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">PDF · PNG · JPEG only, decided by MAGIC BYTES not the name</text>
+<text x="1219" y="741" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Random stored names — an uploaded name cannot traverse</text>
+<text x="1219" y="754" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#b45309" text-anchor="start">Per-owner quota checked BEFORE the body is buffered</text>
+<text x="1219" y="767" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Two siblings: uploads/ and interview-audio/ (the recorder)</text>
+<rect x="1208" y="792" width="432" height="108" rx="9" fill="#ffffff" stroke="#b45309" stroke-width="1.7"/>
+<path d="M1217 792 H1631 A9 9 0 0 1 1640 801 V818 H1208 V801 A9 9 0 0 1 1217 792 Z" fill="#b45309"/>
+<text x="1219" y="810" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">POSTGRESQL 17 + pgvector 0.5</text>
+<text x="1219" y="834" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">61 tables · every enum created by a hand-written migration</text>
+<text x="1219" y="847" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Knowledge base: full-text blended with vector cosine (&lt;=&gt;)</text>
+<text x="1219" y="860" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">Embeddings mistral-embed, 1024-dim — and OPTIONAL: with no</text>
+<text x="1219" y="873" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">embedder configured retrieval degrades to full-text only</text>
+<text x="1219" y="886" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="700" fill="#b45309" text-anchor="start">Rule 2 is enforced in SQL, never filtered in Python after</text>
+<rect x="1208" y="912" width="432" height="68" rx="9" fill="#ffffff" stroke="#334155" stroke-width="1.7"/>
+<path d="M1217 912 H1631 A9 9 0 0 1 1640 921 V938 H1208 V921 A9 9 0 0 1 1217 912 Z" fill="#334155"/>
+<text x="1219" y="930" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">RETAINED / OCCASIONAL</text>
+<text x="1219" y="954" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">livekit-api 1.2 — room tokens for the voice rollback path</text>
+<text x="1219" y="967" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.9" font-weight="400" fill="#111827" text-anchor="start">SMTP mailer — job alerts, with deliver_once idempotency</text>
+<circle cx="432" cy="360" r="10.5" fill="#0f766e"/>
+<text x="432" y="364.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">1</text>
+<polyline points="444,360 560,360" fill="none" stroke="#0f766e" stroke-width="2.3" marker-end="url(#a-0f766e)" stroke-linejoin="round"/>
+<text x="446" y="352" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">HTTPS · JSON</text>
+<text x="446" y="374" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">Cookie: reep_session</text>
+<text x="446" y="385" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8.6" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">X-Request-ID echoed back</text>
+<circle cx="432" cy="470" r="10.5" fill="#0f766e"/>
+<text x="432" y="474.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">2</text>
+<polyline points="444,470 560,470" fill="none" stroke="#0f766e" stroke-width="2.3" marker-end="url(#a-0f766e)" stroke-linejoin="round"/>
+<text x="446" y="462" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">multipart/form-data</text>
+<text x="446" y="484" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">python-multipart 0.0.32</text>
+<text x="446" y="495" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8.6" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">type from magic bytes</text>
+<circle cx="432" cy="580" r="10.5" fill="#0f766e"/>
+<text x="432" y="584.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">3</text>
+<polyline points="444,580 560,580" fill="none" stroke="#0f766e" stroke-width="2.3" marker-end="url(#a-0f766e)" stroke-linejoin="round"/>
+<polyline points="536,588 446,588" fill="none" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#a-0f766e)" stroke-linejoin="round"/>
+<text x="446" y="572" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">WSS /api/interview</text>
+<text x="446" y="601" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">PCM16 24 kHz · binary</text>
+<text x="446" y="612" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8.6" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">JSON control events</text>
+<circle cx="432" cy="700" r="10.5" fill="#0f766e"/>
+<text x="432" y="704.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">4</text>
+<polyline points="444,700 560,700" fill="none" stroke="#0f766e" stroke-width="2.3" marker-end="url(#a-0f766e)" stroke-linejoin="round"/>
+<text x="446" y="692" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">302 · OAuth 2.0</text>
+<text x="446" y="714" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">state + nonce cookies</text>
+<text x="446" y="725" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8.6" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">lands on the role's home</text>
+<circle cx="1032" cy="190" r="10.5" fill="#334155"/>
+<text x="1032" y="194.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">5</text>
+<polyline points="1044,190 1190,190" fill="none" stroke="#334155" stroke-width="2.3" marker-end="url(#a-334155)" stroke-linejoin="round"/>
+<text x="1046" y="182" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">HTTPS · OpenID Connect</text>
+<text x="1046" y="204" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">code exchange + JWKS fetch</text>
+<text x="1046" y="215" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8.6" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">aud / iss / nonce verified</text>
+<circle cx="1032" cy="302" r="10.5" fill="#be123c"/>
+<text x="1032" y="306.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">6</text>
+<polyline points="1044,302 1190,302" fill="none" stroke="#be123c" stroke-width="2.3" marker-end="url(#a-be123c)" stroke-linejoin="round"/>
+<polyline points="1166,310 1046,310" fill="none" stroke="#be123c" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#a-be123c)" stroke-linejoin="round"/>
+<text x="1046" y="294" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">WSS · websockets 15.0.1</text>
+<text x="1046" y="323" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">Authorization: Bearer</text>
+<text x="1046" y="334" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8.6" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">audio + events both ways</text>
+<circle cx="1032" cy="420" r="10.5" fill="#be123c"/>
+<text x="1032" y="424.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">7</text>
+<polyline points="1044,420 1190,420" fill="none" stroke="#be123c" stroke-width="2.3" marker-end="url(#a-be123c)" stroke-linejoin="round"/>
+<text x="1046" y="412" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">HTTPS · SigV4 (boto3)</text>
+<text x="1046" y="434" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">converse / converse_stream</text>
+<text x="1046" y="445" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8.6" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">signed by the task role</text>
+<circle cx="1032" cy="526" r="10.5" fill="#be123c"/>
+<text x="1032" y="530.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">8</text>
+<polyline points="1044,526 1190,526" fill="none" stroke="#be123c" stroke-width="2.3" marker-end="url(#a-be123c)" stroke-linejoin="round"/>
+<text x="1046" y="518" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">HTTPS · JSON + SSE</text>
+<text x="1046" y="540" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">POST /chat/completions</text>
+<text x="1046" y="551" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8.6" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">rule 1 gate runs first</text>
+<circle cx="1032" cy="632" r="10.5" fill="#0369a1"/>
+<text x="1032" y="636.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">9</text>
+<polyline points="1044,632 1190,632" fill="none" stroke="#0369a1" stroke-width="2.3" marker-end="url(#a-0369a1)" stroke-linejoin="round"/>
+<text x="1046" y="624" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">HTTPS · Sentry envelope</text>
+<text x="1046" y="646" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">async, batched, PII off</text>
+<circle cx="1032" cy="724" r="10.5" fill="#b45309"/>
+<text x="1032" y="728.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">10</text>
+<polyline points="1044,724 1190,724" fill="none" stroke="#b45309" stroke-width="2.3" marker-end="url(#a-b45309)" stroke-linejoin="round"/>
+<text x="1046" y="716" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">POSIX file I/O</text>
+<text x="1046" y="738" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">sniff · quota · random name</text>
+<circle cx="1032" cy="830" r="10.5" fill="#b45309"/>
+<text x="1032" y="834.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">11</text>
+<polyline points="1044,830 1190,830" fill="none" stroke="#b45309" stroke-width="2.3" marker-end="url(#a-b45309)" stroke-linejoin="round"/>
+<text x="1046" y="822" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">psycopg 3.3 binary</text>
+<text x="1046" y="844" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">pooled, pool_pre_ping</text>
+<text x="1046" y="855" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="8.6" font-weight="400" fill="#64748b" text-anchor="start" font-style="italic">SQLAlchemy 2.0 select()</text>
+<circle cx="1032" cy="950" r="10.5" fill="#334155"/>
+<text x="1032" y="954.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#ffffff" text-anchor="middle">12</text>
+<polyline points="1044,950 1190,950" fill="none" stroke="#334155" stroke-width="2.3" marker-end="url(#a-334155)" stroke-linejoin="round"/>
+<text x="1046" y="942" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.4" font-weight="700" fill="#111827" text-anchor="start">HTTPS / SMTP</text>
+<text x="1046" y="964" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="400" fill="#475569" text-anchor="start">tokens · mail, best-effort</text>
+<rect x="22" y="1024" width="534" height="146" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M31 1024 H547 A9 9 0 0 1 556 1033 V1046 H22 V1033 A9 9 0 0 1 31 1024 Z" fill="#6d28d9"/>
+<text x="33" y="1038" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">BUILD, TEST &amp; CI — FOUR JOBS</text>
+<text x="33" y="1062" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">pytest — 609 tests across 37 modules; TestClient boots the SAME ASGI app</text>
+<text x="33" y="1074.4" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">REEP_REQUIRE_DB=1 turns a missing Postgres into a hard failure, not a green skip</text>
+<text x="33" y="1086.8000000000002" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">api-imports — proves every app/ module imports against requirements.txt ALONE</text>
+<text x="33" y="1099.2000000000003" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">worker-imports — the same proof for the voice worker's separate manifest</text>
+<text x="33" y="1111.6000000000004" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">web — ng build, where a bundle budget fails a route that stopped being lazy</text>
+<text x="33" y="1124.0000000000005" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">vitest 4 + jsdom 28 for client unit tests · prettier for format</text>
+<rect x="572" y="1024" width="534" height="146" rx="9" fill="#ffffff" stroke="#334155" stroke-width="1.7"/>
+<path d="M581 1024 H1097 A9 9 0 0 1 1106 1033 V1046 H572 V1033 A9 9 0 0 1 581 1024 Z" fill="#334155"/>
+<text x="583" y="1038" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">PACKAGING &amp; PROCESS TOPOLOGY</text>
+<text x="583" y="1062" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Dockerfile: python:3.14-slim-bookworm, dependency layer before code</text>
+<text x="583" y="1074.4" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">requirements.txt is runtime-only and pinned == ; -dev.txt adds pytest</text>
+<text x="583" y="1086.8000000000002" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="700" fill="#334155" text-anchor="start">Voice worker needs its OWN venv on Python 3.12 — livekit requires &lt; 3.15</text>
+<text x="583" y="1099.2000000000003" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Processes: the API (uvicorn) · a scheduled retention task · Postgres</text>
+<text x="583" y="1111.6000000000004" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">…and optionally the voice worker. The AI interviewer runs INSIDE the API.</text>
+<text x="583" y="1124.0000000000005" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Terraform provisions the infrastructure; Alembic owns the schema</text>
+<rect x="1122" y="1024" width="536" height="146" rx="9" fill="#ffffff" stroke="#be123c" stroke-width="1.7"/>
+<path d="M1131 1024 H1649 A9 9 0 0 1 1658 1033 V1046 H1122 V1033 A9 9 0 0 1 1131 1024 Z" fill="#be123c"/>
+<text x="1133" y="1038" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">THE GUARDS THAT RIDE THESE WIRES</text>
+<text x="1133" y="1062" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="700" fill="#be123c" text-anchor="start">RULE 1 — wires 7 &amp; 8: student PII may not reach a remote model unless the</text>
+<text x="1133" y="1074.4" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">egress flag is open; refused in-process, and the resume composes deterministically</text>
+<text x="1133" y="1086.8000000000002" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="700" fill="#be123c" text-anchor="start">RULE 2 — wire 11: staff scope narrowed in SQL, never filtered afterwards</text>
+<text x="1133" y="1099.2000000000003" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="700" fill="#be123c" text-anchor="start">CONSENT — wire 6: no live grant and the socket never opens (close 4013)</text>
+<text x="1133" y="1111.6000000000004" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">TRACE — every wire: one X-Request-ID, echoed, tagged on Sentry, printed as rid=</text>
+<text x="1133" y="1124.0000000000005" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">BOOT GUARD — the process refuses to start on repo-default secrets in production</text>
+<line x1="22" y1="1178" x2="1658" y2="1178" stroke="#64748b" stroke-width="1"/>
+<text x="22" y="1186" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#64748b" text-anchor="start">Numbered discs key each wire to its protocol · payload · guard.  A dashed return arrow means traffic flows both ways on the same connection.</text>
+<text x="1658" y="1186" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#64748b" text-anchor="end">Generated by tools/diagrams/render_stack_interaction.py — regenerate when the stack changes</text>
+</svg>

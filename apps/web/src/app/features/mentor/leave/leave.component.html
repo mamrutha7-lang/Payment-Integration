@@ -1,0 +1,634 @@
+<div class="panel" data-p="leave">
+  @if (!composing() && !viewing()) {
+    <!-- DASHBOARD -->
+    <div class="dt-header">
+      <div>
+        <h1 class="dt-title">Leave requests</h1>
+        <div class="dt-sub lv-lede">
+          The official BGSCET leave form — sign and send to Admin / Program Director.
+        </div>
+      </div>
+      <button type="button" class="btn primary" (click)="startNew()">
+        <span class="icon" aria-hidden="true">add_circle</span> New leave request
+      </button>
+    </div>
+
+    @if (error()) {
+      <div class="state-note risk"><span class="icon" aria-hidden="true">error</span>{{ error() }}</div>
+    }
+    @if (draftFlash()) {
+      <div class="state-note"><span class="icon" aria-hidden="true">check_circle</span>Draft saved on this device.</div>
+    }
+
+    @if (draft(); as d) {
+      <!-- KEYBOARD-REACHABLE, and nothing else about this card changed.
+           It was a plain <div (click)>: no role, no tabindex, no key
+           handler. Since the detail view is the ONLY place the "Download
+           PDF" link exists, a keyboard user could not reach their own leave
+           paper at all, and a screen reader never announced the row as
+           something you could open. Same handler, two more ways in. The
+           form, its Sign button and the submit/decide endpoints are
+           untouched. -->
+      <div
+        class="card req-card"
+        role="button"
+        tabindex="0"
+        (click)="openDraft()"
+        (keydown.enter)="openDraft()"
+        (keydown.space)="openDraft(); $event.preventDefault()"
+      >
+        <div class="req-main">
+          <div class="req-top">
+            <strong>{{ kindLabel(d.kind) }}</strong>
+            <span class="req-kind">Draft · saved on this device</span>
+          </div>
+          <div class="req-dates">
+            {{ d.from && d.to ? dateSpan({ from_date: d.from, to_date: d.to }) : 'Dates not filled in yet' }}
+            · saved {{ d.savedAt | date: 'd MMM y, HH:mm' }}
+          </div>
+        </div>
+        <span class="chip neutral"><span class="icon" aria-hidden="true">edit_note</span> Draft</span>
+      </div>
+    }
+
+    @if (rows() === null) {
+      <div class="state-note"><span class="icon" aria-hidden="true">hourglass_empty</span>Loading your requests…</div>
+    } @else if (rows()!.length === 0 && !draft()) {
+      <div class="card lv-empty">No leave requests yet.</div>
+    } @else {
+      @for (r of rows()!; track r.id) {
+        <div
+          class="card req-card"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Open the ' + kindLabel(r.leave_kind) + ' request'"
+          (click)="open(r)"
+          (keydown.enter)="open(r)"
+          (keydown.space)="open(r); $event.preventDefault()"
+        >
+          <div class="req-main">
+            <div class="req-top">
+              <strong>{{ kindLabel(r.leave_kind) }}</strong>
+              @if (r.signed_at) {
+                <span class="req-kind">Applied {{ r.signed_at | date: 'd MMM y' }}</span>
+              }
+            </div>
+            <div class="req-dates">{{ dateSpan(r) }}</div>
+          </div>
+          <span class="chip {{ chip(r.status).tone }}">
+            <span class="icon" aria-hidden="true">{{ chip(r.status).icon }}</span> {{ chip(r.status).label }}
+          </span>
+        </div>
+      }
+    }
+
+    <!-- YOUR ALLOWANCE (B10.2) — a READ, beside the list and not on the sheet.
+         It is here because the submit path can now refuse a form for want of
+         days, and "you have 2 casual days left" is a number the applicant has
+         to be able to see somewhere other than in the refusal that stopped
+         them. An EMPTY list is not a zero: it means the office has recorded no
+         allowance, and then nothing is measured at all — two opposite states
+         that must never render the same. -->
+    @if (balances(); as allowance) {
+      <div class="card lv-balance">
+        <div class="lv-balance-head">
+          <strong>Your leave allowance</strong>
+          <span class="req-kind">{{ allowance.academic_year }}</span>
+        </div>
+        @if (allowance.balances.length) {
+          <ul class="lv-balance-list">
+            @for (balance of allowance.balances; track balance.kind) {
+              <li>
+                <span class="lv-balance-kind">{{ kindLabel(balance.kind) }}</span>
+                <span class="chip {{ balance.remaining_days < 0 ? 'risk' : 'neutral' }}">
+                  {{ balance.remaining_days }} left
+                </span>
+                <span class="req-kind">
+                  {{ balance.consumed_days }} of {{ balance.entitled_days }} taken
+                </span>
+              </li>
+            }
+          </ul>
+          <p class="form-hint">
+            Days are counted from your college's calendar, so a holiday inside a leave span is not
+            charged against this.
+          </p>
+        } @else {
+          <p class="form-hint">
+            The office has recorded no allowance for you this year, so no request of yours is
+            measured against one. That is not a balance of zero.
+          </p>
+        }
+      </div>
+    }
+
+    <!-- ASKED TO COVER (B10.6) — the other side of the Alternate Arrangements
+         table, and a different document from the one above: these are other
+         people's requests, and every one of them arrives as the REDUCED
+         projection. There is no reason on it and no Download PDF beside it;
+         being named as somebody's cover entitles you to the dates and the
+         class, not to why they are away. -->
+    @if ((cover() ?? []).length) {
+      <h2 class="cover-head">
+        Colleagues who named you
+        @if (coverAwaiting() > 0) {
+          · {{ coverAwaiting() }} waiting on you
+        }
+      </h2>
+      @if (coverError()) {
+        <div class="state-note risk" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ coverError() }}
+        </div>
+      }
+      @for (brief of cover()!; track brief.id) {
+        <div class="card req-card cover-card">
+          <div class="req-main">
+            <div class="req-top">
+              <strong>{{ brief.requester_name }}</strong>
+              <span class="req-kind">{{ kindLabel(brief.leave_kind) }}</span>
+            </div>
+            <div class="req-dates">
+              {{ dateSpan(brief) }} · {{ coverState(brief) }}
+            </div>
+            @if (brief.alt_row) {
+              <div class="req-dates cover-what">
+                Your row · {{ brief.alt_row.date || 'no date given' }}
+                {{ brief.alt_row.time }} {{ brief.alt_row.cls }} {{ brief.alt_row.remarks }}
+              </div>
+            }
+          </div>
+          @if (hasAccepted(brief)) {
+            <span class="chip good">
+              <span class="icon" aria-hidden="true">how_to_reg</span> You agreed to cover
+            </span>
+          } @else if (coverIsOpen(brief)) {
+            <button
+              type="button"
+              class="btn primary"
+              [disabled]="accepting() === brief.id"
+              (click)="acceptCover(brief)"
+            >
+              <span class="icon" aria-hidden="true">how_to_reg</span>
+              {{ accepting() === brief.id ? 'Recording…' : 'I will cover this' }}
+            </button>
+          } @else {
+            <span class="chip neutral">Nothing to do</span>
+          }
+        </div>
+      }
+    }
+  } @else {
+    <!-- THE FORM -->
+    <div class="form-bar">
+      <button type="button" class="iconbtn lv-back" title="Back to requests" (click)="backToDash()">
+        <span class="icon" aria-hidden="true">arrow_back</span>
+      </button>
+      <div class="form-bar-note">
+        Signatures are recorded as a name and a timestamp against your REEP account.
+      </div>
+      @if (viewing()?.signed_at) {
+        <a class="btn paper-link" [href]="paperUrl(viewing()!)" download>
+          <span class="icon" aria-hidden="true">picture_as_pdf</span> Download PDF
+        </a>
+      }
+    </div>
+
+    @if (viewing()?.decision_change_reason) {
+      <div class="remarks">
+        <span class="icon" aria-hidden="true">undo</span>
+        <div>
+          <strong>{{ changeLabel(viewing()!) }}</strong>
+          <div>{{ viewing()!.decision_change_reason }}</div>
+        </div>
+      </div>
+    }
+
+    @if (viewing()?.director_note) {
+      <div class="remarks">
+        <span class="icon" aria-hidden="true">flag</span>
+        <div>
+          <strong>{{ remarksLabel(viewing()!.status) }}</strong>
+          <div>{{ viewing()!.director_note }}</div>
+        </div>
+      </div>
+    }
+
+    @let v = viewing();
+    <div class="sheet">
+      <div class="sheet-invoke">|| Jai Sri Gurudev ||</div>
+      <div class="sheet-college">BGS COLLEGE OF ENGINEERING AND TECHNOLOGY,MBA</div>
+      <div class="sheet-addr">Mahalakshmipuram,Bengaluru-86.</div>
+
+      <div class="sheet-apply">
+        Application for
+        @for (k of kinds; track k.id) {
+          @if (v) {
+            <span class="kind" [class.kind--off]="v.leave_kind !== k.id">{{ k.label }}</span>
+          } @else {
+            <button
+              type="button"
+              class="kind kind--btn"
+              [class.kind--off]="fKind() !== k.id"
+              (click)="fKind.set(k.id)"
+            >
+              {{ k.label }}
+            </button>
+          }
+          @if (!$last) {
+            <span class="kind-sep">/</span>
+          }
+        }
+        (Strike-off, if not applicable)
+      </div>
+
+      <div class="app-date">
+        Date:
+        <span class="app-date-val">{{ (v ? v.signed_at : null) || today | date: 'dd MMM y' }}</span>
+      </div>
+
+      <table class="sheet-table">
+        <tbody>
+          <tr>
+            <th scope="row">Name</th>
+            <td>
+              {{ (v ? v.requester_name : identity().name) || 'Not on record' }}
+              <span class="synced">(synced)</span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Designation</th>
+            <td>
+              {{ (v ? v.requester_designation : identity().designation) || 'Not on record' }}
+              <span class="synced">(synced)</span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Department</th>
+            <td>
+              {{ (v ? v.requester_department : identity().department) || 'Not on record' }}
+              <span class="synced">(synced)</span>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Date</th>
+            <td>
+              @if (v) {
+                {{ dateSpan(v) }}
+              } @else {
+                <span class="date-pair">
+                  <input
+                    type="date"
+                    aria-label="From date"
+                    [value]="fFrom()"
+                    (input)="fFrom.set($any($event.target).value)"
+                  />
+                  <span>to</span>
+                  <input
+                    type="date"
+                    aria-label="To date"
+                    [value]="fTo()"
+                    (input)="fTo.set($any($event.target).value)"
+                  />
+                </span>
+              }
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Purpose</th>
+            <td>
+              @if (v) {
+                {{ v.reason }}
+              } @else {
+                <textarea
+                  rows="2"
+                  aria-label="Purpose"
+                  [value]="fPurpose()"
+                  (input)="fPurpose.set($any($event.target).value)"
+                ></textarea>
+              }
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Credit</th>
+            <td>
+              @if (v) {
+                {{ v.credit || '—' }}
+              } @else {
+                <input
+                  type="text"
+                  aria-label="Credit"
+                  placeholder="e.g. 3 days"
+                  [value]="fCredit()"
+                  (input)="fCredit.set($any($event.target).value)"
+                />
+              }
+            </td>
+          </tr>
+          <tr>
+            <th scope="row">Sanctioned</th>
+            <td>{{ v ? sanctioned(v.status) : 'Pending' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="sig-row">
+        <div class="sig">
+          @if (v?.signed_at) {
+            <div class="sig-name">{{ v!.requester_name }}</div>
+            <div class="sig-when">{{ v!.signed_at | date: 'd MMM y, HH:mm' }}</div>
+          } @else if (!v) {
+            <button
+              type="button"
+              class="btn primary sig-btn"
+              [disabled]="!canSubmit()"
+              (click)="signAndSubmit()"
+            >
+              <span class="icon" aria-hidden="true">draw</span> Sign
+            </button>
+          }
+          <div class="sig-line">SIGNATURE OF STAFF</div>
+        </div>
+        <div class="sig">
+          @if (v?.director_name && v?.director_decided_at) {
+            <div class="sig-name">{{ v!.director_name }}</div>
+            <div class="sig-when">{{ v!.director_decided_at | date: 'd MMM y, HH:mm' }}</div>
+          } @else {
+            <div class="sig-await">Awaiting</div>
+          }
+          <div class="sig-line">PROGRAM DIRECTOR</div>
+        </div>
+      </div>
+
+      <div class="sheet-rule"></div>
+
+      <div class="alt-head">Alternate Arrangements: (For Department purpose)</div>
+      <div class="alt-name">
+        Name:
+        @if (v) {
+          <span class="alt-name-val">{{ v.alt_name || '—' }}</span>
+        } @else {
+          <input
+            type="text"
+            aria-label="Alternate arrangement name"
+            [value]="fAltName()"
+            (input)="fAltName.set($any($event.target).value)"
+          />
+        }
+      </div>
+
+      <table class="alt-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Staff Name (Alternative)</th>
+            <th>Class</th>
+            <th>Time</th>
+            <th>Remarks</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (v) {
+            @for (r of v.alt_rows; track $index) {
+              <tr>
+                <td>{{ r.date }}</td>
+                <td>{{ r.staff_name }}</td>
+                <td>{{ r.cls }}</td>
+                <td>{{ r.time }}</td>
+                <td>{{ r.remarks }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="alt-empty">No alternate arrangements recorded.</td>
+              </tr>
+            }
+          } @else {
+            @for (r of fAltRows(); track $index) {
+              <tr>
+                <td>
+                  <input
+                    type="text"
+                    aria-label="Date"
+                    [value]="r.date"
+                    (input)="setAltCell($index, 'date', $any($event.target).value)"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    aria-label="Staff name"
+                    [value]="r.staff_name"
+                    (input)="setAltCell($index, 'staff_name', $any($event.target).value)"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    aria-label="Class"
+                    [value]="r.cls"
+                    (input)="setAltCell($index, 'cls', $any($event.target).value)"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    aria-label="Time"
+                    [value]="r.time"
+                    (input)="setAltCell($index, 'time', $any($event.target).value)"
+                  />
+                </td>
+                <td>
+                  <input
+                    type="text"
+                    aria-label="Remarks"
+                    [value]="r.remarks"
+                    (input)="setAltCell($index, 'remarks', $any($event.target).value)"
+                  />
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+      @if (!v) {
+        <button type="button" class="btn ghost add-row" (click)="addAltRow()">
+          <span class="icon" aria-hidden="true">add</span> Add a row
+        </button>
+      }
+
+      <div class="sig-foot">
+        @if (v?.signed_at) {
+          <div class="sig-name">{{ v!.requester_name }}</div>
+        }
+        <div class="sig-line">Signature of staff.</div>
+      </div>
+    </div>
+
+    <!-- ATTACHED PAPERS (B10.3). Beside the form, never on it: the sheet asks
+         for what the college's sheet asks for, and a certificate is what travels
+         WITH an application. Only on a request that exists — there is nothing to
+         attach a document to until it has been signed and sent. -->
+    @if (v) {
+      <div class="attach-block">
+        <div class="attach-head">
+          <strong>Supporting papers</strong>
+          <!-- THE INPUT IS HIDDEN BY GEOMETRY, NEVER `hidden`. `display:none`
+               takes it out of the focus order and a <label> is not tabbable, so
+               the picker becomes mouse-only — the exact bug the 2026-09-10 audit
+               found on /mentor/signature and on /register. The label carries the
+               focus ring, or the focusable invisible input is a trap. -->
+          <label class="btn sm lv-file">
+            <span class="icon" aria-hidden="true">upload_file</span>
+            {{ attachBusy() ? 'Working…' : 'Attach a document' }}
+            <input
+              type="file"
+              class="lv-file__input"
+              accept="application/pdf,image/png,image/jpeg"
+              [disabled]="attachBusy()"
+              (change)="onAttach($event)"
+            />
+          </label>
+        </div>
+
+        @if (attachError()) {
+          <!-- role="alert": inserted by @if after the pick, so without a live
+               region a refused upload tells a screen-reader user nothing. -->
+          <div class="state-note risk" role="alert">
+            <span class="icon" aria-hidden="true">error</span>{{ attachError() }}
+          </div>
+        }
+
+        @if (attachments(); as papers) {
+          @if (papers.length) {
+            <ul class="attach-list">
+              @for (paper of papers; track paper.id) {
+                <li>
+                  <a
+                    class="btn ghost sm"
+                    [href]="attachmentUrl(v!, paper)"
+                    [attr.aria-label]="'Download ' + paper.original_name"
+                    download
+                  >
+                    <span class="icon" aria-hidden="true">download</span> {{ paper.original_name }}
+                  </a>
+                  <span class="attach-meta">
+                    {{ fileSize(paper.size_bytes) }} ·
+                    {{ paper.uploaded_by_name || 'account removed' }} ·
+                    {{ paper.uploaded_at | date: 'd MMM y' }}
+                  </span>
+                  @if (paper.can_delete) {
+                    <button
+                      type="button"
+                      class="btn ghost sm"
+                      [attr.aria-label]="'Remove ' + paper.original_name"
+                      [disabled]="attachBusy()"
+                      (click)="removeAttachment(paper)"
+                    >
+                      <span class="icon" aria-hidden="true">delete</span>
+                    </button>
+                  }
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="form-hint">
+              Nothing attached. Whoever signs this request can read what you put here, and can
+              attach the office's own letter to it.
+            </p>
+          }
+        }
+      </div>
+    }
+
+    @if (v?.status === 'REJECTED' || v?.status === 'REVOKED') {
+      <div class="form-actions">
+        <button type="button" class="btn" (click)="editAndResubmit(v!)">
+          <span class="icon" aria-hidden="true">edit</span> Edit &amp; resubmit
+        </button>
+        <span class="form-hint">Opens a fresh form with these details; this one stays on record.</span>
+      </div>
+    }
+
+    <!-- WITHDRAW (B10.4). Two taps, like the signature screen's Remove: a
+         withdrawn request cannot be un-withdrawn, and this button sits under a
+         document somebody has already signed their name to. -->
+    @if (v && canWithdraw(v)) {
+      @if (withdrawError()) {
+        <div class="state-note risk" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ withdrawError() }}
+        </div>
+      }
+      <div class="form-actions">
+        @if (confirmWithdraw()) {
+          <span class="form-hint">
+            This takes the request back. It cannot be undone — a new form is how you ask again.
+          </span>
+          <button
+            type="button"
+            class="btn danger"
+            [disabled]="withdrawing()"
+            (click)="withdraw()"
+          >
+            <span class="icon" aria-hidden="true">event_busy</span>
+            {{ withdrawing() ? 'Withdrawing…' : 'Yes, withdraw it' }}
+          </button>
+          <button type="button" class="btn" (click)="confirmWithdraw.set(false)">Keep it</button>
+        } @else {
+          <button type="button" class="btn" (click)="confirmWithdraw.set(true)">
+            <span class="icon" aria-hidden="true">event_busy</span> Withdraw this request
+          </button>
+          <span class="form-hint">
+            Only while it is still awaiting a signature. Once it is decided, the decision stands.
+          </span>
+        }
+      </div>
+    }
+
+    @if (!viewing()) {
+      @if (formError()) {
+        <!-- role="alert": this is inserted by @if after the click, so without a
+             live region the applicant is told nothing when the server refuses
+             the form. Display only — the Sign button and the submit call are
+             untouched. -->
+        <div class="state-note risk" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ formError() }}
+        </div>
+      }
+      <div class="form-actions">
+        <button type="button" class="btn" (click)="saveDraft()">
+          <span class="icon" aria-hidden="true">save</span> Save draft
+        </button>
+        <button
+          type="button"
+          class="btn primary"
+          [disabled]="!canSubmit()"
+          (click)="signAndSubmit()"
+        >
+          <span class="icon" aria-hidden="true">draw</span>
+          {{ submitting() ? 'Submitting…' : 'Sign & submit to Program Director' }}
+        </button>
+        @if (draft()) {
+          <button type="button" class="btn ghost" (click)="discardDraft()">Discard draft</button>
+        }
+        @if (!canSubmit() && !submitting()) {
+          <span class="form-hint">Dates and a purpose are needed before this can be signed.</span>
+        }
+      </div>
+      <!-- The picture above your name on the paper is the one on file under
+           Signature; without it the paper prints your name and the time
+           alone. Said here, before the Sign button, because "my signature is
+           not on the PDF" was the question this line answers. -->
+      @if (signatureOnFile() === false) {
+        <p class="form-hint" role="status">
+          <span class="icon" aria-hidden="true">draw</span>
+          No signature image is on file, so the paper will print your name and the time without a
+          picture. <a routerLink="/mentor/signature">Add your signature image</a>.
+        </p>
+      } @else if (signatureOnFile() === true) {
+        <p class="form-hint" role="status">
+          <span class="icon" aria-hidden="true">check_circle</span>
+          Your signature image is on file and prints above your name on the paper.
+        </p>
+      }
+    }
+  }
+</div>

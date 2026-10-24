@@ -1,0 +1,511 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>REEP Interview Sketch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Architects+Daughter&display=swap">
+<style>
+  :root {
+    --paper: #f5f1e6;
+    --grid: rgba(58, 54, 47, 0.075);
+    --ink: #3a362f;
+    --ink-soft: #7d766a;
+    --hi: #e8b32c;
+    --hi-soft: rgba(232, 179, 44, 0.32);
+    --red: #b5432f;
+    --margin-line: rgba(181, 67, 47, 0.25);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper: #26231c;
+      --grid: rgba(219, 213, 199, 0.06);
+      --ink: #dbd5c7;
+      --ink-soft: #97907e;
+      --hi: #d9ad2a;
+      --hi-soft: rgba(217, 173, 42, 0.26);
+      --red: #e0755b;
+      --margin-line: rgba(224, 117, 91, 0.3);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #26231c;
+    --grid: rgba(219, 213, 199, 0.06);
+    --ink: #dbd5c7;
+    --ink-soft: #97907e;
+    --hi: #d9ad2a;
+    --hi-soft: rgba(217, 173, 42, 0.26);
+    --red: #e0755b;
+    --margin-line: rgba(224, 117, 91, 0.3);
+  }
+
+  body {
+    background: var(--paper);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    color: var(--ink);
+    font-family: "Architects Daughter", "Comic Sans MS", cursive, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    margin: 0;
+    padding: 0 16px 96px;
+  }
+
+  .page {
+    max-width: 1010px;
+    margin: 0 auto;
+    border-left: 2px solid var(--margin-line);
+    padding-left: clamp(16px, 3vw, 44px);
+  }
+
+  header { padding-top: 56px; }
+  h1 {
+    font-family: "Caveat", cursive;
+    font-weight: 700;
+    font-size: clamp(2.6rem, 6vw, 4.2rem);
+    line-height: 1.05;
+    margin: 0 0 4px;
+    text-wrap: balance;
+    transform: rotate(-1.2deg);
+    transform-origin: left bottom;
+  }
+  h1 .hi {
+    background: linear-gradient(transparent 42%, var(--hi-soft) 42%, var(--hi-soft) 92%, transparent 92%);
+    padding: 0 4px;
+  }
+  .dateline {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    letter-spacing: 0.04em;
+    margin: 0 0 20px;
+  }
+  .lede {
+    max-width: 62ch;
+    margin: 0 0 8px;
+  }
+  .lede em { font-style: normal; border-bottom: 2px solid var(--hi); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 26px;
+    align-items: center;
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    margin: 18px 0 10px;
+  }
+  .legend .swatch {
+    display: inline-block;
+    vertical-align: -2px;
+    width: 30px; height: 0;
+    margin-right: 8px;
+  }
+  .legend .pencil { border-top: 2px solid var(--ink); }
+  .legend .marker { border-top: 9px solid var(--hi-soft); }
+  .legend .redp   { border-top: 2px dashed var(--red); }
+
+  h2 {
+    font-family: "Caveat", cursive;
+    font-weight: 600;
+    font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+    margin: 64px 0 6px;
+    transform: rotate(-0.6deg);
+    transform-origin: left bottom;
+  }
+  h2 .no {
+    color: var(--red);
+    font-size: 0.8em;
+    margin-right: 10px;
+  }
+  .note {
+    color: var(--ink-soft);
+    max-width: 66ch;
+    margin: 0 0 14px;
+  }
+  .note strong { color: var(--ink); font-weight: 400; border-bottom: 2px solid var(--hi); }
+  .note .warn { color: var(--red); }
+
+  figure { margin: 8px 0 0; }
+  .board { overflow-x: auto; }
+  .board svg {
+    display: block;
+    min-width: 720px;
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+  }
+  figcaption {
+    color: var(--ink-soft);
+    font-size: 0.92rem;
+    max-width: 70ch;
+    margin: 6px 0 0;
+  }
+
+  /* ---- SVG sketch vocabulary (styled from here so themes flow through) ---- */
+  svg { color: var(--ink); }
+  .stroke {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .stroke.thin  { stroke-width: 1.3; opacity: 0.85; }
+  .stroke.ghost { stroke-dasharray: 7 6; opacity: 0.7; }
+  .stroke.redp  { stroke: var(--red); }
+  .overdraw { opacity: 0.35; }
+  .markerline {
+    fill: none;
+    stroke: var(--hi-soft);
+    stroke-width: 13;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .markerpad { fill: var(--hi-soft); }
+  .lbl   { font-family: "Architects Daughter", cursive; font-size: 15px; fill: currentColor; }
+  .lbl.b { font-size: 16.5px; }
+  .lbl.s { font-size: 12.5px; fill: var(--ink-soft); }
+  .lbl.arrow { font-size: 12.5px; fill: var(--ink-soft); }
+  .lbl.red { fill: var(--red); }
+  .lbl.script { font-family: "Caveat", cursive; font-size: 24px; }
+  .lbl.script.big { font-size: 30px; }
+
+  footer {
+    margin-top: 72px;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    max-width: 66ch;
+  }
+  footer .sig {
+    font-family: "Caveat", cursive;
+    font-size: 1.5rem;
+    color: var(--ink);
+    transform: rotate(-2deg);
+    display: inline-block;
+    margin-top: 8px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    h1 { animation: settle 0.5s ease-out; }
+    @keyframes settle { from { opacity: 0; transform: rotate(-1.2deg) translateY(6px); } }
+  }
+</style>
+
+<div style="max-width:1100px;margin:16px auto;padding:14px 18px;border:2px solid #b4341f;border-radius:8px;background:#fdeeea;color:#5a1a0e;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:14px;line-height:1.55">
+  <strong style="display:block;font-size:15px;margin-bottom:6px">PARTLY STALE &mdash; drawn before 2026-09. <code>AGENTS.md</code> is the current truth.</strong>
+  This sketch draws the interview relay as it was built on <strong>OpenAI's realtime API</strong> (<code>app/interview_relay.py</code>, <code>OPENAI_API_KEY</code>, <code>wss://api.openai.com/v1/realtime</code>) and mentions the <strong>LiveKit voice stack</strong>. Both were removed in 2026-09. The live engine is <strong>Amazon Nova 2 Sonic</strong> on Bedrock, in-process, signed with SigV4 and holding no API key; there is no fourth process and no second venv. The reasoning the sketch records is still the engine's reasoning &mdash; see <code>docs/interview-engine-v3.md</code>, kept for the same reason.
+</div>
+</head>
+<body>
+
+<div class="page">
+<header>
+  <h1>REEP, as sketched on one page —<br>and <span class="hi">how the AI interview flows</span></h1>
+  <p class="dateline">field notes · apps/web + apps/api-py · Aug 2026</p>
+  <p class="lede">Three drawings. The first is the whole machine; the yellow marker traces the only path this page cares about: a student's voice going up to the model and a record coming back down. The second is the turn loop that makes it feel like a real interviewer. The third is how an interview ends and what it leaves behind.</p>
+  <div class="legend" role="list">
+    <span role="listitem"><span class="swatch pencil"></span>pencil = the whole stack</span>
+    <span role="listitem"><span class="swatch marker"></span>marker = the AI-interview path</span>
+    <span role="listitem"><span class="swatch redp"></span>red = refusals &amp; close codes</span>
+  </div>
+</header>
+
+<h2><span class="no">fig. 1</span>The whole machine, interview path in marker</h2>
+<p class="note">Four processes at most, and the fourth is optional. The interviewer is <strong>not a fifth process</strong> — the relay lives inside the FastAPI worker on :3300. The old LiveKit voice stack stays drawn in dashed pencil: mounted, callable, no button in the UI. It's the rollback path, not dead code.</p>
+
+<figure>
+<div class="board">
+<svg viewBox="0 0 980 600" role="img" aria-label="System sketch: the Angular browser talks to FastAPI over the /api proxy; inside FastAPI the interview relay speaks WebSocket audio with the browser, exchanges realtime events with the OpenAI Realtime API, and fire-and-forgets transcript rows into Postgres. The LiveKit voice worker is dashed as the rollback path.">
+  <defs>
+    <filter id="wob1" x="-6%" y="-6%" width="112%" height="112%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.017" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.4"/>
+    </filter>
+    <filter id="wob1b" x="-6%" y="-6%" width="112%" height="112%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.021" numOctaves="2" seed="23" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.8"/>
+    </filter>
+    <marker id="ah1" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </marker>
+    <marker id="ah1r" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9" fill="none" stroke="var(--red)" stroke-width="1.7" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <!-- highlighter underlay: browser -> relay -> cloud, relay -> db -->
+  <g filter="url(#wob1)">
+    <path class="markerline" d="M 160 265 C 260 260, 320 225, 400 205 C 480 188, 600 175, 745 150"/>
+    <path class="markerline" d="M 620 230 C 700 260, 760 320, 800 355"/>
+    <rect class="markerpad" x="378" y="148" width="264" height="118" rx="10"/>
+  </g>
+
+  <!-- browser -->
+  <g filter="url(#wob1)">
+    <rect class="stroke" x="42" y="170" width="228" height="150" rx="9"/>
+    <rect class="stroke thin overdraw" x="45" y="173" width="224" height="146" rx="11"/>
+    <!-- little mic doodle -->
+    <rect class="stroke thin" x="66" y="270" width="14" height="24" rx="7"/>
+    <path class="stroke thin" d="M 60 288 C 60 302, 86 302, 86 288 M 73 300 L 73 310 M 64 310 L 82 310"/>
+  </g>
+  <text class="lbl b" x="60" y="198">Student's browser</text>
+  <text class="lbl s" x="60" y="220">Angular 20 SPA · :4200</text>
+  <text class="lbl s" x="60" y="240">/student/assistant → the interviewer</text>
+  <text class="lbl s" x="98" y="292">mic in, voice out</text>
+
+  <!-- fastapi big box -->
+  <g filter="url(#wob1b)">
+    <rect class="stroke" x="360" y="92" width="300" height="428" rx="10"/>
+    <rect class="stroke thin overdraw" x="357" y="95" width="305" height="424" rx="12"/>
+  </g>
+  <text class="lbl b" x="380" y="122">FastAPI · apps/api-py · :3300</text>
+  <text class="lbl s" x="380" y="141">one process — the relay lives inside it</text>
+
+  <!-- relay box (highlighted) -->
+  <g filter="url(#wob1)">
+    <rect class="stroke" x="382" y="152" width="256" height="110" rx="8"/>
+  </g>
+  <text class="lbl b" x="398" y="180">Interview relay</text>
+  <text class="lbl s" x="398" y="201">WS /api/interview?specialization=</text>
+  <text class="lbl s" x="398" y="221">phase machine · word gate</text>
+  <text class="lbl s" x="398" y="241">ONE response.create site</text>
+
+  <!-- rest routers -->
+  <g filter="url(#wob1)"><rect class="stroke thin" x="382" y="292" width="256" height="72" rx="8"/></g>
+  <text class="lbl" x="398" y="318">REST routers /api/*</text>
+  <text class="lbl s" x="398" y="340">auth (Google) · mentor · jobs · resume…</text>
+
+  <!-- sweeper -->
+  <g filter="url(#wob1)"><rect class="stroke thin" x="382" y="392" width="256" height="64" rx="8"/></g>
+  <text class="lbl" x="398" y="418">Retention sweeper</text>
+  <text class="lbl s" x="398" y="440">orphan closer + 180-day broom</text>
+
+  <!-- openai cloud -->
+  <g filter="url(#wob1)">
+    <path class="stroke" d="M 762 150 C 748 128, 768 104, 794 108 C 800 88, 836 84, 848 100 C 872 88, 904 100, 902 122 C 926 126, 930 154, 908 164 C 912 182, 884 194, 862 186 C 852 202, 812 202, 802 188 C 778 196, 754 176, 762 150 Z"/>
+    <path class="stroke thin overdraw" d="M 765 152 C 752 130, 770 107, 795 111 C 802 91, 835 88, 847 103 C 870 91, 901 103, 899 124 C 922 128, 926 152, 906 162 C 909 179, 883 190, 862 183 C 851 198, 813 198, 804 185 C 781 193, 758 175, 765 152 Z"/>
+  </g>
+  <text class="lbl b" x="843" y="138" text-anchor="middle">OpenAI</text>
+  <text class="lbl" x="843" y="158" text-anchor="middle">Realtime API</text>
+  <text class="lbl s" x="843" y="215" text-anchor="middle">voice picked per specialization</text>
+  <text class="lbl s" x="843" y="233" text-anchor="middle">HR coral · DM marin · BA cedar · FA ash</text>
+
+  <!-- postgres cylinder -->
+  <g filter="url(#wob1)">
+    <path class="stroke" d="M 756 330 C 756 318, 940 318, 940 330 L 940 480 C 940 494, 756 494, 756 480 Z"/>
+    <path class="stroke thin" d="M 756 330 C 756 344, 940 344, 940 330"/>
+  </g>
+  <text class="lbl b" x="848" y="372" text-anchor="middle">Postgres 17 + pgvector</text>
+  <text class="lbl s" x="848" y="392" text-anchor="middle">reep_py · :5433</text>
+  <text class="lbl s" x="848" y="418" text-anchor="middle">messages(channel='interview')</text>
+  <text class="lbl s" x="848" y="437" text-anchor="middle">interview_sessions / turns /</text>
+  <text class="lbl s" x="848" y="455" text-anchor="middle">evaluations / consents</text>
+  <text class="lbl s" x="848" y="475" text-anchor="middle">+ KB chunks (vector)</text>
+
+  <!-- voice worker, dashed -->
+  <g filter="url(#wob1)"><rect class="stroke ghost" x="42" y="408" width="228" height="112" rx="9"/></g>
+  <text class="lbl" x="60" y="436">LiveKit voice worker</text>
+  <text class="lbl s" x="60" y="457">4th process · own 3.12 venv</text>
+  <text class="lbl s" x="60" y="477">rollback path — mounted,</text>
+  <text class="lbl s" x="60" y="496">no UI button calls it today</text>
+
+  <!-- arrows -->
+  <g filter="url(#wob1)">
+    <path class="stroke" d="M 272 212 C 306 210, 326 208, 356 206" marker-end="url(#ah1)"/>
+    <path class="stroke" d="M 272 258 C 312 250, 340 232, 378 218" marker-end="url(#ah1)"/>
+    <path class="stroke" d="M 378 232 C 340 246, 312 262, 274 270" marker-end="url(#ah1)"/>
+    <path class="stroke" d="M 642 190 C 690 178, 716 168, 756 156" marker-end="url(#ah1)"/>
+    <path class="stroke" d="M 758 172 C 718 184, 692 192, 644 204" marker-end="url(#ah1)"/>
+    <path class="stroke" d="M 642 240 C 706 268, 762 322, 798 358" marker-end="url(#ah1)"/>
+    <path class="stroke thin" d="M 642 328 C 686 346, 716 366, 752 390" marker-end="url(#ah1)"/>
+    <path class="stroke thin" d="M 642 428 C 682 438, 712 448, 750 458" marker-end="url(#ah1)"/>
+    <path class="stroke ghost" d="M 272 452 C 306 452, 326 450, 356 448" marker-end="url(#ah1)"/>
+  </g>
+  <text class="lbl arrow" x="278" y="196">HTTPS /api/* · reep_session cookie</text>
+  <text class="lbl arrow" x="252" y="290">WebSocket · 24 kHz PCM, both ways</text>
+  <text class="lbl arrow" x="662" y="152">realtime events</text>
+  <text class="lbl arrow" x="646" y="292">fire-and-forget writes</text>
+  <text class="lbl arrow" x="646" y="311">(a bad write never kills a call)</text>
+  <text class="lbl arrow" x="672" y="366">SQLAlchemy</text>
+  <text class="lbl arrow" x="656" y="462">deletes at 180 d</text>
+  <text class="lbl arrow" x="278" y="440">POST /voice/transcript</text>
+</svg>
+</div>
+<figcaption>fig. 1 — The interview path (marker): browser mic → relay inside FastAPI → OpenAI Realtime API, with transcripts falling into Postgres on the way past. Dashed pencil = the retained LiveKit rollback stack.</figcaption>
+</figure>
+
+<h2><span class="no">fig. 2</span>The turn loop — why it never talks over itself</h2>
+<p class="note">Upstream runs with <strong>create_response: false</strong>, so the model never answers on its own when the student pauses. The relay owns the turn: wait for the transcript (on a deadline), gate it by word count, tick the phase, and only then issue <strong>one</strong> response.create — from one call site, <code style="font-family:inherit">_advance_turn</code>. "One open question at a time" is a property of the call graph, not a sentence in the persona. <span class="warn">Red is the door: four ways the socket refuses.</span></p>
+
+<figure>
+<div class="board">
+<svg viewBox="0 0 980 680" role="img" aria-label="The interview turn loop: student answers, transcript arrives on a bounded wait, a word-count gate accepts it, the phase machine ticks, an instructions-only session.update steers the model, and a single response.create asks the next question. To the left, four door checks with close codes 4001, 4010, 4013 and 4014. Below, the phase arc opening to probing to deep dive to wrap up.">
+  <defs>
+    <filter id="wob2" x="-6%" y="-6%" width="112%" height="112%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="11" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.4"/>
+    </filter>
+    <marker id="ah2" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </marker>
+    <marker id="ah2r" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9" fill="none" stroke="var(--red)" stroke-width="1.7" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <!-- door checks -->
+  <g filter="url(#wob2)">
+    <path class="stroke redp" d="M 52 118 C 40 120, 38 340, 52 344"/>
+  </g>
+  <text class="lbl script red" x="64" y="100">the door — refused before, or during</text>
+  <text class="lbl" x="70" y="146">no OPENAI_API_KEY</text>
+  <text class="lbl red" x="252" y="146">→ 4001</text>
+  <text class="lbl" x="70" y="196">unknown ?specialization=</text>
+  <text class="lbl red" x="288" y="196">→ 4010</text>
+  <text class="lbl" x="70" y="246">no live consent grant</text>
+  <text class="lbl red" x="258" y="246">→ 4013</text>
+  <text class="lbl s" x="70" y="266">fails closed — never opens</text>
+  <text class="lbl" x="70" y="308">consent revoked mid-call</text>
+  <text class="lbl red" x="286" y="308">→ 4014</text>
+  <text class="lbl s" x="70" y="328">heartbeat poll notices ≤ 1 min</text>
+  <g filter="url(#wob2)">
+    <path class="stroke thin" d="M 200 360 C 230 400, 300 430, 386 442" marker-end="url(#ah2)"/>
+  </g>
+  <text class="lbl s" x="216" y="404">past the door, the loop runs</text>
+
+  <!-- loop nodes -->
+  <text class="lbl b" x="660" y="98" text-anchor="middle">student answers</text>
+  <text class="lbl s" x="660" y="118" text-anchor="middle">audio streams up</text>
+
+  <text class="lbl b" x="852" y="208" text-anchor="middle">transcript lands</text>
+  <text class="lbl s" x="852" y="228" text-anchor="middle">bounded wait — an unbounded one</text>
+  <text class="lbl s" x="852" y="246" text-anchor="middle">is an interview that never continues</text>
+
+  <text class="lbl b" x="852" y="392" text-anchor="middle">word-count gate</text>
+  <text class="lbl s" x="852" y="412" text-anchor="middle">deterministic, no model call</text>
+  <text class="lbl red" x="852" y="432" text-anchor="middle">too thin → clarify, don't advance</text>
+
+  <text class="lbl b" x="660" y="510" text-anchor="middle">phase machine ticks</text>
+  <text class="lbl s" x="660" y="530" text-anchor="middle">only on an accepted answer</text>
+
+  <text class="lbl b" x="462" y="392" text-anchor="middle">session.update</text>
+  <text class="lbl s" x="462" y="412" text-anchor="middle">instructions only — no student</text>
+  <text class="lbl s" x="462" y="430" text-anchor="middle">text ever composed in</text>
+
+  <g filter="url(#wob2)"><rect class="markerpad" x="352" y="176" width="222" height="66" rx="9"/></g>
+  <text class="lbl b" x="463" y="202" text-anchor="middle">ONE response.create</text>
+  <text class="lbl s" x="463" y="224" text-anchor="middle">single site: _advance_turn</text>
+
+  <!-- loop arrows -->
+  <g filter="url(#wob2)">
+    <path class="stroke" d="M 726 118 Q 812 138 842 184" marker-end="url(#ah2)"/>
+    <path class="stroke" d="M 868 256 Q 892 312 872 366" marker-end="url(#ah2)"/>
+    <path class="stroke" d="M 830 444 Q 790 486 736 502" marker-end="url(#ah2)"/>
+    <path class="stroke" d="M 588 500 Q 516 470 484 440" marker-end="url(#ah2)"/>
+    <path class="stroke" d="M 448 372 Q 424 300 444 252" marker-end="url(#ah2)"/>
+    <path class="stroke" d="M 486 168 Q 540 116 592 100" marker-end="url(#ah2)"/>
+  </g>
+  <text class="lbl arrow" x="906" y="316">accepted?</text>
+  <text class="lbl arrow" x="500" y="480">steers the NEXT reply</text>
+  <text class="lbl arrow" x="500" y="128">model asks, voice comes down</text>
+
+  <!-- center -->
+  <text class="lbl script big" x="660" y="292" text-anchor="middle">one open question</text>
+  <text class="lbl script big" x="660" y="324" text-anchor="middle">at a time</text>
+  <text class="lbl s" x="660" y="352" text-anchor="middle">a second create site = invariant gone,</text>
+  <text class="lbl s" x="660" y="370" text-anchor="middle">and no test will notice</text>
+
+  <!-- phase arc -->
+  <g filter="url(#wob2)">
+    <path class="stroke thin" d="M 210 600 C 400 592, 700 592, 900 600"/>
+    <path class="stroke thin" d="M 322 596 L 348 596" marker-end="url(#ah2)"/>
+    <path class="stroke thin" d="M 508 593 L 534 593" marker-end="url(#ah2)"/>
+    <path class="stroke thin" d="M 716 594 L 742 594" marker-end="url(#ah2)"/>
+    <rect class="markerpad" x="756" y="608" width="118" height="30" rx="8"/>
+  </g>
+  <text class="lbl script" x="100" y="608">the arc:</text>
+  <text class="lbl" x="228" y="630">opening</text>
+  <text class="lbl s" x="216" y="650">greet, self-intro</text>
+  <text class="lbl" x="392" y="630">probing</text>
+  <text class="lbl s" x="374" y="650">the hard scenario</text>
+  <text class="lbl" x="576" y="630">deep_dive</text>
+  <text class="lbl" x="770" y="630">wrap_up</text>
+  <text class="lbl s" x="732" y="656">"any questions for us?" first</text>
+</svg>
+</div>
+<figcaption>fig. 2 — Each accepted answer drives the cycle clockwise once. The phase directive rides an instructions-only session.update between turns; a cough can't create a question because nothing fires until the word gate accepts.</figcaption>
+</figure>
+
+<h2><span class="no">fig. 3</span>The landing — verdict, scorecard, and what remains</h2>
+<p class="note">The interview closes like a real one: the student's "questions for us" reply (never word-gated) earns a spoken verdict, and only the verdict's response.done requests the scorecard — a <strong>text-only</strong> response.create in the same session, parsed defensively, never spoken, never written into the chat history. Then the record has to be true: a <span class="warn">running row that never closes is a record that lies</span>, so three idempotent hands close it.</p>
+
+<figure>
+<div class="board">
+<svg viewBox="0 0 980 470" role="img" aria-label="Wrap-up sequence on the left: the invite question, the student's reply, the spoken verdict, then a text-only response.create producing a strict-JSON scorecard. On the right, the four interview tables plus messages, closed by three idempotent closers and swept after 180 days.">
+  <defs>
+    <filter id="wob3" x="-6%" y="-6%" width="112%" height="112%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="17" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="3.2"/>
+    </filter>
+    <marker id="ah3" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">
+      <path d="M1 1 L9 5 L1 9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </marker>
+  </defs>
+
+  <text class="lbl script" x="46" y="58">how it ends</text>
+  <text class="lbl" x="66" y="104">tick into wrap_up: "any questions for us?"</text>
+  <text class="lbl" x="66" y="168">student replies — never word-gated</text>
+  <text class="lbl" x="66" y="232">verdict, spoken aloud</text>
+  <g filter="url(#wob3)"><rect class="markerpad" x="52" y="264" width="330" height="34" rx="8"/></g>
+  <text class="lbl" x="66" y="288">then ONE text-only response.create</text>
+  <text class="lbl" x="66" y="352">strict-JSON scorecard</text>
+  <text class="lbl s" x="66" y="374">parsed defensively · never spoken ·</text>
+  <text class="lbl s" x="66" y="392">persisted whatever happens to it</text>
+  <g filter="url(#wob3)">
+    <path class="stroke thin" d="M 52 116 C 46 132, 46 140, 52 152" marker-end="url(#ah3)"/>
+    <path class="stroke thin" d="M 52 180 C 46 196, 46 204, 52 216" marker-end="url(#ah3)"/>
+    <path class="stroke thin" d="M 52 244 C 46 256, 46 262, 50 272" marker-end="url(#ah3)"/>
+    <path class="stroke thin" d="M 52 308 C 46 324, 46 330, 52 340" marker-end="url(#ah3)"/>
+    <path class="stroke" d="M 392 358 C 452 366, 490 372, 546 380" marker-end="url(#ah3)"/>
+  </g>
+  <text class="lbl arrow" x="420" y="346">lands in the ledger</text>
+
+  <!-- ledger -->
+  <g filter="url(#wob3)">
+    <rect class="stroke" x="560" y="52" width="384" height="360" rx="10"/>
+    <rect class="stroke thin overdraw" x="557" y="55" width="389" height="356" rx="12"/>
+    <path class="stroke thin" d="M 576 92 L 928 90"/>
+  </g>
+  <text class="lbl b" x="580" y="82">what remains — for 180 days</text>
+  <text class="lbl" x="580" y="122">messages · channel='interview'</text>
+  <text class="lbl" x="580" y="154">interview_sessions</text>
+  <text class="lbl s" x="598" y="174">status · emitted vs persisted · consent_id</text>
+  <text class="lbl" x="580" y="204">interview_turns</text>
+  <text class="lbl s" x="598" y="224">phase · heard? · advanced? (empty is legal)</text>
+  <text class="lbl" x="580" y="254">interview_evaluations</text>
+  <text class="lbl s" x="598" y="274">scores NULLABLE — missing ≠ zero</text>
+  <text class="lbl" x="580" y="304">interview_consents</text>
+  <text class="lbl s" x="598" y="324">3 separate booleans: live AI · transcript · audio</text>
+  <text class="lbl s" x="580" y="360">audio: OFF unless the deploy flag AND the</text>
+  <text class="lbl s" x="580" y="378">student's own checkbox — then two WAVs,</text>
+  <text class="lbl s" x="580" y="396">one per speaker, never mixed</text>
+
+  <!-- closers -->
+  <text class="lbl script" x="560" y="446">closed by three idempotent hands:</text>
+  <text class="lbl s" x="560" y="466">relay finalizer · router finally · orphan sweeper — all racing on AND status='running'</text>
+</svg>
+</div>
+<figcaption>fig. 3 — Wrap-up earns the verdict; the verdict's own completion triggers the scorecard request. The four interview tables sit beside messages, never instead of it, and everything on the page above is deleted on the same 180-day clock.</figcaption>
+</figure>
+
+<footer>
+  <p>Two house rules shadow every arrow here: student PII goes to a remote model only through the egress gate in <code style="font-family:inherit">app/ai/llm.py</code>, and staff scope is decided by role — a mentor with no group sees nobody, never the whole programme. The interviewer's instructions never contain student transcript text, so rule 1 holds by shape.</p>
+  <p class="sig">— sketched from apps/api-py/app/interview_relay.py &amp; routers/interview.py</p>
+</footer>
+</div>
+
+</body>
+</html>

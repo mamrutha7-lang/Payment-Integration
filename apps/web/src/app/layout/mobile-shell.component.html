@@ -1,0 +1,101 @@
+<!-- The side menu. Slides in from the left (menu button, or a swipe from the
+     left edge). Every screen this account has, in the same groups as the
+     website's sidebar. -->
+<ion-menu menuId="reep-menu" contentId="reep-main" type="overlay">
+  <ion-header>
+    <ion-toolbar>
+      <div class="m-who">
+        <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+        <span class="m-who__text">
+          <span class="m-who__name">{{ displayName() }}</span>
+          <span class="m-who__sub">{{ subtitle() }}</span>
+        </span>
+      </div>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    @for (group of navigation(); track group.title) {
+      <ion-list lines="none" class="m-list">
+        @if (group.title) {
+          <ion-list-header>{{ group.title }}</ion-list-header>
+        }
+        @for (item of group.items; track item.label) {
+          @if (item.path) {
+            <ion-menu-toggle [autoHide]="false">
+              <ion-item
+                button
+                [detail]="false"
+                [routerLink]="item.path"
+                routerLinkActive="m-active"
+                [routerLinkActiveOptions]="{ exact: !!item.exact }"
+              >
+                <span class="icon" slot="start" aria-hidden="true">{{ item.icon }}</span>
+                <ion-label>{{ item.label }}</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          } @else {
+            <ion-item [disabled]="true">
+              <span class="icon" slot="start" aria-hidden="true">{{ item.icon }}</span>
+              <ion-label>{{ item.label }}</ion-label>
+              @if (item.arrivesIn) {
+                <span class="chip neutral" slot="end">{{ item.arrivesIn }}</span>
+              }
+            </ion-item>
+          }
+        }
+      </ion-list>
+    }
+    <ion-list lines="none" class="m-list">
+      <ion-menu-toggle [autoHide]="false">
+        <ion-item button [detail]="false" routerLink="/account">
+          <span class="icon" slot="start" aria-hidden="true">person</span>
+          <ion-label>My account</ion-label>
+        </ion-item>
+      </ion-menu-toggle>
+      <ion-item button [detail]="false" (click)="onSignOut()">
+        <span class="icon" slot="start" aria-hidden="true">logout</span>
+        <ion-label>Sign out</ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<!-- The page. `ion-page` + the id above are what ion-menu slides over. -->
+<div class="ion-page" id="reep-main">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button menu="reep-menu" aria-label="Open menu"></ion-menu-button>
+      </ion-buttons>
+      <ion-title>{{ pageTitle() }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-content>
+    <!-- `desktop-main` keeps the global screen rules (tables that scroll
+         sideways, spacing) every existing screen was built against. -->
+    <main class="desktop-main m-main">
+      <router-outlet />
+    </main>
+  </ion-content>
+
+  @if (tabs().length) {
+    <!-- Bottom tabs: the first four screens of this account's menu, then
+         "More", which opens the menu. -->
+    <ion-tab-bar slot="bottom" [selectedTab]="activeTab()">
+      @for (tab of tabs(); track tab.path) {
+        <ion-tab-button [tab]="tab.path!" (click)="open(tab.path!)">
+          <span class="icon" aria-hidden="true">{{ tab.icon }}</span>
+          <ion-label>{{ tab.label }}</ion-label>
+        </ion-tab-button>
+      }
+      <ion-tab-button tab="more" (click)="openMenu()">
+        <span class="icon" aria-hidden="true">menu</span>
+        <ion-label>More</ion-label>
+      </ion-tab-button>
+    </ion-tab-bar>
+  }
+
+  <app-agent-orb />
+  <app-agent-dock />
+</div>

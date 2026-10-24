@@ -1,0 +1,264 @@
+<!-- Generated Resume view. Reuses the global reep-v2 .main / .preview / .psec /
+     .card / .chip / .btn / .evi-tag classes; the generate bar and markdown block
+     styles are local. -->
+<div class="rb-view">
+  <section class="main">
+    <div class="main-head">
+      <div>
+        <h2>Generated Resume</h2>
+        <div class="sub">
+          Every claim is tied to the record that supports it, so your mentor can audit it.
+        </div>
+      </div>
+      <div class="head-actions">
+        <button type="button" class="btn" (click)="navigate.emit('builder')">
+          <span class="icon" aria-hidden="true">edit</span> Edit profile
+        </button>
+        <button type="button" class="btn" [disabled]="!result()" (click)="download()">
+          <span class="icon" aria-hidden="true">download</span> Download PDF
+        </button>
+        <button
+          type="button"
+          class="btn accent"
+          disabled
+          title="Submitting a resume for approval isn't available yet — there is no backend endpoint for it."
+        >
+          <span class="icon" aria-hidden="true">send</span> Submit for approval
+        </button>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="prev-grid">
+        <!-- LEFT: generate control + rendered resume -->
+        <div>
+          <div class="gen-bar">
+            <input
+              class="ctrl"
+              placeholder="Resume title (optional) — e.g. General — Finance roles"
+              [(ngModel)]="title"
+              [disabled]="generating()"
+            />
+            <button type="button" class="btn accent" [disabled]="generating()" (click)="generate()">
+              <span class="icon" aria-hidden="true">auto_awesome</span>
+              {{ generating() ? 'Generating…' : result() ? 'Regenerate' : 'Generate Resume' }}
+            </button>
+          </div>
+
+          @if (error()) {
+            <div class="notice info">
+              <span class="icon" aria-hidden="true">error</span>
+              <div>{{ error() }}</div>
+            </div>
+          }
+
+          <!-- ATS view + page count, then the warnings — read before the document. -->
+          <div class="prev-controls">
+            <label class="ats-toggle">
+              <input
+                type="checkbox"
+                [checked]="atsOn()"
+                (change)="atsOn.set($any($event.target).checked)"
+              />
+              ATS-safe preview
+            </label>
+            <div class="page-count">
+              Page count:
+              @if (pageCount(); as n) {
+                <b>{{ n }}</b>
+                @if (n > 1) {
+                  — consider trimming to one page
+                }
+              } @else {
+                <b>—</b>
+              }
+            </div>
+          </div>
+          @if (warnings().length) {
+            <div class="warnings" role="note">
+              <div class="warnings-title">Warnings</div>
+              <!-- track by position: these are computed strings, so tracking by
+                   value re-creates the whole list (and its DOM) every time one
+                   of them changes — Angular NG0956. -->
+              @for (w of warnings(); track $index) {
+                <div class="warning-line">⚠ {{ w }}</div>
+              }
+            </div>
+          }
+
+          @if (result(); as r) {
+            <div class="preview" [class.ats]="atsOn()">
+              @for (b of blocks(); track $index) {
+                @switch (b.kind) {
+                  @case ('title') {
+                    <h2>
+                      @for (s of b.segs; track $index) {
+                        @if (s.bold) {
+                          <b>{{ s.text }}</b>
+                        } @else {
+                          {{ s.text }}
+                        }
+                      }
+                    </h2>
+                  }
+                  @case ('section') {
+                    <div class="psec">
+                      @for (s of b.segs; track $index) {
+                        @if (s.bold) {
+                          <b>{{ s.text }}</b>
+                        } @else {
+                          {{ s.text }}
+                        }
+                      }
+                    </div>
+                  }
+                  @case ('bullet') {
+                    <div class="pline">
+                      <span class="dot">•</span>
+                      <span>
+                        @for (s of b.segs; track $index) {
+                          @if (s.bold) {
+                            <b>{{ s.text }}</b>
+                          } @else {
+                            {{ s.text }}
+                          }
+                        }
+                      </span>
+                    </div>
+                  }
+                  @case ('table') {
+                    <table class="ptable">
+                      @for (row of b.rows; track $index; let first = $first) {
+                        <tr>
+                          @for (c of row; track $index) {
+                            @if (first) {
+                              <th scope="col">{{ c }}</th>
+                            } @else {
+                              <td>{{ c }}</td>
+                            }
+                          }
+                        </tr>
+                      }
+                    </table>
+                  }
+                  @default {
+                    <p class="ppara">
+                      @for (s of b.segs; track $index) {
+                        @if (s.bold) {
+                          <b>{{ s.text }}</b>
+                        } @else {
+                          {{ s.text }}
+                        }
+                      }
+                    </p>
+                  }
+                }
+              }
+            </div>
+          } @else if (!generating()) {
+            <div class="preview">
+              <div class="empty">
+                <span class="icon" aria-hidden="true">auto_awesome</span>
+                <p>
+                  No resume generated yet. Press <b>Generate Resume</b> to compose one from your
+                  saved REEP records.
+                </p>
+              </div>
+            </div>
+          } @else {
+            <div class="preview">
+              <div class="empty"><p>Composing your resume from your REEP records…</p></div>
+            </div>
+          }
+        </div>
+
+        <!-- RIGHT: trace, evidence, and what-would-strengthen cards -->
+        <div>
+          <div class="card">
+            <h3>Generation trace</h3>
+            @if (result(); as r) {
+              <div class="trace">
+                <div>
+                  <span class="chip neutral">
+                    <span class="icon" aria-hidden="true">bolt</span>
+                    {{ r.used_ai ? (r.model ?? r.generated_by) : 'Deterministic draft' }}
+                  </span>
+                  {{ r.used_ai ? 'polished by a model' : 'composed on this machine' }}
+                </div>
+                @if (r.note) {
+                  <div class="trace-note">{{ r.note }}</div>
+                } @else if (!r.used_ai) {
+                  <div class="trace-note">
+                    Student data never left the building — every line is drawn straight from your
+                    saved records.
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="trace-hint">
+                Generate a resume to see how it was composed — which model (if any) was used and
+                whether any claim was dropped.
+              </div>
+            }
+          </div>
+
+          <div class="card">
+            <h3>Evidence pack</h3>
+            <div class="evi">
+              <div>
+                <span class="chip good"><span class="icon" aria-hidden="true">check</span></span> Composed only from
+                your saved REEP records
+              </div>
+              <div>
+                <span class="chip good"><span class="icon" aria-hidden="true">check</span></span> Academic &amp;
+                certification data pulled from source
+              </div>
+              <div>
+                <span class="chip good"><span class="icon" aria-hidden="true">check</span></span> Nothing invented —
+                every claim is grounded
+              </div>
+              <div>
+                <span class="chip warn"><span class="icon" aria-hidden="true">remove</span></span> Self-reported items
+                awaiting verification are excluded
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>What would strengthen this</h3>
+            <div class="strengthen">
+              @if (suggestions().length >= 2) {
+                Adding <b>{{ suggestions()[0] }}</b> and <b>{{ suggestions()[1] }}</b> would give
+                the resume more substantive sections and lift your profile completeness from
+                <b>{{ svc.completeness() }}%</b>.
+              } @else if (suggestions().length === 1) {
+                Adding <b>{{ suggestions()[0] }}</b> would give the resume another substantive
+                section and lift your profile completeness from <b>{{ svc.completeness() }}%</b>.
+              } @else {
+                Your profile is <b>{{ svc.completeness() }}%</b> complete and every value-add
+                section is filled — this resume is drawing on your full record.
+              }
+              @if (suggestions().length > 0) {
+                <button
+                  type="button"
+                  class="btn primary"
+                  style="margin-top: 12px; padding: 7px 12px; font-size: 12px"
+                  (click)="navigate.emit('builder')"
+                >
+                  <span class="icon" aria-hidden="true">arrow_forward</span> Complete those sections
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footbar">
+      <div class="hint">
+        <span class="icon" style="font-size: 16px" aria-hidden="true">lock</span>
+        Generated on-device · evidence stored for mentor audit
+      </div>
+    </div>
+  </section>
+</div>

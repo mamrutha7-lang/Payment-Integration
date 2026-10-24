@@ -1,0 +1,53 @@
+/* Ionic's stylesheet, FOR THE PHONE APP ONLY.
+ *
+ * Built as its own file (angular.json: "bundleName": "ionic", "inject": false)
+ * and added to the page by src/app/native/native-bootstrap.ts only inside the
+ * app. The website never loads it: Ionic's structure rules pin <body> in
+ * place for app-style scrolling, which would stop every website page from
+ * scrolling.
+ *
+ * normalize.css and typography.css are deliberately NOT imported: REEP's own
+ * global styles (styles.scss) already set the fonts and resets, and these
+ * two would override them. */
+@import '@ionic/angular/css/core.css';
+@import '@ionic/angular/css/structure.css';
+
+/* REEP's brand as Ionic's colours, so Ionic's own parts (the menu button
+ * ripple, the selected tab, focus rings) match the rest of the app. */
+:root {
+  --ion-font-family: var(--font, 'Inter', system-ui, sans-serif);
+  --ion-background-color: #ece4f5;
+  --ion-text-color: #1e1b29;
+  --ion-color-primary: #552c7e;
+  --ion-color-primary-rgb: 85, 44, 126;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #4b2770;
+  --ion-color-primary-tint: #66418b;
+}
+
+/* The page wash behind the app, the same lilac as the website. */
+html.native-app body {
+  background: #ece4f5;
+}
+
+/* The website's own frame never renders inside the app, but its fixed
+ * drawer scrim and orb positions assume a 52px app bar; inside the app the
+ * Ionic header owns the top edge instead. */
+html.native-app .desktop-frame {
+  display: none;
+}
+
+/* The floating assistant button sits above the bottom tab bar (56px) and the
+ * phone's gesture bar, instead of on top of the "More" tab. The dock it opens
+ * moves up by the same amount. */
+html.native-app .agent-orb-wrap {
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  right: 14px;
+}
+html.native-app app-agent-dock .dock {
+  right: 12px;
+  width: calc(100vw - 24px);
+  bottom: calc(142px + env(safe-area-inset-bottom, 0px));
+  height: calc(100vh - 142px - 64px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+}

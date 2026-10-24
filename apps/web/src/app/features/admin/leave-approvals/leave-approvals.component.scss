@@ -1,0 +1,484 @@
+/* Leave approvals — this screen's LAYOUT only.
+ *
+ * `.panel` `.card` `.chip` `.btn` `.select` `.field` `.ctrl` `.notice` `.tabs`
+ * `.eyebrow` `.crumb` `.avatar` `.icon` `.wizard-steps` `.dt-header`
+ * `.dt-title` `.dt-sub` `.dt-toolbar` `.dt-frame` `.dt-table` `.dt-statusbar`
+ * `.sr-only` are global (styles/reep-v2.scss) and are used as they are.
+ *
+ * What is here is the shape of this board: the filter row, the queue table
+ * beside its 380px decision panel, the policy card under the table, and the
+ * vertical approval chain. The chain wears the global `.wizard-steps` dress and
+ * only turns it down the page — the boards draw the same numbered circles for a
+ * wizard and for a signature trail, and a second set of circles here would be a
+ * second definition of one idea.
+ *
+ * Two step states the global does not carry are added under `.chain` only:
+ * `pending` (a step nobody has reached) and `refused` (the step that stopped
+ * the form). Both are scoped to this component, so `.wizard-steps` keeps its
+ * two states everywhere else.
+ */
+
+:host {
+  display: block;
+}
+
+/* --- tabs and the board's filter row ------------------------------------- */
+
+.queue-tabs {
+  margin-bottom: 12px;
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.filters .select {
+  max-width: 240px;
+}
+
+/* A filter whose answer needs an unmerged endpoint. The directive disables the
+   real <select> inside — which is what takes it out of the tab order and stops
+   the menu — and this dims the pill it is laid over, so the row does not read
+   as four live filters three of which silently ignore you. */
+.filters .filter-pending {
+  opacity: 0.55;
+}
+
+.queue-banner {
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+/* --- the queue beside its 380px panel ------------------------------------ */
+
+.queue {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.queue-left {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.queue-grid {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* The table scrolls inside its frame so the status bar stays on screen, the
+   way the board's grid does. */
+.queue-scroll {
+  overflow: auto;
+  max-height: clamp(280px, calc(100vh - 460px), 620px);
+}
+
+.queue-state {
+  margin: 0;
+  padding: 28px 16px;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.queue-state .icon {
+  font-size: 17px;
+  color: var(--purple-mid);
+}
+
+/* --- the queue's rows ---------------------------------------------------- */
+
+.queue-row {
+  cursor: pointer;
+}
+
+.dates-cell {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The requester cell is a real button so the panel opens from the keyboard
+   too: a row that only answers a pointer is a mouse-only screen. */
+.requester {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.requester-who {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.requester-name {
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.requester-role {
+  font-size: 11px;
+  color: var(--faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-empty {
+  padding: 26px 14px;
+  text-align: center;
+}
+
+.empty-title {
+  display: block;
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.empty-sub {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* --- the policy card ----------------------------------------------------- */
+
+.policy-card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.policy-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.policy-title {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.policy-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.policy-key {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* --- the decision panel -------------------------------------------------- */
+
+.queue-panel {
+  width: 380px;
+  flex: none;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-self: flex-start;
+}
+
+.panel-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.panel-who {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.panel-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+}
+
+.panel-meta {
+  font-size: 12px;
+  color: var(--faint);
+  margin-top: 2px;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.facts dt {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.facts dd {
+  margin: 2px 0 0;
+  font-size: 12.5px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.alt-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.alt-list li {
+  display: flex;
+  flex-direction: column;
+}
+
+.alt-when {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+/* The acceptance chip sits inline with the colleague's name, so the name line
+   wraps rather than pushing the chip out of the 380px panel. ONE rule, not a
+   second `.alt-who` further down the file: two declarations of the same name in
+   one sheet is the same trap the global sheets have, at component scale. */
+.alt-who {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.alt-what {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.reason-text {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--ink);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* --- the approval chain -------------------------------------------------- */
+
+.chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.chain .step {
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.chain .step .n .icon {
+  font-size: 13px;
+}
+
+.chain .step.pending .n {
+  border-style: dashed;
+}
+
+.chain .step.refused .n {
+  background: var(--risk-bg);
+  border-color: transparent;
+  color: var(--risk);
+}
+
+.chain .step.refused {
+  color: var(--risk);
+}
+
+.chain-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.chain-label {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.chain-detail {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--faint);
+  overflow-wrap: anywhere;
+}
+
+.chain-block,
+.reason,
+.alt-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* --- the decision -------------------------------------------------------- */
+
+.panel-remarks {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.confirm-note {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.paper-link {
+  margin-left: auto;
+  text-decoration: none;
+}
+
+.panel-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 18px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.panel-empty .icon {
+  font-size: 26px;
+  color: var(--purple-mid);
+}
+
+.panel-empty p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* --- the panel's three extra reads (B10.2/B10.3/B10.6) -------------------- */
+/* `.panel-hint` and not `.hint`: the two global sheets both own short generic
+   names, and a component rule of the same name overrides only the properties
+   it repeats and silently inherits the rest. One owner per global class. */
+
+.panel-hint {
+  margin: 6px 0 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.balance-list,
+.attach-list {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.balance-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.balance-kind {
+  font-weight: 600;
+  min-width: 78px;
+}
+
+.balance-detail {
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.attach-list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.attach-meta {
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* "This leave has already begun" — the office's explicit yes before a
+   revocation that takes back days already taken. */
+.confirm-started {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink);
+  margin: 4px 0 8px;
+
+  input {
+    margin-top: 2px;
+    flex: none;
+  }
+}

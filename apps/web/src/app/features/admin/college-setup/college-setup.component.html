@@ -1,0 +1,637 @@
+<div class="panel" data-p="college-setup">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <span>College setup</span><span class="sep">/</span><span>Set up a college</span>
+      </div>
+      <h1 class="dt-title">Set up a college</h1>
+      <div class="dt-sub">
+        @if (collegeName()) {
+          {{ collegeName() }} · {{ departments().length | plural: 'department' }} ·
+          {{ courses().length | plural: 'course' }} ·
+          {{ includedBatches().length | plural: 'batch' : 'batches' }}
+        } @else {
+          College, departments, courses, batches — in one go.
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="card wizard-card">
+    <ol class="wizard-steps wizard-rail" aria-label="Set up a college: six steps">
+      @for (label of steps; track label; let i = $index) {
+        <li
+          class="step"
+          [class.active]="step() === i + 1"
+          [class.done]="step() > i + 1"
+          [attr.aria-current]="step() === i + 1 ? 'step' : null"
+        >
+          @if (step() > i + 1) {
+            <button type="button" class="step-jump" (click)="goTo(i + 1)">
+              <span class="n">{{ i + 1 }}</span>
+              <span>{{ label }}</span>
+            </button>
+          } @else {
+            <span class="n">{{ i + 1 }}</span>
+            <span>{{ label }}</span>
+          }
+        </li>
+        @if (!$last) {
+          <li class="sep" aria-hidden="true"></li>
+        }
+      }
+    </ol>
+
+    <!-- ------------------------------------------------------ 1 · College -->
+    @if (step() === 1) {
+      <section class="wizard-body" aria-label="Step 1: college">
+        @if (colleges().length) {
+          <div class="field">
+            <label for="setup-existing">Continue a college that is already here</label>
+            <!-- The choice is on the options, not a [value] on the select:
+                 opened with ?college=, the list and the pick arrive in the same
+                 pass, and a value set before its option exists is dropped. -->
+            <select
+              id="setup-existing"
+              class="ctrl"
+              (change)="pickCollege($any($event.target).value)"
+              [disabled]="loadingExisting()"
+            >
+              <option value="" [selected]="!pickedCollegeId()">— New college —</option>
+              @for (c of colleges(); track c.id) {
+                <option [value]="c.id" [selected]="c.id === pickedCollegeId()">
+                  {{ c.code }} · {{ c.name }}
+                </option>
+              }
+            </select>
+          </div>
+        }
+        @if (loadingExisting()) {
+          <p class="loading-line" role="status">Reading what {{ collegeName() }} already has…</p>
+        }
+        @if (existingCollege(); as college) {
+          <dl class="facts">
+            <div>
+              <dt>Code</dt>
+              <dd>{{ college.code }}</dd>
+            </div>
+            <div>
+              <dt>Name</dt>
+              <dd>{{ college.name }}</dd>
+            </div>
+            <div>
+              <dt>Campus</dt>
+              <dd>{{ college.campus || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Contact</dt>
+              <dd>{{ college.contact || '—' }}</dd>
+            </div>
+            <div>
+              <dt>Email domains</dt>
+              <dd>{{ college.email_domains.join(', ') || '—' }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <div class="field-row">
+            <div class="field narrow">
+              <label for="setup-code">Code <span class="required-mark">*</span></label>
+              <input
+                id="setup-code"
+                class="ctrl"
+                placeholder="1MP"
+                [value]="code()"
+                (input)="setCode($any($event.target).value)"
+                autocomplete="off"
+              />
+            </div>
+            <div class="field grow">
+              <label for="setup-name">Name <span class="required-mark">*</span></label>
+              <input
+                id="setup-name"
+                class="ctrl"
+                placeholder="BGS College of Engineering and Technology"
+                [value]="name()"
+                (input)="setName($any($event.target).value)"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field grow">
+              <label for="setup-campus">Campus</label>
+              <input
+                id="setup-campus"
+                class="ctrl"
+                placeholder="Mahalakshmipuram, Bengaluru"
+                [value]="campus()"
+                (input)="setCampus($any($event.target).value)"
+                autocomplete="off"
+              />
+            </div>
+            <div class="field grow">
+              <label for="setup-contact">Contact</label>
+              <input
+                id="setup-contact"
+                class="ctrl"
+                placeholder="Office email or phone"
+                [value]="contact()"
+                (input)="setContact($any($event.target).value)"
+                autocomplete="off"
+              />
+            </div>
+            <div class="field grow">
+              <label for="setup-domains">Email domains</label>
+              <input
+                id="setup-domains"
+                class="ctrl"
+                placeholder="bgscet.ac.in"
+                [value]="domains()"
+                (input)="setDomains($any($event.target).value)"
+                autocomplete="off"
+              />
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- -------------------------------------------------- 2 · Departments -->
+    @if (step() === 2) {
+      <section class="wizard-body" aria-label="Step 2: departments">
+        @for (dept of departments(); track dept.key) {
+          <div class="row" [class.row--locked]="dept.existingId !== null">
+            <div class="field narrow">
+              <label [for]="'dept-code-' + dept.key"
+                >Code <span class="required-mark">*</span></label
+              >
+              <input
+                [id]="'dept-code-' + dept.key"
+                class="ctrl"
+                placeholder="MBA"
+                [value]="dept.code"
+                (input)="setDepartment(dept.key, 'code', $any($event.target).value)"
+                [disabled]="dept.existingId !== null"
+                autocomplete="off"
+              />
+            </div>
+            <div class="field grow">
+              <label [for]="'dept-name-' + dept.key"
+                >Name <span class="required-mark">*</span></label
+              >
+              <input
+                [id]="'dept-name-' + dept.key"
+                class="ctrl"
+                placeholder="Management Studies"
+                [value]="dept.name"
+                (input)="setDepartment(dept.key, 'name', $any($event.target).value)"
+                [disabled]="dept.existingId !== null"
+                autocomplete="off"
+              />
+            </div>
+            <div class="field grow">
+              <label [for]="'dept-head-' + dept.key">Head</label>
+              <input
+                [id]="'dept-head-' + dept.key"
+                class="ctrl"
+                placeholder="Dr. Asha Rao"
+                [value]="dept.head"
+                (input)="setDepartment(dept.key, 'head', $any($event.target).value)"
+                [disabled]="dept.existingId !== null"
+                autocomplete="off"
+              />
+            </div>
+            @if (dept.existingId) {
+              <span class="chip neutral row-chip">Already there</span>
+            } @else if (departments().length > 1) {
+              <button
+                type="button"
+                class="iconbtn row-remove"
+                [attr.aria-label]="'Remove ' + (dept.name || 'this department')"
+                (click)="removeDepartment(dept.key)"
+              >
+                <span class="icon" aria-hidden="true">delete</span>
+              </button>
+            }
+          </div>
+        }
+        <div>
+          <button type="button" class="btn secondary" (click)="addDepartment()">
+            <span class="icon" aria-hidden="true">add</span> Add a department
+          </button>
+        </div>
+      </section>
+    }
+
+    <!-- ------------------------------------------------------ 3 · Courses -->
+    @if (step() === 3) {
+      <section class="wizard-body" aria-label="Step 3: courses">
+        @for (dept of departments(); track dept.key) {
+          <div class="group">
+            <h2 class="group-title">{{ dept.name || dept.code }}</h2>
+            @for (course of coursesOf(dept.key); track course.key) {
+              <div class="row" [class.row--locked]="course.existingId !== null">
+                <div class="field narrow">
+                  <label [for]="'course-code-' + course.key"
+                    >Code <span class="required-mark">*</span></label
+                  >
+                  <input
+                    [id]="'course-code-' + course.key"
+                    class="ctrl"
+                    placeholder="MBA"
+                    [value]="course.code"
+                    (input)="setCourse(course.key, 'code', $any($event.target).value)"
+                    [disabled]="course.existingId !== null"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="field grow">
+                  <label [for]="'course-name-' + course.key"
+                    >Name <span class="required-mark">*</span></label
+                  >
+                  <input
+                    [id]="'course-name-' + course.key"
+                    class="ctrl"
+                    placeholder="General MBA"
+                    [value]="course.name"
+                    (input)="setCourse(course.key, 'name', $any($event.target).value)"
+                    [disabled]="course.existingId !== null"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="field tiny">
+                  <label [for]="'course-degree-' + course.key">Degree</label>
+                  <select
+                    [id]="'course-degree-' + course.key"
+                    class="ctrl"
+                    [value]="course.degree"
+                    (change)="setCourseDegree(course.key, $any($event.target).value)"
+                    [disabled]="course.existingId !== null"
+                  >
+                    <option value="PG">PG</option>
+                    <option value="UG">UG</option>
+                  </select>
+                </div>
+                <div class="field tiny">
+                  <label [for]="'course-years-' + course.key">Years</label>
+                  <input
+                    [id]="'course-years-' + course.key"
+                    class="ctrl"
+                    type="number"
+                    min="1"
+                    max="6"
+                    [value]="course.years"
+                    (change)="setCourseYears(course.key, $any($event.target).value)"
+                    [disabled]="course.existingId !== null"
+                  />
+                </div>
+                @if (course.existingId) {
+                  <span class="chip neutral row-chip">Already there</span>
+                } @else {
+                  <button
+                    type="button"
+                    class="iconbtn row-remove"
+                    [attr.aria-label]="'Remove ' + (course.name || 'this course')"
+                    (click)="removeCourse(course.key)"
+                  >
+                    <span class="icon" aria-hidden="true">delete</span>
+                  </button>
+                }
+              </div>
+            } @empty {
+              <p class="empty-row">No course yet.</p>
+            }
+            <div>
+              <button type="button" class="btn secondary sm" (click)="addCourse(dept.key)">
+                <span class="icon" aria-hidden="true">add</span> Add a course
+              </button>
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- ---------------------------------------------- 4 · Specializations -->
+    @if (step() === 4) {
+      <section class="wizard-body" aria-label="Step 4: specializations">
+        @for (course of courses(); track course.key) {
+          <div class="group">
+            <h2 class="group-title">{{ course.name || course.code }}</h2>
+            @for (spec of specsOf(course.key); track spec.key) {
+              <div class="row" [class.row--locked]="spec.existingId !== null">
+                <div class="field narrow">
+                  <label [for]="'spec-code-' + spec.key"
+                    >Code <span class="required-mark">*</span></label
+                  >
+                  <input
+                    [id]="'spec-code-' + spec.key"
+                    class="ctrl"
+                    placeholder="fa"
+                    [value]="spec.code"
+                    (input)="setSpec(spec.key, 'code', $any($event.target).value)"
+                    [disabled]="spec.existingId !== null"
+                    autocomplete="off"
+                  />
+                </div>
+                <div class="field grow">
+                  <label [for]="'spec-name-' + spec.key"
+                    >Name <span class="required-mark">*</span></label
+                  >
+                  <input
+                    [id]="'spec-name-' + spec.key"
+                    class="ctrl"
+                    placeholder="Financial Analytics"
+                    [value]="spec.name"
+                    (input)="setSpec(spec.key, 'name', $any($event.target).value)"
+                    [disabled]="spec.existingId !== null"
+                    autocomplete="off"
+                  />
+                </div>
+                @if (spec.existingId) {
+                  <span class="chip neutral row-chip">Already there</span>
+                } @else {
+                  <button
+                    type="button"
+                    class="iconbtn row-remove"
+                    [attr.aria-label]="'Remove ' + (spec.name || 'this specialization')"
+                    (click)="removeSpec(spec.key)"
+                  >
+                    <span class="icon" aria-hidden="true">delete</span>
+                  </button>
+                }
+              </div>
+            } @empty {
+              <p class="empty-row">No specialization — the course is the whole programme.</p>
+            }
+            <div>
+              <button type="button" class="btn secondary sm" (click)="addSpec(course.key)">
+                <span class="icon" aria-hidden="true">add</span> Add a specialization
+              </button>
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <!-- ------------------------------------------------------ 5 · Batches -->
+    @if (step() === 5) {
+      <section class="wizard-body" aria-label="Step 5: batches">
+        <div class="field tiny">
+          <label for="setup-year">Starting year</label>
+          <select id="setup-year" class="ctrl" (change)="setStartYear($any($event.target).value)">
+            @for (year of startYearChoices(); track year) {
+              <option [value]="year" [selected]="year === startYear()">{{ year }}</option>
+            }
+          </select>
+        </div>
+        @for (b of batches(); track b.leaf.key) {
+          <div class="leaf" [class.leaf--off]="!b.include">
+            <label class="check leaf-check">
+              <input
+                type="checkbox"
+                [checked]="b.include"
+                (change)="setBatchIncluded(b.leaf.key, $any($event.target).checked)"
+              />
+              <span class="leaf-title"
+                >{{ b.leaf.course.name }}
+                @if (b.leaf.spec) {
+                  · {{ b.leaf.spec.name }}
+                }
+              </span>
+            </label>
+            <div class="leaf-body">
+              <div class="field tiny">
+                <label [for]="'batch-start-' + b.leaf.key">Start year</label>
+                <select
+                  [id]="'batch-start-' + b.leaf.key"
+                  class="ctrl"
+                  (change)="setBatchStartYear(b.leaf.key, $any($event.target).value)"
+                  [attr.aria-invalid]="b.include && b.entry === null ? 'true' : null"
+                  [disabled]="!b.include"
+                >
+                  <!-- A select with no option marked selected shows its FIRST
+                       one, so a span that cannot be read back would read as a
+                       year the office never picked. This is the state "Runs"
+                       shows as a dash, and it holds Continue. -->
+                  @if (!b.span) {
+                    <option value="" selected>—</option>
+                  }
+                  @for (year of b.startYears; track year) {
+                    <option [value]="year" [selected]="year === b.span?.start">{{ year }}</option>
+                  }
+                </select>
+              </div>
+              <div class="field tiny">
+                <label [for]="'batch-end-' + b.leaf.key">End year</label>
+                <select
+                  [id]="'batch-end-' + b.leaf.key"
+                  class="ctrl"
+                  (change)="setBatchEndYear(b.leaf.key, $any($event.target).value)"
+                  [disabled]="!b.include"
+                >
+                  @if (!b.span) {
+                    <option value="" selected>—</option>
+                  }
+                  @for (year of b.endYears; track year) {
+                    <option [value]="year" [selected]="year === b.span?.end">{{ year }}</option>
+                  }
+                </select>
+              </div>
+              <dl class="facts leaf-facts">
+                <div>
+                  <dt>Code</dt>
+                  <dd>{{ b.code }}</dd>
+                </div>
+                <div>
+                  <dt>Reads as</dt>
+                  <dd>{{ b.display }}</dd>
+                </div>
+                <div>
+                  <dt>Runs</dt>
+                  <dd>{{ b.entry && b.completion ? b.entry + ' → ' + b.completion : '—' }}</dd>
+                </div>
+                <div>
+                  <dt>Degree</dt>
+                  <dd>{{ b.leaf.course.degree }}</dd>
+                </div>
+              </dl>
+              <div class="leaf-chips">
+                @if (b.alreadyThere) {
+                  <span class="chip neutral">Has a batch already</span>
+                }
+                @if (b.track) {
+                  <span class="chip good">Mock interview: {{ b.track }}</span>
+                } @else {
+                  <span class="chip warn">Mock interview: general</span>
+                }
+              </div>
+            </div>
+          </div>
+        } @empty {
+          <p class="empty-row">No course to put a batch under.</p>
+        }
+      </section>
+    }
+
+    <!-- ------------------------------------------------------- 6 · Create -->
+    @if (step() === 6) {
+      <section class="wizard-body" aria-label="Step 6: create">
+        <ul class="plan">
+          <li class="plan-row">
+            <span class="icon" aria-hidden="true">apartment</span>
+            <span class="plan-what">{{ collegeCode() }} · {{ collegeName() }}</span>
+            <ng-container
+              *ngTemplateOutlet="
+                outcomeChip;
+                context: {
+                  $implicit: outcome('college'),
+                  fallback: existingCollege() ? 'Already there' : 'New',
+                }
+              "
+            />
+          </li>
+          @for (dept of departments(); track dept.key) {
+            <li class="plan-row plan-row--1">
+              <span class="icon" aria-hidden="true">school</span>
+              <span class="plan-what">{{ dept.code }} · {{ dept.name }}</span>
+              <ng-container
+                *ngTemplateOutlet="
+                  outcomeChip;
+                  context: {
+                    $implicit: outcome(dept.key),
+                    fallback: dept.existingId ? 'Already there' : 'New',
+                  }
+                "
+              />
+            </li>
+            @for (course of coursesOf(dept.key); track course.key) {
+              <li class="plan-row plan-row--2">
+                <span class="icon" aria-hidden="true">menu_book</span>
+                <span class="plan-what"
+                  >{{ course.code }} · {{ course.name }} · {{ course.degree }} ·
+                  {{ course.years | plural: 'year' }}</span
+                >
+                <ng-container
+                  *ngTemplateOutlet="
+                    outcomeChip;
+                    context: {
+                      $implicit: outcome(course.key),
+                      fallback: course.existingId ? 'Already there' : 'New',
+                    }
+                  "
+                />
+              </li>
+              @for (spec of specsOf(course.key); track spec.key) {
+                <li class="plan-row plan-row--3">
+                  <span class="icon" aria-hidden="true">verified</span>
+                  <span class="plan-what">{{ spec.code }} · {{ spec.name }}</span>
+                  <ng-container
+                    *ngTemplateOutlet="
+                      outcomeChip;
+                      context: {
+                        $implicit: outcome(spec.key),
+                        fallback: spec.existingId ? 'Already there' : 'New',
+                      }
+                    "
+                  />
+                </li>
+              }
+            }
+          }
+          @for (b of includedBatches(); track b.leaf.key) {
+            <li class="plan-row plan-row--3">
+              <span class="icon" aria-hidden="true">groups</span>
+              <span class="plan-what">{{ b.code }} · {{ b.display }}</span>
+              <ng-container
+                *ngTemplateOutlet="
+                  outcomeChip;
+                  context: { $implicit: outcome('batch:' + b.leaf.key), fallback: 'New' }
+                "
+              />
+            </li>
+          }
+        </ul>
+
+        @if (runState() === 'done') {
+          <div class="notice good" role="status">
+            <span class="icon" aria-hidden="true">check_circle</span>
+            <div>{{ collegeName() }} is set up.</div>
+          </div>
+          <div class="actions">
+            <a class="btn primary" routerLink="/admin/institution">
+              <span class="icon" aria-hidden="true">school</span> Open College structure
+            </a>
+            <a class="btn secondary" routerLink="/admin/registrations">
+              <span class="icon" aria-hidden="true">pending_actions</span> Approve new students
+            </a>
+            <button type="button" class="btn ghost" (click)="startAnother()">
+              <span class="icon" aria-hidden="true">add</span> Set up another college
+            </button>
+          </div>
+        }
+        @if (runState() === 'failed') {
+          <div class="notice" role="alert">
+            <span class="icon" aria-hidden="true">error</span>
+            <div>
+              {{ failures() | plural: 'row' }} could not be created. Fix and press Create again;
+              what landed stays.
+            </div>
+          </div>
+        }
+      </section>
+    }
+
+    <footer class="wizard-foot">
+      <span class="wizard-pos">Step {{ step() }} of {{ lastStep }}</span>
+      <span class="wizard-actions">
+        @if (step() > 1 && runState() !== 'running') {
+          <button type="button" class="btn secondary" (click)="goBack()">
+            <span class="icon" aria-hidden="true">arrow_back</span> Back
+          </button>
+        }
+        @if (step() < lastStep) {
+          <button
+            type="button"
+            class="btn primary"
+            [disabled]="!stepComplete() || loadingExisting()"
+            (click)="goNext()"
+          >
+            Continue <span class="icon" aria-hidden="true">arrow_forward</span>
+          </button>
+        } @else if (runState() !== 'done') {
+          <button
+            type="button"
+            class="btn primary"
+            [disabled]="runState() === 'running' || toWrite() === 0"
+            (click)="createEverything()"
+          >
+            <span class="icon" aria-hidden="true">{{
+              runState() === 'running' ? 'hourglass_empty' : 'check'
+            }}</span>
+            {{
+              runState() === 'running'
+                ? 'Creating…'
+                : runState() === 'failed'
+                  ? 'Create again'
+                  : 'Create everything · ' + toWrite()
+            }}
+          </button>
+        }
+      </span>
+    </footer>
+  </div>
+</div>
+
+<ng-template #outcomeChip let-outcome let-fallback="fallback">
+  @if (outcome === null) {
+    <span class="chip neutral">{{ fallback }}</span>
+  } @else if (outcome.status === 'created') {
+    <span class="chip good">Created</span>
+  } @else if (outcome.status === 'existed') {
+    <span class="chip neutral">Already there</span>
+  } @else if (outcome.status === 'skipped') {
+    <span class="chip warn" [title]="outcome.detail">Skipped</span>
+  } @else {
+    <span class="chip risk" [title]="outcome.detail">Failed · {{ outcome.detail }}</span>
+  }
+</ng-template>

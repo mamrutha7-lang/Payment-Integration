@@ -1,0 +1,271 @@
+<div class="dialog-backdrop" (click)="dismissed.emit()">
+  <div
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="titleId"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="dialog-head">
+      <div>
+        <h2 class="dialog-title" [id]="titleId">Leave policy</h2>
+        <p class="dialog-sub">One allowance per person, per option, per academic year.</p>
+      </div>
+      <button
+        type="button"
+        class="btn ghost sm"
+        aria-label="Close the leave policy dialog"
+        (click)="dismissed.emit()"
+      >
+        <span class="icon" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <div class="dialog-body">
+      @if (error()) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ error() }}
+        </div>
+      }
+      @if (flash()) {
+        <div class="notice good" role="status">
+          <span class="icon" aria-hidden="true">check_circle</span>{{ flash() }}
+        </div>
+      }
+
+      <div class="row-fields">
+        <label class="field narrow">
+          <span>Academic year</span>
+          <input
+            class="ctrl"
+            type="text"
+            [value]="year()"
+            aria-describedby="leave-year-hint"
+            (input)="year.set(inputValue($event))"
+          />
+        </label>
+        <label class="field narrow">
+          <span>Type</span>
+          <select
+            class="ctrl"
+            aria-label="Leave type"
+            (change)="kindFilter.set(selectValue($event))"
+          >
+            <option [value]="everyKind" [selected]="kindFilter() === everyKind">All</option>
+            @for (kind of kinds; track kind.id) {
+              <option [value]="kind.id" [selected]="kind.id === kindFilter()">
+                {{ kind.label }}
+              </option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>Department</span>
+          <select
+            class="ctrl"
+            aria-label="Department"
+            (change)="departmentFilter.set(selectValue($event))"
+          >
+            <option [value]="everyDepartment" [selected]="departmentFilter() === everyDepartment">
+              Every department
+            </option>
+            @for (department of departments(); track department.id) {
+              <option [value]="department.id" [selected]="department.id === departmentFilter()">
+                {{ department.label }}
+              </option>
+            }
+          </select>
+        </label>
+        <button type="button" class="btn secondary" [disabled]="busy()" (click)="loadBalances()">
+          <span class="icon" aria-hidden="true">search</span> Show
+        </button>
+      </div>
+
+      <p class="dialog-sub" id="leave-year-hint">
+        @if (yearIsServerSpelling()) {
+          <code>{{ serverYear() }}</code> is how REEP spells the current year.
+        } @else {
+          <strong>This is not the spelling REEP uses.</strong> Write it as
+          <code>{{ serverYear() }}</code>, or the allowance will never be found.
+        }
+      </p>
+
+      @if (sheet(); as policy) {
+        <div class="summary">
+          <span><b>{{ policy.balances_recorded }}</b> allowances recorded</span>
+          <span><b>{{ policy.people_with_balances }}</b> people covered</span>
+          <span><b>{{ policy.kinds.length }}</b> printed options</span>
+          @for (college of policy.colleges; track college.college_id) {
+            <span>
+              {{ college.college_name || college.college_id }} ·
+              <b>{{ college.holidays }}</b> holidays recorded
+            </span>
+          }
+        </div>
+      }
+
+      <!-- --------------------------------------------- a whole department -->
+      <h3 class="section-head">Record one allowance for a department</h3>
+      <div class="row-fields">
+        <label class="field">
+          <span>Department</span>
+          <select
+            class="ctrl"
+            aria-label="Department to record an allowance for"
+            (change)="bulkDepartment.set(selectValue($event))"
+          >
+            <option value="" [selected]="bulkDepartment() === ''">Choose a department…</option>
+            @for (department of departments(); track department.id) {
+              <option [value]="department.id" [selected]="department.id === bulkDepartment()">
+                {{ department.label }}
+              </option>
+            }
+          </select>
+        </label>
+        <label class="field narrow">
+          <span>Type</span>
+          <select class="ctrl" aria-label="Leave type" (change)="bulkKind.set(selectValue($event))">
+            @for (kind of kinds; track kind.id) {
+              <option [value]="kind.id" [selected]="kind.id === bulkKind()">{{ kind.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="field narrow">
+          <span>Days</span>
+          <input
+            class="ctrl"
+            type="number"
+            min="0"
+            max="365"
+            [value]="bulkDays()"
+            (input)="bulkDays.set(inputValue($event))"
+          />
+        </label>
+        <button
+          type="button"
+          class="btn primary"
+          [disabled]="!canBulk() || busy()"
+          (click)="recordForDepartment()"
+        >
+          <span class="icon" aria-hidden="true">group</span> Record
+        </button>
+      </div>
+      <div class="check-row">
+        <label>
+          <input type="checkbox" [checked]="bulkStaff()" (change)="bulkStaff.set(checked($event))" />
+          Faculty in this department
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            [checked]="bulkStudents()"
+            (change)="bulkStudents.set(checked($event))"
+          />
+          Students in this department
+        </label>
+      </div>
+      <div class="notice accent">
+        <span class="icon" aria-hidden="true">info</span>
+        <div>
+          Existing allowances are left as they are; correct one person in the table below.
+        </div>
+      </div>
+
+      <!-- ------------------------------------------------- person by person -->
+      <h3 class="section-head">Allowances recorded</h3>
+      <div class="table-scroll">
+        <table class="dt-table">
+          <caption class="sr-only">Leave allowances for {{ year() }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Person</th>
+              <th scope="col">Type</th>
+              <th scope="col">Entitled</th>
+              <th scope="col">Taken</th>
+              <th scope="col">Left</th>
+              <th scope="col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of balances() ?? []; track row.id) {
+              <tr>
+                <td>
+                  <div>{{ row.user_name || row.user_email || row.user_id }}</div>
+                  <div class="dialog-sub">{{ roleWord(row) }}</div>
+                </td>
+                <td>{{ row.kind }}</td>
+                <td class="num-cell">
+                  <input
+                    class="ctrl"
+                    type="number"
+                    min="0"
+                    max="365"
+                    [attr.aria-label]="'Days entitled for ' + (row.user_name || row.user_id)"
+                    [value]="entitledOf(row)"
+                    (input)="setEntitled(row, inputValue($event))"
+                  />
+                </td>
+                <td class="num-cell">
+                  <input
+                    class="ctrl"
+                    type="number"
+                    min="0"
+                    max="365"
+                    [attr.aria-label]="'Days taken by ' + (row.user_name || row.user_id)"
+                    [value]="consumedOf(row)"
+                    (input)="setConsumed(row, inputValue($event))"
+                  />
+                </td>
+                <td>
+                  <span class="chip {{ row.remaining_days < 0 ? 'risk' : 'neutral' }}">
+                    {{ row.remaining_days }}
+                  </span>
+                </td>
+                <td>
+                  <div class="row-actions">
+                    <button
+                      type="button"
+                      class="btn sm"
+                      [disabled]="!isEdited(row) || busy()"
+                      (click)="saveRow(row)"
+                    >
+                      <span class="icon" aria-hidden="true">save</span> Save
+                    </button>
+                    <button
+                      type="button"
+                      class="btn ghost sm"
+                      [attr.aria-label]="'Remove the ' + row.kind + ' allowance'"
+                      [disabled]="busy()"
+                      (click)="deleteRow(row)"
+                    >
+                      <span class="icon" aria-hidden="true">delete</span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="empty-row">
+                  @if (balances() === null) {
+                    Loading the allowances…
+                  } @else {
+                    No allowance is recorded for {{ year() }} under this filter. Nothing is refused
+                    because of that — the balance check simply does not run for anybody without a
+                    row.
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="dialog-foot">
+      <span class="dialog-sub">
+        A negative "Left" is a real state: leave past an allowance happens and the office signs it.
+      </span>
+      <button type="button" class="btn secondary" (click)="dismissed.emit()">Close</button>
+    </footer>
+  </div>
+</div>

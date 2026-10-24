@@ -1,0 +1,246 @@
+/* My account — this screen's LAYOUT only.
+ *
+ * `.panel`, `.card`, `.dt-header`, `.dt-title`, `.dt-sub`, `.crumb`, `.chip`,
+ * `.btn`, `.field`, `.notice`, `.empty`, `.wizard-steps`, `.loading-line` and
+ * `.icon` are global (styles/reep-v2.scss) and are not restated here. Every
+ * class below is prefixed `account-` so it cannot collide with a global name —
+ * reep-v2-resume.scss loads last and owns several short names (`.entry`,
+ * `.completeness`, `.step-group`), so short, generic class names here would be
+ * a coin toss about which sheet wins.
+ */
+
+:host {
+  display: block;
+}
+
+/* The board's two columns: the sign-in work on the left, the smaller cards on
+   the right. One column under ~1080px, where 1.3fr/1fr would put the code and
+   password fields in a 300px gutter. */
+.account-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .account-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.account-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.account-card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.account-card__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.account-card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.account-card-sub {
+  margin: 1px 0 0;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+/* A line of the security card: leading glyph, the sentence, an action right. */
+.account-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+}
+
+.account-row__lead {
+  color: var(--brand-purple);
+  flex: none;
+}
+
+.account-row__body {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.account-row .chip {
+  margin-left: 6px;
+  vertical-align: middle;
+}
+
+.account-hint {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* The two-step change, in its own well so the steps and the fields read as one
+   thing rather than as three more rows of the card. */
+.account-password {
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.account-fields {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.account-fields .field {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+/* The code is six characters wide and does not need a third of the row. */
+.account-field--code {
+  flex: 0 0 140px;
+}
+
+.account-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* One notification switch: the checkbox and its label on the left, the state
+   chip right. Text AND colour — the chip is never the only thing that says
+   whether this is on. */
+.account-pref {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+}
+
+.account-pref__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.account-pref__label input[disabled] {
+  cursor: not-allowed;
+}
+
+/* The sign-ins table. `.dt-table` is global and is not restated; this is the
+   scroll box around it, because four columns of timestamps, doors and user
+   agents do not fit the right column on a laptop and the panel itself must
+   never scroll sideways. */
+.account-signins {
+  overflow-x: auto;
+}
+
+/* A user agent is a long single line. It stays in the DOM in full — a screen
+   reader reads it all — and is clipped visually rather than wrapped, which at
+   this width would give one row four lines of height. */
+.account-signins__device {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-signins__ip {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The signature on the paper it is printed on. */
+.account-signature__paper {
+  background: #fff;
+  border: 1px dashed var(--hairline-42);
+  border-radius: var(--r-card);
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    max-height: 110px;
+    max-width: 100%;
+    object-fit: contain;
+  }
+}
+
+/* A <label> wrapping the file input, so the whole button opens the picker. */
+.account-filepick {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+
+/* INVISIBLE BUT FOCUSABLE. `hidden` / `display: none` takes the input out of
+   the focus order and a <label> is not tabbable either, which on the mentor
+   signature screen left "Remove…" as the only keyboard-reachable control: you
+   could delete your signature and never upload one. Geometry, never display. */
+.account-filepick__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Focus has to be visible on the label, or the focusable invisible input is a
+   trap for the person who cannot see where they are. */
+.account-filepick:focus-within {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+}
+
+/* A LIVE REGION HAS TO EXIST BEFORE THE MESSAGE DOES, so several of these
+   wrappers are always in the DOM and usually empty — and an empty flex child
+   still spends the card's 10px gap, which reads as a hole above the buttons.
+   `:empty` ignores comment nodes, which is all Angular's @if leaves behind,
+   and whitespace-only text nodes are dropped by the template compiler. */
+[role='status']:empty,
+[role='alert']:empty {
+  display: none;
+}
+
+/* An empty state inside a card is not a page-sized void. */
+.account-card .empty {
+  padding: 14px 8px;
+}
+
+.account-card code {
+  font-size: 11px;
+  background: var(--tint-2);
+  border-radius: 6px;
+  padding: 1px 5px;
+}

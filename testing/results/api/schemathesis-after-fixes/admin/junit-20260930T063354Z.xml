@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites errors="0" failures="21" skipped="0" tests="64" time="18.846847">
+  <testsuite name="schemathesis" hostname="vm" errors="0" failures="21" skipped="0" tests="64" time="18.846847">
+    <testcase name="GET /api/admin/analytics-summary" time="0.150952" />
+    <testcase name="GET /api/admin/analytics/kpis" time="1.958287" />
+    <testcase name="GET /api/admin/analytics/series" time="1.763669" />
+    <testcase name="GET /api/admin/audit" time="1.029770" />
+    <testcase name="GET /api/admin/badge-catalogue" time="0.032827" />
+    <testcase name="GET /api/admin/badges/cohort" time="0.030112" />
+    <testcase name="GET /api/admin/catalogue" time="0.030693" />
+    <testcase name="GET /api/admin/catalogue/courses" time="0.028035" />
+    <testcase name="GET /api/admin/cohorts" time="0.025835" />
+    <testcase name="GET /api/admin/cohorts/incomplete" time="0.017587" />
+    <testcase name="GET /api/admin/cohorts/unassigned" time="0.017793" />
+    <testcase name="GET /api/admin/colleges" time="0.034875" />
+    <testcase name="GET /api/admin/departments" time="0.020507" />
+    <testcase name="GET /api/admin/exports/history" time="0.134156" />
+    <testcase name="GET /api/admin/faculty" time="0.232941" />
+    <testcase name="GET /api/admin/governance/catalogue" time="0.024386" />
+    <testcase name="GET /api/admin/governance/effective/{user_id}" time="0.161271">
+      <failure type="failure">1. Test Case ID: 8dRbCq
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"User not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/effective/0</failure>
+    </testcase>
+    <testcase name="GET /api/admin/governance/features" time="0.019806" />
+    <testcase name="GET /api/admin/governance/grants" time="0.025874" />
+    <testcase name="GET /api/admin/governance/groups" time="0.030657" />
+    <testcase name="GET /api/admin/governance/hierarchy" time="0.031514" />
+    <testcase name="GET /api/admin/governance/review" time="0.021908" />
+    <testcase name="GET /api/admin/governance/staff" time="0.019495" />
+    <testcase name="GET /api/admin/hierarchy/levels" time="0.015531" />
+    <testcase name="GET /api/admin/imports/templates/{kind}.xlsx" time="0.209487">
+      <failure type="failure">1. Test Case ID: aXFMTH
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"No template for '0'. Use one of: attendance, marks."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/imports/templates/0.xlsx</failure>
+      <failure type="failure">1. Test Case ID: Gii2wt
+
+- Undocumented Content-Type
+
+    Received: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+    Documented: application/json
+
+[200] OK:
+
+    &lt;BINARY&gt;
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/imports/templates/attendance.xlsx</failure>
+    </testcase>
+    <testcase name="GET /api/admin/interview-questions" time="0.187711" />
+    <testcase name="GET /api/admin/interview-questions/tracks" time="0.027459" />
+    <testcase name="GET /api/admin/interviews" time="0.752691" />
+    <testcase name="GET /api/admin/interviews/summary" time="0.876883" />
+    <testcase name="GET /api/admin/jobs" time="0.040224" />
+    <testcase name="GET /api/admin/leave-policy" time="0.175800" />
+    <testcase name="GET /api/admin/mail-log" time="0.420700" />
+    <testcase name="GET /api/admin/mail-log/suppression" time="0.145002" />
+    <testcase name="GET /api/admin/students/unseated" time="0.023373" />
+    <testcase name="GET /api/admin/students/{student_id}/weekly" time="0.251104">
+      <failure type="failure">1. Test Case ID: BcXakk
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/weekly</failure>
+    </testcase>
+    <testcase name="GET /api/admin/users/{user_id}/delete-plan" time="1.094110">
+      <failure type="failure">1. Test Case ID: YlOO0V
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/0/delete-plan</failure>
+    </testcase>
+    <testcase name="GET /api/admin/alert-rules" time="0.135868" />
+    <testcase name="GET /api/admin/audit/{event_id}" time="0.124803">
+      <failure type="failure">1. Test Case ID: avHu1K
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Audit event not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/audit/ef918db4e0724af1982f2e96d1ade707</failure>
+    </testcase>
+    <testcase name="GET /api/admin/cohorts/{cohort_id}/promotion-history" time="0.159272">
+      <failure type="failure">1. Test Case ID: fIj7bg
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Batch not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/%01%1AH/promotion-history</failure>
+    </testcase>
+    <testcase name="GET /api/admin/cohorts/{cohort_id}/students" time="0.140510">
+      <failure type="failure">1. Test Case ID: 4Me6ce
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Batch not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/%01%1AH/students</failure>
+    </testcase>
+    <testcase name="GET /api/admin/colleges/{college_id}/admins" time="0.163914">
+      <failure type="failure">1. Test Case ID: cP7mOw
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"College not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges/o%17Z%C3%90%0D%C3%95%F2%AA%B2%99%3AO%F2%BE%9F%90M/admins</failure>
+    </testcase>
+    <testcase name="GET /api/admin/colleges/{college_id}/delete-plan" time="0.509379">
+      <failure type="failure">1. Test Case ID: VCJx8r
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"College not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges/o%17Z%C3%90%0D%C3%95%F2%AA%B2%99%3AO%F2%BE%9F%90M/delete-plan</failure>
+    </testcase>
+    <testcase name="GET /api/admin/colleges/{college_id}/departments" time="0.168519">
+      <failure type="failure">1. Test Case ID: zozi9q
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"College not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges/o%17Z%C3%90%0D%C3%95%F2%AA%B2%99%3AO%F2%BE%9F%90M/departments</failure>
+    </testcase>
+    <testcase name="GET /api/admin/criteria" time="0.227938" />
+    <testcase name="GET /api/admin/criteria/history" time="0.208400" />
+    <testcase name="GET /api/admin/imports" time="0.204640" />
+    <testcase name="GET /api/admin/interview-policies/{college_id}" time="0.162744">
+      <failure type="failure">1. Test Case ID: bXckin
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"College not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interview-policies/o%17Z%C3%90%0D%C3%95%F2%AA%B2%99%3AO%F2%BE%9F%90M</failure>
+    </testcase>
+    <testcase name="GET /api/admin/leave-calendar/{college_id}" time="0.268338" />
+    <testcase name="GET /api/admin/placement" time="0.583678" />
+    <testcase name="GET /api/admin/students" time="0.829123" />
+    <testcase name="GET /api/admin/students/{student_id}/360" time="0.464530">
+      <failure type="failure">1. Test Case ID: PpyCDv
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/360</failure>
+    </testcase>
+    <testcase name="GET /api/admin/students/{student_id}/delete-plan" time="1.005962">
+      <failure type="failure">1. Test Case ID: CX0Yhj
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/delete-plan</failure>
+    </testcase>
+    <testcase name="GET /api/admin/students/{student_id}/mentor-history" time="0.160064">
+      <failure type="failure">1. Test Case ID: HMZnYG
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/mentor-history</failure>
+    </testcase>
+    <testcase name="GET /api/admin/swoc" time="0.522318" />
+    <testcase name="GET /api/admin/swoc/{student_id}/history" time="0.228709">
+      <failure type="failure">1. Test Case ID: RmxZad
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"No such student."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/swoc/0/history</failure>
+    </testcase>
+    <testcase name="GET /api/admin/departments/{department_id}/academic-courses" time="0.136560">
+      <failure type="failure">1. Test Case ID: wqSvdK
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Department not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/departments/%F2%83%90%87g%F0%9A%BE%83%C2%9E%C3%87%C2%AE/academic-courses</failure>
+    </testcase>
+    <testcase name="GET /api/admin/departments/{department_id}/cohorts" time="0.134944">
+      <failure type="failure">1. Test Case ID: IojrVw
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Department not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/departments/%F2%83%90%87g%F0%9A%BE%83%C2%9E%C3%87%C2%AE/cohorts</failure>
+    </testcase>
+    <testcase name="GET /api/admin/leave-balances" time="0.422456" />
+    <testcase name="GET /api/admin/mentor-load" time="0.680960" />
+    <testcase name="GET /api/admin/unassigned-students" time="0.530461" />
+    <testcase name="GET /api/admin/academic-courses/{course_id}/academic-specializations" time="0.145463">
+      <failure type="failure">1. Test Case ID: Jba5Bm
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/academic-courses/%C3%B54%F2%B8%B7%BC%29%F3%9A%BC%8D%C3%9A%C2%8E/academic-specializations</failure>
+    </testcase>
+    <testcase name="GET /api/admin/approved-certifications" time="0.169476">
+      <failure type="failure">1. Test Case ID: V9Eo29
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/approved-certifications?course_id=null&amp;course_id=null'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/catalogue/badges" time="0.145526">
+      <failure type="failure">1. Test Case ID: VnvF3A
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/catalogue/badges?%05=null&amp;%05=13616&amp;%05=-14370&amp;%C3%B1%F3%87%BA%A0%C2%AE=&amp;course_id=%06%F3%B1%83%9B%C2%B0&amp;+%C2%B2%C3%BC%C2%A3%C3%A7=%F0%A0%B7%A5%F3%B6%BD%8A%C2%94%F3%A7%90%A4'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/catalogue/stage-rules" time="0.149268">
+      <failure type="failure">1. Test Case ID: 9GRFCS
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/catalogue/stage-rules?course_id=null&amp;course_id=null'</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

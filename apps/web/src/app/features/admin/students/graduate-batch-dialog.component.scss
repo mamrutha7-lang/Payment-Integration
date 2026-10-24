@@ -1,0 +1,58 @@
+/* What Graduate batch needs on top of `batch-dialog.scss`.
+ *
+ * `batch-dialog.scss` is SHARED — the promote dialog and the roster's own small
+ * dialogs wear it too — so the per-student table and the two notes below live
+ * here rather than being added to it. `.dt-table`, `.chip`, `.notice`, `.field`
+ * and `.ctrl` are global (styles/reep-v2.scss) and are used exactly as they
+ * are; nothing global is redefined.
+ *
+ * These rules are deliberately the same as the promote dialog's twin file
+ * rather than a third shared sheet: two components, two stylesheets, and the
+ * shared one is the one neither of them owns. A third shared file would be a
+ * second place to look for the same three rules.
+ */
+
+.preflight-loading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.field-note {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--faint);
+}
+
+/* A batch can hold sixty students and the dialog is 560px tall: the table
+   scrolls inside the body rather than pushing the footer off the panel.
+   `flex: none`, or a short window squeezes it to nothing: it is the one child
+   of `.dialog-body` that is itself a scroll container, which makes its minimum
+   height 0, so it took the whole shortfall before the body scrolled. */
+.roster-scroll {
+  flex: none;
+  max-height: 260px;
+  overflow: auto;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+}
+
+.usn {
+  display: block;
+  font-size: 11px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The server's own sentence for why one record cannot move, under the chip
+   that says so — text and colour together, never the colour alone. */
+.blocked-why {
+  display: block;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--faint);
+}

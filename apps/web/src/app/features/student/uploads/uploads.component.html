@@ -1,0 +1,259 @@
+<div class="dt-header">
+  <div>
+    <h1 class="dt-title">Uploads</h1>
+    <div class="dt-sub">Certificates, your CV and photo — and where each one sits in review.</div>
+  </div>
+</div>
+
+<!-- 1. STEPPER — makes the flow explicit and shows where the student is -->
+<ol class="up-stepper" aria-label="Upload steps">
+  <li class="up-step" [class.active]="currentStep() === 1" [class.done]="currentStep() > 1">
+    <span class="up-step__num">
+      @if (currentStep() > 1) {
+        <span class="icon" aria-hidden="true">check</span>
+      } @else {
+        1
+      }
+    </span>
+    <span class="up-step__label">Choose document type</span>
+  </li>
+  <li class="up-step" [class.active]="currentStep() === 2" [class.done]="currentStep() > 2">
+    <span class="up-step__num">
+      @if (currentStep() > 2) {
+        <span class="icon" aria-hidden="true">check</span>
+      } @else {
+        2
+      }
+    </span>
+    <span class="up-step__label">Upload file</span>
+  </li>
+  <li class="up-step" [class.active]="currentStep() === 3">
+    <span class="up-step__num">3</span>
+    <span class="up-step__label">In review</span>
+  </li>
+</ol>
+
+<!-- 5. MISSING-DOCUMENTS CHECKLIST for placement-critical documents -->
+<div class="card checklist">
+  <div class="checklist__head">
+    <h4>Placement documents</h4>
+    @if (missingCount() === 0) {
+      <span class="chip good"><span class="icon" aria-hidden="true">task_alt</span>All in</span>
+    } @else {
+      <span class="chip warn"
+        ><span class="icon" aria-hidden="true">pending_actions</span>{{ missingCount() }} outstanding</span
+      >
+    }
+  </div>
+  <ul class="checklist__items">
+    @for (item of checklist(); track item.kind) {
+      <li class="ck" [class.ck--done]="item.present">
+        <span class="ck__mark" [class.good]="item.present">
+          <span class="icon" aria-hidden="true">{{ item.present ? 'check_circle' : 'radio_button_unchecked' }}</span>
+        </span>
+        <span class="ck__text">
+          <span class="ck__label">{{ item.label }}</span>
+          <span class="ck__hint">{{ item.present ? 'Added' : item.hint }}</span>
+        </span>
+      </li>
+    }
+  </ul>
+  @if (missingCount() > 0) {
+    <p class="checklist__prompt">
+      Add the outstanding {{ missingCount() === 1 ? 'document' : 'documents' }} below so your
+      profile is placement-ready.
+    </p>
+  }
+</div>
+
+<!-- 1–3. UPLOAD PANEL: type picker, accepted formats, dropzone, feedback -->
+<div class="card upload-panel">
+  <div class="up-top">
+    <label class="dz-kind">
+      Document type
+      <select [value]="kind()" (change)="setKind($any($event.target).value)">
+        @for (opt of kindOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </label>
+    <div class="up-accepts">
+      <span class="icon" aria-hidden="true">info</span>
+      <span>Accepted: <strong>PDF, PNG, JPEG</strong> · up to <strong>10 MB</strong></span>
+    </div>
+  </div>
+
+  <button
+    type="button"
+    class="dropzone dz"
+    [class.dz--over]="dragOver()"
+    [class.dz--busy]="uploading()"
+    [disabled]="uploading()"
+    (click)="picker.click()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)"
+  >
+    <span class="icon" aria-hidden="true">{{ uploading() ? 'progress_activity' : 'cloud_upload' }}</span>
+    @if (uploading()) {
+      <span class="dz__title">Uploading…</span>
+    } @else {
+      <span class="dz__title">Drag &amp; drop a file here, or click to browse</span>
+      <span class="dz__hint"
+        >Uploading as <strong>{{ kindLabel(kind()) }}</strong></span
+      >
+    }
+  </button>
+  <input
+    #picker
+    type="file"
+    accept="application/pdf,image/png,image/jpeg"
+    hidden
+    (change)="onPick($event)"
+  />
+  <!-- A SECOND picker, opened only by a Replace button, because only a
+       selection made through this one may delete an existing document. The two
+       shared one input, so a Replace that was pressed and then cancelled — no
+       change event, nothing cleared — left the delete armed for whatever file
+       the student picked next, and an unrelated upload silently destroyed the
+       document they had abandoned. `(cancel)` disarms it the moment the dialog
+       is dismissed; the separate input is what makes the mistake unreachable
+       even where that event never arrives. -->
+  <input
+    #replacePicker
+    type="file"
+    accept="application/pdf,image/png,image/jpeg"
+    hidden
+    (change)="onReplacePick($event)"
+    (cancel)="cancelReplace()"
+  />
+
+  <!-- ERROR feedback (server rejects by magic bytes — message surfaced) -->
+  @if (uploadError()) {
+    <div class="feedback feedback--err" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      <div>
+        <div class="feedback__title">Upload failed</div>
+        <div class="feedback__body">{{ uploadError() }}</div>
+      </div>
+    </div>
+  }
+
+  <!-- SUCCESS feedback with a file PREVIEW -->
+  @if (justUploaded(); as up) {
+    <div class="feedback feedback--ok">
+      <div class="up-preview">
+        @if (isImage(up.mime_type)) {
+          <img class="up-preview__img" [src]="fileUrl(up.id)" [alt]="up.title" />
+        } @else {
+          <span class="up-preview__icon icon">picture_as_pdf</span>
+        }
+      </div>
+      <div class="feedback__main">
+        <div class="feedback__title">
+          <span class="icon" aria-hidden="true">check_circle</span>Uploaded — now in review
+        </div>
+        <div class="feedback__body">
+          {{ up.title }} · {{ formatSize(up.size_bytes) }}. A mentor will verify it shortly.
+        </div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- 4. EXISTING UPLOADS as cards: status, reviewer comment, Replace / Remove -->
+@if (actionError()) {
+  <div class="feedback feedback--err" role="alert">
+    <span class="icon" aria-hidden="true">error</span>
+    <div class="feedback__body">{{ actionError() }}</div>
+  </div>
+}
+
+<div class="dt-sub section-head">Your documents</div>
+
+@if (error()) {
+  <div class="feedback feedback--err" role="alert">
+    <span class="icon" aria-hidden="true">wifi_off</span>
+    <div class="feedback__body">{{ error() }}</div>
+  </div>
+} @else if (rows(); as list) {
+  @if (list.length === 0) {
+    <div class="card up-empty">
+      <span class="icon" aria-hidden="true">folder_open</span>
+      <div>
+        <div class="up-empty__title">Nothing on your record yet</div>
+        <div class="up-empty__hint">
+          Upload a certificate, your CV or a photo above — it will appear here with its review
+          status.
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="up-list">
+      @for (u of list; track u.id) {
+        <div class="up-card" [class.up-card--busy]="removingId() === u.id">
+          <div class="up-thumb">
+            @if (isImage(u.mime_type)) {
+              <img class="up-thumb__img" [src]="fileUrl(u.id)" [alt]="u.title" />
+            } @else {
+              <span class="up-thumb__icon icon">picture_as_pdf</span>
+            }
+          </div>
+          <div class="up-body">
+            <div class="up-card__head">
+              <div class="up-title">{{ u.title }}</div>
+              <span class="chip {{ statusTone(u.status) }}"
+                ><span class="icon" aria-hidden="true">{{ statusIcon(u.status) }}</span
+                >{{ statusLabel(u.status) }}</span
+              >
+            </div>
+            <div class="up-file">{{ u.original_name }}</div>
+            <div class="up-meta">
+              {{ kindLabel(u.kind) }} · {{ formatSize(u.size_bytes) }} ·
+              {{ u.uploaded_at | date: 'd MMM y' }}
+            </div>
+
+            <!-- REVIEWER COMMENT made visible, not hidden -->
+            @if (u.review_note) {
+              <div class="up-note {{ statusTone(u.status) }}">
+                <span class="icon" aria-hidden="true">rate_review</span>
+                <span><strong>Reviewer:</strong> {{ u.review_note }}</span>
+              </div>
+            }
+
+            <div class="up-actions">
+              <button
+                type="button"
+                class="dt-btn"
+                [disabled]="uploading() || removingId() === u.id"
+                (click)="replace(u, replacePicker)"
+              >
+                <span class="icon" aria-hidden="true">sync</span>Replace
+              </button>
+              <button
+                type="button"
+                class="dt-btn danger"
+                [disabled]="removingId() === u.id"
+                (click)="remove(u)"
+              >
+                <span class="icon" aria-hidden="true">delete</span>
+                {{ removingId() === u.id ? 'Removing…' : 'Remove' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+} @else {
+  <div class="up-list">
+    <div class="up-card up-card--skeleton">
+      <div class="sk sk--thumb"></div>
+      <div class="sk sk--lines"></div>
+    </div>
+    <div class="up-card up-card--skeleton">
+      <div class="sk sk--thumb"></div>
+      <div class="sk sk--lines"></div>
+    </div>
+  </div>
+}

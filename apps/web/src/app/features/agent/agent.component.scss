@@ -1,0 +1,163 @@
+/* The REEP Agent PAGE: heading, disclaimer, the Main Admin's rail. The thread
+ * itself and every rule for it live in shared/agent-chat/. */
+
+:host {
+  display: block;
+}
+
+.agent {
+  --ag-wash: rgba(58, 31, 82, 0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- header ------------------------------------------------------------- */
+.ag-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 16px;
+}
+.ag-title {
+  min-width: 0;
+}
+.ag-title h1 {
+  margin: 0;
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: -0.021em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+.ag-title p {
+  margin: 6px 0 0;
+  max-width: 68ch;
+  color: var(--muted);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.ag-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.ag-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 12px;
+  font-family: var(--font);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.ag-ghost:hover:not(:disabled) {
+  background: var(--ag-wash);
+}
+.ag-ghost:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* --- disclaimer --------------------------------------------------------- */
+/* `.note` carries the look; these are the parts this screen sets. */
+.ag-disclaimer {
+  margin: 0 0 16px;
+  max-width: none;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.ag-disclaimer a {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* --- "What the agent can see" — the Main Admin's card only ---------------
+ * The board draws this in a 320px rail to the RIGHT of the thread, and that is
+ * where it is. It was a full-width block above the frame first, which pushed a
+ * frame already sized `calc(100vh - 330px)` down by the height of the card —
+ * on the Main Admin's screen the composer and the Send button started below
+ * the fold, on a screen whose whole purpose is the composer.
+ *
+ * The row is turned on by a class the admin branch adds, so nothing moves for
+ * the other two roles: `.ag-body` and `.ag-thread` are plain blocks otherwise,
+ * and a block wrapper around a full-width child renders identically. Only the
+ * layout is here — `.card`, `.chip`, `.notice` are the design system's and are
+ * not redefined. */
+.ag-body--rail {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.ag-body--rail > .ag-thread {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.ag-rail {
+  width: 320px;
+  flex: none;
+}
+.ag-scope {
+  padding: 14px;
+}
+.ag-scope h4 .icon {
+  font-size: 15px;
+  vertical-align: -2px;
+  margin-right: 6px;
+}
+/* Label over value, not beside it: the board's 96px label column has nowhere
+   to go in a 320px rail once a value is a sentence. */
+.ag-scope__rows {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+.ag-scope__rows dt {
+  color: var(--muted);
+  font-weight: 600;
+}
+.ag-scope__rows dd {
+  margin: 0 0 8px;
+  color: var(--ink);
+}
+.ag-scope__rows dd:last-of-type {
+  margin-bottom: 0;
+}
+/* The functions are a DISCLOSURE, not a wall. An office account holds ~28 of
+   them, and 28 chips in a 320px rail is 11 wrapped rows — taller than the chat
+   beside it. The count is the fact; the keys are one click away. */
+.ag-scope__functions > summary {
+  cursor: pointer;
+  color: var(--ink);
+}
+.ag-scope__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.ag-scope__note {
+  margin-top: 14px;
+}
+
+/* Below 1040px the rail has no room beside the thread: the card drops under
+   the composer rather than squeezing the chat to nothing. */
+@media (max-width: 1040px) {
+  .ag-body--rail {
+    display: block;
+  }
+  .ag-rail {
+    width: auto;
+    margin-top: 12px;
+  }
+}

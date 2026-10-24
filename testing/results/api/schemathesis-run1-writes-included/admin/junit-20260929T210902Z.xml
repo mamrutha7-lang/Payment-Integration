@@ -1,0 +1,4647 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites errors="0" failures="150" skipped="0" tests="151" time="41.908489">
+  <testsuite name="schemathesis" hostname="vm" errors="0" failures="150" skipped="0" tests="151" time="41.908489">
+    <testcase name="POST /api/admin/catalogue/copy" time="0.608371">
+      <failure type="failure">1. Test Case ID: w0lzt7
+
+- Response violates schema
+
+    "The source and destination course are the same." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "The source and destination course are the same."
+
+[422] Unprocessable Content:
+
+    `{"detail":"The source and destination course are the same."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"from_course": "", "to_course": "", "parts": ["certifications"]}' 'http://localhost:3300/api/admin/catalogue/copy?dry_run=false'</failure>
+      <failure type="failure">1. Test Case ID: pDiYKj
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"to_course": "\u00b6\u0096", "parts": ["stage_rules", "certifications", "badges"], "from_course": "6\u00be\u00c4A"}' 'http://localhost:3300/api/admin/catalogue/copy?dry_run=false'
+
+2. Test Case ID: q2cOZD
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'\x0c�C\`g�� (�' 'http://localhost:3300/api/admin/catalogue/copy?dry_run=Be%2A'</failure>
+    </testcase>
+    <testcase name="POST /api/admin/catalogue/subjects/import" time="0.220316">
+      <failure type="failure">1. Test Case ID: iXP8Cg
+
+- Response violates schema
+
+    "The CSV is missing these columns: code, dimension, model_type, name, semester, stage." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "The CSV is missing these columns: code, dimension, model_type, name, semeste...
+
+[422] Unprocessable Content:
+
+    `{"detail":"The CSV is missing these columns: code, dimension, model_type, name, semester, stage."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: multipart/form-data; boundary=bbb22a5a1a7202543010d9de884611ec' -d $'--bbb22a5a1a7202543010d9de884611ec\r\nContent-Disposition: form-data; name="file"; filename="file"\r\n\r\n\r\n--bbb22a5a1a7202543010d9de884611ec--\r\n' 'http://localhost:3300/api/admin/catalogue/subjects/import?dry_run=false'</failure>
+      <failure type="failure">1. Test Case ID: qhkKEC
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 200, 422
+
+[500] Internal Server Error:
+
+    `Internal Server Error`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: multipart/form-data; boundary=2dcf8b97aec1aa0468953bd4ad4e70ac' -d $'--2dcf8b97aec1aa0468953bd4ad4e70ac\r\nContent-Disposition: form-data; name=""\r\n\r\n{\'\': True, \'´\\U000e9e97\\U0004ca65¹@Á~Të\\x9f\\x1d-ç\': 330966, \'\\U000be76e\\x02Æ\': \'.exe\'}\r\n--2dcf8b97aec1aa0468953bd4ad4e70ac\r\nContent-Disposition: form-data; name="t򍃷ã\x12òÅ󾙀"; filename="t򍃷ã\x12òÅ󾙀"\r\n\r\nNone\r\n--2dcf8b97aec1aa0468953bd4ad4e70ac\r\nContent-Disposition: form-data; name="t򍃷ã\x12òÅ󾙀"; filename="t򍃷ã\x12òÅ󾙀"\r\n\r\n{}\r\n--2dcf8b97aec1aa0468953bd4ad4e70ac\r\nContent-Disposition: form-data; name="file"; filename="file"\r\n\r\nIÏ\r򊈀_\x7f4n°ha\r\n--2dcf8b97aec1aa0468953bd4ad4e70ac--\r\n' 'http://localhost:3300/api/admin/catalogue/subjects/import?dry_run=true'</failure>
+    </testcase>
+    <testcase name="POST /api/admin/colleges" time="0.440932">
+      <failure type="failure">1. Test Case ID: 3UwOVj
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 201, 422
+
+[409] Conflict:
+
+    `{"detail":"A college with code 0 already exists."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0", "campus": null, "contact": null, "email_domains": null}' http://localhost:3300/api/admin/colleges</failure>
+      <failure type="failure">1. Test Case ID: 918u6I
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�+4�' http://localhost:3300/api/admin/colleges</failure>
+    </testcase>
+    <testcase name="POST /api/admin/deletions/code" time="0.079369" />
+    <testcase name="POST /api/admin/governance/groups" time="0.259608">
+      <failure type="failure">1. Test Case ID: SnJsto
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 201, 422
+
+[409] Conflict:
+
+    `{"detail":"A group with that name exists."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"name": "00", "description": ""}' http://localhost:3300/api/admin/governance/groups</failure>
+      <failure type="failure">1. Test Case ID: xVgVnm
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�+4�' http://localhost:3300/api/admin/governance/groups</failure>
+    </testcase>
+    <testcase name="POST /api/admin/imports/preview" time="0.183632">
+      <failure type="failure">1. Test Case ID: QbnUkZ
+
+- Response violates schema
+
+    "Unknown import kind 'badges'. Use one of: attendance, marks." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Unknown import kind 'badges'. Use one of: attendance, marks."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Unknown import kind 'badges'. Use one of: attendance, marks."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: multipart/form-data; boundary=d2b33b6cdfe8c3dceaa70dc30fe2ecfc' -d $'--d2b33b6cdfe8c3dceaa70dc30fe2ecfc\r\nContent-Disposition: form-data; name="cohort_id"\r\n\r\nb8f4fa1952f94c6aba326bfb7f73cbe8\r\n--d2b33b6cdfe8c3dceaa70dc30fe2ecfc\r\nContent-Disposition: form-data; name="file"; filename="file"\r\n\r\n\r\n--d2b33b6cdfe8c3dceaa70dc30fe2ecfc\r\nContent-Disposition: form-data; name="kind"\r\n\r\nbadges\r\n--d2b33b6cdfe8c3dceaa70dc30fe2ecfc--\r\n' http://localhost:3300/api/admin/imports/preview</failure>
+    </testcase>
+    <testcase name="POST /api/admin/interview-questions" time="0.225546">
+      <failure type="failure">1. Test Case ID: vVZUOm
+
+- Response violates schema
+
+    "track must be one of hr, dm, ba, fa." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "track must be one of hr, dm, ba, fa."
+
+[422] Unprocessable Content:
+
+    `{"detail":"track must be one of hr, dm, ba, fa."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"track": "", "phase": "", "text": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"}' http://localhost:3300/api/admin/interview-questions</failure>
+      <failure type="failure">1. Test Case ID: 2Ht42g
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d 'A�' http://localhost:3300/api/admin/interview-questions</failure>
+    </testcase>
+    <testcase name="POST /api/admin/interview-questions/bulk" time="0.211822">
+      <failure type="failure">1. Test Case ID: yO5PWv
+
+- Response violates schema
+
+    "track must be one of hr, dm, ba, fa." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "track must be one of hr, dm, ba, fa."
+
+[422] Unprocessable Content:
+
+    `{"detail":"track must be one of hr, dm, ba, fa."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"track": "", "lines": "00"}' http://localhost:3300/api/admin/interview-questions/bulk</failure>
+      <failure type="failure">1. Test Case ID: nW6R0I
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $' W\x06�' http://localhost:3300/api/admin/interview-questions/bulk</failure>
+    </testcase>
+    <testcase name="POST /api/admin/interview-questions/reorder" time="0.246879">
+      <failure type="failure">1. Test Case ID: B4bOLO
+
+- Response violates schema
+
+    "track must be one of hr, dm, ba, fa." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "track must be one of hr, dm, ba, fa."
+
+[422] Unprocessable Content:
+
+    `{"detail":"track must be one of hr, dm, ba, fa."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"track": "", "ids": ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]}' http://localhost:3300/api/admin/interview-questions/reorder</failure>
+      <failure type="failure">1. Test Case ID: lptBlE
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d 'n��IE�' http://localhost:3300/api/admin/interview-questions/reorder</failure>
+    </testcase>
+    <testcase name="POST /api/admin/users/{user_id}/activation-link" time="0.232870">
+      <failure type="failure">1. Test Case ID: 9JV6Gm
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"User not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/0/activation-link</failure>
+      <failure type="failure">1. Test Case ID: uoBzrC
+
+- Response violates schema
+
+    "mentor@bgscet.ac.in already has a password, so there is no first password to set. Ask them to use \"Forgot password?\" on the sign-in screen — a reset link goes to their own mailbox, which an activation link handed over in person does not." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "mentor@bgscet.ac.in already has a password, so there is no first password to...
+
+[422] Unprocessable Content:
+
+    `{"detail":"mentor@bgscet.ac.in already has a password, so there is no first password to set. Ask them to use \"Forgot password?\" on the sign-in screen — a reset link goes to their own mailbox, which an activation link handed over in person does not."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/110000ea0bd447248396e55134518f52/activation-link</failure>
+    </testcase>
+    <testcase name="POST /api/admin/users/{user_id}/delete" time="0.485406">
+      <failure type="failure">1. Test Case ID: rkjAv6
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "000000", "reason": [null, null]}' http://localhost:3300/api/admin/users/0/delete</failure>
+      <failure type="failure">1. Test Case ID: 0CYJ4n
+
+- Undocumented HTTP status code
+
+    Received: 403
+    Documented: 200, 422
+
+[403] Forbidden:
+
+    `{"detail":"That code is not right, has expired, or was already used. Ask for a new one - it is emailed to the office account's own address."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "000000", "reason": "handover"}' http://localhost:3300/api/admin/users/110000ea0bd447248396e55134518f52/delete</failure>
+    </testcase>
+    <testcase name="POST /api/admin/users/{user_id}/disable" time="0.251559">
+      <failure type="failure">1. Test Case ID: zbedfl
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": [null, null]}' http://localhost:3300/api/admin/users/0/disable</failure>
+      <failure type="failure">1. Test Case ID: laQx05
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"mentor@bgscet.ac.in was already disabled on 2026-09-29."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover"}' http://localhost:3300/api/admin/users/110000ea0bd447248396e55134518f52/disable
+
+2. Test Case ID: vccgu0
+
+- Response violates schema
+
+    "You cannot disable the account you are signed in with." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "You cannot disable the account you are signed in with."
+
+[422] Unprocessable Content:
+
+    `{"detail":"You cannot disable the account you are signed in with."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"": {}, "h\ue003 ;4\u0090u\u00e1": {"\u001c3\u000f\u008b#": []}, "60\ud8c5\udda2": [], "\u00cd\u009f\u0000\u00d7\"": {}, "reason": "No recruiter interview round is recorded anywhere in REEP. The mock interviewer'"'"'s sessions are rehearsals, not hiring rounds, and counting them here would put a practice figure in a placement funnel."}' http://localhost:3300/api/admin/users/c2fb8a71ee0e4ff788bd2d3f43b7fa06/disable</failure>
+    </testcase>
+    <testcase name="POST /api/admin/users/{user_id}/enable" time="0.262050">
+      <failure type="failure">1. Test Case ID: p2DsPp
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/0/enable</failure>
+      <failure type="failure">1. Test Case ID: MaY80Z
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"loadtest008@bgscet.ac.in is not disabled."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/ad2664a225244e86b5acb7a29aaa76da/enable</failure>
+    </testcase>
+    <testcase name="POST /api/admin/users/{user_id}/remove" time="0.248068">
+      <failure type="failure">1. Test Case ID: aC8Swf
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": [null, null]}' http://localhost:3300/api/admin/users/0/remove</failure>
+      <failure type="failure">1. Test Case ID: MbPhDR
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"loadtest008@bgscet.ac.in was already removed on 2026-09-29."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"": "", "\u00b6G\uda6a\udf33^": [-1106024, [], {}], "-script.pyw": [], "\udad2\udef1": {"null": -76312, "": [-5.845335179030697e+16], "\u0095\ue10a\u00ba": {}}, "I\u00d1": {"-script.pyw": -1501734, "\u0096Y\u00f2\udaa7\udf56\u0090": "x\u00c3O\u0097\u0086L7\u009d", "\u00b9\ud996\udf82\ud8d1\udc66\u001a": null}, "reason": "No recruiter interview round is recorded anywhere in REEP. The mock interviewer'"'"'s sessions are rehearsals, not hiring rounds, and counting them here would put a practice figure in a placement funnel."}' http://localhost:3300/api/admin/users/ad2664a225244e86b5acb7a29aaa76da/remove
+
+2. Test Case ID: 3aCCPc
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '%��' http://localhost:3300/api/admin/users/110000ea0bd447248396e55134518f52/remove</failure>
+    </testcase>
+    <testcase name="POST /api/admin/users/{user_id}/restore" time="0.156342">
+      <failure type="failure">1. Test Case ID: 07U2mE
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/0/restore</failure>
+      <failure type="failure">1. Test Case ID: 2QuguA
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"loadtest005@bgscet.ac.in is not removed."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/10277db7653d45f59e0f75927b75b338/restore</failure>
+    </testcase>
+    <testcase name="POST /api/admin/users/{user_id}/sign-out-everywhere" time="0.151712">
+      <failure type="failure">1. Test Case ID: kFDnuV
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/0/sign-out-everywhere</failure>
+      <failure type="failure">1. Test Case ID: wfpQHB
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/d70c79247c58494e8e7833b592fe68e3/sign-out-everywhere</failure>
+    </testcase>
+    <testcase name="PUT /api/admin/catalogue/badges" time="0.266528">
+      <failure type="failure">1. Test Case ID: lw7tM1
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"course_id": "", "badge_code": "", "enabled": 0}' http://localhost:3300/api/admin/catalogue/badges</failure>
+      <failure type="failure">1. Test Case ID: RYi9Va
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"badge_code": "TECH-EXCEL-FOUNDATION", "course_id": "3d500502360f4f91a2a0b49ea004322d", "enabled": false}' http://localhost:3300/api/admin/catalogue/badges
+
+2. Test Case ID: 2hzlMm
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'=i��n\x0e' http://localhost:3300/api/admin/catalogue/badges</failure>
+    </testcase>
+    <testcase name="PUT /api/admin/governance/features" time="0.357455">
+      <failure type="failure">1. Test Case ID: Z24GkV
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"feature": "", "reason": "handover", "scope": "COHORT", "target_id": "c2fb8a71ee0e4ff788bd2d3f43b7fa06"}' http://localhost:3300/api/admin/governance/features
+
+2. Test Case ID: Bg0qiy
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�+4�' http://localhost:3300/api/admin/governance/features</failure>
+    </testcase>
+    <testcase name="GET /api/admin/analytics-summary" time="0.046962">
+      <failure type="failure">1. Test Case ID: tFV43i
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/analytics-summary</failure>
+    </testcase>
+    <testcase name="GET /api/admin/analytics/kpis" time="0.254439">
+      <failure type="failure">1. Test Case ID: XBYL32
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/analytics/kpis</failure>
+    </testcase>
+    <testcase name="GET /api/admin/analytics/series" time="0.256467">
+      <failure type="failure">1. Test Case ID: Qcrf1L
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/analytics/series</failure>
+    </testcase>
+    <testcase name="GET /api/admin/audit" time="0.651294">
+      <failure type="failure">1. Test Case ID: IjPp2Z
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/audit</failure>
+    </testcase>
+    <testcase name="GET /api/admin/audit/export.csv" time="0.738931">
+      <failure type="failure">1. Test Case ID: tj5Z71
+
+- Undocumented Content-Type
+
+    Received: text/csv; charset=utf-8
+    Documented: application/json
+
+[200] OK:
+
+    `When,Actor,Actor email,Actor type,Action,Target type,Target id,Route,Request id
+    2026-09-29T21:08:09.340241+00:00,Main Admin (seed),admin@bgscet.ac.in,USER,SIGN_OUT_EVERYWHERE,user,c2fb8a71ee0e4ff788bd2d3f43b7fa06,/api/admin/users/c2fb8a71ee0e4ff788bd2d3f43b7fa06/sign-out-everywhere,ae16bf61febf426187da8d99c592509e
+    2026-09-29T21:08:07.866706+00:00,Main Admin (seed),admin@bgscet.ac.in,USER,STUDENTS_UNGRADUATE,cohort,b8f4fa1952f94c6aba326bfb7f73cbe8,/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/ungradu // Output truncated...`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/audit/export.csv?actor=&amp;action=&amp;target_id=&amp;from=2000-01-01T00%3A00%3A00Z'</failure>
+      <failure type="failure">1. Test Case ID: N2r0dR
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/audit/export.csv</failure>
+    </testcase>
+    <testcase name="GET /api/admin/badge-catalogue" time="0.042657">
+      <failure type="failure">1. Test Case ID: P6B9Md
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/badge-catalogue</failure>
+    </testcase>
+    <testcase name="GET /api/admin/badges/cohort" time="0.029379">
+      <failure type="failure">1. Test Case ID: R4JUj0
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/badges/cohort</failure>
+    </testcase>
+    <testcase name="GET /api/admin/badges/export.csv" time="0.032027">
+      <failure type="failure">1. Test Case ID: xFeuCV
+
+- Undocumented Content-Type
+
+    Received: text/csv; charset=utf-8
+    Documented: application/json
+
+[200] OK:
+
+    `Name,USN,REEP stage,Points,Managerial Skills,Sectoral Skills,Platform / Technical Skills,Thinking Skills,Interview Readiness,Mean growth from T0
+    Load Test 001,,EXCEL,0,0,0,0,0,0,
+    Load Test 002,,EXCEL,0,0,0,0,0,0,
+    Load Test 003,,EXCEL,0,0,0,0,0,0,
+    Load Test 004,,EXCEL,0,0,0,0,0,0,
+    Load Test 005,,EXCEL,0,0,0,0,0,0,
+    Load Test 006,,EXCEL,0,0,0,0,0,0,
+    Load Test 007,,EXCEL,0,0,0,0,0,0,
+    Load Test 008,,EXCEL,0,0,0,0,0,0,
+    Load Test 009,,EXCEL,0,0,0,0,0,0,
+    Load Test 010,,EXCEL,0,0,0,0,0,0,
+    Load Test 011,,E // Output truncated...`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/badges/export.csv</failure>
+      <failure type="failure">1. Test Case ID: Lnuxeq
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/badges/export.csv</failure>
+    </testcase>
+    <testcase name="GET /api/admin/catalogue" time="0.026713">
+      <failure type="failure">1. Test Case ID: QmsAiw
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/catalogue</failure>
+    </testcase>
+    <testcase name="GET /api/admin/catalogue/courses" time="0.029685">
+      <failure type="failure">1. Test Case ID: P2mjO9
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/catalogue/courses</failure>
+    </testcase>
+    <testcase name="GET /api/admin/cohorts" time="0.024996">
+      <failure type="failure">1. Test Case ID: BKei0w
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts</failure>
+    </testcase>
+    <testcase name="GET /api/admin/cohorts/incomplete" time="0.025961">
+      <failure type="failure">1. Test Case ID: 6dCk2T
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/incomplete</failure>
+    </testcase>
+    <testcase name="GET /api/admin/cohorts/unassigned" time="0.028830">
+      <failure type="failure">1. Test Case ID: qvBhVV
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/unassigned</failure>
+    </testcase>
+    <testcase name="GET /api/admin/colleges" time="0.015765">
+      <failure type="failure">1. Test Case ID: RDW4Y6
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges</failure>
+    </testcase>
+    <testcase name="GET /api/admin/departments" time="0.028753">
+      <failure type="failure">1. Test Case ID: htPlOr
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/departments</failure>
+    </testcase>
+    <testcase name="GET /api/admin/exports/history" time="0.136905">
+      <failure type="failure">1. Test Case ID: kZpQ9g
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/exports/history</failure>
+    </testcase>
+    <testcase name="GET /api/admin/exports/ledger.csv" time="0.031857">
+      <failure type="failure">1. Test Case ID: szv616
+
+- Undocumented Content-Type
+
+    Received: text/csv; charset=utf-8
+    Documented: application/json
+
+[200] OK:
+
+    `Name,USN,Days logged,Days submitted,Hours logged,Productive hours
+    Load Test 001,,0,0,0.0,0.0
+    Load Test 002,,0,0,0.0,0.0
+    Load Test 003,,0,0,0.0,0.0
+    Load Test 004,,0,0,0.0,0.0
+    Load Test 005,,0,0,0.0,0.0
+    Load Test 006,,0,0,0.0,0.0
+    Load Test 007,,0,0,0.0,0.0
+    Load Test 008,,0,0,0.0,0.0
+    Load Test 009,,0,0,0.0,0.0
+    Load Test 010,,0,0,0.0,0.0
+    Load Test 011,,0,0,0.0,0.0
+    Load Test 012,,0,0,0.0,0.0
+    Load Test 013,,0,0,0.0,0.0
+    Load Test 014,,0,0,0.0,0.0
+    Load Test 015,,0,0,0.0,0.0
+    Load Test 016,,0,0,0.0,0. // Output truncated...`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/exports/ledger.csv</failure>
+      <failure type="failure">1. Test Case ID: DaTp3z
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/exports/ledger.csv</failure>
+    </testcase>
+    <testcase name="GET /api/admin/exports/students.csv" time="0.027248">
+      <failure type="failure">1. Test Case ID: XN2LKp
+
+- Undocumented Content-Type
+
+    Received: text/csv; charset=utf-8
+    Documented: application/json
+
+[200] OK:
+
+    `Name,USN,REEP stage,Semester,Cohort,Mentor
+    Load Test 001,,EXCEL,1,,Unassigned
+    Load Test 002,,EXCEL,1,,Unassigned
+    Load Test 003,,EXCEL,1,,Unassigned
+    Load Test 004,,EXCEL,1,,Unassigned
+    Load Test 005,,EXCEL,1,,Unassigned
+    Load Test 006,,EXCEL,1,,Unassigned
+    Load Test 007,,EXCEL,1,,Unassigned
+    Load Test 008,,EXCEL,1,,Unassigned
+    Load Test 009,,EXCEL,1,,Unassigned
+    Load Test 010,,EXCEL,1,,Unassigned
+    Load Test 011,,EXCEL,1,,Unassigned
+    Load Test 012,,EXCEL,1,,Unassigned
+    Load Test 013,,EXCEL,1,,Unassigned
+     // Output truncated...`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/exports/students.csv</failure>
+      <failure type="failure">1. Test Case ID: Rp8I3C
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/exports/students.csv</failure>
+    </testcase>
+    <testcase name="GET /api/admin/faculty" time="0.191539">
+      <failure type="failure">1. Test Case ID: GpqBFm
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/faculty</failure>
+    </testcase>
+    <testcase name="GET /api/admin/governance/catalogue" time="0.030550">
+      <failure type="failure">1. Test Case ID: shRbaG
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/catalogue</failure>
+    </testcase>
+    <testcase name="GET /api/admin/governance/effective/{user_id}" time="0.108439">
+      <failure type="failure">1. Test Case ID: GuUC07
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"User not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/effective/0</failure>
+      <failure type="failure">1. Test Case ID: NNIioY
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/effective/110000ea0bd447248396e55134518f52</failure>
+    </testcase>
+    <testcase name="GET /api/admin/governance/features" time="0.012027">
+      <failure type="failure">1. Test Case ID: M9Kcm4
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/features</failure>
+    </testcase>
+    <testcase name="GET /api/admin/governance/grants" time="0.027230">
+      <failure type="failure">1. Test Case ID: ipWwcX
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/grants</failure>
+    </testcase>
+    <testcase name="GET /api/admin/governance/groups" time="0.023053">
+      <failure type="failure">1. Test Case ID: hmE7fE
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/groups</failure>
+    </testcase>
+    <testcase name="GET /api/admin/governance/hierarchy" time="0.047612">
+      <failure type="failure">1. Test Case ID: A7HqLL
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/hierarchy</failure>
+    </testcase>
+    <testcase name="GET /api/admin/governance/review" time="0.026684">
+      <failure type="failure">1. Test Case ID: 7HKCKx
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/review</failure>
+    </testcase>
+    <testcase name="GET /api/admin/governance/staff" time="0.025465">
+      <failure type="failure">1. Test Case ID: ntSYY0
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/staff</failure>
+    </testcase>
+    <testcase name="GET /api/admin/hierarchy/levels" time="0.023316">
+      <failure type="failure">1. Test Case ID: EDZeBl
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/hierarchy/levels</failure>
+    </testcase>
+    <testcase name="GET /api/admin/imports/templates/{kind}.xlsx" time="0.242503">
+      <failure type="failure">1. Test Case ID: rWBSFz
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"No template for '0'. Use one of: attendance, marks."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/imports/templates/0.xlsx</failure>
+      <failure type="failure">1. Test Case ID: EMdmn4
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/imports/templates/badges.xlsx</failure>
+    </testcase>
+    <testcase name="GET /api/admin/interview-questions" time="0.129583">
+      <failure type="failure">1. Test Case ID: 9DpGT2
+
+- Response violates schema
+
+    "track must be one of hr, dm, ba, fa." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "track must be one of hr, dm, ba, fa."
+
+[422] Unprocessable Content:
+
+    `{"detail":"track must be one of hr, dm, ba, fa."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/interview-questions?track='</failure>
+      <failure type="failure">1. Test Case ID: 9uuxj7
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/interview-questions?track='</failure>
+    </testcase>
+    <testcase name="GET /api/admin/interview-questions/tracks" time="0.035244">
+      <failure type="failure">1. Test Case ID: bzt5bP
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interview-questions/tracks</failure>
+    </testcase>
+    <testcase name="GET /api/admin/interviews" time="0.702668">
+      <failure type="failure">1. Test Case ID: 1ZzbW5
+
+- Response violates schema
+
+    "status must be one of: running, completed, abandoned, failed." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "status must be one of: running, completed, abandoned, failed."
+
+[422] Unprocessable Content:
+
+    `{"detail":"status must be one of: running, completed, abandoned, failed."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/interviews?status=null&amp;x-schemathesis-unknown-property=42'</failure>
+      <failure type="failure">1. Test Case ID: uJ9wJZ
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interviews</failure>
+    </testcase>
+    <testcase name="GET /api/admin/interviews/export.csv" time="0.756964">
+      <failure type="failure">1. Test Case ID: zGOsLM
+
+- Undocumented Content-Type
+
+    Received: text/csv; charset=utf-8
+    Documented: application/json
+
+[200] OK:
+
+    `Name,USN,Started,Track,Status,Overall,Communication,Domain,Structure,Record`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/interviews/export.csv?college=&amp;cohort=&amp;status=&amp;from=2000-01-01T00%3A00%3A00Z'
+
+2. Test Case ID: ZL4DEA
+
+- Response violates schema
+
+    "status must be one of: running, completed, abandoned, failed." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "status must be one of: running, completed, abandoned, failed."
+
+[422] Unprocessable Content:
+
+    `{"detail":"status must be one of: running, completed, abandoned, failed."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/interviews/export.csv?status=null&amp;x-schemathesis-unknown-property=42'</failure>
+      <failure type="failure">1. Test Case ID: JSsjFw
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interviews/export.csv</failure>
+    </testcase>
+    <testcase name="GET /api/admin/interviews/summary" time="0.698661">
+      <failure type="failure">1. Test Case ID: 5yWtYV
+
+- Response violates schema
+
+    "status must be one of: running, completed, abandoned, failed." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "status must be one of: running, completed, abandoned, failed."
+
+[422] Unprocessable Content:
+
+    `{"detail":"status must be one of: running, completed, abandoned, failed."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/interviews/summary?status=null&amp;x-schemathesis-unknown-property=42'</failure>
+      <failure type="failure">1. Test Case ID: UIekM1
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interviews/summary</failure>
+    </testcase>
+    <testcase name="GET /api/admin/jobs" time="0.040849">
+      <failure type="failure">1. Test Case ID: tF5F2K
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/jobs</failure>
+    </testcase>
+    <testcase name="GET /api/admin/leave-policy" time="0.126234">
+      <failure type="failure">1. Test Case ID: H5DgU5
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/leave-policy</failure>
+    </testcase>
+    <testcase name="GET /api/admin/mail-log" time="0.312409">
+      <failure type="failure">1. Test Case ID: c9Zedb
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/mail-log</failure>
+    </testcase>
+    <testcase name="GET /api/admin/mail-log/suppression" time="0.158743">
+      <failure type="failure">1. Test Case ID: r4e36V
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/mail-log/suppression?email=mentor%40bgscet.ac.in'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/students/unseated" time="0.034670">
+      <failure type="failure">1. Test Case ID: yI3kdV
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/unseated</failure>
+    </testcase>
+    <testcase name="GET /api/admin/users/{user_id}/delete-plan" time="0.108991">
+      <failure type="failure">1. Test Case ID: X19zt5
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/0/delete-plan</failure>
+      <failure type="failure">1. Test Case ID: rChjZa
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/110000ea0bd447248396e55134518f52/delete-plan</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/users/{user_id}/institutional-identity" time="0.269873">
+      <failure type="failure">1. Test Case ID: 1SET3l
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"User not found."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"designation": "", "department": null}' http://localhost:3300/api/admin/users/0/institutional-identity</failure>
+      <failure type="failure">1. Test Case ID: jskcmx
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/users/110000ea0bd447248396e55134518f52/institutional-identity
+
+2. Test Case ID: HQxxoj
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '��s' http://localhost:3300/api/admin/users/%F0%B9%A9%9A%C2%82%5E%11%3E%C3%B7%C3%96%F1%AE%A0%99%F3%98%86%BA%F3%AE%99%8A/institutional-identity</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/mail-log/suppression" time="0.136923">
+      <failure type="failure">1. Test Case ID: lWVavt
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"This deployment has no mail transport, so there is no suppression list."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/mail-log/suppression?email=0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'</failure>
+      <failure type="failure">1. Test Case ID: hNCCl9
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/mail-log/suppression?email=mentor%40bgscet.ac.in'</failure>
+    </testcase>
+    <testcase name="POST /api/admin/cohorts/{cohort_id}/graduate" time="0.317868">
+      <failure type="failure">1. Test Case ID: 5Brh5D
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"effective_on": "2026-07-07"}' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/graduate</failure>
+    </testcase>
+    <testcase name="POST /api/admin/cohorts/{cohort_id}/promote" time="0.382260">
+      <failure type="failure">1. Test Case ID: PWXcrr
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"Master of Business Administration - Finance · 2024-26 Section B has graduated. Reverse the graduation first if this batch is still running."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"effective_on": "2000-01-01", "hold_back": [], "reason": ""}' 'http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/promote?dry_run=false'</failure>
+      <failure type="failure">1. Test Case ID: BLnYts
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"effective_on": "2026-07-07"}' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/promote</failure>
+    </testcase>
+    <testcase name="POST /api/admin/cohorts/{cohort_id}/students/bulk" time="0.447905">
+      <failure type="failure">1. Test Case ID: 6zgEST
+
+- Response violates schema
+
+    "move needs cohort_id, the destination batch." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "move needs cohort_id, the destination batch."
+
+[422] Unprocessable Content:
+
+    `{"detail":"move needs cohort_id, the destination batch."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"action": "move", "cohort_id": null, "mentor_user_id": null, "current_stage": null, "current_semester": 1, "reason": ""}' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/students/bulk
+
+2. Test Case ID: 325KWv
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Batch not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"action": "move", "cohort_id": "", "mentor_user_id": null, "current_stage": null, "current_semester": 1, "reason": null}' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/students/bulk</failure>
+      <failure type="failure">1. Test Case ID: OHTzij
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"action": "move"}' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/students/bulk
+
+2. Test Case ID: edp5NT
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '��+�' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/students/bulk</failure>
+    </testcase>
+    <testcase name="POST /api/admin/cohorts/{cohort_id}/ungraduate" time="0.296254">
+      <failure type="failure">1. Test Case ID: xl4kAm
+
+- Response violates schema
+
+    "Master of Business Administration - Finance · 2024-26 Section B has no graduated students to reverse." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Master of Business Administration - Finance \u00b7 2024-26 Section B has no ...
+
+[422] Unprocessable Content:
+
+    `{"detail":"Master of Business Administration - Finance · 2024-26 Section B has no graduated students to reverse."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": {}}' 'http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/ungraduate?dry_run=true'</failure>
+      <failure type="failure">1. Test Case ID: uFTMOi
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/ungraduate
+
+2. Test Case ID: 7ujOGt
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�y�' 'http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/ungraduate?Rd%21h%F3%87%BF%97%C3%86=&amp;Rd%21h%F3%87%BF%97%C3%86=-F%C3%BB&amp;Rd%21h%F3%87%BF%97%C3%86=8%C3%86%F0%A9%BF%89%C3%A3dh%C2%BBY%F1%94%A2%95&amp;__dict__=%F0%A8%8D%8Ev%C2%90v&amp;__dict__=%F0%AF%B5%87t%F0%99%AA%85%21-%F3%88%AD%93.%C2%B9&amp;__dict__=%F2%A2%93%82%29%F3%82%93%8D%7F%C3%B4&amp;=%C3%B6%F2%8D%8A%82%C3%B2&amp;%E9%AB%A6=%C3%A9%F0%A2%88%89%C2%AC%F1%83%9B%B0.~X%C2%B9&amp;%E9%AB%A6=%C2%9F%F2%A2%B3%93R%C2%AFY&amp;%E9%AB%A6=&amp;dry_run=true&amp;%C3%90%C2%90%C3%AA%C3%80='</failure>
+    </testcase>
+    <testcase name="GET /api/admin/alert-rules" time="0.151304">
+      <failure type="failure">1. Test Case ID: WVwC2B
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/alert-rules?cohort_id=b8f4fa1952f94c6aba326bfb7f73cbe8'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/audit/{event_id}" time="0.216577">
+      <failure type="failure">1. Test Case ID: Ll7FuU
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Audit event not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/audit/ceee6e33f7c54785a14b8bb1d6374140</failure>
+      <failure type="failure">1. Test Case ID: PqRYHl
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/audit/ceee6e33f7c54785a14b8bb1d6374140</failure>
+    </testcase>
+    <testcase name="GET /api/admin/cohorts/{cohort_id}/promotion-history" time="0.200899">
+      <failure type="failure">1. Test Case ID: v1fGqj
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/promotion-history</failure>
+    </testcase>
+    <testcase name="GET /api/admin/cohorts/{cohort_id}/students" time="0.195548">
+      <failure type="failure">1. Test Case ID: mQbgJg
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8/students</failure>
+    </testcase>
+    <testcase name="GET /api/admin/exports/placement.csv" time="0.158760">
+      <failure type="failure">1. Test Case ID: ukN9H2
+
+- Undocumented Content-Type
+
+    Received: text/csv; charset=utf-8
+    Documented: application/json
+
+[200] OK:
+
+    `Student,USN,Company,Role,Role type,CTC (INR),Status,Submitted,Decided`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/exports/placement.csv?cohort_id=null&amp;cohort_id=null'</failure>
+      <failure type="failure">1. Test Case ID: Rihx7e
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/exports/placement.csv?cohort_id=b8f4fa1952f94c6aba326bfb7f73cbe8'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/imports" time="0.179342">
+      <failure type="failure">1. Test Case ID: q4TjGO
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/imports?cohort_id=b8f4fa1952f94c6aba326bfb7f73cbe8'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/placement" time="0.335879">
+      <failure type="failure">1. Test Case ID: dyxux4
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/placement?cohort_id=b8f4fa1952f94c6aba326bfb7f73cbe8'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/students" time="1.039541">
+      <failure type="failure">1. Test Case ID: fxx2t3
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/students?cohort_id=b8f4fa1952f94c6aba326bfb7f73cbe8'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/swoc" time="0.437701">
+      <failure type="failure">1. Test Case ID: wWXTkL
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/swoc?cohort_id=b8f4fa1952f94c6aba326bfb7f73cbe8'</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/colleges/{college_id}" time="0.553760">
+      <failure type="failure">1. Test Case ID: Yci8SW
+
+- Response violates schema
+
+    "status must be one of ['ACTIVE', 'ARCHIVED']." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "status must be one of ['ACTIVE', 'ARCHIVED']."
+
+[422] Unprocessable Content:
+
+    `{"detail":"status must be one of ['ACTIVE', 'ARCHIVED']."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0", "campus": null, "contact": null, "status": "", "email_domains": []}' http://localhost:3300/api/admin/colleges/e3acde73c84c4d7983eb32a5462da542
+
+2. Test Case ID: d2wEdT
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"A college with code 0 already exists."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0", "campus": null, "contact": null, "email_domains": []}' http://localhost:3300/api/admin/colleges/e3acde73c84c4d7983eb32a5462da542</failure>
+      <failure type="failure">1. Test Case ID: ldfefk
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/colleges/e3acde73c84c4d7983eb32a5462da542</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/interview-questions/{question_id}" time="0.290287">
+      <failure type="failure">1. Test Case ID: VFAj5Y
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Question not found."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"phase": null, "text": "00000000", "enabled": 0}' http://localhost:3300/api/admin/interview-questions/0</failure>
+      <failure type="failure">1. Test Case ID: IAvHRx
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/interview-questions/0</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/cohorts/{cohort_id}" time="0.212755">
+      <failure type="failure">1. Test Case ID: p9bWZU
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 204, 422
+
+[409] Conflict:
+
+    `{"detail":"1 student is seated in this batch. Move or delete them first."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8</failure>
+      <failure type="failure">1. Test Case ID: xc46Ps
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/governance/features/{override_id}" time="0.207618">
+      <failure type="failure">1. Test Case ID: mFzlQ7
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 204, 422
+
+[404] Not Found:
+
+    `{"detail":"Override not found."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/features/0</failure>
+      <failure type="failure">1. Test Case ID: qgznQp
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/features/0</failure>
+    </testcase>
+    <testcase name="POST /api/admin/approved-certifications" time="0.498854">
+      <failure type="failure">1. Test Case ID: bH0mAd
+
+- Response violates schema
+
+    "No such badge." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "No such badge."
+
+[422] Unprocessable Content:
+
+    `{"detail":"No such badge."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"name": "0", "provider": "0", "badge_code": "", "evidence_type": "EXTERNAL_VERIFIED", "stage": "EXCEL", "duration_text": "", "is_free": true, "url": "", "active": 0, "college_id": "7cf68f71a6e347f886bdc8b1f62dfa74", "course_id": null}' http://localhost:3300/api/admin/approved-certifications</failure>
+      <failure type="failure">1. Test Case ID: TJdhJd
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"badge_code": "TECH-EXCEL-FOUNDATION", "name": "Business Communication", "provider": "Coursera", "college_id": "e3acde73c84c4d7983eb32a5462da542"}' http://localhost:3300/api/admin/approved-certifications</failure>
+    </testcase>
+    <testcase name="POST /api/admin/colleges/{college_id}/admins" time="0.221028">
+      <failure type="failure">1. Test Case ID: CZoqfy
+
+- Response violates schema
+
+    "A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "A reason of at least 20 characters is required. It is written onto the audit...
+
+[422] Unprocessable Content:
+
+    `{"detail":"A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"user_id": "", "reason": ""}' http://localhost:3300/api/admin/colleges/e37ada1e22584a868b88340ef147de52/admins</failure>
+      <failure type="failure">1. Test Case ID: xiDYSs
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover", "user_id": "110000ea0bd447248396e55134518f52"}' http://localhost:3300/api/admin/colleges/7cf68f71a6e347f886bdc8b1f62dfa74/admins</failure>
+    </testcase>
+    <testcase name="POST /api/admin/colleges/{college_id}/delete" time="0.269584">
+      <failure type="failure">1. Test Case ID: SJsLgh
+
+- Undocumented HTTP status code
+
+    Received: 403
+    Documented: 200, 422
+
+[403] Forbidden:
+
+    `{"detail":"That code is not right, has expired, or was already used. Ask for a new one - it is emailed to the office account's own address."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "000000", "reason": [null, null]}' http://localhost:3300/api/admin/colleges/b2f9b8993e1c4534b45a4cfe2ec319e0/delete</failure>
+      <failure type="failure">1. Test Case ID: ww3Vjs
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "000000", "reason": "handover"}' http://localhost:3300/api/admin/colleges/7cf68f71a6e347f886bdc8b1f62dfa74/delete</failure>
+    </testcase>
+    <testcase name="POST /api/admin/colleges/{college_id}/departments" time="0.302618">
+      <failure type="failure">1. Test Case ID: 8ZvvLQ
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 201, 422
+
+[409] Conflict:
+
+    `{"detail":"This college already has a department with code 22MBA12."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "22MBA12", "name": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "head": null}' http://localhost:3300/api/admin/colleges/f8bf03e7e8de4e7f982af028014f2dd6/departments</failure>
+      <failure type="failure">1. Test Case ID: MDSPA2
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "00", "name": "0"}' http://localhost:3300/api/admin/colleges/7cf68f71a6e347f886bdc8b1f62dfa74/departments</failure>
+    </testcase>
+    <testcase name="POST /api/admin/criteria" time="0.835805">
+      <failure type="failure">1. Test Case ID: 6Pbfhg
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 201, 422
+
+[500] Internal Server Error:
+
+    `Internal Server Error`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"name": "Default", "college_id": "95eeb678b2a240fb9ad05b1d1bfd51d0", "course_id": "", "effective_from": "2000-01-01", "min_cgpa": 0.0, "max_live_backlogs": 0, "max_gap_months": 0, "min_attendance_pct": 0.0, "min_reep_completion_pct": 0.0, "min_cert_completion_pct": 0.0, "require_core_certs": null}' http://localhost:3300/api/admin/criteria</failure>
+      <failure type="failure">1. Test Case ID: wYc8gH
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"college_id": "e3acde73c84c4d7983eb32a5462da542"}' http://localhost:3300/api/admin/criteria</failure>
+    </testcase>
+    <testcase name="POST /api/admin/imports/{run_id}/apply" time="0.305276">
+      <failure type="failure">1. Test Case ID: rqWOJS
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Import not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/imports/0/apply</failure>
+      <failure type="failure">1. Test Case ID: hbX2Ab
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/imports/0/apply</failure>
+    </testcase>
+    <testcase name="POST /api/admin/interview-questions/tracks" time="0.669072">
+      <failure type="failure">1. Test Case ID: FwJ7Eg
+
+- Response violates schema
+
+    "code must be 2-20 characters, lower case, starting with a letter and made of letters, digits, '-' or '_'. It is what ?specialization= carries on the interview socket and what every past interview is filed under, so it is a slug, not a title." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "code must be 2-20 characters, lower case, starting with a letter and made of...
+
+[422] Unprocessable Content:
+
+    `{"detail":"code must be 2-20 characters, lower case, starting with a letter and made of letters, digits, '-' or '_'. It is what ?specialization= carries on the interview socket and what every past interview is filed under, so it is a slug, not a title."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "00", "label": "00", "persona": "000", "frameworks": [], "sample_question": "000000000000", "nova_voice": "", "syllabus": [], "college_id": "9dfbc9e333ff4b24ba049fac0c4016b4", "course_id": null, "specialization_id": null, "enabled": true, "position": false}' http://localhost:3300/api/admin/interview-questions/tracks</failure>
+      <failure type="failure">1. Test Case ID: tjhsFE
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "00", "label": "Placement rate", "persona": "an empathetic yet compliant Chief Human Resources Officer (CHRO)", "sample_question": "Walk me through how you would handle a sexual harassment claim involving a top-performing executive.", "college_id": "e3acde73c84c4d7983eb32a5462da542"}' http://localhost:3300/api/admin/interview-questions/tracks</failure>
+    </testcase>
+    <testcase name="POST /api/admin/jobs" time="0.636690">
+      <failure type="failure">1. Test Case ID: JsFAVS
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 201, 422
+
+[500] Internal Server Error:
+
+    `Internal Server Error`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"title": "0", "company": "0", "degree_level": "PG", "location": "", "closes_on": "2000-01-01", "apply_url": "", "required_skills": [], "college_id": "5597b3b0bcf94142bbc2e2086feeddb4", "course_id": "", "tracks": []}' http://localhost:3300/api/admin/jobs
+
+2. Test Case ID: 37l9d0
+
+- Response violates schema
+
+    "The apply link must start with http:// or https://." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "The apply link must start with http:// or https://."
+
+[422] Unprocessable Content:
+
+    `{"detail":"The apply link must start with http:// or https://."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"title": "0", "company": "0", "degree_level": "PG", "location": "", "closes_on": "2000-01-01", "apply_url": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000", "required_skills": [], "college_id": "5597b3b0bcf94142bbc2e2086feeddb4", "course_id": null, "tracks": []}' http://localhost:3300/api/admin/jobs</failure>
+      <failure type="failure">1. Test Case ID: Al5sMj
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"company": "Acme Capital", "title": "Financial Analyst", "college_id": "e3acde73c84c4d7983eb32a5462da542"}' http://localhost:3300/api/admin/jobs
+
+2. Test Case ID: OcrF7m
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'����\x0b' http://localhost:3300/api/admin/jobs</failure>
+    </testcase>
+    <testcase name="PUT /api/admin/alert-rules" time="0.252649">
+      <failure type="failure">1. Test Case ID: yXiJc4
+
+- Response violates schema
+
+    "Unknown rule_key." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Unknown rule_key."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Unknown rule_key."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"cohort_id": "b8f4fa1952f94c6aba326bfb7f73cbe8", "rule_key": "", "params": {}, "enabled": 0, "severity": "WARNING"}' http://localhost:3300/api/admin/alert-rules</failure>
+      <failure type="failure">1. Test Case ID: t3LOtz
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"cohort_id": "b8f4fa1952f94c6aba326bfb7f73cbe8", "params": {}, "rule_key": "NO_CHECKIN_N_DAYS"}' http://localhost:3300/api/admin/alert-rules</failure>
+    </testcase>
+    <testcase name="PUT /api/admin/interview-policies/{college_id}" time="0.640662">
+      <failure type="failure">1. Test Case ID: hfZgkn
+
+- Response violates schema
+
+    "The attempt ceiling (1) must be at least the daily practice cap (99); otherwise the practice cap can never be reached and the students' allowance silently becomes the spend ceiling." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "The attempt ceiling (1) must be at least the daily practice cap (99); otherw...
+
+[422] Unprocessable Content:
+
+    `{"detail":"The attempt ceiling (1) must be at least the daily practice cap (99); otherwise the practice cap can never be reached and the students' allowance silently becomes the spend ceiling."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"store_transcript": null, "store_audio": null, "retention_days": 1, "daily_cap": 99, "attempt_cap": 1, "time_limit_seconds": 60}' http://localhost:3300/api/admin/interview-policies/aabddadbfc264c44bdeff1ae3c0f133c</failure>
+      <failure type="failure">1. Test Case ID: 0lb2zI
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/interview-policies/e3acde73c84c4d7983eb32a5462da542
+
+2. Test Case ID: omCCH1
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '��imP' http://localhost:3300/api/admin/interview-policies/b0c64a9a5b08413a9488b231b8854d43</failure>
+    </testcase>
+    <testcase name="PUT /api/admin/leave-calendar/{college_id}" time="0.369894">
+      <failure type="failure">1. Test Case ID: 5OGyLv
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"day": "2026-07-07"}' http://localhost:3300/api/admin/leave-calendar/e3acde73c84c4d7983eb32a5462da542</failure>
+    </testcase>
+    <testcase name="GET /api/admin/colleges/{college_id}/admins" time="0.094921">
+      <failure type="failure">1. Test Case ID: vJTdeb
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges/7cf68f71a6e347f886bdc8b1f62dfa74/admins</failure>
+    </testcase>
+    <testcase name="GET /api/admin/colleges/{college_id}/delete-plan" time="0.130055">
+      <failure type="failure">1. Test Case ID: Gxrfz1
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges/e3acde73c84c4d7983eb32a5462da542/delete-plan</failure>
+    </testcase>
+    <testcase name="GET /api/admin/colleges/{college_id}/departments" time="0.089216">
+      <failure type="failure">1. Test Case ID: oxYTtU
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges/e3acde73c84c4d7983eb32a5462da542/departments</failure>
+    </testcase>
+    <testcase name="GET /api/admin/criteria" time="0.169354">
+      <failure type="failure">1. Test Case ID: uLm8Vp
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/criteria?college_id=e3acde73c84c4d7983eb32a5462da542'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/criteria/history" time="0.171241">
+      <failure type="failure">1. Test Case ID: 2ajPAT
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/criteria/history?college_id=e3acde73c84c4d7983eb32a5462da542'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/interview-policies/{college_id}" time="0.095913">
+      <failure type="failure">1. Test Case ID: bchNaA
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interview-policies/7cf68f71a6e347f886bdc8b1f62dfa74</failure>
+    </testcase>
+    <testcase name="GET /api/admin/leave-calendar/{college_id}" time="0.322704">
+      <failure type="failure">1. Test Case ID: mXWsce
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/leave-calendar/e3acde73c84c4d7983eb32a5462da542</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/interview-questions/{question_id}" time="0.218230">
+      <failure type="failure">1. Test Case ID: zAQxHv
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 204, 422
+
+[404] Not Found:
+
+    `{"detail":"Question not found."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interview-questions/0</failure>
+      <failure type="failure">1. Test Case ID: bDIhJN
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interview-questions/0</failure>
+    </testcase>
+    <testcase name="POST /api/admin/jobs/{job_id}/close" time="0.113908">
+      <failure type="failure">1. Test Case ID: OJXvQw
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/jobs/f2160db8593540eaad913f58b1605949/close</failure>
+    </testcase>
+    <testcase name="PUT /api/admin/interview-policies/{college_id}/{course_id}" time="0.546283">
+      <failure type="failure">1. Test Case ID: fq1LXj
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"store_transcript": null, "store_audio": 0, "retention_days": 1, "daily_cap": 1, "attempt_cap": 1, "time_limit_seconds": 60}' http://localhost:3300/api/admin/interview-policies/7cf68f71a6e347f886bdc8b1f62dfa74/0</failure>
+      <failure type="failure">1. Test Case ID: fFNPkK
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/interview-policies/e3acde73c84c4d7983eb32a5462da542/3d500502360f4f91a2a0b49ea004322d</failure>
+    </testcase>
+    <testcase name="GET /api/admin/imports/{run_id}/errors.csv" time="0.220254">
+      <failure type="failure">1. Test Case ID: XeElTO
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Import not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/imports/0/errors.csv</failure>
+      <failure type="failure">1. Test Case ID: rydtrU
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/imports/0/errors.csv</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/departments/{department_id}" time="0.296072">
+      <failure type="failure">1. Test Case ID: FiM55f
+
+- Response violates schema
+
+    "status must be one of ['ACTIVE', 'ARCHIVED']." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "status must be one of ['ACTIVE', 'ARCHIVED']."
+
+[422] Unprocessable Content:
+
+    `{"detail":"status must be one of ['ACTIVE', 'ARCHIVED']."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0", "head": null, "status": ""}' http://localhost:3300/api/admin/departments/3f6e25be5e7f48d4b931004d49a912ac
+
+2. Test Case ID: 15FOun
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"This college already has a department with code 0."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0", "head": null}' http://localhost:3300/api/admin/departments/3f6e25be5e7f48d4b931004d49a912ac</failure>
+      <failure type="failure">1. Test Case ID: Fm69Cd
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/departments/3f6e25be5e7f48d4b931004d49a912ac
+
+2. Test Case ID: OYNF3S
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�C`g�� (�' http://localhost:3300/api/admin/departments/080bd788e8ce4aeb8d78964d40a654df</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/interview-questions/tracks/{track_id}" time="0.899842">
+      <failure type="failure">1. Test Case ID: PGb7KX
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Specialization not found."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"label": "00", "persona": "000", "frameworks": [], "sample_question": "000000000000", "nova_voice": "", "syllabus": [], "college_id": "e37ada1e22584a868b88340ef147de52", "course_id": null, "specialization_id": "", "enabled": null, "position": null}' http://localhost:3300/api/admin/interview-questions/tracks/c4b3a0a998174bbf8f904e1277567364
+
+2. Test Case ID: s6WwEX
+
+- Response violates schema
+
+    "'000000000000000000000000000000000000000' is not a voice Amazon Nova 2 Sonic accepts, and an unknown voice ends the stream during the handshake — an interview that never starts. Leave it empty for the configured default, or use one of: ambre, amy, arjun, beatrice, carlos, carolina, florian, kiara, lennart, leo, lorenzo, lupe, matthew, olivia, tiffany, tina" is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "'000000000000000000000000000000000000000' is not a voice Amazon Nova 2 Sonic...
+
+[422] Unprocessable Content:
+
+    `{"detail":"'000000000000000000000000000000000000000' is not a voice Amazon Nova 2 Sonic accepts, and an unknown voice ends the stream during the handshake — an interview that never starts. Leave it empty for the configured default, or use one of: ambre, amy, arjun, beatrice, carlos, carolina, florian, kiara, lennart, leo, lorenzo, lupe, matthew, olivia, tiffany, tina"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"label": "00", "persona": "000", "frameworks": [], "sample_question": "000000000000", "nova_voice": "000000000000000000000000000000000000000", "syllabus": [], "college_id": "e37ada1e22584a868b88340ef147de52", "course_id": null, "specialization_id": null, "enabled": null, "position": null}' http://localhost:3300/api/admin/interview-questions/tracks/c4b3a0a998174bbf8f904e1277567364</failure>
+      <failure type="failure">1. Test Case ID: 2ftrAR
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"college_id": "e3acde73c84c4d7983eb32a5462da542"}' http://localhost:3300/api/admin/interview-questions/tracks/c4b3a0a998174bbf8f904e1277567364</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/leave-calendar/{college_id}/{day_id}" time="0.134529">
+      <failure type="failure">1. Test Case ID: HOLmcy
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/leave-calendar/e3acde73c84c4d7983eb32a5462da542/0</failure>
+    </testcase>
+    <testcase name="POST /api/admin/departments/{department_id}/academic-courses" time="0.354648">
+      <failure type="failure">1. Test Case ID: 9vIs3T
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 201, 422
+
+[409] Conflict:
+
+    `{"detail":"This department already has a course with code 0000000000000000000000000000000."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0000000000000000000000000000000", "name": "00", "duration_months": 119}' http://localhost:3300/api/admin/departments/080bd788e8ce4aeb8d78964d40a654df/academic-courses</failure>
+      <failure type="failure">1. Test Case ID: WHJBii
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "22MBA12", "name": "00"}' http://localhost:3300/api/admin/departments/3f6e25be5e7f48d4b931004d49a912ac/academic-courses</failure>
+    </testcase>
+    <testcase name="POST /api/admin/departments/{department_id}/cohorts" time="0.446064">
+      <failure type="failure">1. Test Case ID: NBuC0u
+
+- Response violates schema
+
+    "Expected completion must be after the entry date." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Expected completion must be after the entry date."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Expected completion must be after the entry date."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0", "batch_label": "0", "degree_level": "UG", "entry_date": "2000-01-01", "expected_completion": 0, "course_id": null, "specialization_id": null}' http://localhost:3300/api/admin/departments/968910c334574026946d9b93c6dafda8/cohorts</failure>
+      <failure type="failure">1. Test Case ID: cUrPck
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"batch_label": "2024-26", "code": "MGR-BUSINESS-COMMUNICATION", "degree_level": "PG", "entry_date": "2026-07-07", "expected_completion": "2026-07-07", "name": "Business Communication"}' http://localhost:3300/api/admin/departments/080bd788e8ce4aeb8d78964d40a654df/cohorts
+
+2. Test Case ID: xyPpFx
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�n�\x0b\x16' http://localhost:3300/api/admin/departments/3f6e25be5e7f48d4b931004d49a912ac/cohorts</failure>
+    </testcase>
+    <testcase name="POST /api/admin/faculty" time="0.286506">
+      <failure type="failure">1. Test Case ID: jXuwdp
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"department_id": "3f6e25be5e7f48d4b931004d49a912ac", "email": "mentor@bgscet.ac.in", "name": "Business Communication"}' http://localhost:3300/api/admin/faculty</failure>
+    </testcase>
+    <testcase name="POST /api/admin/leave-balances/bulk" time="0.423572">
+      <failure type="failure">1. Test Case ID: 0uOPKf
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"academic_year": "null", "department_id": "080bd788e8ce4aeb8d78964d40a654df", "entitled_days": 0, "kind": "CASUAL"}' http://localhost:3300/api/admin/leave-balances/bulk</failure>
+    </testcase>
+    <testcase name="POST /api/admin/students/bulk" time="0.255155">
+      <failure type="failure">1. Test Case ID: OBlqyF
+
+- Response violates schema
+
+    "department needs department_id, the department to file them under." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "department needs department_id, the department to file them under."
+
+[422] Unprocessable Content:
+
+    `{"detail":"department needs department_id, the department to file them under."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"student_ids": [""], "action": "department", "department_id": null}' http://localhost:3300/api/admin/students/bulk
+
+2. Test Case ID: a7s8nc
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"1 of those students no longer exist."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"student_ids": ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""], "action": "department", "department_id": "3f6e25be5e7f48d4b931004d49a912ac"}' http://localhost:3300/api/admin/students/bulk</failure>
+      <failure type="failure">1. Test Case ID: mA8Jbb
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"action": "department", "student_ids": [""], "department_id": "3f6e25be5e7f48d4b931004d49a912ac"}' http://localhost:3300/api/admin/students/bulk</failure>
+    </testcase>
+    <testcase name="GET /api/admin/departments/{department_id}/academic-courses" time="0.099469">
+      <failure type="failure">1. Test Case ID: QiSwqq
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/departments/080bd788e8ce4aeb8d78964d40a654df/academic-courses</failure>
+    </testcase>
+    <testcase name="GET /api/admin/departments/{department_id}/cohorts" time="0.093168">
+      <failure type="failure">1. Test Case ID: 7EyaBu
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/departments/3f6e25be5e7f48d4b931004d49a912ac/cohorts</failure>
+    </testcase>
+    <testcase name="GET /api/admin/mentor-load" time="0.662533">
+      <failure type="failure">1. Test Case ID: qpIzhc
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/mentor-load?college_id=e3acde73c84c4d7983eb32a5462da542&amp;department_id=3f6e25be5e7f48d4b931004d49a912ac&amp;cohort_id=b8f4fa1952f94c6aba326bfb7f73cbe8'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/unassigned-students" time="0.445089">
+      <failure type="failure">1. Test Case ID: RKyruu
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/unassigned-students?college_id=e3acde73c84c4d7983eb32a5462da542&amp;department_id=3f6e25be5e7f48d4b931004d49a912ac&amp;cohort_id=b8f4fa1952f94c6aba326bfb7f73cbe8'</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/cohorts/{cohort_id}" time="0.411241">
+      <failure type="failure">1. Test Case ID: Nbdod5
+
+- Response violates schema
+
+    "Expected completion must be after the entry date." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "Expected completion must be after the entry date."
+
+[422] Unprocessable Content:
+
+    `{"detail":"Expected completion must be after the entry date."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"name": "0", "batch_label": "0", "entry_date": "2000-01-01", "expected_completion": 0, "department_id": "080bd788e8ce4aeb8d78964d40a654df", "course_id": null, "specialization_id": null}' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8</failure>
+      <failure type="failure">1. Test Case ID: Cd1wFF
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"department_id": "3f6e25be5e7f48d4b931004d49a912ac"}' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8
+
+2. Test Case ID: a2WYUF
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '��' http://localhost:3300/api/admin/cohorts/b8f4fa1952f94c6aba326bfb7f73cbe8</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/interview-questions/tracks/{track_id}" time="0.101560">
+      <failure type="failure">1. Test Case ID: Od79ZY
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interview-questions/tracks/c4b3a0a998174bbf8f904e1277567364</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/jobs/{job_id}" time="0.110934">
+      <failure type="failure">1. Test Case ID: IAaaUQ
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 204, 422
+
+[409] Conflict:
+
+    `{"detail":"1 student has applied to this posting, so it cannot be removed — the applications are part of their records."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/jobs/9fe7c98b59a54bcd82a8f3f3e3ff9548</failure>
+      <failure type="failure">1. Test Case ID: WDvcAL
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/jobs/f2160db8593540eaad913f58b1605949</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/academic-courses/{course_id}" time="0.309226">
+      <failure type="failure">1. Test Case ID: 6maeQl
+
+- Response violates schema
+
+    "status must be one of ['ACTIVE', 'ARCHIVED']." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "status must be one of ['ACTIVE', 'ARCHIVED']."
+
+[422] Unprocessable Content:
+
+    `{"detail":"status must be one of ['ACTIVE', 'ARCHIVED']."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0", "duration_months": 1, "status": ""}' http://localhost:3300/api/admin/academic-courses/8cce141ba8e84c3385dd7cfc5877c550
+
+2. Test Case ID: W18BHJ
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"This department already has a course with code 0."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0", "duration_months": 1}' http://localhost:3300/api/admin/academic-courses/8cce141ba8e84c3385dd7cfc5877c550</failure>
+      <failure type="failure">1. Test Case ID: AU2mZW
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/academic-courses/8cce141ba8e84c3385dd7cfc5877c550
+
+2. Test Case ID: PjRkVF
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�;����' http://localhost:3300/api/admin/academic-courses/eb4bdb24209c4fcfb6b16606ed250cae</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/faculty/{user_id}" time="0.383128">
+      <failure type="failure">1. Test Case ID: uBhRDV
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Faculty member not found."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"name": null, "email": null, "designation": null, "department": null, "department_id": "968910c334574026946d9b93c6dafda8", "allow_external": false, "external_reason": {}}' http://localhost:3300/api/admin/faculty/0</failure>
+      <failure type="failure">1. Test Case ID: kWdTDC
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"department_id": "3f6e25be5e7f48d4b931004d49a912ac"}' http://localhost:3300/api/admin/faculty/110000ea0bd447248396e55134518f52</failure>
+    </testcase>
+    <testcase name="POST /api/admin/academic-courses/{course_id}/academic-specializations" time="0.325961">
+      <failure type="failure">1. Test Case ID: dOTkDL
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 201, 422
+
+[409] Conflict:
+
+    `{"detail":"This course already has a specialization with code 00000000000000000000000000000000."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "00000000000000000000000000000000", "name": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"}' http://localhost:3300/api/admin/academic-courses/3d500502360f4f91a2a0b49ea004322d/academic-specializations</failure>
+      <failure type="failure">1. Test Case ID: JAsEUy
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0000000000000000000000000000000", "name": "00"}' http://localhost:3300/api/admin/academic-courses/8cce141ba8e84c3385dd7cfc5877c550/academic-specializations
+
+2. Test Case ID: YpepVU
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�|�' http://localhost:3300/api/admin/academic-courses/b301fa795dcd4dbd900af07a1bb2417d/academic-specializations</failure>
+    </testcase>
+    <testcase name="GET /api/admin/academic-courses/{course_id}/academic-specializations" time="0.090078">
+      <failure type="failure">1. Test Case ID: T3sYsK
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/academic-courses/3d500502360f4f91a2a0b49ea004322d/academic-specializations</failure>
+    </testcase>
+    <testcase name="GET /api/admin/approved-certifications" time="0.120339">
+      <failure type="failure">1. Test Case ID: WQBFYV
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/approved-certifications?course_id=null&amp;course_id=null'</failure>
+      <failure type="failure">1. Test Case ID: QjtMLi
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/approved-certifications?course_id=8cce141ba8e84c3385dd7cfc5877c550'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/catalogue/badges" time="0.097504">
+      <failure type="failure">1. Test Case ID: JmGps0
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/catalogue/badges?course_id=8cce141ba8e84c3385dd7cfc5877c550'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/catalogue/stage-rules" time="0.135128">
+      <failure type="failure">1. Test Case ID: 04aFlt
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/catalogue/stage-rules?course_id=null&amp;course_id=null'</failure>
+      <failure type="failure">1. Test Case ID: qiyy9g
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/catalogue/stage-rules?course_id=8cce141ba8e84c3385dd7cfc5877c550'</failure>
+    </testcase>
+    <testcase name="PUT /api/admin/catalogue/stage-rules" time="0.197635">
+      <failure type="failure">1. Test Case ID: u5giFT
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"course_id": "", "semester": 19, "stage": ""}' http://localhost:3300/api/admin/catalogue/stage-rules</failure>
+      <failure type="failure">1. Test Case ID: p5udjS
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"course_id": "3d500502360f4f91a2a0b49ea004322d", "semester": 1, "stage": "EXCEL"}' http://localhost:3300/api/admin/catalogue/stage-rules
+
+2. Test Case ID: wfgCyA
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'!j:\x0bt�' http://localhost:3300/api/admin/catalogue/stage-rules</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/academic-specializations/{specialization_id}" time="0.323552">
+      <failure type="failure">1. Test Case ID: ZvlVZN
+
+- Response violates schema
+
+    "status must be one of ['ACTIVE', 'ARCHIVED']." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "status must be one of ['ACTIVE', 'ARCHIVED']."
+
+[422] Unprocessable Content:
+
+    `{"detail":"status must be one of ['ACTIVE', 'ARCHIVED']."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0", "status": ""}' http://localhost:3300/api/admin/academic-specializations/e55f705953464ae6979d40beeaeb0b88
+
+2. Test Case ID: 9FDLhV
+
+- Undocumented HTTP status code
+
+    Received: 409
+    Documented: 200, 422
+
+[409] Conflict:
+
+    `{"detail":"This course already has a specialization with code 0."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "0", "name": "0"}' http://localhost:3300/api/admin/academic-specializations/e55f705953464ae6979d40beeaeb0b88</failure>
+      <failure type="failure">1. Test Case ID: ebnHW6
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/academic-specializations/e55f705953464ae6979d40beeaeb0b88
+
+2. Test Case ID: NEeNGK
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�k;�\x1c' http://localhost:3300/api/admin/academic-specializations/628ffb9c8f864619b09fa7ea3db376fb</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/approved-certifications/{cert_id}" time="0.556518">
+      <failure type="failure">1. Test Case ID: I2CCbc
+
+- Response violates schema
+
+    "No such badge." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "No such badge."
+
+[422] Unprocessable Content:
+
+    `{"detail":"No such badge."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"name": "0", "provider": "0", "badge_code": "", "evidence_type": "EXTERNAL_VERIFIED", "stage": "EXCEL", "duration_text": "", "is_free": true, "url": "", "active": 0, "college_id": "f8bf03e7e8de4e7f982af028014f2dd6", "course_id": null}' http://localhost:3300/api/admin/approved-certifications/2d50eb7b244744489d88ceebb9e4c744</failure>
+      <failure type="failure">1. Test Case ID: 7bIs7A
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"badge_code": "TECH-EXCEL-FOUNDATION", "name": "Business Communication", "provider": "Coursera", "college_id": "e3acde73c84c4d7983eb32a5462da542"}' http://localhost:3300/api/admin/approved-certifications/2d50eb7b244744489d88ceebb9e4c744</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/catalogue/stage-rules/{rule_id}" time="0.332913">
+      <failure type="failure">1. Test Case ID: tGeKD5
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 204, 422
+
+[404] Not Found:
+
+    `{"detail":"Stage rule not found."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/catalogue/stage-rules/0</failure>
+      <failure type="failure">1. Test Case ID: o9RPgb
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/catalogue/stage-rules/0</failure>
+    </testcase>
+    <testcase name="POST /api/admin/governance/grants" time="0.325579">
+      <failure type="failure">1. Test Case ID: NSgpdV
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"capability": "READING", "reason": "handover"}' http://localhost:3300/api/admin/governance/grants
+
+2. Test Case ID: 62UySW
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 201, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�+4�' http://localhost:3300/api/admin/governance/grants</failure>
+    </testcase>
+    <testcase name="POST /api/admin/governance/grants/{grant_id}/approve" time="0.174603">
+      <failure type="failure">1. Test Case ID: 2D4rE3
+
+- Response violates schema
+
+    "A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "A reason of at least 20 characters is required. It is written onto the audit...
+
+[422] Unprocessable Content:
+
+    `{"detail":"A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover"}' http://localhost:3300/api/admin/governance/grants/37d7d788e66f4a1b850ec3c804acd435/approve</failure>
+      <failure type="failure">1. Test Case ID: DB3SFx
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover"}' http://localhost:3300/api/admin/governance/grants/37d7d788e66f4a1b850ec3c804acd435/approve</failure>
+    </testcase>
+    <testcase name="POST /api/admin/governance/grants/{grant_id}/extend" time="0.259654">
+      <failure type="failure">1. Test Case ID: A5N2FE
+
+- Response violates schema
+
+    "A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "A reason of at least 20 characters is required. It is written onto the audit...
+
+[422] Unprocessable Content:
+
+    `{"detail":"A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover", "expires_at": "2000-01-01T00:00:00Z", "review_at": 0}' http://localhost:3300/api/admin/governance/grants/37d7d788e66f4a1b850ec3c804acd435/extend</failure>
+      <failure type="failure">1. Test Case ID: OM0Asr
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover"}' http://localhost:3300/api/admin/governance/grants/37d7d788e66f4a1b850ec3c804acd435/extend</failure>
+    </testcase>
+    <testcase name="POST /api/admin/governance/grants/{grant_id}/revoke" time="0.179071">
+      <failure type="failure">1. Test Case ID: HnUlLX
+
+- Response violates schema
+
+    "A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "A reason of at least 20 characters is required. It is written onto the audit...
+
+[422] Unprocessable Content:
+
+    `{"detail":"A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover"}' http://localhost:3300/api/admin/governance/grants/37d7d788e66f4a1b850ec3c804acd435/revoke</failure>
+      <failure type="failure">1. Test Case ID: 4FyfX0
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover"}' http://localhost:3300/api/admin/governance/grants/37d7d788e66f4a1b850ec3c804acd435/revoke</failure>
+    </testcase>
+    <testcase name="POST /api/admin/governance/groups/{group_id}/members" time="0.225629">
+      <failure type="failure">1. Test Case ID: L19WC0
+
+- Response violates schema
+
+    "A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "A reason of at least 20 characters is required. It is written onto the audit...
+
+[422] Unprocessable Content:
+
+    `{"detail":"A reason of at least 20 characters is required. It is written onto the audit trail and read by whoever reviews this grant later."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"user_ids": [""], "reason": ""}' http://localhost:3300/api/admin/governance/groups/b4de64f62937453e8d61c54796da2443/members</failure>
+      <failure type="failure">1. Test Case ID: 8Gk4yl
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover", "user_ids": []}' http://localhost:3300/api/admin/governance/groups/b4de64f62937453e8d61c54796da2443/members
+
+2. Test Case ID: TKVC0F
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '\�^"(' http://localhost:3300/api/admin/governance/groups/f00dcf282fb84bf3b6b24d1880ada0ed/members</failure>
+    </testcase>
+    <testcase name="POST /api/admin/students/{student_id}/delete" time="0.262676">
+      <failure type="failure">1. Test Case ID: ga6RiZ
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "000000", "reason": [null, null]}' http://localhost:3300/api/admin/students/0/delete</failure>
+      <failure type="failure">1. Test Case ID: 9hZYoT
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"code": "000000", "reason": "handover"}' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/delete</failure>
+    </testcase>
+    <testcase name="POST /api/admin/students/{student_id}/interview-cap/reset" time="0.221165">
+      <failure type="failure">1. Test Case ID: IdT2ef
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 201, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"}' http://localhost:3300/api/admin/students/0/interview-cap/reset</failure>
+      <failure type="failure">1. Test Case ID: T5djgM
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover"}' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/interview-cap/reset</failure>
+    </testcase>
+    <testcase name="POST /api/admin/students/{student_id}/mentor" time="0.266581">
+      <failure type="failure">1. Test Case ID: iK8aIL
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 204, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"mentor_id": null, "mentor_user_id": null, "reason": [null, null]}' http://localhost:3300/api/admin/students/0/mentor</failure>
+      <failure type="failure">1. Test Case ID: Mep4PR
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover"}' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/mentor</failure>
+    </testcase>
+    <testcase name="POST /api/admin/students/{student_id}/remove" time="0.196203">
+      <failure type="failure">1. Test Case ID: 6VABCd
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": [null, null]}' http://localhost:3300/api/admin/students/0/remove</failure>
+      <failure type="failure">1. Test Case ID: GcDlBu
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"reason": "handover"}' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/remove</failure>
+    </testcase>
+    <testcase name="POST /api/admin/students/{student_id}/restore" time="0.235409">
+      <failure type="failure">1. Test Case ID: BYAaxz
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/restore</failure>
+      <failure type="failure">1. Test Case ID: IvoQXQ
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/restore</failure>
+    </testcase>
+    <testcase name="POST /api/admin/swoc/{student_id}" time="0.460138">
+      <failure type="failure">1. Test Case ID: lsFeTJ
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"kind": "badges", "text": "Strong analytical and quantitative skills."}' http://localhost:3300/api/admin/swoc/0b46db75058b4b9b861dcc555c747120</failure>
+    </testcase>
+    <testcase name="PUT /api/admin/leave-balances" time="0.346013">
+      <failure type="failure">1. Test Case ID: q1Lcir
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"user_id": "", "kind": "CASUAL", "academic_year": "0000", "entitled_days": 0, "consumed_days": false}' http://localhost:3300/api/admin/leave-balances</failure>
+      <failure type="failure">1. Test Case ID: ZxDgi3
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"academic_year": "null", "entitled_days": 0, "kind": "CASUAL", "user_id": "110000ea0bd447248396e55134518f52"}' http://localhost:3300/api/admin/leave-balances
+
+2. Test Case ID: xff1Hk
+
+- Undocumented HTTP status code
+
+    Received: 400
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '�+4�' http://localhost:3300/api/admin/leave-balances</failure>
+    </testcase>
+    <testcase name="PUT /api/admin/students/{student_id}/cohort" time="0.221347">
+      <failure type="failure">1. Test Case ID: wenode
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 204, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"cohort_id": ""}' http://localhost:3300/api/admin/students/0/cohort</failure>
+      <failure type="failure">1. Test Case ID: LrSiMg
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/cohort</failure>
+    </testcase>
+    <testcase name="GET /api/admin/leave-balances" time="0.508241">
+      <failure type="failure">1. Test Case ID: ZLQXye
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/leave-balances?department_id=3f6e25be5e7f48d4b931004d49a912ac'</failure>
+    </testcase>
+    <testcase name="GET /api/admin/students/{student_id}/360" time="0.222586">
+      <failure type="failure">1. Test Case ID: 9edLwi
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/360</failure>
+      <failure type="failure">1. Test Case ID: 4S8N1L
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/360</failure>
+    </testcase>
+    <testcase name="GET /api/admin/students/{student_id}/delete-plan" time="0.193108">
+      <failure type="failure">1. Test Case ID: lZO0i3
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/delete-plan</failure>
+      <failure type="failure">1. Test Case ID: eurd3a
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/delete-plan</failure>
+    </testcase>
+    <testcase name="GET /api/admin/students/{student_id}/mentor-history" time="0.185941">
+      <failure type="failure">1. Test Case ID: f6PTvE
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/mentor-history</failure>
+      <failure type="failure">1. Test Case ID: p3ud0h
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/mentor-history</failure>
+    </testcase>
+    <testcase name="GET /api/admin/students/{student_id}/resume.pdf" time="0.180172">
+      <failure type="failure">1. Test Case ID: eErtyW
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/resume.pdf</failure>
+      <failure type="failure">1. Test Case ID: LOT8XG
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/resume.pdf</failure>
+    </testcase>
+    <testcase name="GET /api/admin/students/{student_id}/weekly" time="0.233922">
+      <failure type="failure">1. Test Case ID: YZSJ7t
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/weekly</failure>
+      <failure type="failure">1. Test Case ID: 0NBPqD
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120/weekly</failure>
+    </testcase>
+    <testcase name="GET /api/admin/swoc/{student_id}/history" time="0.367299">
+      <failure type="failure">1. Test Case ID: 21HEp3
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"No such student."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/swoc/0/history</failure>
+      <failure type="failure">1. Test Case ID: HiTsFm
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/swoc/0b46db75058b4b9b861dcc555c747120/history</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/students/{student_id}" time="0.418775">
+      <failure type="failure">1. Test Case ID: VFMGIp
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"name": null, "email": null, "usn": null, "cohort_id": null, "department_id": "fb95ede0b198489e979b485524c85f01", "mentor_user_id": null, "current_stage": null, "current_semester": 1, "second_specialization_id": ""}' http://localhost:3300/api/admin/students/0</failure>
+      <failure type="failure">1. Test Case ID: prONKa
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"department_id": "3f6e25be5e7f48d4b931004d49a912ac"}' http://localhost:3300/api/admin/students/0b46db75058b4b9b861dcc555c747120</failure>
+    </testcase>
+    <testcase name="PATCH /api/admin/swoc/entries/{entry_id}" time="0.510723">
+      <failure type="failure">1. Test Case ID: jcGn7P
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 200, 422
+
+[500] Internal Server Error:
+
+    `Internal Server Error`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"linked_skill_id": null, "linked_session_id": null, "linked_job_id": "", "text": null, "weight": 1}' http://localhost:3300/api/admin/swoc/entries/6670c598adb14d169809fb2880587961</failure>
+      <failure type="failure">1. Test Case ID: MTSMcs
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://localhost:3300/api/admin/swoc/entries/6670c598adb14d169809fb2880587961</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/governance/groups/{group_id}/members/{user_id}" time="0.143182">
+      <failure type="failure">1. Test Case ID: lbZTJk
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/groups/b4de64f62937453e8d61c54796da2443/members/b4de64f62937453e8d61c54796da2443</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/leave-balances/{balance_id}" time="0.237705">
+      <failure type="failure">1. Test Case ID: 5eHeJa
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 204, 422
+
+[404] Not Found:
+
+    `{"detail":"Balance not found."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/leave-balances/0</failure>
+      <failure type="failure">1. Test Case ID: cRIIgG
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/leave-balances/0</failure>
+    </testcase>
+    <testcase name="DELETE /api/admin/swoc/entries/{entry_id}" time="0.108431">
+      <failure type="failure">1. Test Case ID: Nhi276
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 204, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/swoc/entries/6670c598adb14d169809fb2880587961</failure>
+    </testcase>
+    <testcase name="Stateful tests" time="2.945939">
+      <failure type="failure">1. Test Case ID: Nv5kJ6
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"": [true], "\u00fd\u000f": {"\u001b\u00b4\u00e4\u00c7\u00d6T\ud883\udce0\u00bf\u00a2st\u0098": {}, "": -2.236456781363163e+16, "\u0097\u00db": [[6.707960806592355e+16, "\u0017\u00a0\u00acyj\u00bf\u008c\u00cab\u00c77t\ud80a\ude21\udb1c\uddb5o", -7.06190675364903e+16]]}, "\u0094\u00fdo\u001b^": {"\ud987\udcf5\udaa8\udf74\u00b9\u00f6\u00b7\u00d3L\u00de": -4.726749863537651e-206, "\u00efy": 33735, "\u0019\u000fM\u00ea": 538174}, "\ud839\udfd2\u00f6\u00bb\u008a": [-1.1589578170880653e-108], "\u00e9i\udaac\udf75#\udbe2\udf16\"": [106, {"?\u0091\u7d8f\u0093=\ud8f2\udf40\u81b2\udb97\udc7c\ud876\udd21\ud94c\udcdc": null, "\u00bb\u00a5\u0000F\u00c4\u00ba\u001b\u00b3\u00d2\u0089\u00ff\u00e7\ud95d\ude66?~\u008e": 9.614714739328185e+227, "\ud8eb\udfc3": "\u001d\u00c0'"'"'\udb01\udea9\u00e9|\ud827\ude9e"}, 3.839170097882143e+16], "track": "F7\u00af\u0089\uda32\udc16\ud93c\udefb", "phase": "probing", "text": "y\uda0d\ude25\u009c\u00c3.\u008a\u00a1\ub02a8\u00ac."}' http://localhost:3300/api/admin/interview-questions</failure>
+      <failure type="failure">1. Test Case ID: K2S3cN
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"\u009cW\u00ee": [669134624639170417524736, 1.2313694521370334e+110, 3.846422862651492e-161], "b\u00d3\udb85\uddc7u\u00b6\u00c8\ud87f\udda8\ud80a\udf02": {}, "lines": "=\u00d6", "track": "\u001e\uda73\udeb9\u0014\u00d7)"}' http://localhost:3300/api/admin/interview-questions/bulk</failure>
+      <failure type="failure">1. Test Case ID: tzX7nI
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"track": "\u0004", "ids": ["6\u008e5\u00c8R", "K\u00a9\udb2d\udf38\u009e", "", "I\u0084\u0011$\u00a2q", "k\u00e6\u00c6\ud9e1\ude28"]}' http://localhost:3300/api/admin/interview-questions/reorder</failure>
+      <failure type="failure">1. Test Case ID: tL68IU
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"\u001f$\u00f8": {}, "": -1824764443, "\udbdb\udda0\u00bcq\u00fe\u007f\u0086\u0085\u00c0": {"\u00d1\u0004\u00cc\u00c7\u000f\u0012m\ue40a\ud83a\udc7dif\u008f\u0088t": -53170, "\u00b6": null, "+\ud851\udd29p&gt;#\ud8bf\udd5c\ud853\udc9d": null}, "\u0098z\ud854\uded2\n.\u00fae\u52dc5\udafb\udf7f": [false, ["\ud851\udcbd\udb9b\udce3\u0087\ud9bc\udf19\u001d\u00cd", -160921, true], {}], "\u00eb\u00d1e\u00cbg\u00fav": {"\u00acW\u00f2\u0006": []}, "email_domains": null, "code": "ba", "name": "00"}' http://localhost:3300/api/admin/colleges</failure>
+      <failure type="failure">1. Test Case ID: Dm7lVa
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 201, 422
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d '{"name": "Default"}' http://localhost:3300/api/admin/governance/groups</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

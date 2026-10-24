@@ -1,0 +1,210 @@
+/* Colleges — this screen's layout only. Every visual token, card, chip, notice,
+   button, field and segmented control is the global design system in
+   apps/web/src/styles/reep-v2.scss; nothing global is redefined here. */
+
+:host {
+  display: block;
+}
+
+.retry {
+  margin-left: 8px;
+}
+
+/* --- the Add-college card --------------------------------------------------
+   Full width above the grid, in the setup screen's row-of-fields shape, rather
+   than a 380px panel beside a table. */
+.add-card {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.field-row .field {
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.field-row .field.narrow {
+  flex: 0 1 140px;
+}
+
+.field-row .field.wide {
+  flex: 2 1 320px;
+}
+
+.required-mark {
+  color: var(--risk);
+}
+
+/* A line of fact under a control, not a help paragraph: where the admin is
+   appointed when this session cannot do it here. */
+.help.plain {
+  padding: 8px 0 0;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+.note-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 12.8px;
+  color: var(--good);
+}
+
+.note-line .icon {
+  font-size: 16px;
+}
+
+/* --- filters --------------------------------------------------------------- */
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.filter-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- one card per college -------------------------------------------------- */
+.college-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.college-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.college-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.college-id {
+  min-width: 0;
+}
+
+.college-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.college-meta {
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.college-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+}
+
+.college-facts dt {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+}
+
+.college-facts dd {
+  margin: 3px 0 0;
+  font-size: 12.8px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.cell-empty {
+  color: var(--faint);
+}
+
+/* One college admin: the name, and a chip saying how much of the eleven is
+   actually live. Text AND colour — the chip never carries the state alone. */
+.admin-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.admin-cell + .admin-cell {
+  margin-top: 4px;
+}
+
+.admin-name {
+  font-weight: 600;
+}
+
+.college-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+.college-empty {
+  grid-column: 1 / -1;
+}
+
+/* --- appointing a college admin, on the card ------------------------------ */
+.appoint-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--tint-1);
+  border: 1px solid var(--hairline);
+}
+
+.appoint-form .footbar {
+  margin-top: 0;
+  padding-top: 10px;
+}
+
+.admin-fact {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* The destructive action sits last on the card and reads in the risk colour,
+   text and colour together. */
+.college-delete {
+  color: var(--risk);
+  margin-left: auto;
+}

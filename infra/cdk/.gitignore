@@ -1,0 +1,5 @@
+cdk.out/
+.venv/
+__pycache__/
+# terraform show -json output holds SECRET VALUES; never commit it
+tf-state.json

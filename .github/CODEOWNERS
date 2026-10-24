@@ -1,0 +1,159 @@
+# CODEOWNERS — routing and labelling for the files where a wrong line has a
+# different consequence from every other file in this repository.
+#
+# WHAT THIS FILE ENFORCES, AND SINCE WHEN (2026-10-15).
+#
+# 1. THE CATCH-ALL DECIDES WHO IS ASKED. `.github/rulesets/lead-review.json`
+#    turns on "require review from Code Owners" for main, stage and dev, and
+#    every path here names `@darshani8`, the repository owner and lead. So every
+#    pull request a collaborator opens asks the owner for an approval, and a
+#    push after that approval asks again. The same ruleset lets only the
+#    repository admin merge at all, so the approval is the second line, not
+#    the first. The owner's own pull requests (and the ones Claude opens in the
+#    owner's sessions, which are authored by the same account) cannot be
+#    approved by their author; the admin merges them through the ruleset's
+#    pull-request-only bypass. Do NOT add a collaborator as an owner of any
+#    path: their approval would satisfy that second line for everyone else.
+#
+# 2. IT STILL DOES NOT SEPARATE THE SHARP PATHS IN THE REVIEW UI. One owner
+#    holds every file, so a one-character edit to `student_data_egress_allowed`
+#    asks the same person as a typo fix in a comment. The paths below are an
+#    INVENTORY for the human reading this file, with the consequence written
+#    beside each one; if you cannot write that paragraph, the path does not
+#    belong here.
+#
+# A PR that edits this file is itself owned by `@darshani8` (last section), and
+# GitHub reads CODEOWNERS from the BASE branch, so a pull request cannot approve
+# its own change to who approves.
+#
+# GitHub semantics that matter when editing this file: the LAST matching pattern
+# wins, not the most specific. Keep the catch-all first and the sharp paths last.
+
+# ---------------------------------------------------------------------------
+# Everything.
+# ---------------------------------------------------------------------------
+*                                       @darshani8
+
+# ---------------------------------------------------------------------------
+# Rule 1 — student data must not leave the machine unbidden.
+# ---------------------------------------------------------------------------
+
+# The gate itself. `student_data_egress_allowed()` at llm.py:117 is the single
+# boolean between a resume brief — name, USN, marks, attendance — and a free-tier
+# model that trains on submissions. `carries_student_data` defaults to False at
+# :207 and :256, so this file is also where "forgot the keyword" becomes silent.
+apps/api-py/app/ai/llm.py               @darshani8
+
+# The callers that compose prompts. A change here can start carrying student
+# records on a path that already passes carries_student_data=False.
+apps/api-py/app/ai/orchestrator.py      @darshani8
+apps/api-py/app/ai/agents.py            @darshani8
+
+# ---------------------------------------------------------------------------
+# Rule 2 — staff scope is decided by role, not by a missing field.
+# ---------------------------------------------------------------------------
+
+# `_assert_can_access_student` (mentor.py:72) plus `require_mentor` (:31) and
+# `require_director` (:248). Deleting the `if not mentor_id` branch turns "a
+# MENTOR with no Mentor group sees NOBODY" into "sees the whole programme", and
+# the diff is three lines that look like dead-code removal.
+apps/api-py/app/routers/mentor.py       @darshani8
+
+# Rule 2's BODY: `assert_student_scope` at policies.py:73. It was once a second,
+# independent implementation beside mentor.py's `_assert_can_access_student`;
+# that name is now a pure delegate to this one, and tests/test_codebase_guards.py
+# pins it as a delegate — so a change to rule 2 is a change here, and only here.
+apps/api-py/app/policies.py             @darshani8
+
+# ---------------------------------------------------------------------------
+# The guards that decide what production refuses.
+# ---------------------------------------------------------------------------
+
+# `production_boot_failures()` (:1093) is why an ENV=prod host on the repo's
+# published AUTH_SECRET never binds a port — that secret signs the reep_session
+# cookie, so the alternative is one forged {"role":"DIRECTOR"} cookie away from
+# every student's record, with no login and no database row involved.
+# `password_login_allowed` (:1016) is an ALLOWLIST of dev/CI environment names,
+# not `not is_prod`; flipping it to a denylist opens the password door on every
+# ENV nobody anticipated.
+apps/api-py/app/config.py               @darshani8
+
+# Session minting and verification: scrypt hashing, the HS256 signing, and the
+# token-version revocation check. Everything downstream trusts what these return.
+apps/api-py/app/security.py             @darshani8
+
+# The only path that turns a Google identity into a REEP session. It verifies the
+# ID token properly — RS256 against Google's JWKS, aud, iss, expiry,
+# email_verified, single-use state cookie, nonce — and then refuses any verified
+# email with no row in `users`. Nothing self-provisions and no role is guessed;
+# each of those checks is load-bearing on its own.
+apps/api-py/app/google_auth.py          @darshani8
+
+# Where every request and every WebSocket reads the session it is then trusted on.
+apps/api-py/app/identity.py             @darshani8
+
+# The consent gate for the interview relay: no live grant, close 4013 before
+# anything is written; revoked mid-interview, close 4014. Opening fails CLOSED and
+# the mid-interview check fails OPEN, deliberately — inverting either is a
+# one-word edit here.
+apps/api-py/app/routers/interview.py    @darshani8
+
+# ---------------------------------------------------------------------------
+# Schema. Applied to a live database, once, in one direction, under time pressure.
+# ---------------------------------------------------------------------------
+
+# Two revisions generated off the same parent pass their own CI runs and collide
+# on main as "Multiple head revisions". 34 `create_type=False` references across
+# 15 of the 46 revision files depend on strict linear ordering or they raise
+# `type "x" does not exist` at apply time — e4c1b7a9d203 carries ten on its own
+# and b4e8d21f9c57 seven. Re-measure before quoting the number anywhere:
+#     grep -ho 'create_type=False' apps/api-py/migrations/versions/*.py | wc -l
+#     grep -l  'create_type=False' apps/api-py/migrations/versions/*.py | wc -l
+# (Both must exclude __pycache__ — globbing *.py does; `grep -r` on the directory
+# does not, and counts each compiled copy a second time.)
+# And all 46 downgrade bodies are code that has only ever been read.
+apps/api-py/migrations/                 @darshani8
+apps/api-py/app/models/                 @darshani8
+
+# ---------------------------------------------------------------------------
+# The process itself, and the things that hold production credentials.
+# ---------------------------------------------------------------------------
+
+# The FOUR CI jobs live here — "API (FastAPI + Postgres)", "API (dependency
+# completeness)", "Voice worker (dependency completeness)", "Web (Angular)". A
+# workflow edit can remove a gate without removing a line of application code,
+# and the required-check list is configured in a settings pane that no PR
+# reviews — so a job renamed here silently becomes a required check that never
+# reports, and a branch that waits forever for it. Rename a job and re-run
+# tools/ci/protect-main.sh in the same sitting.
+.github/workflows/                      @darshani8
+
+# This file, and the committed ruleset payload. `.github/rulesets/main.json`
+# names the four required checks as strings and sets bypass_actors to [] — a
+# one-line diff there is the difference between a gate and a gate with a door in
+# it, and it will never fail a test. NOTE that the payload is a RECORD: applying
+# it is a separate act by an admin, and as of this line nothing is applied
+# (`gh api repos/darshani8/reep-/rulesets` returns []). Both files describe
+# controls; neither IS the control. A diff that quietly relaxes them should never
+# be routed like documentation.
+.github/rulesets/                       @darshani8
+.github/CODEOWNERS                      @darshani8
+
+# Terraform for the account that holds the production database, the ECR registry
+# the deploy pushes to, and the OIDC trust that lets a workflow assume a role.
+# `allow_remote_student_data` lives in variables.tf — a Terraform default is a
+# rule-1 decision wearing the clothes of a config value.
+infra/aws/                              @darshani8
+
+# check_api_imports.py is CI's only evidence for a claim nothing else makes —
+# that requirements.txt is complete — and protect-main.sh is the script that
+# turns every advisory CI job in this repository into a gate. A change to either
+# is a change to the enforcement layer, not to a tool. tools/fonts/ is the icon
+# subset: a glyph missing from the 144 kB face renders as nothing at all.
+tools/ci/                               @darshani8
+tools/fonts/                            @darshani8
+
+# The house instruction file. It is the only place most of these rules are
+# written down, and it is loaded into every agent session in this repo.
+AGENTS.md                               @darshani8
+CLAUDE.md                               @darshani8

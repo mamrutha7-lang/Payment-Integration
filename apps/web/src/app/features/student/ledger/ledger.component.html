@@ -1,0 +1,329 @@
+<div class="dt-header ledger-head">
+  <div>
+    <p class="eyebrow">
+      Daily log
+      @if (semester(); as sem) {
+        · Semester {{ sem }}
+      }
+    </p>
+    <h1 class="dt-title">Time Allocation Ledger</h1>
+    <p class="dt-sub">
+      Six slots covering a 24-hour day · five activity heads · hours to the nearest half
+    </p>
+  </div>
+
+  <div class="dt-toolbar">
+    <div class="stepper-ctrl">
+      <button type="button" class="iconbtn" aria-label="Previous day" (click)="step(-1)">
+        <span class="icon" aria-hidden="true">chevron_left</span>
+      </button>
+      <span class="lbl">{{ day() | date: 'EEE · d MMM y' }}</span>
+      <button
+        type="button"
+        class="iconbtn"
+        aria-label="Next day"
+        [disabled]="atToday"
+        (click)="step(1)"
+      >
+        <span class="icon" aria-hidden="true">chevron_right</span>
+      </button>
+    </div>
+
+    @if (canCopyYesterday()) {
+      <button type="button" class="btn" [disabled]="saving()" (click)="copyYesterday()">
+        <span class="icon" aria-hidden="true">content_copy</span>
+        Copy yesterday
+      </button>
+    }
+
+    <button
+      type="button"
+      class="btn primary"
+      [disabled]="saving() || !editable() || dayTotal() !== 24"
+      [attr.title]="ledger()?.submit_blocked_reason"
+      (click)="submitDay()"
+    >
+      <span class="icon" aria-hidden="true">{{ locked() && !submitted() ? 'lock' : 'task_alt' }}</span>
+      {{ submitted() ? 'Submitted' : locked() ? 'Locked' : 'Submit day' }}
+    </button>
+  </div>
+</div>
+
+@if (error(); as message) {
+  <div class="notice ledger-notice" role="alert">
+    <span class="icon" aria-hidden="true">info</span>
+    {{ message }}
+  </div>
+}
+
+<!--
+  The record of what was filled in: the last fortnight, one chip per calendar
+  day, most recent first. Each chip is a button that opens that day. The
+  server says what each day is (submitted / draft / not logged) and whether it
+  is still open; the chip prints both as words, never as a colour alone.
+-->
+@if (history(); as h) {
+  <div class="card history-card">
+    <div class="history-head">
+      <div>
+        <div class="eyebrow">Last {{ h.window_days }} days</div>
+        <div class="history-sum">
+          <b>{{ h.days_submitted }}</b> submitted · <b>{{ h.days_logged }}</b> with entries
+        </div>
+      </div>
+      <div class="dt-sub history-rule">
+        <span class="icon" aria-hidden="true">schedule</span>
+        {{ windowSentence() }}
+      </div>
+    </div>
+    <div class="history-strip" role="list" aria-label="Recent days">
+      @for (d of h.days; track d.day) {
+        @let chip = historyChip(d);
+        <button
+          type="button"
+          class="day-chip"
+          role="listitem"
+          [class.active]="d.day === day()"
+          [class.is-locked]="d.locked"
+          [attr.aria-current]="d.day === day() ? 'date' : null"
+          [attr.aria-label]="(d.day | date: 'EEEE d MMMM') + ' — ' + chip.label"
+          (click)="open(d.day)"
+        >
+          <span class="day-chip__dow">{{ d.day === h.today ? 'Today' : (d.day | date: 'EEE') }}</span>
+          <span class="day-chip__num">{{ d.day | date: 'd MMM' }}</span>
+          <span
+            class="chip day-chip__state"
+            [class.good]="chip.tone === 'good'"
+            [class.warn]="chip.tone === 'warn'"
+            [class.risk]="chip.tone === 'risk'"
+            [class.neutral]="chip.tone === 'neutral'"
+          >
+            @if (d.locked && d.status !== 'SUBMITTED') {
+              <span class="icon" aria-hidden="true">lock</span>
+            }
+            {{ chip.label }}
+          </span>
+        </button>
+      }
+    </div>
+  </div>
+}
+
+@switch (state()) {
+  @case ('loading') {
+    <p class="loading-line">Loading the time sheet…</p>
+  }
+
+  @case ('error') {
+    <div class="notice ledger-notice" role="alert">
+      <span class="icon" aria-hidden="true">info</span>
+      @if (refusal(); as message) {
+        {{ message }}
+      } @else {
+        Could not load this day’s time sheet.
+      }
+      <button type="button" class="btn ghost" (click)="load()">Retry</button>
+    </div>
+  }
+
+  @case ('data') {
+    @if (ledger(); as l) {
+      <!--
+        Metrics: FOUR SEPARATE TILES, which is what the 2026-09 board draws and
+        what the rest of the product already uses. They were one card divided by
+        left hairlines; the design system has a metric tile (.card + .eyebrow +
+        .kpi) that the admin boards use for exactly this, so the ledger stops
+        carrying a strip of its own.
+
+        The count comes from `metrics[]` and is not four in the markup: the
+        server decides how many there are, and the row wraps if it ever changes.
+      -->
+      <div class="ledger-kpis">
+        @for (m of l.metrics; track m.key) {
+          <div class="card kpi-tile">
+            <div class="eyebrow">
+              @if (m.key === 'accounted' && l.unaccounted_hours > 0) {
+                <span class="dot" aria-hidden="true"></span>
+              }
+              {{ m.label }}
+            </div>
+            <div class="kpi-line">
+              <span class="kpi">{{ m.value }}</span><span class="kpi-unit">{{ m.unit }}</span>
+            </div>
+            <div class="kpi-sub" [class.warn]="m.tone === 'warn'">{{ m.sub }}</div>
+          </div>
+        }
+      </div>
+
+      <!-- The table: six slot rows × five activity columns, in its own card. -->
+      <div class="ledger-card table-card" [class.is-locked]="l.locked && l.status !== 'SUBMITTED'">
+        <div class="table-scroll">
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th class="slot-col">
+                  <span class="lbl">Slot</span>
+                </th>
+                @for (a of l.activities; track a.key) {
+                  <th>
+                    <span class="head-key">
+                      <span class="sw" [style.background]="a.colour" aria-hidden="true"></span>
+                      <span class="lbl">{{ a.label }}</span>
+                    </span>
+                  </th>
+                }
+                <th class="logged-col"><span class="lbl">Logged</span></th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (s of l.slots; track s.key) {
+                <tr>
+                  <td class="slot-col">
+                    <div class="slot-name">
+                      @if (s.icon) {
+                        <span class="icon" aria-hidden="true">{{ s.icon }}</span>
+                      }
+                      <span>
+                        <span class="slot-label">{{ s.label }}</span>
+                        <span class="slot-cap">{{ s.capacity_hours }} h capacity</span>
+                      </span>
+                    </div>
+                  </td>
+
+                  @for (a of l.activities; track a.key) {
+                    <td>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        [max]="s.capacity_hours"
+                        [disabled]="!l.editable"
+                        [value]="cellValue(s, a.key) || ''"
+                        [attr.aria-label]="s.label + ' · ' + a.label + ' hours'"
+                        (input)="onCellInput(s, a.key, $any($event.target).value)"
+                      />
+                    </td>
+                  }
+
+                  <td class="logged logged-col">
+                    <div class="logged-val">
+                      {{ slotTotal(s) }}<span class="of"> /{{ s.capacity_hours }}</span>
+                    </div>
+                    <span
+                      class="slot-chip"
+                      [class.good]="slotTotal(s) === s.capacity_hours"
+                      [class.warn]="slotTotal(s) < s.capacity_hours && slotTotal(s) > 0"
+                      [class.risk]="slotTotal(s) > s.capacity_hours"
+                      [class.neutral]="slotTotal(s) === 0"
+                    >
+                      @if (slotTotal(s) === 0) {
+                        Empty
+                      } @else if (slotTotal(s) > s.capacity_hours) {
+                        {{ slotTotal(s) - s.capacity_hours }} h over
+                      } @else if (slotTotal(s) < s.capacity_hours) {
+                        {{ s.capacity_hours - slotTotal(s) }} h open
+                      } @else {
+                        Balanced
+                      }
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+
+            <tfoot>
+              <tr class="total-row">
+                <td class="slot-col"><span class="lbl">Day total</span></td>
+                @for (a of l.activities; track a.key) {
+                  <td class="logged">{{ columnTotal(a.key) }}</td>
+                }
+                <td class="logged logged-col">
+                  @let ds = dayState();
+                  <div class="logged-val">
+                    {{ dayTotal() }}<span class="of"> /{{ l.day_capacity_hours }}</span>
+                  </div>
+                  <span
+                    class="slot-chip"
+                    [class.good]="ds.tone === 'good'"
+                    [class.warn]="ds.tone === 'warn'"
+                    [class.risk]="ds.tone === 'risk'"
+                  >
+                    {{ ds.label }}
+                  </span>
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="footbar">
+          @if (l.status === 'SUBMITTED') {
+            <span class="chip good">
+              <span class="icon" aria-hidden="true">check_circle</span>
+              Submitted — this day is closed
+            </span>
+          } @else if (l.locked) {
+            <!-- The server's sentence, verbatim: it names the day and the last
+                 day it could have been filled in, and it is the same sentence
+                 the 409 would carry if anything tried to write anyway. -->
+            <span class="chip risk" role="status">
+              <span class="icon" aria-hidden="true">lock</span>
+              {{ l.lock_reason }}
+            </span>
+          } @else {
+            @if (l.submit_blocked_reason; as reason) {
+              <span class="chip warn">
+                <span class="icon" aria-hidden="true">pending</span>
+                {{ reason }}
+              </span>
+            }
+            <span class="chip neutral open-until">
+              <span class="icon" aria-hidden="true">schedule</span>
+              Open until {{ l.edit_until | date: 'EEE d MMM' }}
+            </span>
+            <button type="button" class="btn" [disabled]="!dirty() || saving()" (click)="save()">
+              <span class="icon" aria-hidden="true">save</span>
+              {{ saving() ? 'Saving…' : 'Save draft' }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="ledger-footnote">
+        <span class="icon" aria-hidden="true">info</span>
+        <span>
+          Hours logged in a slot cannot exceed its capacity, and the six slots must reconcile to 24
+          h before the day can be submitted. {{ windowSentence() }} Faculty review the weekly
+          roll-up, not individual entries.
+        </span>
+      </div>
+
+      <!-- The OTHER time table: SKILLING hours this week against the target. It
+           lost its own route and lives here, beside the days it is summed from. -->
+      @if (weekly(); as w) {
+        <div class="ledger-card weekly-card">
+          <div class="rowline weekly-row">
+            <span class="icon" aria-hidden="true">bolt</span>
+            <div class="weekly-body">
+              <b>Skilling this week</b>
+              <span class="dt-sub">
+                · {{ w.skilling_hours }} h of a {{ w.weekly_hour_target }} h target
+              </span>
+              <div class="meter">
+                <span [style.width.%]="weeklyPercent()"></span>
+              </div>
+            </div>
+            <span
+              class="chip"
+              [class.good]="weeklyPercent() >= 100"
+              [class.warn]="weeklyPercent() < 100"
+            >
+              {{ weeklyPercent() }}%
+            </span>
+          </div>
+        </div>
+      }
+    }
+  }
+}

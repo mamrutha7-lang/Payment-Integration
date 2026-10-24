@@ -1,0 +1,286 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420mm" height="297mm" viewBox="0 0 1680 1188">
+<defs>
+<marker id="a-1d4ed8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1d4ed8"/></marker>
+<marker id="a-0f766e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0f766e"/></marker>
+<marker id="a-6d28d9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6d28d9"/></marker>
+<marker id="a-b45309" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b45309"/></marker>
+<marker id="a-be123c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#be123c"/></marker>
+<marker id="a-0369a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0369a1"/></marker>
+<marker id="a-7c2d12" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7c2d12"/></marker>
+<marker id="a-334155" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#334155"/></marker>
+<marker id="a-111827" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#111827"/></marker>
+<marker id="a-475569" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#475569"/></marker>
+<marker id="a-64748b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker>
+</defs>
+<rect width="1680" height="1188" fill="#ffffff"/>
+<text x="22" y="50" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="31" font-weight="800" fill="#111827" text-anchor="start">REEP — Placement-Readiness Platform</text>
+<text x="22" y="72" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14" font-weight="500" fill="#475569" text-anchor="start">Complete system architecture, as deployed on AWS</text>
+<text x="1658" y="38" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#475569" text-anchor="end">BGSCET MBA · github.com/darshani8/reep-</text>
+<text x="1658" y="56" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#475569" text-anchor="end">Angular 22 SPA · FastAPI (Python 3.14) · PostgreSQL 17 + pgvector · AWS ap-south-1</text>
+<text x="1658" y="74" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#64748b" text-anchor="end">Print A3 landscape (420 × 297 mm) at 100 % scale, no margins</text>
+<line x1="22" y1="86" x2="1658" y2="86" stroke="#111827" stroke-width="2"/>
+<rect x="22" y="96" width="156" height="26" rx="13" fill="#1d4ed8"/>
+<text x="32" y="114" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">1 · PEOPLE &amp; ROLES</text>
+<rect x="22" y="138" width="259" height="136" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M31 138 H272 A9 9 0 0 1 281 147 V164 H22 V147 A9 9 0 0 1 31 138 Z" fill="#1d4ed8"/>
+<text x="33" y="156" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">STUDENT · role STUDENT</text>
+<text x="33" y="180" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Google SSO · must exist on the roster</text>
+<text x="33" y="192.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Programme map · Reboot→Excel→Elevate</text>
+<text x="33" y="205.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Skills &amp; Badge profile — 48 badges</text>
+<text x="33" y="217.79999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Time ledger · English baseline · records</text>
+<text x="33" y="230.39999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Jobs feed: match % + eligibility verdict</text>
+<text x="33" y="242.99999999999997" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Resume builder · document uploads</text>
+<text x="33" y="255.59999999999997" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">AI mock interview + practice reports</text>
+<rect x="295" y="138" width="259" height="136" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M304 138 H545 A9 9 0 0 1 554 147 V164 H295 V147 A9 9 0 0 1 304 138 Z" fill="#1d4ed8"/>
+<text x="306" y="156" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">FACULTY · role MENTOR</text>
+<text x="306" y="180" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="700" fill="#1d4ed8" text-anchor="start">A mentor only once assigned a mentee</text>
+<text x="306" y="192.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Mentee log — 1:1 notes students read</text>
+<text x="306" y="205.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Leave — apply; the Main Admin sanctions</text>
+<text x="306" y="217.79999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Badge Centre · assessments T0 → T4</text>
+<text x="306" y="230.39999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Upskilling — own certificates</text>
+<text x="306" y="242.99999999999997" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Scope: their own mentee group ONLY</text>
+<text x="306" y="255.59999999999997" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="700" fill="#1d4ed8" text-anchor="start">No group ⇒ sees NOBODY (rule 2)</text>
+<rect x="568" y="138" width="259" height="136" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M577 138 H818 A9 9 0 0 1 827 147 V164 H568 V147 A9 9 0 0 1 577 138 Z" fill="#1d4ed8"/>
+<text x="579" y="156" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">MAIN ADMIN · role ADMIN</text>
+<text x="579" y="180" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="700" fill="#1d4ed8" text-anchor="start">The placement office (TPO) — ONE account</text>
+<text x="579" y="192.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">All a mentor sees, programme-wide</text>
+<text x="579" y="205.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Approved Certification Catalogue</text>
+<text x="579" y="217.79999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Manual award · revoke badges</text>
+<text x="579" y="230.39999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Placement criteria · offers · intake</text>
+<text x="579" y="242.99999999999997" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Interview audio (consented only)</text>
+<text x="579" y="255.59999999999997" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Grants console screens to faculty</text>
+<rect x="841" y="138" width="259" height="136" rx="9" fill="#ffffff" stroke="#1d4ed8" stroke-width="1.7"/>
+<path d="M850 138 H1091 A9 9 0 0 1 1100 147 V164 H841 V147 A9 9 0 0 1 850 138 Z" fill="#1d4ed8"/>
+<text x="852" y="156" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">ALUMNI · role ALUMNI</text>
+<text x="852" y="180" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">A role with no student or mentor row</text>
+<text x="852" y="192.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">First login ⇒ create profile</text>
+<text x="852" y="205.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Company + current resume (required)</text>
+<text x="852" y="217.79999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Resume kept if omitted on update</text>
+<text x="852" y="230.39999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">Jobs sheet — postings only</text>
+<text x="852" y="242.99999999999997" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">No match % (needs a student's marks)</text>
+<text x="852" y="255.59999999999997" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.8" font-weight="400" fill="#111827" text-anchor="start">No access to any student record</text>
+<polyline points="151,274 151,292" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="424,274 424,292" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="697,274 697,292" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="970,274 970,292" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="151,292 970,292" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linejoin="round"/>
+<polyline points="189,292 189,316" fill="none" stroke="#1d4ed8" stroke-width="2.6" marker-end="url(#a-1d4ed8)" stroke-linejoin="round"/>
+<rect x="22" y="300" width="217" height="26" rx="13" fill="#0f766e"/>
+<text x="32" y="318" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">2 · EDGE — ONE PUBLIC DOOR</text>
+<rect x="22" y="326" width="334" height="150" rx="9" fill="#ffffff" stroke="#0f766e" stroke-width="1.7"/>
+<path d="M31 326 H347 A9 9 0 0 1 356 335 V352 H22 V335 A9 9 0 0 1 31 326 Z" fill="#0f766e"/>
+<text x="33" y="344" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">CLOUDFRONT + AWS WAF</text>
+<text x="33" y="368" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">PriceClass_200 — includes India POPs</text>
+<text x="33" y="381" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">TLS 1.2+ · HTTP → HTTPS redirect</text>
+<text x="33" y="394" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">WAF: Common + KnownBadInputs rules</text>
+<text x="33" y="407" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">Rate limit 2 000 req / 5 min per IP</text>
+<text x="33" y="420" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">403 / 404 → /index.html (SPA routes)</text>
+<text x="33" y="433" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">WebSocket upgrade passes through</text>
+<text x="33" y="446" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#475569" text-anchor="start">Nothing else is reachable from outside</text>
+<rect x="376" y="326" width="334" height="70" rx="9" fill="#ffffff" stroke="#0f766e" stroke-width="1.7"/>
+<path d="M385 326 H701 A9 9 0 0 1 710 335 V352 H376 V335 A9 9 0 0 1 385 326 Z" fill="#0f766e"/>
+<text x="387" y="344" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">S3 — ANGULAR SPA (private)</text>
+<text x="387" y="368" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">Origin Access Control · versioned bucket</text>
+<text x="387" y="381" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#475569" text-anchor="start">172 kB initial · every route lazy-loaded</text>
+<rect x="376" y="406" width="334" height="70" rx="9" fill="#ffffff" stroke="#0f766e" stroke-width="1.7"/>
+<path d="M385 406 H701 A9 9 0 0 1 710 415 V432 H376 V415 A9 9 0 0 1 385 406 Z" fill="#0f766e"/>
+<text x="387" y="424" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">APPLICATION LOAD BALANCER</text>
+<text x="387" y="448" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">HTTPS TLS 1.3 → target group :3300</text>
+<text x="387" y="461" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">Health /health · idle 300 s (interview WS)</text>
+<rect x="730" y="326" width="370" height="150" rx="9" fill="#ffffff" stroke="#0f766e" stroke-width="1.7"/>
+<path d="M739 326 H1091 A9 9 0 0 1 1100 335 V352 H730 V335 A9 9 0 0 1 739 326 Z" fill="#0f766e"/>
+<text x="741" y="344" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">DNS, CERTIFICATES &amp; ORIGINS</text>
+<text x="741" y="368" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">Route 53 / college DNS → CloudFront</text>
+<text x="741" y="381" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">ACM certificate in us-east-1 → CloudFront</text>
+<text x="741" y="394" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">ACM certificate in ap-south-1 → ALB</text>
+<text x="741" y="407" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">The CloudFront → ALB hop stays encrypted</text>
+<text x="741" y="420" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="700" fill="#0f766e" text-anchor="start">Same-origin: the SPA and /api share a host,</text>
+<text x="741" y="433" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="700" fill="#0f766e" text-anchor="start">so the httpOnly session cookie just works</text>
+<text x="741" y="446" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#475569" text-anchor="start">Google redirect: /api/auth/sso/google/callback</text>
+<polyline points="356,361 376,361" fill="none" stroke="#0f766e" stroke-width="2.4" marker-end="url(#a-0f766e)" stroke-linejoin="round"/>
+<polyline points="356,441 376,441" fill="none" stroke="#0f766e" stroke-width="2.4" marker-end="url(#a-0f766e)" stroke-linejoin="round"/>
+<rect x="353.0" y="340" width="26" height="12" fill="#ffffff"/>
+<text x="366" y="349" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="700" fill="#0f766e" text-anchor="middle">SPA</text>
+<rect x="349.0" y="420" width="34" height="12" fill="#ffffff"/>
+<text x="366" y="429" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9" font-weight="700" fill="#0f766e" text-anchor="middle">/api/*</text>
+<polyline points="543,476 543,512" fill="none" stroke="#0f766e" stroke-width="2.8" marker-end="url(#a-0f766e)" stroke-linejoin="round"/>
+<rect x="22" y="512" width="1078" height="310" rx="12" fill="#f8fafc" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="7 4"/>
+<rect x="36" y="499" width="458" height="26" rx="13" fill="#6d28d9"/>
+<text x="46" y="517" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">3 · COMPUTE — ECS FARGATE CLUSTER (private subnets, 2 AZs)</text>
+<rect x="40" y="556" width="590" height="248" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M49 556 H621 A9 9 0 0 1 630 565 V582 H40 V565 A9 9 0 0 1 49 556 Z" fill="#6d28d9"/>
+<text x="51" y="574" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">API TASK — FastAPI + uvicorn on :3300</text>
+<text x="51" y="598" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">Python 3.14 · 0.5 vCPU / 1 GB · awsvpc, no public IP</text>
+<text x="51" y="612" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="700" fill="#64748b" text-anchor="start">ROUTERS</text>
+<text x="51" y="626" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">auth · google_auth · identity — SSO, session, role gates</text>
+<text x="51" y="640" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">student · student_programme — records, ledger, English baseline</text>
+<text x="51" y="654" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">badges · badge_verification — 48-badge engine, evidence, growth</text>
+<text x="51" y="668" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">mentor · mentee_records — mentee scope enforced (rule 2)</text>
+<text x="51" y="682" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">alumni · staff_upskilling · leave — alumni + faculty surfaces</text>
+<text x="51" y="696" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">console · admin_* (the Main Admin) · registration · health</text>
+<text x="51" y="710" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">interview — WebSocket /api/interview, the realtime relay</text>
+<text x="51" y="724" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">voice · agent — retained rollback path, no UI caller</text>
+<text x="51" y="738" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="700" fill="#64748b" text-anchor="start">SERVICE LAYER</text>
+<text x="51" y="752" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">document_store — magic-byte sniffing, quotas, random names</text>
+<text x="51" y="766" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">ai/llm — universal adapter · Bedrock transport · egress gate</text>
+<text x="51" y="780" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">knowledge — hybrid pgvector + Postgres full-text retrieval</text>
+<text x="51" y="794" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#111827" text-anchor="start">retention · interview_audio · traceability middleware</text>
+<rect x="650" y="556" width="226" height="120" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M659 556 H867 A9 9 0 0 1 876 565 V582 H650 V565 A9 9 0 0 1 659 556 Z" fill="#6d28d9"/>
+<text x="661" y="574" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">AUTOSCALING</text>
+<text x="661" y="598" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Target tracking on ECS</text>
+<text x="661" y="610.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#6d28d9" text-anchor="start">CPU 60 % · Memory 75 %</text>
+<text x="661" y="623.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#6d28d9" text-anchor="start">2 → 10 tasks</text>
+<text x="661" y="635.8000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Out ~60 s · in after 300 s</text>
+<text x="661" y="648.4000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#475569" text-anchor="start">Floor of 2: a restart is</text>
+<text x="661" y="661.0000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#475569" text-anchor="start">never an outage</text>
+<rect x="650" y="688" width="226" height="116" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M659 688 H867 A9 9 0 0 1 876 697 V714 H650 V697 A9 9 0 0 1 659 688 Z" fill="#6d28d9"/>
+<text x="661" y="706" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">RETENTION JOB</text>
+<text x="661" y="730" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">EventBridge Scheduler</text>
+<text x="661" y="742.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Daily at 03:00 IST</text>
+<text x="661" y="755.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">python -m app.retention_job</text>
+<text x="661" y="767.8000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Purges expired records,</text>
+<text x="661" y="780.4000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">sweeps orphaned interviews</text>
+<rect x="896" y="556" width="180" height="120" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M905 556 H1067 A9 9 0 0 1 1076 565 V582 H896 V565 A9 9 0 0 1 905 556 Z" fill="#6d28d9"/>
+<text x="907" y="574" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">DEPLOY</text>
+<text x="907" y="598" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">ECR image push</text>
+<text x="907" y="610.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">force-new-deployment</text>
+<text x="907" y="623.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#6d28d9" text-anchor="start">Circuit breaker +</text>
+<text x="907" y="635.8000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="700" fill="#6d28d9" text-anchor="start">automatic rollback</text>
+<text x="907" y="648.4000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">Health-gated cutover</text>
+<rect x="896" y="688" width="180" height="116" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M905 688 H1067 A9 9 0 0 1 1076 697 V714 H896 V697 A9 9 0 0 1 905 688 Z" fill="#6d28d9"/>
+<text x="907" y="706" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">SECRETS</text>
+<text x="907" y="730" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">AWS Secrets Manager</text>
+<text x="907" y="742.6" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">app/ — generated:</text>
+<text x="907" y="755.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">AUTH_SECRET, DB URL</text>
+<text x="907" y="767.8000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">external/ — operator:</text>
+<text x="907" y="780.4000000000001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10" font-weight="400" fill="#111827" text-anchor="start">API keys, Sentry DSN</text>
+<rect x="22" y="838" width="88" height="26" rx="13" fill="#b45309"/>
+<text x="32" y="856" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">4 · STATE</text>
+<rect x="22" y="866" width="530" height="188" rx="9" fill="#ffffff" stroke="#b45309" stroke-width="1.7"/>
+<path d="M31 866 H543 A9 9 0 0 1 552 875 V892 H22 V875 A9 9 0 0 1 31 866 Z" fill="#b45309"/>
+<text x="33" y="884" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">AMAZON RDS · POSTGRESQL 17 + pgvector</text>
+<text x="33" y="908" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="400" fill="#111827" text-anchor="start">Private subnets · encrypted · reachable only from API tasks</text>
+<text x="33" y="922" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="700" fill="#64748b" text-anchor="start">CORE  users · students · mentors · cohorts</text>
+<text x="33" y="936" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="700" fill="#64748b" text-anchor="start">BADGES  badge_evidence · student_badges · capability_assessments</text>
+<text x="33" y="950" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="700" fill="#64748b" text-anchor="start">         approved_certifications</text>
+<text x="33" y="964" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="700" fill="#64748b" text-anchor="start">INTERVIEW  sessions · turns · evaluations · consents</text>
+<text x="33" y="978" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="700" fill="#64748b" text-anchor="start">PROGRAMME  time_ledger · english_baselines · milestones</text>
+<text x="33" y="992" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="700" fill="#64748b" text-anchor="start">DOCUMENTS  uploads · alumni_profiles · staff_upskilling_certs</text>
+<text x="33" y="1006" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="700" fill="#64748b" text-anchor="start">KNOWLEDGE  knowledge_chunks — vector embeddings</text>
+<text x="33" y="1020" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="400" fill="#111827" text-anchor="start">Storage autoscales 20 → 100 GB · Performance Insights on</text>
+<rect x="572" y="866" width="528" height="188" rx="9" fill="#ffffff" stroke="#b45309" stroke-width="1.7"/>
+<path d="M581 866 H1091 A9 9 0 0 1 1100 875 V892 H572 V875 A9 9 0 0 1 581 866 Z" fill="#b45309"/>
+<text x="583" y="884" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">AMAZON EFS · /data — persistent, encrypted</text>
+<text x="583" y="908" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="400" fill="#111827" text-anchor="start">Mounted by every task · survives restarts and redeploys</text>
+<text x="583" y="922" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="700" fill="#b45309" text-anchor="start">/data/uploads</text>
+<text x="583" y="936" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="400" fill="#111827" text-anchor="start">marksheets · certificates · profile photos · student CVs ·</text>
+<text x="583" y="950" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="400" fill="#111827" text-anchor="start">faculty upskilling certificates · alumni resumes</text>
+<text x="583" y="964" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="700" fill="#b45309" text-anchor="start">/data/interview-audio</text>
+<text x="583" y="978" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="400" fill="#111827" text-anchor="start">per-speaker interview WAVs — the call recorder (panel →)</text>
+<text x="583" y="992" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="400" fill="#111827" text-anchor="start">Access point pins uid/gid · lifecycle → IA after 30 days</text>
+<text x="583" y="1006" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.3" font-weight="400" fill="#111827" text-anchor="start">Covered by the same AWS Backup plan as the database</text>
+<polyline points="287,822 287,866" fill="none" stroke="#b45309" stroke-width="2.6" marker-end="url(#a-b45309)" stroke-linejoin="round"/>
+<polyline points="836,822 836,866" fill="none" stroke="#b45309" stroke-width="2.6" marker-end="url(#a-b45309)" stroke-linejoin="round"/>
+<rect x="22" y="1074" width="348" height="96" rx="9" fill="#ffffff" stroke="#6d28d9" stroke-width="1.7"/>
+<path d="M31 1074 H361 A9 9 0 0 1 370 1083 V1096 H22 V1083 A9 9 0 0 1 31 1074 Z" fill="#6d28d9"/>
+<text x="33" y="1088" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">AUTOSCALING, CAPACITY &amp; COST</text>
+<text x="33" y="1112" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">API 2 → 10 tasks · RDS storage 20 → 100 GB</text>
+<text x="33" y="1124" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">RDS compute is FIXED — resizing is a human call</text>
+<text x="33" y="1136" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">CloudFront · S3 · EFS · ALB scale themselves</text>
+<text x="33" y="1148" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="700" fill="#6d28d9" text-anchor="start">≈ $130 / month infra before model tokens</text>
+<text x="33" y="1160" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#475569" text-anchor="start">A voice interview costs ≈ $3–5 — the real variable</text>
+<rect x="386" y="1074" width="348" height="96" rx="9" fill="#ffffff" stroke="#b45309" stroke-width="1.7"/>
+<path d="M395 1074 H725 A9 9 0 0 1 734 1083 V1096 H386 V1083 A9 9 0 0 1 395 1074 Z" fill="#b45309"/>
+<text x="397" y="1088" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">BACKUPS &amp; DISASTER RECOVERY</text>
+<text x="397" y="1112" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">RDS automated snapshots — 14-day point-in-time</text>
+<text x="397" y="1124" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">AWS Backup vault — daily, kept 35 days</text>
+<text x="397" y="1136" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">…covering BOTH the database and EFS</text>
+<text x="397" y="1148" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">Deletion protection + final snapshot on the instance</text>
+<text x="397" y="1160" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="700" fill="#b45309" text-anchor="start">Two independent planes: one destroy loses nothing</text>
+<rect x="750" y="1074" width="350" height="96" rx="9" fill="#ffffff" stroke="#334155" stroke-width="1.7"/>
+<path d="M759 1074 H1091 A9 9 0 0 1 1100 1083 V1096 H750 V1083 A9 9 0 0 1 759 1074 Z" fill="#334155"/>
+<text x="761" y="1088" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">SECURITY &amp; ACCESS CONTROL</text>
+<text x="761" y="1112" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">Google-only SSO — the roster IS the allowlist</text>
+<text x="761" y="1124" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">google_sub pins identity · token_version revokes</text>
+<text x="761" y="1136" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="700" fill="#334155" text-anchor="start">RULE 1  student PII reaches no model unless opened</text>
+<text x="761" y="1148" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="700" fill="#334155" text-anchor="start">RULE 2  staff scope by role, never by a missing field</text>
+<text x="761" y="1160" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.6" font-weight="400" fill="#111827" text-anchor="start">Boot guard refuses to start on repo-default secrets</text>
+<rect x="1130" y="138" width="528" height="458" rx="12" fill="#f8fafc" stroke="#be123c" stroke-width="1.6" stroke-dasharray="7 4"/>
+<rect x="1144" y="125" width="368" height="26" rx="13" fill="#be123c"/>
+<text x="1154" y="143" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">5 · AI &amp; MODEL PLANE — called by the API tasks</text>
+<rect x="1152" y="180" width="484" height="132" rx="9" fill="#ffffff" stroke="#be123c" stroke-width="1.7"/>
+<path d="M1161 180 H1627 A9 9 0 0 1 1636 189 V206 H1152 V189 A9 9 0 0 1 1161 180 Z" fill="#be123c"/>
+<text x="1163" y="198" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">AMAZON BEDROCK — NOVA</text>
+<text x="1163" y="222" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Model: apac.amazon.nova-pro-v1:0 (configurable)</text>
+<text x="1163" y="235" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Transport: converse / converse_stream via boto3</text>
+<text x="1163" y="248" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Powers: resume brief · grounded assistant · scoring</text>
+<text x="1163" y="261" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="700" fill="#be123c" text-anchor="start">Auth is the IAM task role — no API key anywhere</text>
+<text x="1163" y="274" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">In-account: your traffic is not used for training</text>
+<text x="1163" y="287" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#475569" text-anchor="start">Rule 1 still applies — student PII needs the flag</text>
+<rect x="1152" y="324" width="484" height="176" rx="9" fill="#ffffff" stroke="#be123c" stroke-width="1.7"/>
+<path d="M1161 324 H1627 A9 9 0 0 1 1636 333 V350 H1152 V333 A9 9 0 0 1 1161 324 Z" fill="#be123c"/>
+<text x="1163" y="342" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">OPENAI REALTIME — THE AI MOCK INTERVIEWER</text>
+<text x="1163" y="366" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">WebSocket /api/interview · 24 kHz PCM both ways</text>
+<text x="1163" y="379" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="700" fill="#be123c" text-anchor="start">The relay owns the turn: create_response = false</text>
+<text x="1163" y="392" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Word-count gate, then exactly ONE response.create</text>
+<text x="1163" y="405" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Phases: opening → probing → deep_dive → wrap_up</text>
+<text x="1163" y="418" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">4 specialisations (HR · DM · BA · FA), voice per track</text>
+<text x="1163" y="431" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Verdict spoken, then a strict-JSON scorecard (text only)</text>
+<text x="1163" y="444" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Persists sessions · turns · evaluations, fire-and-forget</text>
+<text x="1163" y="457" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Consent gate: no live grant ⇒ 4013 · revoked ⇒ 4014</text>
+<text x="1163" y="470" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#475569" text-anchor="start">MIGRATION → Amazon Nova Sonic (bidirectional stream).</text>
+<text x="1163" y="483" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#475569" text-anchor="start">IAM already allows it; the engine port is still to do.</text>
+<rect x="1152" y="512" width="484" height="70" rx="9" fill="#ffffff" stroke="#be123c" stroke-width="1.7"/>
+<path d="M1161 512 H1627 A9 9 0 0 1 1636 521 V538 H1152 V521 A9 9 0 0 1 1161 512 Z" fill="#be123c"/>
+<text x="1163" y="530" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">KNOWLEDGE BASE &amp; RETAINED PATHS</text>
+<text x="1163" y="554" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">KB: pgvector cosine blended with full-text, distance-floored</text>
+<text x="1163" y="567" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Retained (no UI caller): LiveKit voice worker + orchestrator</text>
+<rect x="1130" y="626" width="528" height="340" rx="12" fill="#f8fafc" stroke="#0369a1" stroke-width="1.6" stroke-dasharray="7 4"/>
+<rect x="1144" y="613" width="436" height="26" rx="13" fill="#0369a1"/>
+<text x="1154" y="631" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">6 · OBSERVABILITY &amp; TRACEABILITY — fed by every request</text>
+<rect x="1152" y="668" width="484" height="106" rx="9" fill="#ffffff" stroke="#0369a1" stroke-width="1.7"/>
+<path d="M1161 668 H1627 A9 9 0 0 1 1636 677 V694 H1152 V677 A9 9 0 0 1 1161 668 Z" fill="#0369a1"/>
+<text x="1163" y="686" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">SENTRY — THE ONE TOOL</text>
+<text x="1163" y="710" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">API (Python SDK) + SPA (lazy chunk) → one org</text>
+<text x="1163" y="723" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Errors AND performance traces in one place</text>
+<text x="1163" y="736" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="700" fill="#0369a1" text-anchor="start">PII OFF — no cookies, no bodies, no student text</text>
+<text x="1163" y="749" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Every event tagged request_id = X-Request-ID</text>
+<text x="1163" y="762" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Claude reads it through the Sentry MCP connector</text>
+<rect x="1152" y="786" width="484" height="88" rx="9" fill="#ffffff" stroke="#0369a1" stroke-width="1.7"/>
+<path d="M1161 786 H1627 A9 9 0 0 1 1636 795 V812 H1152 V795 A9 9 0 0 1 1161 786 Z" fill="#0369a1"/>
+<text x="1163" y="804" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">CLOUDWATCH — WHAT SENTRY CANNOT BE</text>
+<text x="1163" y="828" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">/reep/api log group (30 d) — one access line per request</text>
+<text x="1163" y="841" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">Alarms → SNS email: no healthy task · ALB 5xx · RDS</text>
+<text x="1163" y="854" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">storage &amp; CPU · CPU still pegged at max tasks</text>
+<text x="1163" y="867" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="700" fill="#0369a1" text-anchor="start">AI tripwire: “Dropped interview turn” metric filter</text>
+<rect x="1152" y="884" width="484" height="76" rx="9" fill="#ffffff" stroke="#0369a1" stroke-width="1.7"/>
+<path d="M1161 884 H1627 A9 9 0 0 1 1636 893 V910 H1152 V893 A9 9 0 0 1 1161 884 Z" fill="#0369a1"/>
+<text x="1163" y="902" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">THE TRACE THREAD — ONE ID, FOUR HOPS</text>
+<text x="1163" y="926" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">1 middleware mints or keeps X-Request-ID · 2 echoed on the</text>
+<text x="1163" y="939" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">response · 3 tagged on the Sentry event · 4 printed as rid=…</text>
+<text x="1163" y="952" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">in the access log — ALB logs in S3 close the loop</text>
+<rect x="1130" y="996" width="528" height="174" rx="12" fill="#f8fafc" stroke="#7c2d12" stroke-width="1.6" stroke-dasharray="7 4"/>
+<rect x="1144" y="983" width="232" height="26" rx="13" fill="#7c2d12"/>
+<text x="1154" y="1001" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.9">7 · INTERVIEW CALL RECORDING</text>
+<rect x="1152" y="1036" width="484" height="62" rx="9" fill="#ffffff" stroke="#7c2d12" stroke-width="1.7"/>
+<path d="M1161 1036 H1627 A9 9 0 0 1 1636 1045 V1062 H1152 V1045 A9 9 0 0 1 1161 1036 Z" fill="#7c2d12"/>
+<text x="1163" y="1054" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">TWO TRACKS, NEVER MIXED</text>
+<text x="1163" y="1078" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">One WAV for the student, one for the AI — kept separate</text>
+<text x="1163" y="1091" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">because the directions are not time-aligned · size-capped</text>
+<rect x="1152" y="1102" width="484" height="64" rx="9" fill="#ffffff" stroke="#7c2d12" stroke-width="1.7"/>
+<path d="M1161 1102 H1627 A9 9 0 0 1 1636 1111 V1128 H1152 V1111 A9 9 0 0 1 1161 1102 Z" fill="#7c2d12"/>
+<text x="1163" y="1120" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#ffffff" text-anchor="start" letter-spacing="0.5">CONSENT IS A ROW, NOT A SETTING</text>
+<text x="1163" y="1144" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="700" fill="#7c2d12" text-anchor="start">Two switches: the deployment flag AND the student's own</text>
+<text x="1163" y="1157" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.2" font-weight="400" fill="#111827" text-anchor="start">store-audio tick · Main Admin only (faculty by grant) · 180-day clock</text>
+<polyline points="1100,600 1130,600" fill="none" stroke="#be123c" stroke-width="2.8" marker-end="url(#a-be123c)" stroke-linejoin="round"/>
+<polyline points="1100,726 1130,726" fill="none" stroke="#0369a1" stroke-width="2.8" marker-end="url(#a-0369a1)" stroke-linejoin="round"/>
+<line x1="22" y1="1178" x2="1658" y2="1178" stroke="#64748b" stroke-width="1"/>
+<text x="22" y="1186" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#64748b" text-anchor="start">Solid arrow = request / data path.  Dashed border = an AWS boundary.  Bold lines are the invariants that must not be broken.</text>
+<text x="1658" y="1186" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="9.5" font-weight="400" fill="#64748b" text-anchor="end">Generated by tools/diagrams/render_architecture.py — regenerate when the architecture changes</text>
+</svg>

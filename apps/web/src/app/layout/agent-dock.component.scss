@@ -1,0 +1,238 @@
+/* The floating assistant panel. Sits above the orb (which is at 22px from the
+ * bottom-right corner and becomes the Close control while this is open), on
+ * the design's white translucent card with a hairline. The interview tab
+ * widens it, because a stage needs room; under 640px both are the whole
+ * viewport, because a 420px panel over a 390px phone is neither. */
+
+:host {
+  display: contents;
+}
+
+.dock {
+  position: fixed;
+  right: 22px;
+  bottom: 92px;
+  z-index: 95;
+  width: min(420px, calc(100vw - 44px));
+  height: min(680px, calc(100vh - 116px));
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  box-shadow:
+    0 22px 60px rgba(40, 20, 60, 0.28),
+    inset 0 1px 0 #fff;
+  overflow: hidden;
+}
+.dock--room {
+  width: min(760px, calc(100vw - 44px));
+  height: min(860px, calc(100vh - 116px));
+}
+
+/* --- bar: tabs + actions ------------------------------------------------- */
+.dock__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 8px 8px 10px;
+  border-bottom: 1px solid var(--hairline-26);
+  background: var(--titlebar-gradient);
+}
+.dock__tabs {
+  display: flex;
+  gap: 4px;
+  min-width: 0;
+}
+.dock__tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.dock__tab .icon {
+  font-size: 16px;
+}
+.dock__tab:hover {
+  color: var(--ink);
+}
+.dock__tab:focus-visible {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 1px;
+}
+/* The active tab is the gradient pill — the one place the design puts it. */
+.dock__tab--on {
+  background: var(--primary-gradient);
+  color: #fff;
+  box-shadow: var(--sh-navpill);
+}
+.dock__live {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.dock__live::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #7fe0a8;
+  animation: dock-pulse 1.4s ease-in-out infinite;
+}
+@keyframes dock-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.dock__actions {
+  display: flex;
+  gap: 2px;
+}
+.dock__iconbtn {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: none;
+}
+.dock__iconbtn .icon {
+  font-size: 18px;
+}
+.dock__iconbtn:hover {
+  background: var(--tint-1);
+  color: var(--ink);
+}
+.dock__iconbtn:focus-visible {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 1px;
+}
+
+/* --- "closing ends the interview" ---------------------------------------- */
+.dock__confirm {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--hairline-26);
+  background: var(--warn-bg);
+  color: var(--ink);
+  font-size: 0.8125rem;
+}
+.dock__confirm-text {
+  flex: 1 1 200px;
+  font-weight: 600;
+}
+.dock__confirm-btn {
+  min-height: 28px;
+  padding: 0 12px;
+  border: 1px solid var(--hairline-45);
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.dock__confirm-btn--end {
+  border-color: var(--risk);
+  color: var(--risk);
+}
+
+/* --- body ---------------------------------------------------------------- */
+.dock__body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dock__panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.dock__panel[hidden] {
+  display: none;
+}
+/* The room scrolls as a whole: stage, then report, then transcript. */
+.dock__panel--room {
+  overflow-y: auto;
+  padding: 12px;
+  background: var(--tint-3);
+}
+.dock__loading {
+  margin: auto;
+  color: var(--faint);
+  font-size: 0.8125rem;
+}
+
+/* A deferred tab that could not be fetched. Centred in the panel like
+   .dock__loading, because it stands in the same place for the same reason —
+   the difference is that this one is not going to resolve on its own. */
+.dock__failed {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 24px;
+  text-align: center;
+}
+
+.dock__failed-icon {
+  font-size: 28px;
+  color: var(--faint);
+}
+
+.dock__failed-text {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--ink);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .dock,
+  .dock--room {
+    inset: 0;
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    border: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dock__live::before {
+    animation: none;
+  }
+}

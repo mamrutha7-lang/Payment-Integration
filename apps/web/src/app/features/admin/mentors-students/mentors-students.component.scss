@@ -1,0 +1,335 @@
+/* Mentor mapping — this screen's LAYOUT only.
+ *
+ * .panel .card .chip .btn .select .field .notice .meter .avatar .rail .crumb
+ * .dt-header .dt-title .dt-sub .dt-toolbar .dt-quickfilter .dt-statusbar
+ * .card-head .card-heading .sr-only are global (styles/reep-v2.scss) and are
+ * used as they are. What is here is the shape of this board: the filter row,
+ * the two columns, the faculty rail rows, the mentee list and the assign bar.
+ */
+:host {
+  display: block;
+}
+
+/* --- the board's filter row --------------------------------------------- */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+/* A filter that cannot be offered — either because no endpoint answers it
+   (Specialization) or because the list it would be built from is empty or was
+   refused. The <select> inside is plainly `disabled` and carries the real
+   reason in its title; this dims the pill it sits in so the row reads as "not
+   available" at a glance. NO PHASE NUMBER: nothing is on its way. */
+.filter-pending {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+/* The sentence under the filter row when the server has narrowed the lists,
+   which is the one thing about these two feeds that is not obvious: a batch
+   narrows the students and leaves the faculty rail whole. */
+.filters__note {
+  flex: 1 1 100%;
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* --- the batch bar ------------------------------------------------------- */
+/* A toolbar button that is holding a panel open. `.toggled` is this screen's
+   own name, not a global modifier: .btn belongs to reep-v2.scss and is used
+   here exactly as it is. */
+.dt-toolbar .toggled {
+  border-color: var(--brand-purple);
+  color: var(--brand-purple);
+}
+.batch-bar {
+  padding: 12px;
+  margin-bottom: 10px;
+}
+.batch-bar__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.batch-bar__reason {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+.batch-bar .notice {
+  margin-top: 10px;
+}
+
+.panel > .notice {
+  margin-bottom: 10px;
+}
+
+/* --- card head: title, actions right ------------------------------------- */
+/* The row and its title are global now (.card-head / .card-heading). The one
+   declaration this board differs on: all three heads here are a single-line
+   title beside one control — the rail's count chip, the pool's search box — so
+   the control centres against the title rather than sitting at the global's
+   flex-start, which is for a title that wraps to two lines. */
+.card-head {
+  align-items: center;
+}
+.card-head__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* --- a load that did not answer ------------------------------------------ */
+.load-failed {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.load-failed p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* --- the two columns ----------------------------------------------------- */
+.mapping {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .mapping {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.mapping__right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.rail-card,
+.pool-card,
+.history-card {
+  padding: 12px;
+}
+
+/* --- one faculty member on the rail -------------------------------------- */
+.mentor-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-control);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+.mentor-row + .mentor-row {
+  margin-top: 4px;
+}
+.mentor-row:hover {
+  border-color: var(--hairline-42);
+  background: var(--tint-3);
+}
+.mentor-row.selected {
+  background: var(--tint-1);
+  border-color: var(--tint-1);
+}
+.mentor-row__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.mentor-row__name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mentor-row__line {
+  font-size: 11.5px;
+  color: var(--faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mentor-row__count {
+  flex: none;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.mentor-row .meter {
+  margin-top: 4px;
+}
+/* The one fill the global .meter does not have: a group that is full reads in
+   the risk colour, beside the words "At capacity" on the line above it —
+   colour never carries the status alone. */
+.meter > span.at-capacity {
+  background: var(--risk);
+}
+
+/* --- the selected faculty member's mentees ------------------------------- */
+.list-lbl {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin: 14px 0 6px;
+}
+.mentee-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.mentee {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 4px;
+  border-top: 1px solid var(--hairline-26);
+}
+.mentee__body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.mentee__name {
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mentee__line {
+  font-size: 11.5px;
+  color: var(--faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* B1.5's cross-department flag sits on its own line: it is a chip, and a chip
+   inside the one-line name would be clipped by the ellipsis the moment a name
+   is long — which is exactly when somebody is scanning for it. */
+.mentee__flag {
+  margin-top: 2px;
+}
+.mentee__actions {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+/* The history button for the student whose spells are on screen. */
+.mentee__actions .on {
+  color: var(--brand-purple);
+  background: var(--tint-1);
+}
+/* The release box takes a line of its own under the student it releases. */
+.release-form {
+  flex: 1 1 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0 6px;
+}
+.release-form__actions {
+  display: flex;
+  gap: 6px;
+}
+.mentee-empty {
+  font-size: 12.5px;
+  color: var(--muted);
+  padding: 8px 4px;
+}
+
+/* --- the pool grid and the one primary action ---------------------------- */
+.pool-grid {
+  display: block;
+  height: 320px;
+  width: 100%;
+}
+.pool-card .dt-statusbar {
+  border: 1px solid var(--hairline-42);
+  border-top: 0;
+  border-radius: 0 0 var(--r-control) var(--r-control);
+}
+.pool-card .notice {
+  margin-top: 10px;
+}
+.assign-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.assign-reason {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+/* --- one student's assignment history (B9.1) ----------------------------- */
+.history-empty {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.spells {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.spell {
+  padding: 8px 10px;
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-control);
+  background: var(--surface);
+}
+.spell__head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.spell__who {
+  font-size: 12.5px;
+  font-weight: 600;
+}
+.spell__when {
+  margin: 2px 0 0;
+  font-size: 11.5px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.spell__act {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}

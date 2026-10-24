@@ -1,0 +1,301 @@
+/* Interview records — this screen's LAYOUT only.
+ *
+ * .panel .card .card-head .card-title .card-sub .kpi-card .chip .btn .select
+ * .notice .tabs .check .field .ctrl .footbar .crumb .dt-header .dt-title
+ * .dt-sub .dt-toolbar .dt-gridbar .dt-quickfilter .dt-statusbar .eyebrow are
+ * global (styles/reep-v2.scss) and are used as they are. What is here is the
+ * shape of this screen, top to bottom: the filter row, the three tiles, the
+ * list, the open record with its chart beside it, and the policy card.
+ */
+:host {
+  display: block;
+}
+
+/* The screen-level error and confirmation notices, above the filters. */
+.panel > .notice {
+  margin-bottom: 10px;
+}
+
+/* --- the filter row ------------------------------------------------------ */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+/* --- the three tiles ----------------------------------------------------- */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.kpi-icon {
+  font-size: 18px;
+  color: var(--ink-nav);
+  opacity: 0.75;
+}
+@media (max-width: 900px) {
+  .kpi-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* --- the list ------------------------------------------------------------ */
+.grid-card {
+  padding: 0;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.grid-note {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.records-grid {
+  display: block;
+  width: 100%;
+}
+.statusbar-note {
+  color: var(--faint);
+}
+
+/* The one shape every loading / progress line on this screen takes. */
+.state-note {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 12px 14px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* --- the open record ----------------------------------------------------- */
+.record-card {
+  margin-bottom: 12px;
+}
+.record-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.record-facts {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.record-audio-reason {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.record-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .record-body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.record-main {
+  min-width: 0;
+}
+.record-tabs {
+  margin-bottom: 10px;
+}
+.record-side {
+  border-left: 1px solid var(--hairline-26);
+  padding-left: 16px;
+  min-width: 0;
+}
+@media (max-width: 1100px) {
+  .record-side {
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid var(--hairline-26);
+    padding-top: 12px;
+  }
+}
+.record-side-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.record-side-sub {
+  margin: 2px 0 8px;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+.progress-chart {
+  width: 100%;
+  height: 190px;
+}
+
+/* --- the report ---------------------------------------------------------- */
+.report-scores {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.score-value {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 800;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+.score-hint {
+  font-size: 10.5px;
+  color: var(--faint);
+}
+/* One line between the numbers and the advice, so a score is never read on
+   its own. */
+.calibration {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 10px;
+  padding: 7px 11px;
+  border-radius: var(--r-control);
+  border-left: 3px solid var(--warn-dot);
+  background: var(--warn-bg);
+  color: var(--ink);
+  font-size: 11.8px;
+}
+.calibration .icon {
+  flex: none;
+  font-size: 16px;
+}
+.report-summary {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.report-sub {
+  margin: 0 0 4px;
+  font-size: 11.5px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--ink-soft);
+}
+.report-list {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  font-size: 12.3px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.report-drill {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin: 0;
+  padding: 9px 11px;
+  border-radius: var(--r-control);
+  background: var(--tint-2);
+  font-size: 12.3px;
+  line-height: 1.45;
+}
+
+/* --- the transcript ------------------------------------------------------ */
+.transcript {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 420px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.turn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: var(--r-control);
+  background: var(--tint-3);
+  border: 1px solid var(--hairline-26);
+}
+.turn-student {
+  background: var(--tint-1);
+}
+.turn-speaker {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.turn-text {
+  font-size: 12.3px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+/* An empty turn is "we could not hear it", never "nothing was said". */
+.turn-unheard {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* --- the policy card ----------------------------------------------------- */
+.policy-card {
+  max-width: 1100px;
+}
+.policy-pick {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.policy-pick .field.grow {
+  flex: 1 1 240px;
+  min-width: 0;
+}
+.policy-card .notice {
+  margin-bottom: 10px;
+}
+.policy-state {
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.policy-checks {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.policy-checks .check {
+  cursor: pointer;
+}
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 900px) {
+  .policy-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

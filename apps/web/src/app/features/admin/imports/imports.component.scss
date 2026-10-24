@@ -1,0 +1,293 @@
+/* Data imports & criteria — this screen's LAYOUT only.
+ *
+ * `.panel` `.card` `.chip` `.btn` `.select` `.field` `.notice` `.wizard-steps`
+ * `.crumb` `.dt-header` `.dt-title` `.dt-sub` `.dt-toolbar` `.dt-frame`
+ * `.dt-statusbar` `.card-head` `.card-title` `.card-sub` `.icon` are global
+ * (styles/reep-v2.scss) and are used as they are. What is here is the shape of
+ * this board: the picker row, the two columns, the wizard's file step and the
+ * criteria card's field grid.
+ *
+ * The card title rows were once a screen-local `imports-card-*` trio, prefixed
+ * so as not to claim `.card-head` / `.card-title` while those were a local pair
+ * on another board. `.card-head`, `.card-title` and `.card-sub` are GLOBAL now
+ * and own those names, so the copy is gone and only the one line this board
+ * needs differently is left.
+ */
+
+:host {
+  display: block;
+}
+
+/* --- the board's picker row ---------------------------------------------- */
+
+.pickers {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.pickers .select {
+  max-width: 230px;
+}
+
+.pickers .batch-select {
+  max-width: 260px;
+}
+
+.pickers .semester-select {
+  max-width: 150px;
+}
+
+.pickers-end {
+  margin-left: auto;
+}
+
+/* --- two columns, the criteria card on the right ------------------------- */
+
+.imports-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.imports-main {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.imports-side {
+  flex: none;
+  width: 330px;
+  max-width: 100%;
+}
+
+/* The boards run these cards denser than the app's default 18px card. */
+.wizard-card,
+.preview-card,
+.history-card,
+.criteria-card {
+  padding: 14px;
+}
+
+/* The global's `flex-start` is for a title with its actions beside it. Every
+   card head on this board instead carries a one-line title and a second piece
+   of TEXT on the same line — the wizard's file-shape sentence, the criteria
+   card's rung chip — which have to sit on the title's baseline and not at the
+   top of a taller box. One line, not a second copy of the rule. */
+.card-head {
+  align-items: baseline;
+}
+
+/* --- the wizard: four numbered steps, then the file --------------------- */
+
+.wizard-steps .step-text {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1.25;
+  min-width: 0;
+}
+
+.wizard-steps .step-label {
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.wizard-steps .step-chosen {
+  font-size: 11px;
+  color: var(--faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 22ch;
+}
+
+.wizard-file {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+/* INVISIBLE BUT FOCUSABLE. `hidden` / display:none takes a file input out of
+   the focus order, and a <label> wrapper is not tabbable, so the picker would
+   be mouse-only — the exact defect the 2026-09 audit found on /mentor/signature
+   and /register. Geometry, not display. */
+.wizard-file__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.wizard-file__label {
+  position: relative;
+  cursor: pointer;
+}
+
+/* Focus has to be visible, or the focusable invisible input is a trap. */
+.wizard-file__label:focus-within {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+}
+
+.wizard-file__name {
+  font-size: 12.5px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* The press that sends the file to the server. Pushed to the end of the row so
+   it reads as the step AFTER choosing, not as an alternative to it. */
+.wizard-file__check {
+  margin-left: auto;
+  flex: none;
+}
+
+.wizard-status {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* What is still missing before the file can be checked, and the semester note.
+   A hint, not a warning: nothing has gone wrong yet. */
+.wizard-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 10px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.wizard-hint .icon {
+  font-size: 15px;
+  color: var(--purple-mid);
+  flex: none;
+}
+
+.wizard-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--risk);
+  line-height: 1.45;
+}
+
+.wizard-error .icon {
+  font-size: 15px;
+  flex: none;
+}
+
+@media (max-width: 720px) {
+  .wizard-file__check {
+    margin-left: 0;
+  }
+}
+
+/* --- the preview grid ---------------------------------------------------- */
+
+.preview-note {
+  margin-bottom: 10px;
+}
+
+.preview-frame {
+  display: flex;
+  flex-direction: column;
+}
+
+.preview-ag {
+  display: block;
+  width: 100%;
+  height: clamp(260px, calc(100vh - 620px), 460px);
+}
+
+.history-ag {
+  display: block;
+  width: 100%;
+  height: 190px;
+}
+
+.pagesize {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagesize select {
+  height: 24px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-seg);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 11.5px;
+  color: var(--ink);
+  padding: 0 4px;
+}
+
+.preview-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.preview-rule {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.preview-actions__end {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- the placement criteria card ---------------------------------------- */
+
+.criteria-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.criteria-field {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.criteria-rule {
+  margin: 12px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.criteria-state {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.criteria-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+}

@@ -1,0 +1,123 @@
+== schemathesis: public (^/(health|api/(auth/sso/status|register/hierarchy|interview/status))$)
+    
+    st replay DOEWkv
+
+=================================== WARNINGS ===================================
+
+Authentication failed: 1 operation returned authentication errors
+
+401 Unauthorized (1 operation):
+  - GET /api/interview/status
+
+💡 Ensure valid authentication credentials are set via --auth or -H
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 4/370
+  Tested: 4
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ Undocumented HTTP status code: 1
+
+Warnings:
+  ⚠️ Missing authentication: 1 operation returned only 401/403 responses
+
+Test cases:
+  36 generated, 1 found 1 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis/public/junit-20260929T210847Z.xml
+  - NDJSON: results/api/schemathesis/public/ndjson-20260929T210847Z.ndjson
+
+Seed: 136633938779889345716284045364863252318
+
+======================== 1 failure, 1 warning in 0.38s =========================
+== schemathesis: student (^/api/student/)
+    Documented: 200, 422
+
+[400] Bad Request:
+
+    `{"detail":"There was an error parsing the body"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Cookie: [Filtered]' -H 'Content-Type: application/json' -d $'�3\x1a\x1d��' http://localhost:3300/api/student/resume-profile
+    
+    st replay ah96Y1
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 57/370
+  Tested: 57
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ❌ Stateful
+
+Failures:
+  ❌ Server error: 2
+  ❌ Response violates schema: 8
+  ❌ Undocumented Content-Type: 1
+  ❌ Undocumented HTTP status code: 32
+
+Test cases:
+  1687 generated, 41 found 43 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis/student/junit-20260929T210848Z.xml
+  - NDJSON: results/api/schemathesis/student/ndjson-20260929T210848Z.ndjson
+
+Seed: 211321043887967634119451824962802816978
+
+============================ 43 failures in 12.16s =============================
+== schemathesis: admin (^/api/admin/)
+  - POST /api/admin/faculty
+  - POST /api/admin/governance/grants
+  - POST /api/admin/imports/preview
+  - POST /api/admin/swoc/{student_id}
+  - PUT /api/admin/governance/features
+
+💡 Check your schema constraints - API validation may be stricter than documented
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 150/370
+  Tested: 150
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ❌ Stateful
+
+Failures:
+  ❌ Server error: 4
+  ❌ Response violates schema: 33
+  ❌ Undocumented Content-Type: 6
+  ❌ Undocumented HTTP status code: 230
+
+Warnings:
+  ⚠️ Missing authentication: 31 operations returned only 401/403 responses
+  ⚠️ Schema validation mismatch: 5 operations mostly rejected generated data
+
+Test cases:
+  6756 generated, 269 found 273 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis/admin/junit-20260929T210902Z.xml
+  - NDJSON: results/api/schemathesis/admin/ndjson-20260929T210902Z.ndjson
+
+Seed: 19742776020460155767513532830757946095
+
+====================== 273 failures, 2 warnings in 43.19s ======================

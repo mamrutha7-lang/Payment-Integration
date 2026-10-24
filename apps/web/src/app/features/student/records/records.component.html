@@ -1,0 +1,283 @@
+<div class="dt-header">
+  <div>
+    <h1 class="dt-title">Records</h1>
+    <div class="dt-sub">
+      Your academic record — VTU results, attendance and history in one place.
+      <!-- The ONE entry point to /student/courses. The shell's sidebar groups
+           Courses with the records it leaves out, but nothing linked it: the
+           only routerLink to /student/courses was on the Courses page itself,
+           so it linked to nowhere but itself. Records is the sibling screen —
+           results and attendance here, subject-by-subject progress there. -->
+      <a class="rec-courses-link" routerLink="/student/courses">
+        <span class="icon" aria-hidden="true">menu_book</span>
+        Subject-by-subject progress
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- headline stats: only shown once results have loaded -->
+@if (resultsState() === 'ready' && results().length) {
+  <div class="dense-grid rec-stats">
+    <div class="dense-stat">
+      <div class="lbl">Latest CGPA</div>
+      <div class="val">{{ latestCgpa() !== null ? latestCgpa() : '—' }}</div>
+    </div>
+    <div class="dense-stat">
+      <div class="lbl">Semesters on record</div>
+      <div class="val">{{ results().length }}</div>
+    </div>
+    <div class="dense-stat">
+      <div class="lbl">Live backlogs</div>
+      <div class="val">{{ liveBacklogs() }}</div>
+    </div>
+    <div class="dense-stat">
+      <div class="lbl">Overall attendance</div>
+      <div class="val">
+        {{
+          attendanceState() === 'ready' && attendance() ? attendance()!.overall_percent + '%' : '—'
+        }}
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ============ SEMESTER RESULTS ============ -->
+<section class="rec-section">
+  <h2 class="rec-h">
+    <span class="icon" aria-hidden="true">school</span> Semester Results
+    <span class="rec-h-sub">VTU marks</span>
+  </h2>
+
+  @if (resultsState() === 'loading') {
+    <div class="card c-note">Loading your semester results…</div>
+  } @else if (resultsState() === 'error') {
+    <div class="card c-note">
+      We could not load your semester results just now. Please refresh in a moment.
+    </div>
+  } @else if (!results().length) {
+    <div class="card c-note">
+      No semester results yet. They appear here once the examination office imports your VTU marks.
+    </div>
+  } @else {
+    @for (r of results(); track r.semester) {
+      <div class="card sem-card">
+        <div class="sem-top">
+          <div class="sem-id">
+            <div class="sem-name">Semester {{ r.semester }}</div>
+            <div class="sem-meta">
+              CGPA {{ r.cgpa !== null ? r.cgpa : '—' }} · SGPA {{ r.sgpa !== null ? r.sgpa : '—' }}
+              @if (r.result_class) {
+                · {{ r.result_class }}
+              }
+            </div>
+          </div>
+          @let bchip = backlogChip(r.live_backlogs);
+          <span class="chip {{ bchip.cls }}">
+            <span class="icon" aria-hidden="true">{{ bchip.icon }}</span
+            >{{ bchip.label }}
+          </span>
+        </div>
+
+        <div class="rec-scroll">
+          <table class="dt-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Subject</th>
+                <th>Credits</th>
+                <th>Internal</th>
+                <th>External</th>
+                <th>Total</th>
+                <th>Result</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (s of r.subjects; track s.subject_code) {
+                @let schip = subjectChip(s.passed);
+                <tr>
+                  <td>{{ s.subject_code }}</td>
+                  <td>{{ s.subject_name }}</td>
+                  <td>{{ s.credits }}</td>
+                  <td>{{ s.internal }}</td>
+                  <td>{{ s.external }}</td>
+                  <td>{{ s.total }}</td>
+                  <td>
+                    <span class="chip {{ schip.cls }}">
+                      <span class="icon" aria-hidden="true">{{ schip.icon }}</span
+                      >{{ schip.label }}
+                    </span>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7" class="rec-empty-row">No subjects recorded for this semester.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</section>
+
+<!-- ============ ATTENDANCE ============ -->
+<section class="rec-section">
+  <h2 class="rec-h"><span class="icon" aria-hidden="true">event_available</span> Attendance</h2>
+
+  @if (attendanceState() === 'loading') {
+    <div class="card c-note">Loading your attendance…</div>
+  } @else if (attendanceState() === 'error') {
+    <div class="card c-note">
+      We could not load your attendance just now. Please refresh in a moment.
+    </div>
+  } @else if (!attendance() || attendance()!.total === 0) {
+    <div class="card c-note">
+      No attendance recorded yet. It appears here once classes are marked.
+    </div>
+  } @else {
+    @let att = attendance()!;
+    @let chip = attendanceChip(att.overall_percent);
+    <div class="card">
+      <div class="att-overall">
+        <div class="att-overall-head">
+          <div>
+            <div class="att-lbl">Overall attendance</div>
+            <div class="att-big">{{ att.overall_percent }}%</div>
+            <div class="att-fine">{{ att.present }} of {{ att.total }} classes attended</div>
+          </div>
+          <span class="chip {{ chip.cls }}">
+            <span class="icon" aria-hidden="true">{{ chip.icon }}</span
+            >{{ chip.label }}
+          </span>
+        </div>
+        <div
+          class="meter"
+          role="progressbar"
+          [attr.aria-valuenow]="att.overall_percent"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-label="Overall attendance"
+        >
+          <div
+            class="meter__fill {{ attendanceTone(att.overall_percent) }}"
+            [style.width.%]="att.overall_percent"
+          ></div>
+        </div>
+      </div>
+
+      @if (att.by_course.length) {
+        <div class="att-courses">
+          <div class="att-courses-h">By course</div>
+          @for (c of att.by_course; track c.course_code) {
+            @let cchip = attendanceChip(c.percent);
+            <div class="att-course">
+              <div class="att-course-code">{{ c.course_code }}</div>
+              <div
+                class="meter sm"
+                role="progressbar"
+                [attr.aria-valuenow]="c.percent"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-label]="c.course_code + ' attendance'"
+              >
+                <div
+                  class="meter__fill {{ attendanceTone(c.percent) }}"
+                  [style.width.%]="c.percent"
+                ></div>
+              </div>
+              <div class="att-course-fig">{{ c.present }}/{{ c.total }}</div>
+              <span class="chip {{ cchip.cls }} att-course-chip">
+                <span class="icon" aria-hidden="true">{{ cchip.icon }}</span
+                >{{ c.percent }}%
+              </span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>
+
+<!-- ============ ACADEMIC HISTORY ============
+     The 10th → PG chain and declared gaps, read-only. The editable Academics
+     screen this used to point at is retired with the v2 handoff: the record is
+     office-maintained and a student reads it here, beside their VTU marks. -->
+<section class="rec-section">
+  <h2 class="rec-h"><span class="icon" aria-hidden="true">history_edu</span> Academic History</h2>
+
+  @if (academicsState() === 'loading') {
+    <div class="card c-note">Loading your academic history…</div>
+  } @else if (academicsState() === 'error') {
+    <div class="card c-note">
+      We could not load your academic history just now. Please refresh in a moment.
+    </div>
+  } @else if (!academics() || !academics()!.qualifications.length) {
+    <!-- Read-only by design: the handoff has no entry form for qualifications,
+         and the old Academics screen that carried one is retired, so this must
+         not send a student to a screen that no longer exists. -->
+    <div class="card c-note">
+      No qualifications on record yet. Your 10th, 12th and prior-degree record appears here once
+      the office adds it to your student record.
+    </div>
+  } @else {
+    <div class="qual-grid">
+      @for (q of academics()!.qualifications; track $index) {
+        <div class="card qual-card">
+          <div class="qual-top">
+            <div class="qual-level">{{ levelName(q.level) }}</div>
+            <span class="chip neutral">{{ q.year }}</span>
+          </div>
+          <div class="qual-inst">{{ q.institution }}</div>
+          @if (q.board) {
+            <div class="qual-line">{{ q.board }}</div>
+          }
+          <div class="qual-marks">
+            <span class="qual-pct">{{ q.percent }}%</span>
+            <span class="qual-raw">{{ q.marks }} / {{ q.max_marks }}</span>
+          </div>
+          @if (q.medium || q.location) {
+            <div class="qual-line qual-sub">
+              @if (q.medium) {
+                <span>Medium: {{ q.medium }}</span>
+              }
+              @if (q.location) {
+                <span>{{ q.location }}</span>
+              }
+            </div>
+          }
+          @if (q.subjects) {
+            <div class="qual-line qual-sub">{{ q.subjects }}</div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- declared education gaps -->
+    <div class="card gap-card">
+      <div class="gap-head">
+        <div class="gap-title">Declared education gaps</div>
+        @if (hasGap()) {
+          <span class="chip warn">
+            <span class="icon" aria-hidden="true">schedule</span>{{ academics()!.gap.total_mo }} months total
+          </span>
+        } @else {
+          <span class="chip good"> <span class="icon" aria-hidden="true">check_circle</span>No gaps declared </span>
+        }
+      </div>
+      @if (hasGap()) {
+        <div class="dense-grid gap-grid">
+          @for (g of gapRows; track g.key) {
+            <div class="dense-stat">
+              <div class="lbl">{{ g.label }}</div>
+              <div class="val">{{ academics()!.gap[g.key] }}<span class="gap-unit"> mo</span></div>
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="gap-none">Your academic timeline is continuous — no gaps to declare.</div>
+      }
+    </div>
+  }
+</section>

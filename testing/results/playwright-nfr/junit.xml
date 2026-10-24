@@ -1,0 +1,133 @@
+<testsuites id="" name="" tests="32" failures="0" skipped="0" errors="0" time="118.11934">
+<testsuite name="accessibility.nfr.ts" timestamp="2026-09-29T21:43:49.111Z" hostname="chromium" tests="6" failures="0" skipped="0" time="31.899" errors="0">
+<testcase name="NFR-A11Y-01 /login has no critical WCAG 2.2 AA violation" classname="accessibility.nfr.ts" time="2.018">
+<system-out>
+<![CDATA[A11Y /login [{"id":"color-contrast","impact":"serious","nodes":3,"help":"Elements must meet minimum color contrast ratio thresholds"}]
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-A11Y-01 /register has no critical WCAG 2.2 AA violation" classname="accessibility.nfr.ts" time="22.02">
+<system-out>
+<![CDATA[A11Y /register []
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-A11Y-01 /student has no critical WCAG 2.2 AA violation" classname="accessibility.nfr.ts" time="2.253">
+<system-out>
+<![CDATA[A11Y /student [{"id":"color-contrast","impact":"serious","nodes":4,"help":"Elements must meet minimum color contrast ratio thresholds"}]
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-A11Y-01 /student/jobs has no critical WCAG 2.2 AA violation" classname="accessibility.nfr.ts" time="2.034">
+<system-out>
+<![CDATA[A11Y /student/jobs [{"id":"color-contrast","impact":"serious","nodes":2,"help":"Elements must meet minimum color contrast ratio thresholds"}]
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-A11Y-01 /student/time-log has no critical WCAG 2.2 AA violation" classname="accessibility.nfr.ts" time="2.641">
+<system-out>
+<![CDATA[A11Y /student/time-log [{"id":"color-contrast","impact":"serious","nodes":3,"help":"Elements must meet minimum color contrast ratio thresholds"}]
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-A11Y-02 the login form is operable by keyboard alone" classname="accessibility.nfr.ts" time="0.933">
+</testcase>
+</testsuite>
+<testsuite name="performance.nfr.ts" timestamp="2026-09-29T21:43:49.111Z" hostname="chromium" tests="8" failures="0" skipped="0" time="7.468" errors="0">
+<testcase name="NFR-PERF-01 /login loads within budget (cold)" classname="performance.nfr.ts" time="0.889">
+<system-out>
+<![CDATA[PERF /login {"ttfb":3,"dcl":266,"load":305,"lcp":440,"jsBytes":7787122,"requests":47}
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-PERF-01 /register loads within budget (cold)" classname="performance.nfr.ts" time="0.798">
+<system-out>
+<![CDATA[PERF /register {"ttfb":2,"dcl":203,"load":254,"lcp":396,"jsBytes":7760616,"requests":48}
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-PERF-02 /student renders its heading within budget (signed in)" classname="performance.nfr.ts" time="0.98">
+<system-out>
+<![CDATA[PERF /student heading=414ms {"ttfb":2,"dcl":223,"load":295,"lcp":404,"jsBytes":7239575,"requests":50}
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-PERF-02 /student/jobs renders its heading within budget (signed in)" classname="performance.nfr.ts" time="0.966">
+<system-out>
+<![CDATA[PERF /student/jobs heading=469ms {"ttfb":3,"dcl":194,"load":259,"lcp":396,"jsBytes":7655359,"requests":48}
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-PERF-02 /student/time-log renders its heading within budget (signed in)" classname="performance.nfr.ts" time="0.92">
+<system-out>
+<![CDATA[PERF /student/time-log heading=430ms {"ttfb":3,"dcl":233,"load":272,"lcp":384,"jsBytes":7222909,"requests":50}
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-PERF-02 /student/leaderboards renders its heading within budget (signed in)" classname="performance.nfr.ts" time="0.997">
+<system-out>
+<![CDATA[PERF /student/leaderboards heading=396ms {"ttfb":3,"dcl":241,"load":279,"lcp":392,"jsBytes":7172998,"requests":47}
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-PERF-02 /student/skilling renders its heading within budget (signed in)" classname="performance.nfr.ts" time="0.878">
+<system-out>
+<![CDATA[PERF /student/skilling heading=389ms {"ttfb":2,"dcl":190,"load":229,"lcp":356,"jsBytes":7219559,"requests":47}
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-PERF-03 client-side navigation between student screens is fast (SPA route change)" classname="performance.nfr.ts" time="1.04">
+<system-out>
+<![CDATA[PERF route-changes ms [62,124,67,54]
+]]>
+</system-out>
+</testcase>
+</testsuite>
+<testsuite name="responsive-resilience-security.nfr.ts" timestamp="2026-09-29T21:43:49.111Z" hostname="chromium" tests="18" failures="0" skipped="0" time="76.705" errors="0">
+<testcase name="NFR-RESP-01 phone-360 /login has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="0.464">
+</testcase>
+<testcase name="NFR-RESP-01 phone-360 /register has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="20.407">
+</testcase>
+<testcase name="NFR-RESP-01 phone-360 /student has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="0.81">
+</testcase>
+<testcase name="NFR-RESP-01 phone-360 /student/jobs has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="0.541">
+</testcase>
+<testcase name="NFR-RESP-01 tablet-768 /login has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="0.585">
+</testcase>
+<testcase name="NFR-RESP-01 tablet-768 /register has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="20.473">
+</testcase>
+<testcase name="NFR-RESP-01 tablet-768 /student has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="0.862">
+</testcase>
+<testcase name="NFR-RESP-01 tablet-768 /student/jobs has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="0.652">
+</testcase>
+<testcase name="NFR-RESP-01 desktop-1366 /login has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="0.61">
+</testcase>
+<testcase name="NFR-RESP-01 desktop-1366 /register has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="20.555">
+</testcase>
+<testcase name="NFR-RESP-01 desktop-1366 /student has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="0.92">
+</testcase>
+<testcase name="NFR-RESP-01 desktop-1366 /student/jobs has no horizontal overflow" classname="responsive-resilience-security.nfr.ts" time="0.835">
+</testcase>
+<testcase name="NFR-REL-01 login with the API unreachable still renders the sign-in screen, not a blank or a hang" classname="responsive-resilience-security.nfr.ts" time="0.714">
+</testcase>
+<testcase name="NFR-REL-01b with the API unreachable the screen does not claim the server is Google-only" classname="responsive-resilience-security.nfr.ts" time="3.731">
+<properties>
+<property name="fail" value="BUG DEF-009: unreachable API is reported as &quot;Google only&quot;">
+</property>
+</properties>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|artifacts/responsive-resilience-secu-38d63-m-the-server-is-Google-only-chromium/error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="NFR-REL-02 a 500 from one student endpoint does not take the whole screen down" classname="responsive-resilience-security.nfr.ts" time="0.838">
+</testcase>
+<testcase name="NFR-SEC-01 the session cookie is httpOnly (invisible to page scripts)" classname="responsive-resilience-security.nfr.ts" time="0.898">
+</testcase>
+<testcase name="NFR-SEC-02 no session material or password is written to web storage" classname="responsive-resilience-security.nfr.ts" time="0.805">
+</testcase>
+<testcase name="NFR-SEC-03 reflected script in a query string is not executed" classname="responsive-resilience-security.nfr.ts" time="2.005">
+</testcase>
+</testsuite>
+</testsuites>

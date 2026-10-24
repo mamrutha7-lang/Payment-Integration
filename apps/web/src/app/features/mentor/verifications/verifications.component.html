@@ -1,0 +1,287 @@
+<div class="panel" data-p="verifications">
+  <div class="dt-header">
+    <div>
+      <div class="eyebrow">Faculty · skill verification</div>
+      <h1 class="dt-title">Verifications</h1>
+      <div class="dt-sub vq-lede">
+        Skill claims and documents from every student your verification access covers. The student
+        is emailed your decision.
+      </div>
+    </div>
+    <div class="head-actions">
+      <span class="chip warn queue-chip">
+        <span class="icon" aria-hidden="true">hourglass_top</span> Skill claims {{ pendingCount() }}
+      </span>
+      <span class="chip warn queue-chip">
+        <span class="icon" aria-hidden="true">hourglass_top</span> Documents
+        {{ pendingUploadCount() }}
+      </span>
+    </div>
+  </div>
+
+  <div class="eyebrow">Skill claims</div>
+
+  @if (error()) {
+    <div class="notice vq-notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      <div>{{ error() }}</div>
+    </div>
+  }
+
+  @if (claims() === null) {
+    <div class="state-note"><span class="icon" aria-hidden="true">hourglass_empty</span>Loading the queue…</div>
+  } @else if (claims()!.length === 0) {
+    <div class="card empty-card">
+      <span class="icon" aria-hidden="true">check_circle</span> Nothing waiting for your review.
+    </div>
+  } @else {
+    @for (c of claims()!; track c.id) {
+      <div class="card claim">
+        <div class="claim-head">
+          <div>
+            <strong>{{ c.badge_name }}</strong>
+            <span class="claim-lvl"> · {{ c.category_label }} · {{ evidenceKind(c) }}</span>
+            <div class="claim-who">
+              {{ c.student_name }} · submitted {{ c.created_at | date: 'd MMM y' }}
+            </div>
+          </div>
+          <span class="chip warn">
+            <span class="icon" aria-hidden="true">hourglass_top</span>
+            {{ openId() === c.id ? 'Under review' : 'Submitted' }}
+          </span>
+        </div>
+
+        @if (openId() !== c.id) {
+          <div class="claim-actions-right">
+            <button type="button" class="btn primary" (click)="toggle(c.id)">
+              <span class="icon" aria-hidden="true">visibility</span> Review evidence
+            </button>
+          </div>
+        } @else {
+          <div class="claim-body">
+            <div class="claim-grid">
+              <div>
+                <div class="fld">Badge claimed</div>
+                <div class="val val--strong">{{ c.badge_name }}</div>
+              </div>
+              <div>
+                <div class="fld">Category</div>
+                <div class="val">{{ c.category_label }}</div>
+              </div>
+              <div>
+                <div class="fld">Evidence</div>
+                <div class="val">{{ evidenceKind(c) }} · {{ c.title || 'Untitled' }}</div>
+              </div>
+              <div>
+                <div class="fld">Issued by</div>
+                <div class="val">{{ c.provider || 'Not stated' }}</div>
+              </div>
+              <div>
+                <div class="fld">Student</div>
+                <div class="val">{{ c.student_name }}{{ c.usn ? ' · ' + c.usn : '' }}</div>
+              </div>
+              <div>
+                <div class="fld">Submitted</div>
+                <div class="val">{{ c.created_at | date: 'd MMM y, HH:mm' }}</div>
+              </div>
+            </div>
+
+            <div class="claim-note-block">
+              <div class="fld">What the student told you</div>
+              <div class="val">{{ c.student_note || 'No note was added with the claim.' }}</div>
+            </div>
+
+            <div class="claim-file">
+              @if (c.upload_id) {
+                <a class="btn" [href]="claimFileUrl(c.id)" target="_blank" rel="noopener">
+                  <span class="icon" aria-hidden="true">open_in_new</span>
+                  {{ c.evidence_file_name || 'Open the certificate' }}
+                </a>
+              } @else {
+                <span class="chip neutral">No file attached</span>
+              }
+            </div>
+
+            <div class="rubric">
+              <div class="fld">Verification rubric</div>
+              <ul>
+                <li>
+                  The certificate names this student, and the skill it evidences is the badge
+                  claimed.
+                </li>
+                <li>The issuer is identifiable and the assessment is more than attendance.</li>
+                <li>
+                  Verifying lights the badge on the student's board and verifies the certificate
+                  in their documents; rejecting refuses both, with your reason.
+                </li>
+              </ul>
+            </div>
+
+            <label class="note-field">
+              <span class="fld">
+                Note to the student
+                <span class="fld-hint"
+                  >(required for Request changes and Reject — it is emailed to them; optional
+                  for Verify)</span
+                >
+              </span>
+              <input
+                type="text"
+                [value]="note(c.id)"
+                (input)="setNote(c.id, $any($event.target).value)"
+                placeholder="e.g. The certificate is in another student's name."
+              />
+            </label>
+            @if (noteError()) {
+              <div class="note-error" role="alert">{{ noteError() }}</div>
+            }
+
+            <div class="decide-row">
+              <button
+                type="button"
+                class="btn primary"
+                [disabled]="deciding() === c.id"
+                (click)="decide(c, 'APPROVE')"
+              >
+                <span class="icon" aria-hidden="true">verified</span> Verify
+              </button>
+              <button
+                type="button"
+                class="btn btn-changes"
+                [disabled]="deciding() === c.id"
+                (click)="decide(c, 'MORE_INFO')"
+              >
+                <span class="icon" aria-hidden="true">undo</span> Request changes
+              </button>
+              <button
+                type="button"
+                class="btn btn-reject"
+                [disabled]="deciding() === c.id"
+                (click)="decide(c, 'REJECT')"
+              >
+                <span class="icon" aria-hidden="true">cancel</span> Reject
+              </button>
+              <button type="button" class="btn ghost" (click)="toggle(c.id)">Close</button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!--
+    Documents: the same verification access and the same reviewer. A certificate a
+    pending claim stands on is NOT listed here — it is decided with the claim
+    above — so what appears is a file no claim explains: a photo, an offer
+    letter, a report. Verify and Reject are the only two decisions
+    POST /mentor/uploads/{id}/review accepts, so they are the only two offered.
+  -->
+  <div style="margin-top: 26px">
+    <div class="eyebrow">Documents</div>
+
+    @if (uploadsError()) {
+      <div class="notice vq-notice" role="alert">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>{{ uploadsError() }}</div>
+      </div>
+    }
+
+    @if (uploads() === null) {
+      <div class="state-note">
+        <span class="icon" aria-hidden="true">hourglass_empty</span>Loading the document queue…
+      </div>
+    } @else if (uploads()!.length === 0 && !uploadsError()) {
+      <div class="card empty-card">
+        <span class="icon" aria-hidden="true">check_circle</span> No documents waiting for your
+        review.
+      </div>
+    } @else {
+      @for (u of uploads()!; track u.id) {
+        <div class="card claim">
+          <div class="claim-head">
+            <div>
+              <strong>{{ u.title || u.original_name }}</strong>
+              <span class="claim-lvl"> · {{ uploadKind(u) }}</span>
+              <div class="claim-who">
+                {{ u.student_name }} · uploaded {{ u.uploaded_at | date: 'd MMM y, HH:mm' }}
+              </div>
+            </div>
+            <span class="chip warn">
+              <span class="icon" aria-hidden="true">hourglass_top</span> Pending review
+            </span>
+          </div>
+
+          <div class="claim-body">
+            <div class="claim-file">
+              <a class="btn" [href]="fileUrl(u.id)" target="_blank" rel="noopener">
+                <span class="icon" aria-hidden="true">open_in_new</span>
+                Open {{ u.original_name }}
+              </a>
+            </div>
+
+            <label class="note-field">
+              <span class="fld">
+                Reviewer note
+                <span class="fld-hint">(required for Reject, optional for Verify)</span>
+              </span>
+              <input
+                type="text"
+                [value]="uploadNote(u.id)"
+                (input)="setUploadNote(u.id, $any($event.target).value)"
+                placeholder="e.g. The name on the certificate is not yours."
+              />
+            </label>
+            @if (uploadNoteError()?.id === u.id) {
+              <div class="note-error" role="alert">{{ uploadNoteError()!.message }}</div>
+            }
+
+            <div class="decide-row">
+              <button
+                type="button"
+                class="btn primary"
+                [disabled]="decidingUpload() === u.id"
+                (click)="decideUpload(u, 'VERIFY')"
+              >
+                <span class="icon" aria-hidden="true">check_circle</span> Verify
+              </button>
+              <button
+                type="button"
+                class="btn btn-reject"
+                [disabled]="decidingUpload() === u.id"
+                (click)="decideUpload(u, 'REJECT')"
+              >
+                <span class="icon" aria-hidden="true">cancel</span> Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Recently reviewed: the same scope, read back with the note the student was given. -->
+  @if (historyError()) {
+    <div class="state-note risk"><span class="icon" aria-hidden="true">error</span>{{ historyError() }}</div>
+  } @else if (history(); as past) {
+    @if (past.length > 0) {
+      <div class="history">
+        <div class="eyebrow history-title">Recently reviewed</div>
+        @for (h of past; track h.id) {
+          <div class="card history-row">
+            <span class="chip {{ outcome(h.status).tone }}">
+              <span class="icon" aria-hidden="true">{{ outcome(h.status).icon }}</span> {{ outcome(h.status).label }}
+            </span>
+            <div class="history-text">
+              <strong>{{ h.badge_name }}</strong>
+              <span class="history-meta">
+                · {{ h.student_name }}
+                @if (h.reviewed_at) { · {{ h.reviewed_at | date: 'd MMM y' }} }
+                @if (h.review_note) { · “{{ h.review_note }}” }
+              </span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

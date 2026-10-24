@@ -1,0 +1,815 @@
+
+Running 256 tests using 1 worker
+
+  ✓    1 [chromium] › tests/02-registration.spec.ts:755:7 › Registration and onboarding › The registration form lists the colleges, departments, courses and batches the office has set up @TC-100 (1.8s)
+  ✓    2 [chromium] › tests/02-registration.spec.ts:850:7 › Registration and onboarding › An empty form is refused with a list of everything missing @TC-101 (1.3s)
+  ✓    3 [chromium] › tests/02-registration.spec.ts:882:7 › Registration and onboarding › Course and Batch are required only where the office has listed some @TC-102 (4.4s)
+  ✓    4 [chromium] › tests/02-registration.spec.ts:960:7 › Registration and onboarding › The specialization checklist takes one tick, or two, and no more @TC-103 (3.6s)
+  ✓    5 [chromium] › tests/02-registration.spec.ts:1013:7 › Registration and onboarding › The CV and photo pickers state their limits and refuse the wrong file @TC-104 (5.3s)
+  ✓    6 [chromium] › tests/02-registration.spec.ts:1108:7 › Registration and onboarding › A complete application is received and held for review @TC-105 (3.2s)
+  ✓    7 [chromium] › tests/02-registration.spec.ts:1182:7 › Registration and onboarding › An application that an auto-approve rule matches is approved at once @TC-106 (5.7s)
+  ✓    8 [chromium] › tests/02-registration.spec.ts:1258:7 › Registration and onboarding › A second application from an address with a live one is refused without saying why @TC-107 (5.9s)
+  ✓    9 [chromium] › tests/02-registration.spec.ts:1324:7 › Registration and onboarding › A file that is not really a PDF is refused and leaves no application behind @TC-108 (2.3s)
+  ✓   10 [chromium] › tests/02-registration.spec.ts:1385:7 › Registration and onboarding › A rejected applicant can apply again, and the reviewer sees the earlier rejection @TC-109 (4.3s)
+  ✓   11 [chromium] › tests/02-registration.spec.ts:1458:7 › Registration and onboarding › The review queue lists pending, auto-approved and held applications on their own tabs @TC-110 (2.9s)
+  ✓   12 [chromium] › tests/02-registration.spec.ts:1570:7 › Registration and onboarding › The reviewer's panel shows the applicant, the checks and the attached files @TC-111 (3.2s)
+  ✓   13 [chromium] › tests/02-registration.spec.ts:1674:7 › Registration and onboarding › Search, filter and export the review queue @TC-112 (2.0s)
+  ✓   14 [chromium] › tests/02-registration.spec.ts:1728:7 › Registration and onboarding › Approving an application creates the student's account @TC-113 (5.9s)
+  ✓   15 [chromium] › tests/02-registration.spec.ts:1804:7 › Registration and onboarding › Rejecting needs a reason, and a rejection can be undone @TC-114 (4.2s)
+  ✓   16 [chromium] › tests/02-registration.spec.ts:1872:7 › Registration and onboarding › Holding needs a note, and a held application can be released @TC-115 (5.1s)
+  ✓   17 [chromium] › tests/02-registration.spec.ts:1956:7 › Registration and onboarding › Approve is refused for an address off the college's domains @TC-116 (2.9s)
+  ✓   18 [chromium] › tests/02-registration.spec.ts:2027:7 › Registration and onboarding › Create, edit, disable and delete an auto-approve rule @TC-117 (2.4s)
+  ✓   19 [chromium] › tests/02-registration.spec.ts:2177:7 › Registration and onboarding › A rule that would auto-approve everyone, or that uses a dangerous USN pattern, is refused @TC-118 (1.9s)
+  ✓   20 [chromium] › tests/02-registration.spec.ts:2262:7 › Registration and onboarding › A faculty member without the Registrations grant cannot open the review queue @TC-119 (900ms)
+  ✓   21 [chromium] › tests/02-registration.spec.ts:2279:7 › Registration and onboarding › The setup page opened without a link says what is missing @TC-120 (831ms)
+  ✓   22 [chromium] › tests/02-registration.spec.ts:2312:7 › Registration and onboarding › The setup page refuses a link it does not recognise @TC-121 (1.0s)
+  ✓   23 [chromium] › tests/02-registration.spec.ts:2360:7 › Registration and onboarding › The rules dialog names the batch a rule seats in, even when the batch names arrive last @TC-123 (1.7s)
+  ✓   24 [chromium] › tests/03-student-progress.spec.ts:556:7 › Student: home and progress › Student home greets the student with their stage, semester, USN and login streak @TC-200 (1.0s)
+  ✓   25 [chromium] › tests/03-student-progress.spec.ts:581:7 › Student: home and progress › The programme stage cards show each module's status @TC-201 (1.1s)
+  ✓   26 [chromium] › tests/03-student-progress.spec.ts:638:7 › Student: home and progress › A stage card row that has its own screen opens it @TC-202 (2.1s)
+  ✓   27 [chromium] › tests/03-student-progress.spec.ts:677:7 › Student: home and progress › The placement readiness card shows the score, the band and every factor @TC-203 (1.8s)
+  ✓   28 [chromium] › tests/03-student-progress.spec.ts:740:7 › Student: home and progress › A recommendation opens the screen that acts on it @TC-204 (1.5s)
+  ✓   29 [chromium] › tests/03-student-progress.spec.ts:775:7 › Student: home and progress › The landing shows the student's SWOC, attendance, marks and academic history @TC-205 (1.9s)
+  ✓   30 [chromium] › tests/03-student-progress.spec.ts:858:7 › Student: home and progress › The badge board shows the student's verified badges and open claims @TC-210 (1.1s)
+  ✓   31 [chromium] › tests/03-student-progress.spec.ts:921:7 › Student: home and progress › Tapping a badge previews its earned state @TC-211 (1.1s)
+  ✓   32 [chromium] › tests/03-student-progress.spec.ts:963:7 › Student: home and progress › The claim form asks for a category before a badge and offers no readiness badges @TC-212 (1.0s)
+  ✓   33 [chromium] › tests/03-student-progress.spec.ts:1034:7 › Student: home and progress › Filing a claim with a certificate sends the badge to the mentor @TC-213 (1.7s)
+  ✓   34 [chromium] › tests/03-student-progress.spec.ts:1109:7 › Student: home and progress › The claim form refuses a certificate of the wrong type or size @TC-214 (1.8s)
+  ✓   35 [chromium] › tests/03-student-progress.spec.ts:1151:7 › Student: home and progress › The Time Allocation Ledger opens on today with the last 14 days @TC-220 (1.1s)
+  ✓   36 [chromium] › tests/03-student-progress.spec.ts:1223:7 › Student: home and progress › The day stepper moves one calendar day at a time and stops at today @TC-221 (1.4s)
+  ✓   37 [chromium] › tests/03-student-progress.spec.ts:1280:7 › Student: home and progress › Saving a draft keeps the hours and updates the day's totals @TC-222 (2.2s)
+  ✓   38 [chromium] › tests/03-student-progress.spec.ts:1376:7 › Student: home and progress › A slot cannot be saved with more hours than its capacity @TC-223 (1.7s)
+  ✓   39 [chromium] › tests/03-student-progress.spec.ts:1429:7 › Student: home and progress › A day that does not add up to 24 hours cannot be submitted @TC-224 (2.2s)
+  ✓   40 [chromium] › tests/03-student-progress.spec.ts:1497:7 › Student: home and progress › The weekly skilling strip adds up the Skilling hours logged this week @TC-225 (2.0s)
+  ✓   41 [chromium] › tests/03-student-progress.spec.ts:1550:7 › Student: home and progress › A day past its edit window is locked @TC-226 (1.4s)
+  ✓   42 [chromium] › tests/03-student-progress.spec.ts:1600:7 › Student: home and progress › Copy yesterday fills an open day from the previous submitted day @TC-227 (2.4s)
+  ✓   43 [chromium] › tests/03-student-progress.spec.ts:1661:7 › Student: home and progress › Submitting a day that adds up to 24 hours closes it @TC-228 (2.6s)
+  ✓   44 [chromium] › tests/03-student-progress.spec.ts:1721:7 › Student: home and progress › The Courses screen shows progress on each enrolled course @TC-230 (1.3s)
+  ✓   45 [chromium] › tests/03-student-progress.spec.ts:1802:7 › Student: home and progress › Records show the student's VTU results, attendance and academic history @TC-240 (1.2s)
+  ✓   46 [chromium] › tests/03-student-progress.spec.ts:1866:7 › Student: home and progress › Leaderboards open on the Overall board, ranked within the student's batch @TC-250 (1.2s)
+  ✓   47 [chromium] › tests/03-student-progress.spec.ts:1911:7 › Student: home and progress › Each leaderboard tab ranks the student by its own measure @TC-251 (1.2s)
+  ✓   48 [chromium] › tests/03-student-progress.spec.ts:1957:7 › Student: home and progress › A batch mate with no record is listed as not ranked @TC-252 (1.6s)
+  ✓   49 [chromium] › tests/03-student-progress.spec.ts:2012:7 › Student: home and progress › A removed batch mate leaves the leaderboard @TC-253 (1.6s)
+  ✓   50 [chromium] › tests/03-student-progress.spec.ts:2057:7 › Student: home and progress › A student hidden from the leaderboards can take part again @TC-254 (900ms)
+  ✓   51 [chromium] › tests/04-student-tools.spec.ts:198:7 › Student: profile, jobs and tools › Profile shows the locked identity and institutional assignment @TC-300 (966ms)
+  ✓   52 [chromium] › tests/04-student-tools.spec.ts:271:7 › Student: profile, jobs and tools › Saving edited contact details on the profile @TC-301 (1.5s)
+  ✓   53 [chromium] › tests/04-student-tools.spec.ts:343:7 › Student: profile, jobs and tools › Invalid phone and LinkedIn entries are refused before saving @TC-302 (1.7s)
+  ✓   54 [chromium] › tests/04-student-tools.spec.ts:414:7 › Student: profile, jobs and tools › Uploads lists the student's documents and their review status @TC-303 (837ms)
+  ✓   55 [chromium] › tests/04-student-tools.spec.ts:476:7 › Student: profile, jobs and tools › Uploading a document puts it in review with a preview @TC-304 (1.1s)
+  ✓   56 [chromium] › tests/04-student-tools.spec.ts:550:7 › Student: profile, jobs and tools › Removing an uploaded document @TC-305 (1.4s)
+  ✓   57 [chromium] › tests/04-student-tools.spec.ts:595:7 › Student: profile, jobs and tools › Replacing an uploaded document @TC-306 (1.1s)
+  ✓   58 [chromium] › tests/04-student-tools.spec.ts:638:7 › Student: profile, jobs and tools › A file that is not a PDF, PNG or JPEG is refused @TC-307 (1.3s)
+  ✓   59 [chromium] › tests/04-student-tools.spec.ts:677:7 › Student: profile, jobs and tools › A file over 10 MB is refused @TC-308 (3.7s)
+  ✓   60 [chromium] › tests/04-student-tools.spec.ts:721:7 › Student: profile, jobs and tools › Filling a resume builder section and saving it @TC-309 (2.5s)
+  ✓   61 [chromium] › tests/04-student-tools.spec.ts:806:7 › Student: profile, jobs and tools › Generating a resume composes it on this machine and downloads it as a PDF @TC-310 (1.9s)
+  ✓   62 [chromium] › tests/04-student-tools.spec.ts:907:7 › Student: profile, jobs and tools › Exporting a resume needs the sharing confirmation @TC-311 (1.8s)
+  ✓   63 [chromium] › tests/04-student-tools.spec.ts:979:7 › Student: profile, jobs and tools › The jobs board shows match and eligibility for each posting @TC-312 (1.1s)
+  ✓   64 [chromium] › tests/04-student-tools.spec.ts:1027:7 › Student: profile, jobs and tools › Filtering the jobs board @TC-313 (1.4s)
+  ✓   65 [chromium] › tests/04-student-tools.spec.ts:1106:7 › Student: profile, jobs and tools › Applying to an eligible posting @TC-314 (2.2s)
+  ✓   66 [chromium] › tests/04-student-tools.spec.ts:1187:7 › Student: profile, jobs and tools › The English baseline shows pending sections as dashes, not zeros @TC-315 (1.3s)
+  ✓   67 [chromium] › tests/04-student-tools.spec.ts:1287:7 › Student: profile, jobs and tools › The English baseline allows one attempt per semester @TC-316 (1.4s)
+  ✓   68 [chromium] › tests/04-student-tools.spec.ts:1338:7 › Student: profile, jobs and tools › Downloading the English baseline report @TC-317 (916ms)
+  ✓   69 [chromium] › tests/04-student-tools.spec.ts:1365:7 › Student: profile, jobs and tools › The Faculty / TPO Log shows the meeting history and SWOC @TC-319 (883ms)
+  ✓   70 [chromium] › tests/04-student-tools.spec.ts:1439:7 › Student: profile, jobs and tools › Requesting a meeting with the mentor @TC-320 (1.5s)
+  ✓   71 [chromium] › tests/04-student-tools.spec.ts:1531:7 › Student: profile, jobs and tools › The Mock interviews screen before any interview @TC-322 (1.1s)
+  ✓   72 [chromium] › tests/04-student-tools.spec.ts:1583:7 › Student: profile, jobs and tools › The mock interview page and its round picker @TC-324 (957ms)
+  ✓   73 [chromium] › tests/04-student-tools.spec.ts:1658:7 › Student: profile, jobs and tools › Start shows the college's interview terms, and Cancel records nothing @TC-325 (1.1s)
+  ✓   74 [chromium] › tests/04-student-tools.spec.ts:1743:7 › Student: profile, jobs and tools › Asking the REEP Agent, rating the answer and clearing the conversation @TC-328 (1.5s)
+  ✓   75 [chromium] › tests/04-student-tools.spec.ts:1842:7 › Student: profile, jobs and tools › The floating orb opens the assistant dock with both tabs @TC-329 (1.6s)
+  ✓   76 [chromium] › tests/05-faculty-alumni.spec.ts:329:7 › Faculty and alumni › Faculty notebook shows the assigned student and the log form @TC-400 (1.1s)
+  ✓   77 [chromium] › tests/05-faculty-alumni.spec.ts:424:7 › Faculty and alumni › Add, publish and delete a notebook entry @TC-401 (2.8s)
+  ✓   78 [chromium] › tests/05-faculty-alumni.spec.ts:538:7 › Faculty and alumni › A notebook entry is refused without the key discussions @TC-402 (950ms)
+  ✓   79 [chromium] › tests/05-faculty-alumni.spec.ts:577:7 › Faculty and alumni › Mentee Log lists the assigned student and their meeting notes @TC-403 (835ms)
+  ✓   80 [chromium] › tests/05-faculty-alumni.spec.ts:634:7 › Faculty and alumni › Search the mentee list by name or USN @TC-404 (822ms)
+  ✓   81 [chromium] › tests/05-faculty-alumni.spec.ts:663:7 › Faculty and alumni › Save and delete a meeting note @TC-405 (2.9s)
+  ✓   82 [chromium] › tests/05-faculty-alumni.spec.ts:746:7 › Faculty and alumni › A meeting note is refused when it is empty @TC-406 (1.4s)
+  ✓   83 [chromium] › tests/05-faculty-alumni.spec.ts:778:7 › Faculty and alumni › Verifications lists the mentees' pending skill claims and documents @TC-407 (1.6s)
+  ✓   84 [chromium] › tests/05-faculty-alumni.spec.ts:925:7 › Faculty and alumni › Verify a skill claim @TC-408 (2.0s)
+  ✓   85 [chromium] › tests/05-faculty-alumni.spec.ts:1041:9 › Faculty and alumni › Request changes on a skill claim, which needs a note @TC-409 (2.0s)
+  ✓   86 [chromium] › tests/05-faculty-alumni.spec.ts:1041:9 › Faculty and alumni › Reject a skill claim, which needs a reason @TC-410 (1.9s)
+  ✓   87 [chromium] › tests/05-faculty-alumni.spec.ts:1113:7 › Faculty and alumni › Verify an uploaded document @TC-411 (1.5s)
+  ✓   88 [chromium] › tests/05-faculty-alumni.spec.ts:1173:7 › Faculty and alumni › Reject an uploaded document, which needs a note @TC-412 (1.5s)
+  ✓   89 [chromium] › tests/05-faculty-alumni.spec.ts:1232:7 › Faculty and alumni › Upload, view and remove an Upskilling certificate @TC-413 (1.6s)
+  ✓   90 [chromium] › tests/05-faculty-alumni.spec.ts:1340:7 › Faculty and alumni › Upskilling asks for the certificate's name before the file @TC-414 (1.3s)
+  ✓   91 [chromium] › tests/05-faculty-alumni.spec.ts:1365:7 › Faculty and alumni › Upskilling refuses a file that is not a PDF, PNG or JPEG @TC-415 (1.0s)
+  ✓   92 [chromium] › tests/05-faculty-alumni.spec.ts:1410:7 › Faculty and alumni › Upload, replace and remove the signature image @TC-416 (1.5s)
+  ✓   93 [chromium] › tests/05-faculty-alumni.spec.ts:1524:7 › Faculty and alumni › The signature refuses a file that is not an image @TC-417 (777ms)
+  ✓   94 [chromium] › tests/05-faculty-alumni.spec.ts:1561:7 › Faculty and alumni › Submit a leave request on the official form @TC-418 (1.5s)
+  ✓   95 [chromium] › tests/05-faculty-alumni.spec.ts:1707:7 › Faculty and alumni › A leave request whose dates run backwards is refused @TC-419 (1.1s)
+  ✓   96 [chromium] › tests/05-faculty-alumni.spec.ts:1749:7 › Faculty and alumni › Withdraw a leave request that is awaiting a decision @TC-420 (1.2s)
+  ✓   97 [chromium] › tests/05-faculty-alumni.spec.ts:1823:7 › Faculty and alumni › Download a leave request's paper as a PDF @TC-421 (968ms)
+  ✓   98 [chromium] › tests/05-faculty-alumni.spec.ts:1861:7 › Faculty and alumni › Save a leave request as a draft on this device, and discard it @TC-422 (1.2s)
+  ✓   99 [chromium] › tests/05-faculty-alumni.spec.ts:1950:7 › Faculty and alumni › Ask the REEP Agent a question as a faculty member @TC-423 (1.3s)
+  ✓  100 [chromium] › tests/05-faculty-alumni.spec.ts:2034:7 › Faculty and alumni › A faculty member is kept out of the admin console @TC-424 (1.3s)
+  ✓  101 [chromium] › tests/05-faculty-alumni.spec.ts:2080:7 › Faculty and alumni › Alumni creates their profile on first sign-in, or edits it afterwards @TC-425 (1.5s)
+  ✓  102 [chromium] › tests/05-faculty-alumni.spec.ts:2246:7 › Faculty and alumni › The alumni profile is not saved without a company @TC-426 (1.2s)
+  ✓  103 [chromium] › tests/05-faculty-alumni.spec.ts:2305:7 › Faculty and alumni › Alumni downloads their resume @TC-427 (821ms)
+  ✓  104 [chromium] › tests/05-faculty-alumni.spec.ts:2342:7 › Faculty and alumni › Alumni jobs sheet lists open postings without match or eligibility @TC-428 (927ms)
+  ✓  105 [chromium] › tests/05-faculty-alumni.spec.ts:2424:7 › Faculty and alumni › Search the alumni jobs sheet @TC-429 (757ms)
+  ✓  106 [chromium] › tests/06-admin-people.spec.ts:522:7 › Admin: people and access › The Main Admin home shows the waiting counts and every task @TC-500 (1.2s)
+  ✓  107 [chromium] › tests/06-admin-people.spec.ts:607:7 › Admin: people and access › A waiting count and a task button open their screens @TC-501 (3.3s)
+  ✓  108 [chromium] › tests/06-admin-people.spec.ts:657:7 › Admin: people and access › Finding a task narrows the buttons @TC-502 (1.1s)
+  ✘  109 [chromium] › tests/06-admin-people.spec.ts:699:7 › Admin: people and access › The roster lists the seeded student with their details @TC-503 (6.9s)
+  ✘  110 [chromium] › tests/06-admin-people.spec.ts:736:7 › Admin: people and access › Searching the roster by USN and by name @TC-504 (6.6s)
+  ✘  111 [chromium] › tests/06-admin-people.spec.ts:768:7 › Admin: people and access › Searching the roster by college email finds the student @TC-505 (6.3s)
+  ✘  112 [chromium] › tests/06-admin-people.spec.ts:792:7 › Admin: people and access › Filtering the roster by batch and status @TC-506 (6.5s)
+  ✓  113 [chromium] › tests/06-admin-people.spec.ts:846:7 › Admin: people and access › A batch whose students are all filtered out is not called empty @TC-507 (2.4s)
+  ✘  114 [chromium] › tests/06-admin-people.spec.ts:893:7 › Admin: people and access › Editing a student and putting the change back @TC-508 (6.0s)
+  ✘  115 [chromium] › tests/06-admin-people.spec.ts:978:7 › Admin: people and access › Editing a student refuses an address off the college domain @TC-509 (30.2s)
+  ✓  116 [chromium] › tests/06-admin-people.spec.ts:1031:7 › Admin: people and access › A batch action sets the semester and the stage for the whole batch @TC-510 (2.9s)
+  ✓  117 [chromium] › tests/06-admin-people.spec.ts:1113:7 › Admin: people and access › A batch action writes only to the students its dialog counts @TC-539 (2.8s)
+  ✘  118 [chromium] › tests/06-admin-people.spec.ts:1190:7 › Admin: people and access › Assigning a faculty member to the ticked students @TC-511 (6.3s)
+  ✘  119 [chromium] › tests/06-admin-people.spec.ts:1282:7 › Admin: people and access › After a selection action the grid's ticks match the toolbar @TC-512 (30.3s)
+  ✘  120 [chromium] › tests/06-admin-people.spec.ts:1330:7 › Admin: people and access › The View button opens the student's full record @TC-513 (30.4s)
+  ✘  121 [chromium] › tests/06-admin-people.spec.ts:1385:7 › Admin: people and access › The full record shows the profile, results, documents and mentor history @TC-514 (30.3s)
+  ✓  122 [chromium] › tests/06-admin-people.spec.ts:1515:7 › Admin: people and access › Removing a student and restoring them from the Removed list @TC-515 (3.6s)
+  ✓  123 [chromium] › tests/06-admin-people.spec.ts:1632:7 › Admin: people and access › The faculty list shows the seeded faculty member @TC-516 (1.7s)
+  ✓  124 [chromium] › tests/06-admin-people.spec.ts:1695:7 › Admin: people and access › Adding a faculty member hands over an activation link @TC-517 (2.3s)
+  ✓  125 [chromium] › tests/06-admin-people.spec.ts:1858:7 › Admin: people and access › Adding a faculty member refuses missing or invalid details @TC-518 (1.5s)
+  ✓  126 [chromium] › tests/06-admin-people.spec.ts:1965:7 › Admin: people and access › Editing a faculty member's profile @TC-519 (2.0s)
+  ✓  127 [chromium] › tests/06-admin-people.spec.ts:2020:7 › Admin: people and access › A new activation link replaces the earlier one @TC-520 (4.0s)
+  ✓  128 [chromium] › tests/06-admin-people.spec.ts:2110:7 › Admin: people and access › Disabling a faculty account needs a reason, and enabling it again @TC-521 (4.6s)
+  ✓  129 [chromium] › tests/06-admin-people.spec.ts:2224:7 › Admin: people and access › The disable dialog says what happens to the faculty member's mentees @TC-522 (3.1s)
+  ✓  130 [chromium] › tests/06-admin-people.spec.ts:2282:7 › Admin: people and access › A disabled faculty member is told their account is disabled @TC-523 (1.8s)
+  ✓  131 [chromium] › tests/06-admin-people.spec.ts:2331:7 › Admin: people and access › Signing a faculty member out of every device @TC-524 (4.6s)
+  ✓  132 [chromium] › tests/06-admin-people.spec.ts:2393:7 › Admin: people and access › Removing a faculty account and restoring it @TC-525 (5.1s)
+  ✓  133 [chromium] › tests/06-admin-people.spec.ts:2475:7 › Admin: people and access › Deleting for good refuses a wrong code @TC-526 (4.2s)
+  ✓  134 [chromium] › tests/06-admin-people.spec.ts:2549:7 › Admin: people and access › The mentor load shows each faculty member's students against capacity @TC-528 (2.4s)
+  ✘  135 [chromium] › tests/06-admin-people.spec.ts:2611:7 › Admin: people and access › Releasing a student and assigning them again, with the history @TC-529 (7.2s)
+  ✓  136 [chromium] › tests/06-admin-people.spec.ts:2718:7 › Admin: people and access › Granting a function with a reason, scope and dates, then revoking it @TC-530 (5.2s)
+  ✓  137 [chromium] › tests/06-admin-people.spec.ts:2893:9 › Admin: people and access › in India Standard Time › A grant's expiry reads back as the day that was typed @TC-531 (1.5s)
+  ✓  138 [chromium] › tests/06-admin-people.spec.ts:2962:7 › Admin: people and access › Switching a student feature off for a batch and removing the rule @TC-532 (1.6s)
+  ✓  139 [chromium] › tests/06-admin-people.spec.ts:3091:7 › Admin: people and access › Every student feature switch is enforced by the API @TC-533 (994ms)
+  ✓  140 [chromium] › tests/06-admin-people.spec.ts:3134:7 › Admin: people and access › A student refused a switched-off feature reads the office's message @TC-534 (1.2s)
+  ✓  141 [chromium] › tests/06-admin-people.spec.ts:3175:7 › Admin: people and access › The audit trail shows a console change and opens its event @TC-535 (2.9s)
+  ✓  142 [chromium] › tests/06-admin-people.spec.ts:3273:7 › Admin: people and access › Exporting the audit trail as a CSV file @TC-536 (2.7s)
+  ✓  143 [chromium] › tests/06-admin-people.spec.ts:3339:7 › Admin: people and access › A faculty member cannot open the admin console @TC-537 (1.7s)
+  ✓  144 [chromium] › tests/06-admin-people.spec.ts:3361:7 › Admin: people and access › A student cannot open the admin console @TC-538 (1.5s)
+  ✓  145 [chromium] › tests/07-admin-operations.spec.ts:378:7 › Admin: daily operations › Analytics shows the programme's figures from the database @TC-600 (2.1s)
+  ✓  146 [chromium] › tests/07-admin-operations.spec.ts:473:7 › Admin: daily operations › The analytics period filter re-counts the figures @TC-601 (1.9s)
+  ✓  147 [chromium] › tests/07-admin-operations.spec.ts:517:7 › Admin: daily operations › The weekly chart can be drawn for one student, and the mentor load can be searched @TC-602 (3.0s)
+  ✓  148 [chromium] › tests/07-admin-operations.spec.ts:589:7 › Admin: daily operations › Changing and restoring an alert rule for a batch @TC-603 (2.8s)
+  ✓  149 [chromium] › tests/07-admin-operations.spec.ts:704:7 › Admin: daily operations › The leave queue lists a faculty member's pending request @TC-610 (1.6s)
+  ✓  150 [chromium] › tests/07-admin-operations.spec.ts:804:7 › Admin: daily operations › Sanctioning a leave request @TC-611 (1.8s)
+  ✓  151 [chromium] › tests/07-admin-operations.spec.ts:905:7 › Admin: daily operations › Rejecting a leave request needs remarks @TC-612 (2.0s)
+  ✓  152 [chromium] › tests/07-admin-operations.spec.ts:995:7 › Admin: daily operations › Downloading a pending request's leave paper @TC-613 (1.6s)
+  ✓  153 [chromium] › tests/07-admin-operations.spec.ts:1034:7 › Admin: daily operations › Recording, correcting and removing a leave allowance @TC-614 (2.8s)
+  ✓  154 [chromium] › tests/07-admin-operations.spec.ts:1163:7 › Admin: daily operations › Recording and removing an academic calendar day @TC-615 (1.8s)
+  ✓  155 [chromium] › tests/07-admin-operations.spec.ts:1250:7 › Admin: daily operations › The allowances table stays readable in a short window @TC-616 (1.1s)
+  ✓  156 [chromium] › tests/07-admin-operations.spec.ts:1285:7 › Admin: daily operations › The jobs sheet lists the postings on record @TC-620 (2.6s)
+  ✓  157 [chromium] › tests/07-admin-operations.spec.ts:1345:7 › Admin: daily operations › Posting a job puts it on the sheet and on the student's board @TC-621 (2.5s)
+  ✓  158 [chromium] › tests/07-admin-operations.spec.ts:1433:7 › Admin: daily operations › A posting is not published without a title, a company and a web apply link @TC-622 (1.8s)
+  ✓  159 [chromium] › tests/07-admin-operations.spec.ts:1508:7 › Admin: daily operations › Duplicating a posting copies it into the form @TC-623 (1.8s)
+  ✓  160 [chromium] › tests/07-admin-operations.spec.ts:1600:7 › Admin: daily operations › Closing a posting takes it off the student's board @TC-624 (3.1s)
+  ✓  161 [chromium] › tests/07-admin-operations.spec.ts:1689:7 › Admin: daily operations › Removing a posting nobody has applied to @TC-625 (1.5s)
+  ✓  162 [chromium] › tests/07-admin-operations.spec.ts:1741:7 › Admin: daily operations › Searching the jobs sheet by company or location @TC-626 (2.2s)
+  ✓  163 [chromium] › tests/07-admin-operations.spec.ts:1777:7 › Admin: daily operations › Placement shows the funnel and the offers from the database @TC-630 (1.7s)
+  ✓  164 [chromium] › tests/07-admin-operations.spec.ts:1855:7 › Admin: daily operations › Placement's batch and period filters, and the offers export @TC-631 (2.1s)
+  ✓  165 [chromium] › tests/07-admin-operations.spec.ts:1941:7 › Admin: daily operations › Rejecting a submitted offer needs remarks @TC-632 (2.5s)
+  ✓  166 [chromium] › tests/07-admin-operations.spec.ts:2023:7 › Admin: daily operations › Downloading each report, with its receipt in the history @TC-640 (13.4s)
+  ✓  167 [chromium] › tests/07-admin-operations.spec.ts:2157:7 › Admin: daily operations › The import wizard asks for a batch, a semester and a file before it checks one @TC-650 (2.4s)
+  ✓  168 [chromium] › tests/07-admin-operations.spec.ts:2243:7 › Admin: daily operations › Checking and importing an attendance spreadsheet @TC-651 (2.1s)
+  ✓  169 [chromium] › tests/07-admin-operations.spec.ts:2394:7 › Admin: daily operations › A spreadsheet with no data rows is refused @TC-652 (1.6s)
+  ✓  170 [chromium] › tests/07-admin-operations.spec.ts:2459:7 › Admin: daily operations › SWOC notes show the student's four quadrants @TC-660 (1.3s)
+  ✓  171 [chromium] › tests/07-admin-operations.spec.ts:2523:7 › Admin: daily operations › Adding a SWOC line shows it to the student @TC-661 (2.0s)
+  ✓  172 [chromium] › tests/07-admin-operations.spec.ts:2593:7 › Admin: daily operations › Editing a SWOC line records the change in the edit history @TC-662 (1.9s)
+  ✓  173 [chromium] › tests/07-admin-operations.spec.ts:2670:7 › Admin: daily operations › Removing a SWOC line takes it off the student's home @TC-663 (2.2s)
+  ✓  174 [chromium] › tests/07-admin-operations.spec.ts:2724:7 › Admin: daily operations › A SWOC line cannot be emptied @TC-664 (1.3s)
+  ✓  175 [chromium] › tests/07-admin-operations.spec.ts:2764:7 › Admin: daily operations › Asking the REEP Agent a policy question @TC-670 (1.2s)
+  ✓  176 [chromium] › tests/07-admin-operations.spec.ts:2827:7 › Admin: daily operations › The REEP Agent does not give the office personalised student answers @TC-671 (1.1s)
+  ✓  177 [chromium] › tests/07-admin-operations.spec.ts:2887:7 › Admin: daily operations › A faculty member cannot open the daily-operations screens @TC-680 (2.7s)
+  ✓  178 [chromium] › tests/07-admin-operations.spec.ts:2913:7 › Admin: daily operations › A student cannot open the daily-operations screens @TC-681 (2.4s)
+  ✓  179 [chromium] › tests/08-admin-setup.spec.ts:442:7 › Admin: college setup and interviews › Colleges lists every college as a card with its facts @TC-700 (1.1s)
+  ✓  180 [chromium] › tests/08-admin-setup.spec.ts:541:7 › Admin: college setup and interviews › A college card opens its structure and its setup @TC-701 (1.5s)
+  ✓  181 [chromium] › tests/08-admin-setup.spec.ts:599:7 › Admin: college setup and interviews › Appoint a faculty member to run a college @TC-702 (2.1s)
+  ✓  182 [chromium] › tests/08-admin-setup.spec.ts:712:7 › Admin: college setup and interviews › Deleting a college that still has people under it is refused @TC-703 (1.3s)
+  ✓  183 [chromium] › tests/08-admin-setup.spec.ts:784:7 › Admin: college setup and interviews › Set up a new college in six steps @TC-705 (2.1s)
+  ✓  184 [chromium] › tests/08-admin-setup.spec.ts:990:7 › Admin: college setup and interviews › Creating a college that is already there changes nothing and says "Already there" @TC-706 (2.4s)
+  ✓  185 [chromium] › tests/08-admin-setup.spec.ts:1110:7 › Admin: college setup and interviews › Continue a half-set-up college from College structure @TC-707 (1.6s)
+  ✓  186 [chromium] › tests/08-admin-setup.spec.ts:1217:7 › Admin: college setup and interviews › A refused row stops only what hangs under it, and "Create again" resumes @TC-708 (1.7s)
+  ✓  187 [chromium] › tests/08-admin-setup.spec.ts:1348:7 › Admin: college setup and interviews › Setup opened for an existing college shows that college in the picker @TC-709 (936ms)
+  ✓  188 [chromium] › tests/08-admin-setup.spec.ts:1376:7 › Admin: college setup and interviews › College structure shows the seeded college top to bottom @TC-710 (1.4s)
+  ✓  189 [chromium] › tests/08-admin-setup.spec.ts:1512:7 › Admin: college setup and interviews › Edit and archive a course @TC-711 (1.3s)
+  ✓  190 [chromium] › tests/08-admin-setup.spec.ts:1587:7 › Admin: college setup and interviews › Map a mock interview to a specialization, and unmap it @TC-712 (1.6s)
+  ✓  191 [chromium] › tests/08-admin-setup.spec.ts:1687:7 › Admin: college setup and interviews › Add a non-standard batch, then edit it @TC-713 (1.9s)
+  ✓  192 [chromium] › tests/08-admin-setup.spec.ts:1810:7 › Admin: college setup and interviews › A batch with a taken code or dates that run backwards is refused @TC-714 (1.6s)
+  ✓  193 [chromium] › tests/08-admin-setup.spec.ts:1870:7 › Admin: college setup and interviews › Take a student out of a batch and seat them again @TC-715 (1.7s)
+  ✓  194 [chromium] › tests/08-admin-setup.spec.ts:1966:7 › Admin: college setup and interviews › Add and remove a college’s email domain @TC-716 (1.7s)
+  ✓  195 [chromium] › tests/08-admin-setup.spec.ts:2033:7 › Admin: college setup and interviews › Catalogue lists the seeded subjects, and the search narrows them @TC-720 (1.1s)
+  ✓  196 [chromium] › tests/08-admin-setup.spec.ts:2119:7 › Admin: college setup and interviews › Import subjects: check first, then import, then update @TC-721 (1.7s)
+  ✓  197 [chromium] › tests/08-admin-setup.spec.ts:2238:7 › Admin: college setup and interviews › Import refuses a file with missing columns and reports a bad row @TC-722 (1.6s)
+  ✓  198 [chromium] › tests/08-admin-setup.spec.ts:2304:7 › Admin: college setup and interviews › Certifications ↔ badges shows which certifications count towards each badge @TC-723 (1.6s)
+  ✓  199 [chromium] › tests/08-admin-setup.spec.ts:2406:7 › Admin: college setup and interviews › Add a certification to a badge, take it off the catalogue and restore it @TC-724 (2.2s)
+  ✓  200 [chromium] › tests/08-admin-setup.spec.ts:2539:7 › Admin: college setup and interviews › A certification needs a name and a web link @TC-725 (1.6s)
+  ✓  201 [chromium] › tests/08-admin-setup.spec.ts:2585:7 › Admin: college setup and interviews › Set a stage rule, change it and remove it @TC-726 (1.6s)
+  ✓  202 [chromium] › tests/08-admin-setup.spec.ts:2661:7 › Admin: college setup and interviews › Interview tracks are listed read-only on the Catalogue @TC-727 (1.2s)
+  ✓  203 [chromium] › tests/08-admin-setup.spec.ts:2698:7 › Admin: college setup and interviews › Copy one programme’s catalogue into another @TC-728 (2.4s)
+  ✓  204 [chromium] › tests/08-admin-setup.spec.ts:2840:7 › Admin: college setup and interviews › Interview records lists a student’s mock interview, and the filters narrow it @TC-730 (10.0s)
+  ✓  205 [chromium] › tests/08-admin-setup.spec.ts:2918:7 › Admin: college setup and interviews › Open an interview record: how it ended, its report and its transcript @TC-731 (9.0s)
+  ✓  206 [chromium] › tests/08-admin-setup.spec.ts:3004:7 › Admin: college setup and interviews › Export the interview records as CSV @TC-732 (9.3s)
+  ✓  207 [chromium] › tests/08-admin-setup.spec.ts:3054:7 › Admin: college setup and interviews › Allow voice recording for a college, then switch it off again @TC-733 (3.4s)
+  ✓  208 [chromium] › tests/08-admin-setup.spec.ts:3163:7 › Admin: college setup and interviews › Attempts per day cannot be lower than completed per day @TC-734 (2.3s)
+  ✓  209 [chromium] › tests/08-admin-setup.spec.ts:3222:7 › Admin: college setup and interviews › Give a student their day’s interview attempts back, with a reason @TC-735 (3.4s)
+  ✓  210 [chromium] › tests/08-admin-setup.spec.ts:3313:7 › Admin: college setup and interviews › Interview questions shows the tracks as tabs, each with its interviewer @TC-740 (948ms)
+  ✓  211 [chromium] › tests/08-admin-setup.spec.ts:3395:7 › Admin: college setup and interviews › Add one question to a track @TC-741 (1.3s)
+  ✓  212 [chromium] › tests/08-admin-setup.spec.ts:3493:7 › Admin: college setup and interviews › Add many questions at once; a line with an unknown phase is skipped @TC-742 (1.5s)
+  ✓  213 [chromium] › tests/08-admin-setup.spec.ts:3599:7 › Admin: college setup and interviews › Edit a question’s phase and text, pause it and find it @TC-743 (1.9s)
+  ✓  214 [chromium] › tests/08-admin-setup.spec.ts:3688:7 › Admin: college setup and interviews › A question edited below 8 characters is put back @TC-744 (1.5s)
+  ✓  215 [chromium] › tests/08-admin-setup.spec.ts:3727:7 › Admin: college setup and interviews › Remove a question after confirming @TC-745 (1.2s)
+  ✓  216 [chromium] › tests/08-admin-setup.spec.ts:3781:7 › Admin: college setup and interviews › Add a track, improve it and remove it @TC-746 (1.5s)
+  ✓  217 [chromium] › tests/08-admin-setup.spec.ts:3897:7 › Admin: college setup and interviews › Move a question down the interviewer’s order @TC-747 (1.8s)
+  ✓  218 [chromium] › tests/08-admin-setup.spec.ts:3982:7 › Admin: college setup and interviews › A faculty member cannot open the college setup and interview screens @TC-750 (2.0s)
+  ✓  219 [chromium] › tests/08-admin-setup.spec.ts:4023:7 › Admin: college setup and interviews › A student cannot open the college setup and interview screens @TC-751 (2.5s)
+  ✓  220 [chromium] › tests/auth-sync.spec.ts:232:7 › Authentication › Successful login with valid credentials @TC-001 (1.5s)
+  ✓  221 [chromium] › tests/auth-sync.spec.ts:302:7 › Authentication › Login is refused for an invalid password @TC-002 (1.3s)
+  ✓  222 [chromium] › tests/auth-sync.spec.ts:349:7 › Authentication › Password reset request @TC-003 (861ms)
+  ✓  223 [chromium] › tests/auth-sync.spec.ts:392:7 › Authentication › Sign-in form asks for a missing ID and password @TC-004 (955ms)
+  ✓  224 [chromium] › tests/auth-sync.spec.ts:451:7 › Authentication › Portal cards and the Main Admin door relabel the ID field @TC-005 (1.0s)
+  ✓  225 [chromium] › tests/auth-sync.spec.ts:535:7 › Authentication › Show password and Hide password @TC-006 (808ms)
+  ✓  226 [chromium] › tests/auth-sync.spec.ts:589:7 › Authentication › Remember me keeps the ID and portal on this device @TC-007 (1.6s)
+  ✓  227 [chromium] › tests/auth-sync.spec.ts:657:7 › Authentication › Remember me through the Main Admin door keeps the admin wording @TC-008 (1.3s)
+  ✓  228 [chromium] › tests/auth-sync.spec.ts:708:7 › Authentication › Faculty member signs in and lands on the faculty notebook @TC-009 (1.2s)
+  ✓  229 [chromium] › tests/auth-sync.spec.ts:755:7 › Authentication › Alumnus signs in and lands on the alumni profile @TC-010 (1.2s)
+  ✓  230 [chromium] › tests/auth-sync.spec.ts:793:7 › Authentication › Main Admin signs in through the Main Admin door @TC-011 (994ms)
+  ✓  231 [chromium] › tests/auth-sync.spec.ts:835:7 › Authentication › The portal picked does not decide where a user lands @TC-012 (974ms)
+  ✓  232 [chromium] › tests/auth-sync.spec.ts:864:7 › Authentication › Sign-in returns to the page that was asked for @TC-013 (983ms)
+  ✓  233 [chromium] › tests/auth-sync.spec.ts:894:7 › Authentication › A next address that leaves REEP is ignored after sign-in @TC-014 (977ms)
+  ✓  234 [chromium] › tests/auth-sync.spec.ts:930:7 › Authentication › Student signs out from the top bar @TC-015 (1.2s)
+  ✓  235 [chromium] › tests/auth-sync.spec.ts:972:7 › Authentication › Faculty member signs out from the account menu @TC-016 (1.3s)
+  ✓  236 [chromium] › tests/auth-sync.spec.ts:1017:7 › Authentication › A signed-out visitor is sent to sign in from protected pages @TC-017 (1.1s)
+  ✓  237 [chromium] › tests/auth-sync.spec.ts:1048:7 › Authentication › A student cannot open faculty, admin or alumni screens @TC-018 (1.5s)
+  ✓  238 [chromium] › tests/auth-sync.spec.ts:1074:7 › Authentication › A faculty member cannot open admin or student screens @TC-019 (1.2s)
+  ✓  239 [chromium] › tests/auth-sync.spec.ts:1102:7 › Authentication › The Main Admin and an alumnus are kept to their own screens @TC-020 (1.6s)
+  ✓  240 [chromium] › tests/auth-sync.spec.ts:1153:7 › Authentication › Unknown addresses lead to the home page or to sign-in @TC-021 (1.2s)
+  ✘  241 [chromium] › tests/auth-sync.spec.ts:1182:7 › Authentication › Signing in on a second device signs the first one out, with a note @TC-022 (7.0s)
+  ✓  242 [chromium] › tests/auth-sync.spec.ts:1250:7 › Authentication › My account shows a faculty member's own details @TC-023 (1.7s)
+  ✓  243 [chromium] › tests/auth-sync.spec.ts:1331:7 › Authentication › My account shows a student's own details, without a signature card @TC-024 (865ms)
+  ✘  244 [chromium] › tests/auth-sync.spec.ts:1375:7 › Authentication › My account says so when the session ended on another device @TC-025 (6.9s)
+  ✓  245 [chromium] › tests/auth-sync.spec.ts:1443:7 › Authentication › Sign-in alert email switch on My account @TC-026 (1.5s)
+  ✓  246 [chromium] › tests/auth-sync.spec.ts:1506:7 › Authentication › Sign out everywhere from My account @TC-027 (1.5s)
+  ✓  247 [chromium] › tests/auth-sync.spec.ts:1563:7 › Authentication › Change password refuses a short password, a mismatch and a wrong code @TC-028 (1.7s)
+  ✓  248 [chromium] › tests/auth-sync.spec.ts:1661:7 › Authentication › A new faculty member sets a first password from the activation link @TC-030 (2.2s)
+  ✓  249 [chromium] › tests/auth-sync.spec.ts:1798:7 › Authentication › Set-password pages refuse a missing or unknown link @TC-031 (1.6s)
+  ✓  250 [chromium] › tests/auth-sync.spec.ts:1894:7 › Authentication › A shortened reset link is reported as a link problem @TC-032 (655ms)
+  ✓  251 [chromium] › tests/auth-sync.spec.ts:1922:7 › Authentication › Continue with Google hands the browser to Google @TC-034 (1.3s)
+  ✓  252 [chromium] › tests/auth-sync.spec.ts:1971:7 › Authentication › Google refusals are explained on the sign-in page @TC-035 (1.3s)
+  ✘  253 [chromium] › tests/auth-sync.spec.ts:2008:7 › Authentication › Reset requests are limited per address @TC-038 (5.9s)
+  ✓  254 [chromium] › tests/auth-sync.spec.ts:2052:7 › Authentication › The links around the sign-in card @TC-039 (1.5s)
+  ✓  255 [chromium] › tests/auth-sync.spec.ts:2097:7 › Authentication › Field messages clear once the fields are filled @TC-040 (785ms)
+  ✓  256 [chromium] › tests/auth-sync.spec.ts:2135:7 › Authentication › Show password from the keyboard @TC-041 (781ms)
+
+
+  1) [chromium] › tests/06-admin-people.spec.ts:699:7 › Admin: people and access › The roster lists the seeded student with their details @TC-503 › 1. Open /admin/students 
+
+    Error: TC-503 ER-1: USN
+
+    expect(locator).toHaveText(expected) failed
+
+    Locator: locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"] [col-id="usn"]')
+    Expected: "1BG24MBA001"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - TC-503 ER-1: USN locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"] [col-id="usn"]') with timeout 5000ms
+      - waiting for locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"] [col-id="usn"]')
+
+
+      711 |       ).toBeVisible();
+      712 |       const cell = (colId: string) => gridCell(page, ids.studentId, colId);
+    > 713 |       await expect(cell('usn'), 'TC-503 ER-1: USN').toHaveText(SEED.student.usn);
+          |                                                     ^
+      714 |       await expect(cell('name'), 'TC-503 ER-1: the Student column names them').toContainText(
+      715 |         SEED.student.name,
+      716 |       );
+        at /home/user/reep-/tests/06-admin-people.spec.ts:713:53
+        at /home/user/reep-/tests/06-admin-people.spec.ts:706:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-5da0b-t-with-their-details-TC-503-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-5da0b-t-with-their-details-TC-503-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-5da0b-t-with-their-details-TC-503-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-5da0b-t-with-their-details-TC-503-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests/06-admin-people.spec.ts:736:7 › Admin: people and access › Searching the roster by USN and by name @TC-504 › 1. Open /admin/students 
+
+    Error: TC-504 (arrange): the seeded student is listed
+
+    expect(locator).toBeVisible() failed
+
+    Locator: locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - TC-504 (arrange): the seeded student is listed locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]') with timeout 5000ms
+      - waiting for locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]')
+
+
+      741 |     await test.step('1. Open /admin/students', async () => {
+      742 |       await page.goto('/admin/students');
+    > 743 |       await expect(row, 'TC-504 (arrange): the seeded student is listed').toBeVisible();
+          |                                                                           ^
+      744 |     });
+      745 |
+      746 |     await test.step('2. Type 1BG24MBA001 into "Quick filter…"', async () => {
+        at /home/user/reep-/tests/06-admin-people.spec.ts:743:75
+        at /home/user/reep-/tests/06-admin-people.spec.ts:741:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-007be-r-by-USN-and-by-name-TC-504-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-007be-r-by-USN-and-by-name-TC-504-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-007be-r-by-USN-and-by-name-TC-504-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-007be-r-by-USN-and-by-name-TC-504-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests/06-admin-people.spec.ts:768:7 › Admin: people and access › Searching the roster by college email finds the student @TC-505 › 1. Open /admin/students 
+
+    Error: TC-505 (arrange): the seeded student is listed
+
+    expect(locator).toBeVisible() failed
+
+    Locator: locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - TC-505 (arrange): the seeded student is listed locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]') with timeout 5000ms
+      - waiting for locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]')
+
+
+      776 |     await test.step('1. Open /admin/students', async () => {
+      777 |       await page.goto('/admin/students');
+    > 778 |       await expect(row, 'TC-505 (arrange): the seeded student is listed').toBeVisible();
+          |                                                                           ^
+      779 |     });
+      780 |
+      781 |     await test.step('2. Type student@bgscet.ac.in into "Quick filter…"', async () => {
+        at /home/user/reep-/tests/06-admin-people.spec.ts:778:75
+        at /home/user/reep-/tests/06-admin-people.spec.ts:776:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-3da2e-il-finds-the-student-TC-505-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-3da2e-il-finds-the-student-TC-505-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-3da2e-il-finds-the-student-TC-505-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-3da2e-il-finds-the-student-TC-505-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [chromium] › tests/06-admin-people.spec.ts:792:7 › Admin: people and access › Filtering the roster by batch and status @TC-506 › 1. Open /admin/students 
+
+    Error: TC-506 (arrange): the seeded student is listed
+
+    expect(locator).toBeVisible() failed
+
+    Locator: locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - TC-506 (arrange): the seeded student is listed locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]') with timeout 5000ms
+      - waiting for locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]')
+
+
+      800 |     await test.step('1. Open /admin/students', async () => {
+      801 |       await page.goto('/admin/students');
+    > 802 |       await expect(row, 'TC-506 (arrange): the seeded student is listed').toBeVisible();
+          |                                                                           ^
+      803 |     });
+      804 |
+      805 |     await test.step(`2. Under "Batch", choose "${BATCH_OPTION}"`, async () => {
+        at /home/user/reep-/tests/06-admin-people.spec.ts:802:75
+        at /home/user/reep-/tests/06-admin-people.spec.ts:800:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-400a5--by-batch-and-status-TC-506-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-400a5--by-batch-and-status-TC-506-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-400a5--by-batch-and-status-TC-506-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-400a5--by-batch-and-status-TC-506-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [chromium] › tests/06-admin-people.spec.ts:893:7 › Admin: people and access › Editing a student and putting the change back @TC-508 › 1. Open /admin/students 
+
+    Error: TC-508 (arrange): Test Student is at Excel-Adv
+
+    expect(locator).toHaveText(expected) failed
+
+    Locator: locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"] [col-id="stage"]')
+    Expected: "Excel-Adv"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - TC-508 (arrange): Test Student is at Excel-Adv locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"] [col-id="stage"]') with timeout 5000ms
+      - waiting for locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"] [col-id="stage"]')
+
+
+      906 |       await test.step('1. Open /admin/students', async () => {
+      907 |         await page.goto('/admin/students');
+    > 908 |         await expect(stage, 'TC-508 (arrange): Test Student is at Excel-Adv').toHaveText(
+          |                                                                               ^
+      909 |           SEED.student.stageLabel,
+      910 |         );
+      911 |       });
+        at /home/user/reep-/tests/06-admin-people.spec.ts:908:79
+        at /home/user/reep-/tests/06-admin-people.spec.ts:906:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-76f0e-ting-the-change-back-TC-508-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-76f0e-ting-the-change-back-TC-508-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-76f0e-ting-the-change-back-TC-508-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-76f0e-ting-the-change-back-TC-508-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [chromium] › tests/06-admin-people.spec.ts:978:7 › Admin: people and access › Editing a student refuses an address off the college domain @TC-509 › 2. Click the pencil on Test Student's row 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: apiRequestContext.get: Test timeout of 30000ms exceeded.
+
+      269 | async function seededStudentRow(api: APIRequestContext): Promise<StudentApiRow> {
+      270 |   const rows = await ok<StudentApiRow[]>(
+    > 271 |     await api.get('/api/admin/students', { params: { q: SEED.student.usn } }),
+          |               ^
+      272 |     'GET /api/admin/students',
+      273 |   );
+      274 |   const row = rows.find((candidate) => candidate.usn === SEED.student.usn);
+        at seededStudentRow (/home/user/reep-/tests/06-admin-people.spec.ts:271:15)
+        at restoreSeededStudent (/home/user/reep-/tests/06-admin-people.spec.ts:388:21)
+        at /home/user/reep-/tests/06-admin-people.spec.ts:1027:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-e2617-f-the-college-domain-TC-509-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-e2617-f-the-college-domain-TC-509-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-e2617-f-the-college-domain-TC-509-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-e2617-f-the-college-domain-TC-509-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [chromium] › tests/06-admin-people.spec.ts:1190:7 › Admin: people and access › Assigning a faculty member to the ticked students @TC-511 › 1. Open /admin/students 
+
+    Error: TC-511 (arrange): Test Student is with Test Mentor
+
+    expect(locator).toHaveText(expected) failed
+
+    Locator: locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"] [col-id="mentor"]')
+    Expected: "Test Mentor"
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - TC-511 (arrange): Test Student is with Test Mentor locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"] [col-id="mentor"]') with timeout 5000ms
+      - waiting for locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"] [col-id="mentor"]')
+
+
+      1207 |       await test.step('1. Open /admin/students', async () => {
+      1208 |         await page.goto('/admin/students');
+    > 1209 |         await expect(mentorCell, 'TC-511 (arrange): Test Student is with Test Mentor').toHaveText(
+           |                                                                                        ^
+      1210 |           SEED.mentor.name,
+      1211 |         );
+      1212 |       });
+        at /home/user/reep-/tests/06-admin-people.spec.ts:1209:88
+        at /home/user/reep-/tests/06-admin-people.spec.ts:1207:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-296af--the-ticked-students-TC-511-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-296af--the-ticked-students-TC-511-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-296af--the-ticked-students-TC-511-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-296af--the-ticked-students-TC-511-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [chromium] › tests/06-admin-people.spec.ts:1282:7 › Admin: people and access › After a selection action the grid's ticks match the toolbar @TC-512 › 2. Tick Test Student's row 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: apiRequestContext.get: Test timeout of 30000ms exceeded.
+
+      269 | async function seededStudentRow(api: APIRequestContext): Promise<StudentApiRow> {
+      270 |   const rows = await ok<StudentApiRow[]>(
+    > 271 |     await api.get('/api/admin/students', { params: { q: SEED.student.usn } }),
+          |               ^
+      272 |     'GET /api/admin/students',
+      273 |   );
+      274 |   const row = rows.find((candidate) => candidate.usn === SEED.student.usn);
+        at seededStudentRow (/home/user/reep-/tests/06-admin-people.spec.ts:271:15)
+        at restoreSeededStudent (/home/user/reep-/tests/06-admin-people.spec.ts:388:21)
+        at /home/user/reep-/tests/06-admin-people.spec.ts:1324:13
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-fd9cc-ks-match-the-toolbar-TC-512-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-fd9cc-ks-match-the-toolbar-TC-512-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-fd9cc-ks-match-the-toolbar-TC-512-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-fd9cc-ks-match-the-toolbar-TC-512-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [chromium] › tests/06-admin-people.spec.ts:1330:7 › Admin: people and access › The View button opens the student's full record @TC-513 › 2. Click the eye on Test Student's row 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'View Test Student\'s record' })
+
+
+      1337 |
+      1338 |     await test.step("2. Click the eye on Test Student's row", async () => {
+    > 1339 |       await page.getByRole('button', { name: `View ${SEED.student.name}'s record` }).click();
+           |                                                                                      ^
+      1340 |       await expect(page, 'TC-513 ER-1: the record opens at /admin/students/<id>').toHaveURL(
+      1341 |         new RegExp(`/admin/students/${ids.studentId}$`),
+      1342 |       );
+        at /home/user/reep-/tests/06-admin-people.spec.ts:1339:86
+        at /home/user/reep-/tests/06-admin-people.spec.ts:1338:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-bff30-tudent-s-full-record-TC-513-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-bff30-tudent-s-full-record-TC-513-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-bff30-tudent-s-full-record-TC-513-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-bff30-tudent-s-full-record-TC-513-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  10) [chromium] › tests/06-admin-people.spec.ts:1385:7 › Admin: people and access › The full record shows the profile, results, documents and mentor history @TC-514 › 1. Open Test Student's full record with the eye on the roster 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByRole('button', { name: 'View Test Student\'s record' })
+
+
+      1422 |     await test.step("1. Open Test Student's full record with the eye on the roster", async () => {
+      1423 |       await page.goto('/admin/students');
+    > 1424 |       await page.getByRole('button', { name: `View ${SEED.student.name}'s record` }).click();
+           |                                                                                      ^
+      1425 |       await expect(
+      1426 |         heading(page, SEED.student.name),
+      1427 |         'TC-514 (arrange): the record is open',
+        at /home/user/reep-/tests/06-admin-people.spec.ts:1424:86
+        at /home/user/reep-/tests/06-admin-people.spec.ts:1422:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-aeeab-s-and-mentor-history-TC-514-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-aeeab-s-and-mentor-history-TC-514-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-aeeab-s-and-mentor-history-TC-514-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-aeeab-s-and-mentor-history-TC-514-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  11) [chromium] › tests/06-admin-people.spec.ts:2611:7 › Admin: people and access › Releasing a student and assigning them again, with the history @TC-529 › 4. Type E2E: moving between groups into "Reason" and click the release button again 
+
+    Error: TC-529 ER-2: Test Student is in "Unassigned students"
+
+    expect(locator).toBeVisible() failed
+
+    Locator: locator('.pool-grid').locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - TC-529 ER-2: Test Student is in "Unassigned students" locator('.pool-grid').locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]') with timeout 5000ms
+      - waiting for locator('.pool-grid').locator('.ag-row[row-id="01283879f7e94d24ac3de27103a605a0"]')
+
+
+      2657 |           poolRow,
+      2658 |           'TC-529 ER-2: Test Student is in "Unassigned students"',
+    > 2659 |         ).toBeVisible();
+           |           ^
+      2660 |         await expect(testMentor, 'TC-529 ER-2: Test Mentor holds one student fewer').toContainText(
+      2661 |           `${load.menteeCount - 1}/${load.capacity}`,
+      2662 |         );
+        at /home/user/reep-/tests/06-admin-people.spec.ts:2659:11
+        at /home/user/reep-/tests/06-admin-people.spec.ts:2649:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-24ec9-ain-with-the-history-TC-529-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/06-admin-people-Admin-peop-24ec9-ain-with-the-history-TC-529-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/06-admin-people-Admin-peop-24ec9-ain-with-the-history-TC-529-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/06-admin-people-Admin-peop-24ec9-ain-with-the-history-TC-529-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  12) [chromium] › tests/auth-sync.spec.ts:1182:7 › Authentication › Signing in on a second device signs the first one out, with a note @TC-022 › 4. In the first browser, reload the page 
+
+    Error: TC-022 ER-3: the first browser is signed out, and told why
+
+    expect(page).toHaveURL(expected) failed
+
+    Expected pattern: /^https?:\/\/[^/]+\/login\?next=%2Fstudent&signedOut=elsewhere$/
+    Received string:  "http://localhost:4200/student"
+    Timeout: 5000ms
+
+    Call log:
+      - TC-022 ER-3: the first browser is signed out, and told why with timeout 5000ms
+        14 × locator resolved to <html lang="en" data-theme="light" class="fonts-ready">…</html>
+           - unexpected value "http://localhost:4200/student"
+
+
+      1215 |       await test.step('4. In the first browser, reload the page', async () => {
+      1216 |         await page.reload();
+    > 1217 |         await expect(page, 'TC-022 ER-3: the first browser is signed out, and told why').toHaveURL(
+           |                                                                                          ^
+      1218 |           exactly('/login?next=%2Fstudent&signedOut=elsewhere'),
+      1219 |         );
+      1220 |         await expect(
+        at /home/user/reep-/tests/auth-sync.spec.ts:1217:90
+        at /home/user/reep-/tests/auth-sync.spec.ts:1215:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/auth-sync-Authentication-S-c7612--one-out-with-a-note-TC-022-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/auth-sync-Authentication-S-c7612--one-out-with-a-note-TC-022-chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/auth-sync-Authentication-S-c7612--one-out-with-a-note-TC-022-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-sync-Authentication-S-c7612--one-out-with-a-note-TC-022-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-sync-Authentication-S-c7612--one-out-with-a-note-TC-022-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  13) [chromium] › tests/auth-sync.spec.ts:1375:7 › Authentication › My account says so when the session ended on another device @TC-025 › 3. In the first browser, click Refresh on the "Recent sign-ins" card 
+
+    Error: TC-025 ER-2: the page says the session is no longer live, and why
+
+    expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert').filter({ hasText: 'This session is no longer live' })
+    Expected substring: "This session is no longer live, so none of the details below could be read. That usually means this account was signed in on another device — REEP allows one at a time. Sign in again to carry on."
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - TC-025 ER-2: the page says the session is no longer live, and why getByRole('alert').filter({ hasText: 'This session is no longer live' }) with timeout 5000ms
+      - waiting for getByRole('alert').filter({ hasText: 'This session is no longer live' })
+
+
+      1412 |           page.getByRole('alert').filter({ hasText: 'This session is no longer live' }),
+      1413 |           'TC-025 ER-2: the page says the session is no longer live, and why',
+    > 1414 |         ).toContainText(SESSION_NOT_LIVE);
+           |           ^
+      1415 |         await expect(
+      1416 |           page.getByRole('button', { name: 'Go to sign in' }),
+      1417 |           'TC-025 ER-2: with a "Go to sign in" button',
+        at /home/user/reep-/tests/auth-sync.spec.ts:1414:11
+        at /home/user/reep-/tests/auth-sync.spec.ts:1406:7
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/auth-sync-Authentication-M-bf206-ed-on-another-device-TC-025-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/auth-sync-Authentication-M-bf206-ed-on-another-device-TC-025-chromium/test-failed-2.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/auth-sync-Authentication-M-bf206-ed-on-another-device-TC-025-chromium/error-context.md
+
+    attachment #4: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-sync-Authentication-M-bf206-ed-on-another-device-TC-025-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-sync-Authentication-M-bf206-ed-on-another-device-TC-025-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14) [chromium] › tests/auth-sync.spec.ts:2008:7 › Authentication › Reset requests are limited per address @TC-038 › 4. Click Send reset link 
+
+    Error: TC-038 ER-2: the fourth request within the hour is refused
+
+    expect(locator).toHaveText(expected) failed
+
+    Locator: getByRole('status').filter({ hasText: 'Too many reset requests. Please wait an hour and try again.' })
+    Expected: "Too many reset requests. Please wait an hour and try again."
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - TC-038 ER-2: the fourth request within the hour is refused getByRole('status').filter({ hasText: 'Too many reset requests. Please wait an hour and try again.' }) with timeout 5000ms
+      - waiting for getByRole('status').filter({ hasText: 'Too many reset requests. Please wait an hour and try again.' })
+
+
+      2045 |         page.getByRole('status').filter({ hasText: TOO_MANY_RESETS }),
+      2046 |         'TC-038 ER-2: the fourth request within the hour is refused',
+    > 2047 |       ).toHaveText(TOO_MANY_RESETS);
+           |         ^
+      2048 |       await expect(emailField, 'TC-038 ER-2: the form is replaced by the answer').toHaveCount(0);
+      2049 |     });
+      2050 |   });
+        at /home/user/reep-/tests/auth-sync.spec.ts:2047:9
+        at /home/user/reep-/tests/auth-sync.spec.ts:2042:5
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/auth-sync-Authentication-R-9ef1a--limited-per-address-TC-038-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/auth-sync-Authentication-R-9ef1a--limited-per-address-TC-038-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/auth-sync-Authentication-R-9ef1a--limited-per-address-TC-038-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/auth-sync-Authentication-R-9ef1a--limited-per-address-TC-038-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  14 failed
+    [chromium] › tests/06-admin-people.spec.ts:699:7 › Admin: people and access › The roster lists the seeded student with their details @TC-503 
+    [chromium] › tests/06-admin-people.spec.ts:736:7 › Admin: people and access › Searching the roster by USN and by name @TC-504 
+    [chromium] › tests/06-admin-people.spec.ts:768:7 › Admin: people and access › Searching the roster by college email finds the student @TC-505 
+    [chromium] › tests/06-admin-people.spec.ts:792:7 › Admin: people and access › Filtering the roster by batch and status @TC-506 
+    [chromium] › tests/06-admin-people.spec.ts:893:7 › Admin: people and access › Editing a student and putting the change back @TC-508 
+    [chromium] › tests/06-admin-people.spec.ts:978:7 › Admin: people and access › Editing a student refuses an address off the college domain @TC-509 
+    [chromium] › tests/06-admin-people.spec.ts:1190:7 › Admin: people and access › Assigning a faculty member to the ticked students @TC-511 
+    [chromium] › tests/06-admin-people.spec.ts:1282:7 › Admin: people and access › After a selection action the grid's ticks match the toolbar @TC-512 
+    [chromium] › tests/06-admin-people.spec.ts:1330:7 › Admin: people and access › The View button opens the student's full record @TC-513 
+    [chromium] › tests/06-admin-people.spec.ts:1385:7 › Admin: people and access › The full record shows the profile, results, documents and mentor history @TC-514 
+    [chromium] › tests/06-admin-people.spec.ts:2611:7 › Admin: people and access › Releasing a student and assigning them again, with the history @TC-529 
+    [chromium] › tests/auth-sync.spec.ts:1182:7 › Authentication › Signing in on a second device signs the first one out, with a note @TC-022 
+    [chromium] › tests/auth-sync.spec.ts:1375:7 › Authentication › My account says so when the session ended on another device @TC-025 
+    [chromium] › tests/auth-sync.spec.ts:2008:7 › Authentication › Reset requests are limited per address @TC-038 
+  242 passed (11.5m)
+
+manual-test-results.csv: 273 rows (242 Passed, 10 Failed, 17 Not automated, 4 Timed out)

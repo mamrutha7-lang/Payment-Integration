@@ -1,0 +1,13 @@
+❯ Building...
+✔ Building...
+Application bundle generation complete. [20.733 seconds] - 2026-09-29T21:47:14.913Z
+
+
+ RUN  v4.1.11 /home/user/reep-/apps/web
+
+
+ Test Files  32 passed (32)
+      Tests  221 passed (221)
+   Start at  21:47:15
+   Duration  8.80s (transform 4.67s, setup 3.22s, import 7.64s, tests 9.34s, environment 46.34s)
+

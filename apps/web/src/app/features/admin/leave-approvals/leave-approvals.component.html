@@ -1,0 +1,611 @@
+<div class="panel" data-p="leave-approvals">
+  <div class="dt-header">
+    <div>
+      <div class="crumb"><span>Every day</span><span class="sep">/</span><span>Leave requests</span></div>
+      <h1 class="dt-title">Leave requests</h1>
+      <div class="dt-sub">Requests waiting for a signature.</div>
+    </div>
+    <div class="dt-toolbar">
+      <!-- Both write through endpoints that are `require_admin` server-side, so
+           an approver who is not the office gets them disabled with the reason
+           on the control rather than a dialog whose every button answers 403.
+           A plain `disabled` and no phase number: this is not waiting on a
+           task, it is not this account's to press. -->
+      <button
+        type="button"
+        class="btn secondary"
+        [disabled]="!isMainAdmin()"
+        [attr.title]="isMainAdmin() ? null : 'Leave policy is the Main Admin’s to edit.'"
+        (click)="openPolicy()"
+      >
+        <span class="icon" aria-hidden="true">description</span> Leave policy
+      </button>
+      <button
+        type="button"
+        class="btn secondary"
+        [disabled]="!isMainAdmin()"
+        [attr.title]="isMainAdmin() ? null : 'The academic calendar is the Main Admin’s to edit.'"
+        (click)="openCalendar()"
+      >
+        <span class="icon" aria-hidden="true">calendar_today</span> Calendar
+      </button>
+    </div>
+  </div>
+
+  <!-- The board's four queues, all four live. Cancelled reads
+       /leaves/history?status=CANCELLED, which is its own request: the default
+       history is APPROVED and REJECTED and /pending is SUBMITTED and
+       FIRST_APPROVED, so a withdrawn row is in neither and this tab could not
+       have been lit by filtering the arrays already loaded. -->
+  <div class="tabs queue-tabs" role="group" aria-label="Leave queues">
+    @for (queue of tabs; track queue.key) {
+      <button
+        type="button"
+        class="tab"
+        [class.active]="tab() === queue.key"
+        [attr.aria-current]="tab() === queue.key ? 'true' : null"
+        (click)="setTab(queue.key)"
+      >
+        {{ queue.label }} · {{ counts()[queue.key] }}
+      </button>
+    }
+  </div>
+
+  <div class="filters">
+    <!-- COLLEGE IS A READ-OUT, NOT A PICKER (B1.4). Neither queue endpoint
+         takes a college parameter: the server narrows both and states the reach
+         it used in X-Reep-Scope. There is nothing to send, so this states what
+         the grant reaches and offers no menu that could only hide rows. Nothing
+         is drawn at all when the response made no claim. (The Calendar dialog
+         does take a college id — that one is a college's own decision to
+         record, not a filter over what this account may read.) -->
+    @if (scopeChip(); as reach) {
+      <span class="chip {{ reach.tone }}">{{ reach.label }}</span>
+    }
+
+    <!-- DEPARTMENT narrows the rows already returned — `requester_department`
+         is on every row — so it is live, and it changes what is drawn and
+         never what may be read. -->
+    <div class="select">
+      <span class="lbl">Department</span>
+      <span class="val">{{ departmentFilterLabel() }}</span>
+      <select
+        aria-label="Department — narrows the requests shown"
+        (change)="setDepartmentFilter(selectValue($event))"
+      >
+        <option [value]="everyDepartment" [selected]="departmentFilter() === everyDepartment">
+          All
+        </option>
+        @for (department of departments(); track department) {
+          <option [value]="department" [selected]="department === departmentFilter()">
+            {{ department }}
+          </option>
+        }
+        @if (hasUnstatedDepartment()) {
+          <option [value]="noDepartment" [selected]="departmentFilter() === noDepartment">
+            Not on record
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">Type</span>
+      <span class="val">{{ kindFilterLabel() }}</span>
+      <select aria-label="Leave type" (change)="setKindFilter(selectValue($event))">
+        <option [value]="everyKind" [selected]="kindFilter() === everyKind">All</option>
+        @for (kind of kinds; track kind.id) {
+          <option [value]="kind.id" [selected]="kind.id === kindFilter()">{{ kind.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  @if (scopeNote(); as note) {
+    <div class="notice {{ note.tone }} queue-banner" role="status">
+      <span class="icon" aria-hidden="true">info</span>{{ note.text }}
+    </div>
+  }
+
+  @if (error()) {
+    <div class="notice queue-banner" role="alert">
+      <span class="icon" aria-hidden="true">error</span>{{ error() }}
+    </div>
+  }
+  @if (flash()) {
+    <div class="notice good queue-banner" role="status">
+      <span class="icon" aria-hidden="true">check_circle</span>{{ flash() }}
+    </div>
+  }
+
+  <div class="queue">
+    <!-- ------------------------------------------------------ the queue -->
+    <div class="queue-left">
+      <div class="dt-frame queue-grid">
+        @if (isLoading()) {
+          <p class="queue-state" role="status">
+            <span class="icon" aria-hidden="true">hourglass_empty</span> Loading the queue…
+          </p>
+        } @else {
+          <div class="queue-scroll">
+            <table class="dt-table">
+              <caption class="sr-only">Leave requests in the {{ tab() }} queue</caption>
+              <thead>
+                <tr>
+                  <th scope="col" class="pinned">Requester</th>
+                  <th scope="col">Type</th>
+                  <th scope="col">Dates</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Approval chain</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (request of rows(); track request.id) {
+                  <tr class="queue-row" [class.selected]="isSelected(request)" (click)="selectRequest(request.id)">
+                    <td class="pinned">
+                      <button
+                        type="button"
+                        class="requester"
+                        [attr.aria-pressed]="isSelected(request)"
+                        (click)="selectRequest(request.id)"
+                      >
+                        <span class="avatar" aria-hidden="true">{{ initialsOf(request) }}</span>
+                        <span class="requester-who">
+                          <span class="requester-name">{{ request.requester_name }}</span>
+                          <span class="requester-role">{{ requesterLine(request) }}</span>
+                        </span>
+                      </button>
+                    </td>
+                    <td><span class="chip neutral">{{ kindLabel(request.leave_kind) }}</span></td>
+                    <td class="dates-cell">
+                      {{ dateSpan(request) }} · {{ dayCountLabel(request) }}
+                    </td>
+                    <td>
+                      <span class="chip dot {{ statusChip(request).tone }}">
+                        {{ statusChip(request).label }}
+                      </span>
+                    </td>
+                    <td>{{ chainSummary(request) }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="5" class="queue-empty">
+                      <strong class="empty-title">{{ emptyTitle() }}</strong>
+                      <span class="empty-sub">{{ emptyNote() }}</span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        <div class="dt-statusbar">
+          <span>Rows: <b>{{ rows().length }}</b></span>
+          <span>Selected: <b>{{ selectedCount() }}</b></span>
+          <span class="pager">{{ rowRangeLabel() }}</span>
+        </div>
+      </div>
+
+      @if (historyCapped()) {
+        <div class="notice accent" role="status">
+          <span class="icon" aria-hidden="true">info</span>
+          Showing the most recent {{ historyCap }} decided requests.
+        </div>
+      }
+
+      <!-- ------------------------------------------------ policy card -->
+      <div class="card policy-card">
+        <div class="policy-head">
+          <h2 class="policy-title">Leave policy</h2>
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="!isMainAdmin()"
+            [attr.title]="isMainAdmin() ? null : 'Leave policy is the Main Admin’s to edit.'"
+            (click)="openPolicy()"
+          >
+            <span class="icon" aria-hidden="true">edit</span> Edit
+          </button>
+        </div>
+        <ul class="policy-list">
+          <li><span class="policy-key">Signatures</span> · one, the Main Admin’s: your Sanction or Reject is the decision, and you cannot decide your own request. Your name, the time and your uploaded signature image print in the PROGRAM DIRECTOR block.</li>
+          <li><span class="policy-key">Who sees a request</span> · the Main Admin alone, staff leave included. Faculty apply, withdraw and read their own; nobody else opens the queue.</li>
+          <li><span class="policy-key">Allowances</span> · recorded per person, per printed option, per academic year, behind Edit. An account with no allowance recorded is not measured against one, which is not a balance of zero.</li>
+          <li><span class="policy-key">Refusing</span> · this console will not send a refusal without remarks, and the applicant reads them.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------- the 380px decision panel -->
+    <aside class="card queue-panel" aria-label="Leave request">
+      @if (selectedRequest(); as request) {
+        <div class="panel-head">
+          <span class="avatar lg" aria-hidden="true">{{ initialsOf(request) }}</span>
+          <div class="panel-who">
+            <div class="panel-name">
+              {{ request.requester_name }} · {{ kindLabel(request.leave_kind) }} leave
+            </div>
+            <div class="panel-meta">
+              {{ dateSpan(request) }} · {{ dayCountLabel(request) }} ·
+              @if (request.signed_at) {
+                submitted {{ request.signed_at | date: 'd MMM y, HH:mm' }}
+              } @else {
+                submission time not recorded
+              }
+            </div>
+          </div>
+          <button
+            type="button"
+            class="btn ghost sm"
+            aria-label="Close this leave request"
+            (click)="clearSelection()"
+          >
+            <span class="icon" aria-hidden="true">close</span>
+          </button>
+        </div>
+
+        <dl class="facts">
+          <div>
+            <dt>Requester</dt>
+            <dd>{{ requesterLine(request) }}</dd>
+          </div>
+          <div>
+            <dt>Status</dt>
+            <dd>
+              <span class="chip dot {{ statusChip(request).tone }}">
+                {{ statusChip(request).label }}
+              </span>
+            </dd>
+          </div>
+          <div>
+            <dt>Credit</dt>
+            <dd>{{ request.credit || 'Not stated' }}</dd>
+          </div>
+          <div>
+            <dt>Alternate arrangement</dt>
+            <dd>{{ request.alt_name || 'Nobody named' }}</dd>
+          </div>
+        </dl>
+
+        @if (altRows().length) {
+          <div class="alt-block">
+            <div class="eyebrow">Classes covered</div>
+            <ul class="alt-list">
+              @for (cover of altRows(); track cover.index) {
+                <li>
+                  <span class="alt-when">{{ cover.date || '—' }} {{ cover.time }}</span>
+                  <span class="alt-who">
+                    {{ cover.staff_name || cover.user_name || 'Not named' }}
+                    @if (cover.accepted_at) {
+                      <span class="chip good">
+                        <span class="icon" aria-hidden="true">how_to_reg</span> Accepted
+                      </span>
+                    } @else if (cover.user_id) {
+                      <span class="chip warn">Asked · no reply yet</span>
+                    }
+                  </span>
+                  <span class="alt-what">{{ cover.cls }} {{ cover.remarks }}</span>
+                </li>
+              }
+            </ul>
+            @if (alternate() === null) {
+              <p class="panel-hint">
+                Only the printed table is shown. Whether each colleague has agreed to cover is read
+                from a separate endpoint this account was not given.
+              </p>
+            }
+          </div>
+        }
+
+        <!-- ------------------------------------------- the applicant's allowance -->
+        @if (balanceSet(); as allowance) {
+          <div class="alt-block">
+            <div class="eyebrow">Allowance · {{ allowance.academic_year }}</div>
+            @if (allowance.balances.length) {
+              <ul class="balance-list">
+                @for (balance of allowance.balances; track balance.kind) {
+                  <li>
+                    <span class="balance-kind">{{ kindLabel(balance.kind) }}</span>
+                    <span class="chip {{ balance.remaining_days < 0 ? 'risk' : 'neutral' }}">
+                      {{ balance.remaining_days }} left
+                    </span>
+                    <span class="balance-detail">
+                      {{ balance.consumed_days }} of {{ balance.entitled_days }} taken
+                    </span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="panel-hint">
+                The office has recorded no allowance for this applicant in {{ allowance.academic_year }},
+                so nothing is measured against one. That is not a balance of zero — a zero would
+                refuse every request of that type.
+              </p>
+            }
+          </div>
+        }
+
+        <!-- ------------------------------------------------------ attachments -->
+        @if (attachments(); as papers) {
+          <div class="alt-block">
+            <div class="eyebrow">Attached papers</div>
+            @if (papers.length) {
+              <ul class="attach-list">
+                @for (paper of papers; track paper.id) {
+                  <li>
+                    <a
+                      class="btn ghost sm"
+                      [href]="attachmentUrl(request, paper)"
+                      [attr.aria-label]="'Download ' + paper.original_name"
+                      download
+                    >
+                      <span class="icon" aria-hidden="true">download</span>
+                      {{ paper.original_name }}
+                    </a>
+                    <span class="attach-meta">
+                      {{ fileSize(paper.size_bytes) }} ·
+                      {{ paper.uploaded_by_name || 'account removed' }} ·
+                      {{ paper.uploaded_at | date: 'd MMM y' }}
+                    </span>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="panel-hint">Nothing was attached to this request.</p>
+            }
+          </div>
+        }
+
+        <div class="reason">
+          <div class="eyebrow">Reason · visible to approvers only</div>
+          <p class="reason-text">{{ request.reason }}</p>
+        </div>
+
+        @if (request.decision_change_reason) {
+          <div class="reason">
+            <div class="eyebrow">
+              {{ request.decision_change_kind === 'REVOKED' ? 'Why the sanction was revoked' : 'Why it was reopened' }}
+              · the applicant reads this
+            </div>
+            <p class="reason-text">{{ request.decision_change_reason }}</p>
+          </div>
+        }
+
+        @if (hasApproverRemarks(request)) {
+          <div class="reason">
+            <div class="eyebrow">{{ remarksLabel(request) }}</div>
+            <p class="reason-text">{{ request.director_note }}</p>
+          </div>
+        }
+
+        <div class="chain-block">
+          <div class="eyebrow">Approval chain</div>
+          <ol class="wizard-steps chain">
+            @for (step of chainSteps(); track step.label; let index = $index) {
+              <li class="step {{ step.state }}">
+                <span class="n" aria-hidden="true">
+                  @if (step.state === 'done') {
+                    <span class="icon">check</span>
+                  } @else {
+                    {{ index + 1 }}
+                  }
+                </span>
+                <span class="chain-text">
+                  <span class="chain-label">{{ step.label }}</span>
+                  <span class="chain-detail">{{ step.detail }}</span>
+                </span>
+              </li>
+            }
+          </ol>
+          <!-- Only where a signature actually exists. A SUBMITTED request has
+               none yet, and a CANCELLED one may never have had one — telling
+               either that "it was decided before REEP recorded a function" is a
+               sentence about something that did not happen. -->
+          @if (!request.first_signed_as && hasASignature(request)) {
+            <div class="notice accent">
+              <span class="icon" aria-hidden="true">info</span>
+              <div>
+                No signing role was recorded for this request.
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (canDecide()) {
+          <div class="field panel-remarks">
+            <label for="leave-remarks">Remarks</label>
+            <textarea
+              id="leave-remarks"
+              class="ctrl multi"
+              rows="3"
+              placeholder="Optional · required when rejecting"
+              [value]="remarks()"
+              [attr.aria-describedby]="remarksError() ? 'leave-remarks-error' : null"
+              [attr.aria-invalid]="remarksError() ? 'true' : null"
+              (input)="onRemarksInput($event)"
+            ></textarea>
+            @if (remarksError()) {
+              <span class="err" id="leave-remarks-error" role="alert">
+                <span class="icon" aria-hidden="true">error</span>{{ remarksError() }}
+              </span>
+            }
+          </div>
+
+          @switch (decisionMode()) {
+            @case ('approve') {
+              <p class="confirm-note" role="status">{{ signNote(request) }}</p>
+              <div class="panel-actions">
+                <button type="button" class="btn secondary" (click)="cancelDecision()">Cancel</button>
+                <button
+                  type="button"
+                  class="btn primary"
+                  [disabled]="deciding()"
+                  (click)="confirmApprove()"
+                >
+                  <span class="icon" aria-hidden="true">draw</span>
+                  {{ deciding() ? 'Working…' : confirmApproveLabel() }}
+                </button>
+              </div>
+            }
+            @case ('reject') {
+              <p class="confirm-note" role="status">
+                The applicant is told the form was not sanctioned, and reads your remarks. Nothing
+                else reaches them.
+              </p>
+              <div class="panel-actions">
+                <button type="button" class="btn secondary" (click)="cancelDecision()">Cancel</button>
+                <button
+                  type="button"
+                  class="btn danger"
+                  [disabled]="deciding()"
+                  (click)="confirmReject()"
+                >
+                  <span class="icon" aria-hidden="true">cancel</span>
+                  {{ deciding() ? 'Working…' : 'Confirm reject' }}
+                </button>
+              </div>
+            }
+            @default {
+              <div class="panel-actions">
+                <button type="button" class="btn danger" (click)="openReject()">
+                  <span class="icon" aria-hidden="true">cancel</span> Reject
+                </button>
+                <button type="button" class="btn primary" (click)="openApprove()">
+                  <span class="icon" aria-hidden="true">draw</span> {{ approveButtonLabel() }}
+                </button>
+                <a class="btn ghost sm paper-link" [href]="paperUrl(request)" download>
+                  <span class="icon" aria-hidden="true">picture_as_pdf</span> PDF
+                </a>
+              </div>
+            }
+          }
+        } @else {
+          @switch (decisionMode()) {
+            @case ('revoke') {
+              <div class="field panel-remarks">
+                <label for="leave-change-reason">Why is the sanction being revoked?</label>
+                <textarea
+                  id="leave-change-reason"
+                  class="ctrl multi"
+                  rows="3"
+                  placeholder="Required · the applicant reads this"
+                  [value]="changeReason()"
+                  [attr.aria-describedby]="changeError() ? 'leave-change-error' : null"
+                  [attr.aria-invalid]="changeError() ? 'true' : null"
+                  (input)="onChangeReasonInput($event)"
+                ></textarea>
+              </div>
+              @if (selectedHasBegun()) {
+                <label class="confirm-started">
+                  <input
+                    type="checkbox"
+                    [checked]="confirmStarted()"
+                    (change)="onConfirmStartedChange($event)"
+                  />
+                  This leave has already begun. Revoke it anyway — the days already taken lose
+                  their sanction.
+                </label>
+              }
+              @if (changeError()) {
+                <span class="err" id="leave-change-error" role="alert">
+                  <span class="icon" aria-hidden="true">error</span>{{ changeError() }}
+                </span>
+              }
+              <p class="confirm-note" role="status">
+                The applicant and any colleague who agreed to cover are emailed that the sanction
+                was withdrawn. Their allowance is not changed — adjust it under Leave policy if you
+                counted these days.
+              </p>
+              <div class="panel-actions">
+                <button type="button" class="btn secondary" (click)="cancelDecision()">Cancel</button>
+                <button
+                  type="button"
+                  class="btn danger"
+                  [disabled]="deciding()"
+                  (click)="confirmChange()"
+                >
+                  <span class="icon" aria-hidden="true">undo</span>
+                  {{ deciding() ? 'Working…' : 'Confirm revoke' }}
+                </button>
+              </div>
+            }
+            @case ('reopen') {
+              <div class="field panel-remarks">
+                <label for="leave-change-reason">Why is it being reopened?</label>
+                <textarea
+                  id="leave-change-reason"
+                  class="ctrl multi"
+                  rows="3"
+                  placeholder="Required · the applicant reads this"
+                  [value]="changeReason()"
+                  [attr.aria-describedby]="changeError() ? 'leave-change-error' : null"
+                  [attr.aria-invalid]="changeError() ? 'true' : null"
+                  (input)="onChangeReasonInput($event)"
+                ></textarea>
+              </div>
+              @if (changeError()) {
+                <span class="err" id="leave-change-error" role="alert">
+                  <span class="icon" aria-hidden="true">error</span>{{ changeError() }}
+                </span>
+              }
+              <p class="confirm-note" role="status">
+                It goes back to Pending with no signature on it, and you decide it again from there.
+              </p>
+              <div class="panel-actions">
+                <button type="button" class="btn secondary" (click)="cancelDecision()">Cancel</button>
+                <button
+                  type="button"
+                  class="btn primary"
+                  [disabled]="deciding()"
+                  (click)="confirmChange()"
+                >
+                  <span class="icon" aria-hidden="true">undo</span>
+                  {{ deciding() ? 'Working…' : 'Confirm reopen' }}
+                </button>
+              </div>
+            }
+            @default {
+              @if (changeAction() === 'revoke' && !mayRevokeSelected()) {
+                <p class="panel-hint">
+                  This leave has already begun. Only the Main Admin can revoke it now.
+                </p>
+              }
+              <div class="panel-actions">
+                @if (changeAction() === 'revoke' && mayRevokeSelected()) {
+                  <button type="button" class="btn danger" (click)="openChange()">
+                    <span class="icon" aria-hidden="true">undo</span> Revoke sanction
+                  </button>
+                }
+                @if (changeAction() === 'reopen') {
+                  <button type="button" class="btn secondary" (click)="openChange()">
+                    <span class="icon" aria-hidden="true">undo</span> Reopen
+                  </button>
+                }
+                <a class="btn ghost sm paper-link" [href]="paperUrl(request)" download>
+                  <span class="icon" aria-hidden="true">picture_as_pdf</span> Open the signed form (PDF)
+                </a>
+              </div>
+            }
+          }
+        }
+      } @else {
+        <div class="panel-empty">
+          <span class="icon" aria-hidden="true">event_note</span>
+          <div class="panel-name">Pick a request</div>
+          <p>
+            Click a row to read the reason, the alternate arrangement and where the form is in its
+            approval chain. The signed document itself is the paper PDF.
+          </p>
+        </div>
+      }
+    </aside>
+  </div>
+
+  @if (policyOpen()) {
+    <app-leave-policy-dialog (dismissed)="closeDialogs()" />
+  }
+  @if (calendarOpen()) {
+    <app-leave-calendar-dialog [colleges]="colleges()" (dismissed)="closeDialogs()" />
+  }
+</div>

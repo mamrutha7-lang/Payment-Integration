@@ -1,0 +1,595 @@
+/**
+ * REEP v2 Resume Builder — global component classes.
+ *
+ * A port of the resume-builder-specific rules in the `<style>` block of
+ * docs/design-v2/resume-builder.html. Loaded AFTER reep-v2.scss (see
+ * src/styles.scss) so, where the two touch, these win on equal specificity.
+ *
+ * Only the classes that reep-v2.scss does NOT already define live here. The
+ * shared token :root, base body/icon/typography, .card, .chip (good/warn/risk),
+ * .dropzone and .field/.field-label bases already exist globally and are not
+ * duplicated. Deliberate skips to avoid regressing other screens:
+ *   - `.field` and `.field label` base rules are left to reep-v2 (registration
+ *     depends on them). Only the genuinely new `.field label .req` and
+ *     `.field .lock` are added here.
+ *   - `.frame` / `.titlebar` / `.shell` / `.meta-*` demo chrome is omitted — the
+ *     Angular builder renders inside the app-shell, and the view tabs are styled
+ *     locally in resume-builder.component.scss.
+ *   - `.panel` stays a plain block (reep-v2 already made it one); no display
+ *     toggle is reintroduced.
+ * New additions layered on top of existing globals: `.chip.neutral`,
+ * `.card > h3`, `.card > .desc`, `.dropzone small`, `.right`.
+ */
+
+/* the mockup's .ctrl carries no font-family of its own; normalize form controls */
+input,
+select,
+textarea {
+  font-family: var(--font);
+}
+
+/* --- section stepper --- */
+.stepper {
+  width: 250px;
+  background: var(--tint-3);
+  border-right: 1px solid var(--hairline);
+  padding: 18px 12px;
+  flex: 0 0 auto;
+  overflow: auto;
+}
+.completeness {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+.completeness .top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.completeness .pct {
+  font-size: 22px;
+  font-weight: 800;
+}
+.completeness .lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  font-weight: 700;
+}
+.completeness small {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 8px;
+  line-height: 1.45;
+}
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  font-size: 12.8px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  margin-bottom: 1px;
+}
+.step-item:hover {
+  background: var(--surface);
+}
+/* The selected section, in the brand's purple — it was --ink, a near-black
+   slab that is the only one in the product and reads as "disabled" beside the
+   purple pill the sidebar uses two inches to its left for the same idea. */
+.step-item.active {
+  background: var(--brand-purple);
+  color: #fff;
+}
+.step-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--hairline);
+  flex: 0 0 auto;
+}
+.step-dot.done {
+  background: var(--good);
+}
+.step-dot.partial {
+  background: var(--warn-dot);
+}
+.step-item.active .step-dot {
+  outline: 2px solid rgba(248, 244, 236, 0.25);
+}
+.step-group {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  padding: 14px 10px 6px;
+  font-weight: 700;
+}
+
+/* --- builder main column --- */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.main-head {
+  padding: 20px 28px 16px;
+  border-bottom: 1px solid var(--hairline);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: var(--tint-3);
+}
+.main-head h2 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.main-head .sub {
+  color: var(--muted);
+  font-size: 12.8px;
+  margin-top: 4px;
+}
+.head-actions {
+  display: flex;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+.body {
+  flex: 1;
+  padding: 24px 28px 20px;
+  overflow: auto;
+}
+.footbar {
+  border-top: 1px solid var(--hairline);
+  background: var(--tint-3);
+  padding: 12px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.footbar .hint {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+/* --- buttons ---
+   DELIBERATELY ABSENT. reep-v2.scss already defines .btn, .btn.primary,
+   .btn.accent and .btn.ghost, and this file's contract is that only classes it
+   does NOT define live here. The copies that stood here broke that rule and,
+   because this sheet loads last, they won everywhere: all 28 `.btn.primary`
+   buttons in the app — Submit day on the ledger, Submit claim on skilling,
+   every primary CTA in the mentor and admin screens — rendered as this file's
+   flat charcoal 9px rectangle instead of the handoff's gradient pill. The
+   resume builder wants the same button as the rest of the app, so there is
+   nothing to scope here; the rule is simply gone.
+   Only `:disabled` differed in kind, and reep-v2's `[disabled]` covers it. */
+
+/* --- form primitives --- */
+.grid2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.grid3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+.grid4 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 16px;
+}
+/* .field + .field label base come from reep-v2; only these two are new here */
+.field label .req {
+  color: var(--risk);
+}
+.field .lock {
+  font-size: 10px;
+  background: var(--ground);
+  color: var(--muted);
+  padding: 2px 6px;
+  border-radius: 5px;
+  margin-left: 6px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+.ctrl {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 9px;
+  border: 1px solid var(--hairline);
+  /* paper-1 well: reep-v2.scss applies var(--sh-well) inset to .ctrl for the carved look */
+  background: var(--tint-3);
+  font-size: 13.3px;
+  color: var(--ink);
+}
+.ctrl:disabled {
+  background: var(--ground);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+textarea.ctrl {
+  min-height: 88px;
+  resize: vertical;
+}
+.inline {
+  display: flex;
+  gap: 8px;
+}
+.inline .code {
+  width: 110px;
+  flex: 0 0 auto;
+}
+
+.addlink {
+  color: var(--purple-mid);
+  font-size: 12.3px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.rowline {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 8px;
+}
+.rowline .ctrl {
+  flex: 1;
+}
+.iconbtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+.iconbtn:hover {
+  color: var(--risk);
+  border-color: rgba(139, 58, 46, 0.3);
+}
+.right {
+  margin-left: auto;
+}
+/* reep-v2 defines .dropzone; only the trailing hint line is new */
+.dropzone small {
+  display: block;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+/* --- entry cards (repeatable records) --- */
+.entry {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 10px;
+  position: relative;
+}
+.entry .tools {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  gap: 6px;
+}
+.entry .tools button {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--faint);
+}
+.entry .tools button:hover {
+  background: var(--ground);
+  color: var(--ink);
+}
+.entry h4 {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 2px;
+}
+.entry .org {
+  font-size: 13px;
+  color: var(--ink-nav);
+  font-weight: 600;
+}
+.entry .meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.entry .desc {
+  font-size: 12.5px;
+  color: var(--ink-nav);
+  line-height: 1.55;
+  margin-top: 8px;
+}
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+.tag.evi {
+  background: transparent;
+  color: var(--good);
+}
+.tag.lock {
+  background: transparent;
+}
+.empty {
+  text-align: center;
+  padding: 44px 20px;
+  color: var(--muted);
+}
+.empty .icon {
+  font-size: 34px;
+  color: var(--magenta-mid);
+  display: block;
+  margin-bottom: 10px;
+}
+.empty p {
+  font-size: 13px;
+}
+
+/* --- tag input --- */
+.taginput {
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  border-radius: 9px;
+  padding: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.taginput .chipx {
+  background: var(--ink);
+  color: var(--tint-3);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 9px;
+  border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.taginput .chipx .icon {
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.taginput input {
+  border: none;
+  outline: none;
+  background: transparent;
+  flex: 1;
+  min-width: 130px;
+  font-size: 13px;
+  padding: 5px;
+}
+
+/* --- tables --- */
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.6px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.tbl th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--ground);
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 10.6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.tbl td {
+  padding: 8px 12px;
+  border-top: 1px solid var(--hairline);
+  vertical-align: middle;
+}
+.tbl td .ctrl {
+  padding: 7px 10px;
+  font-size: 12.5px;
+}
+.tbl .num {
+  width: 110px;
+}
+
+/* --- notices --- */
+.notice {
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12.3px;
+  line-height: 1.5;
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+.notice .icon {
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+.notice.info {
+  background: rgba(138, 90, 30, 0.09);
+  color: var(--brand-purple);
+}
+.notice.evi {
+  background: rgba(92, 122, 58, 0.1);
+  color: var(--good);
+}
+
+/* --- radio / check rows --- */
+.radio-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+.radio-row label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.3px;
+  font-weight: 600;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.8px;
+  font-weight: 600;
+  color: var(--ink-nav);
+}
+
+/* --- resume list --- */
+.res-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.res-card {
+  background: var(--tint-3);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 18px;
+}
+.res-card.default {
+  border-color: var(--purple-mid);
+  box-shadow: 0 0 0 1px var(--purple-mid) inset;
+}
+.res-card h4 {
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 3px;
+}
+.res-card .meta {
+  font-size: 11.8px;
+  color: var(--muted);
+}
+.res-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+/* --- generated resume preview --- */
+.preview {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  padding: 28px;
+  font-size: 12.4px;
+  line-height: 1.6;
+}
+.preview h2 {
+  font-size: 19px;
+  margin-bottom: 2px;
+}
+.preview .psub {
+  color: var(--muted);
+  font-size: 11.8px;
+  margin-bottom: 16px;
+}
+.preview .psec {
+  font-size: 10.6px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--purple-mid);
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: 4px;
+  margin: 16px 0 8px;
+}
+.evi-tag {
+  font-size: 9.6px;
+  background: transparent;
+  color: var(--good);
+  padding: 2px 6px;
+  border-radius: 5px;
+  margin-left: 6px;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+ * PHONE WIDTH (2026-09-22)
+ *
+ * `.field .lock` is 10px — the smallest text in the product, and it is the
+ * chip that says a field is locked because it comes from the student record.
+ * A descendant selector so it matches the (0,2,0) rule above; mobile only, so
+ * the desktop builder keeps the 10px chip it has today.
+ * ======================================================================= */
+
+@media (max-width: 640px) {
+  .field .lock {
+    font-size: 11px;
+  }
+}
+
+/* THE GRIDS NEVER COLLAPSED, AND THE TWO-STYLESHEETS RULE IS EXACTLY WHY.
+ *
+ * reep-v2.scss collapses `.grid-2 / .grid2 / .grid3 / .grid4` to one column at
+ * 720px. This sheet re-declares those three names at 182-196 with NO media
+ * query, and it loads AFTER — so at equal specificity source order wins and
+ * the resume builder's cards stayed two and three columns wide on a phone.
+ * Measured at 390px once the shell was stacked: `.grid2` rendered
+ * `172.5px 172.5px` inside a 294px box, so 67px of every paired field was
+ * clipped.
+ *
+ * It is invisible until the shell collapses, which is why it surfaced only
+ * after the fix above — before that the whole builder was clipped anyway.
+ * AGENTS.md's "two global stylesheets, and they must not claim each other's
+ * names" is this defect, from the other direction: the duplicate is already
+ * listed in check_style_duplicates.py's KNOWN_DUPLICATES, and what that list
+ * records is a name claimed twice, not a behaviour anybody checked.
+ *
+ * 720px and not this file's 640, deliberately: these three names belong to the
+ * global design system and their breakpoint is its business, not the builder's.
+ */
+
+@media (max-width: 720px) {
+  .grid2,
+  .grid3,
+  .grid4 {
+    grid-template-columns: 1fr;
+  }
+}

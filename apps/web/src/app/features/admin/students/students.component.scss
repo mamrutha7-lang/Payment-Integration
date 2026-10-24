@@ -1,0 +1,336 @@
+/* Students & batches — this screen's LAYOUT only.
+ *
+ * `.panel` `.card` `.chip` `.btn` `.select` `.field` `.ctrl` `.notice`
+ * `.dt-header` `.dt-title` `.dt-sub` `.dt-toolbar` `.dt-frame` `.dt-gridbar`
+ * `.dt-quickfilter` `.dt-statusbar` `.crumb` `.avatar` `.icon` `.card-heading`
+ * are global (styles/reep-v2.scss) and are used as they are; the dialog chrome comes from
+ * ./batch-dialog.scss, which this component loads alongside this file so the
+ * two batch dialogs and the roster's own dialogs wear one shape.
+ *
+ * What is here is the shape of this board: the filter row, the grid beside its
+ * 300px rail, the grid bar's columns popover, and the forms inside the
+ * dialogs.
+ */
+
+:host {
+  display: block;
+}
+
+/* --- the board's filter row --------------------------------------------- */
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.filters .select {
+  max-width: 230px;
+}
+
+.filters .batch-select {
+  max-width: 260px;
+}
+
+.filters-end {
+  margin-left: auto;
+}
+
+.columns-note {
+  margin-bottom: 10px;
+}
+
+/* --- grid beside its rail ----------------------------------------------- */
+
+.roster {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.roster-grid {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* The grid bar has to be able to hold the columns popover. */
+  position: relative;
+}
+
+.roster-ag {
+  display: block;
+  width: 100%;
+  height: clamp(380px, calc(100vh - 400px), 760px);
+}
+
+/* Loading, empty and error all sit where the grid would, in main's own words. */
+.roster-state {
+  margin: 0;
+  padding: 28px 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.gridbar-end {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --- the Columns popover ------------------------------------------------- */
+/* AG Grid's own side panel is an Enterprise feature; this is the Community
+   equivalent of the board's Columns tab, driven by setColumnsVisible. */
+.columns-panel {
+  position: absolute;
+  top: 46px;
+  right: 10px;
+  z-index: 5;
+  width: 200px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-card);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.columns-panel__title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin-bottom: 2px;
+}
+
+.columns-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+/* --- the status bar's page-size control ---------------------------------- */
+
+.pagesize {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagesize select {
+  height: 24px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-seg);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 11.5px;
+  color: var(--ink);
+  padding: 0 4px;
+}
+
+/* --- the 300px rail ------------------------------------------------------ */
+
+.roster-rail {
+  flex: none;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rail-card {
+  padding: 12px;
+}
+
+.rail-card__head {
+  margin-bottom: 12px;
+  /* The Promotion history card puts a count chip beside its heading. */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rail-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 12.5px;
+  margin: 0;
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  dt {
+    color: var(--muted);
+    flex: none;
+  }
+
+  dd {
+    margin: 0;
+    text-align: right;
+    min-width: 0;
+  }
+}
+
+.rail-hint {
+  margin: 12px 0 0;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+@media (max-width: 1180px) {
+  .roster {
+    flex-direction: column;
+  }
+
+  .roster-rail {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+
+    > * {
+      flex: 1 1 260px;
+    }
+  }
+}
+
+/* --- forms inside the dialogs -------------------------------------------- */
+
+.edit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+@media (max-width: 620px) {
+  .edit-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* One whole-batch control and its button, the button on the baseline. */
+.batch-action {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+
+  .field {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .btn {
+    flex: none;
+  }
+}
+
+.batch-danger {
+  padding-top: 12px;
+  border-top: 1px dashed var(--hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+.batch-danger__warn {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--risk);
+}
+
+.batch-danger__row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.batch-danger__hint {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.5;
+
+  code {
+    font-size: 11px;
+  }
+}
+
+/* --- the promotion history card ----------------------------------------
+   Component-scoped names, not globals: `.history-*` is this card's list and
+   belongs to it. `.rail-card__head` already lays the heading out, so the
+   count chip sits in `.rail-card__head` above. */
+
+.history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.history-row {
+  border-top: 1px solid var(--hairline);
+  padding-top: 10px;
+  font-size: 12.2px;
+  line-height: 1.5;
+
+  &:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+}
+
+.history-row__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.history-row__usn {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.history-row__move {
+  color: var(--ink-soft);
+  margin-top: 3px;
+}
+
+.history-row__by {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.history-row__reason {
+  margin: 4px 0 0;
+  font-size: 11.8px;
+  color: var(--ink-soft);
+
+  &.muted {
+    color: var(--faint);
+  }
+}
+
+/* Pushes the destructive button to the far left of the edit dialog's foot,
+   away from Save. */
+.dialog-foot-gap {
+  flex: 1 1 auto;
+}

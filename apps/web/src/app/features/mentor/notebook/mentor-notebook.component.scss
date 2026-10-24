@@ -1,0 +1,290 @@
+/* Mentor notebook — one card, the printed mentoring-log table inside it.
+   Panel / header / card / chip / btn / notice / icon are global; only the
+   log's own furniture lives here. */
+:host {
+  display: block;
+}
+
+.nb-lede {
+  max-width: 64ch;
+}
+.nb-private {
+  padding: 6px 12px;
+  font-size: 13px;
+  background: rgba(58, 31, 82, 0.06);
+  color: var(--ink-nav);
+  align-self: center;
+}
+.nb-private .icon {
+  font-size: 15px;
+}
+
+.nb-notice {
+  margin-bottom: 14px;
+}
+
+.nb-wrap {
+  max-width: 920px;
+}
+
+.nb-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+.nb-kicker {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  color: var(--ink-soft);
+}
+.nb-student {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: auto;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+}
+.nb-select {
+  padding: 8px 11px;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--hairline-45);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  box-shadow: inset 0 1px 2px rgba(58, 31, 82, 0.06);
+  cursor: pointer;
+  max-width: 100%;
+}
+.nb-select:disabled {
+  cursor: default;
+  color: var(--muted);
+}
+.nb-toggle {
+  padding: 8px 13px;
+  white-space: nowrap;
+  flex: none;
+}
+
+.nb-empty {
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border-radius: var(--r-alert);
+  background: var(--tint-2);
+  color: var(--ink-soft);
+  font-size: 13px;
+}
+
+/* The compose strip: a white well with the four cells and the send button. */
+.nb-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid rgba(160, 138, 178, 0.4);
+  margin-bottom: 14px;
+}
+.nb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  min-width: 0;
+}
+.nb-field--wide {
+  grid-column: span 2;
+}
+.nb-field input,
+.nb-field select {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--hairline-45);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink);
+  box-shadow: inset 0 1px 2px rgba(58, 31, 82, 0.06);
+}
+.nb-field input:focus,
+.nb-field select:focus {
+  outline: none;
+  border-color: var(--purple-mid);
+  box-shadow: var(--focus-ring);
+}
+.nb-form__actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.nb-form__error {
+  grid-column: 1 / -1;
+  color: var(--risk);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+@media (max-width: 560px) {
+  .nb-field--wide {
+    grid-column: auto;
+  }
+}
+
+/* The printed log: ruled on every side, tinted header, fixed columns. */
+.nb-scroll {
+  overflow-x: auto;
+  margin: 0 -2px;
+  padding: 0 2px;
+}
+.nb-table {
+  min-width: 560px;
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  border: 1px solid var(--hairline-45);
+}
+.nb-table th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-soft);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--hairline-45);
+  border-right: 1px solid rgba(160, 138, 178, 0.32);
+  background: rgba(239, 228, 246, 0.6);
+}
+.nb-table th:last-child {
+  border-right: 0;
+}
+.nb-col-date {
+  width: 112px;
+}
+.nb-col-follow {
+  width: 22%;
+}
+.nb-col-remark {
+  width: 17%;
+}
+.nb-col-act {
+  width: 68px;
+}
+.nb-table td {
+  padding: 9px 10px;
+  font-size: 13px;
+  color: var(--ink);
+  border-bottom: 1px solid rgba(160, 138, 178, 0.28);
+  border-right: 1px solid rgba(160, 138, 178, 0.32);
+  vertical-align: top;
+  background: var(--surface);
+}
+.nb-table td:last-child {
+  border-right: 0;
+}
+.nb-table tbody tr:nth-child(even) td {
+  background: rgba(250, 246, 253, 0.7);
+}
+.nb-date {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.nb-text {
+  line-height: 1.5;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.nb-title {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.nb-dash {
+  color: var(--muted);
+}
+.nb-pub {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--good);
+}
+.nb-pub .icon {
+  font-size: 13px;
+}
+.nb-actions {
+  text-align: center;
+  white-space: nowrap;
+}
+.nb-rowbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-icon);
+  border: 1px solid rgba(160, 138, 178, 0.4);
+  background: var(--surface);
+  color: var(--muted);
+  padding: 0;
+  margin-left: 3px;
+}
+.nb-rowbtn .icon {
+  font-size: 16px;
+}
+.nb-rowbtn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.nb-rowbtn--pub:hover:not([disabled]) {
+  background: var(--tint-2);
+  color: var(--brand-purple);
+  border-color: rgba(122, 47, 158, 0.45);
+}
+.nb-rowbtn--del:hover:not([disabled]) {
+  background: rgba(173, 36, 82, 0.08);
+  color: var(--risk);
+  border-color: rgba(173, 36, 82, 0.3);
+}
+.nb-row-note {
+  padding: 16px 10px;
+  color: var(--muted);
+}
+
+.nb-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.nb-foot .icon {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

@@ -1,0 +1,56 @@
+<p class="crumb">Programme <span class="sep">/</span> Fees</p>
+<div class="dt-header">
+  <div>
+    <h1 class="dt-title">Fees</h1>
+    <p class="dt-sub">What the office has asked you to pay, and what you have already paid.</p>
+  </div>
+</div>
+
+@if (notice(); as n) {
+  <div class="card fee-notice" [class.risk]="n.tone === 'risk'" role="status">{{ n.text }}</div>
+}
+
+@switch (state()) {
+  @case ('loading') {
+    <div class="card"><p class="card-line">Loading your fees…</p></div>
+  }
+  @case ('error') {
+    <div class="card">
+      <p class="card-line">Could not load your fees.</p>
+      <button type="button" class="btn" (click)="load()">Try again</button>
+    </div>
+  }
+  @default {
+    @if (fees().length === 0) {
+      <div class="card"><p class="card-line">You have no fees to pay.</p></div>
+    } @else {
+      @for (fee of fees(); track fee.id) {
+        <div class="card fee-row">
+          <div class="fee-main">
+            <b>{{ fee.title }}</b>
+            <span class="fee-meta">
+              @if (fee.status === 'PAID') {
+                Paid on {{ formatDate(fee.paid_at) }}
+              } @else if (fee.due_date) {
+                Due {{ formatDate(fee.due_date) }}
+                @if (fee.overdue) {
+                  <span class="fee-overdue">· Overdue</span>
+                }
+              } @else {
+                No due date
+              }
+            </span>
+          </div>
+          <div class="fee-amount">₹{{ fee.amount }}</div>
+          @if (fee.status === 'PAID') {
+            <span class="fee-paid"><span class="icon" aria-hidden="true">check_circle</span> Paid</span>
+          } @else {
+            <button type="button" class="btn" [disabled]="paying() !== null" (click)="pay(fee)">
+              {{ paying() === fee.id ? 'Opening…' : 'Pay now' }}
+            </button>
+          }
+        </div>
+      }
+    }
+  }
+}

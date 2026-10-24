@@ -1,0 +1,179 @@
+@if (error(); as message) {
+  <p class="ag-error" role="alert">{{ message }}</p>
+}
+
+<div class="ag-frame">
+  <div class="ag-scroll" #scroller role="log" aria-live="polite" aria-label="Conversation">
+    @if (historyState() === 'loading') {
+      <p class="ag-quiet">Loading your conversation…</p>
+    }
+
+    @for (m of messages(); track m.id) {
+      @if (m.role === 'user') {
+        <div class="ag-row ag-row--user">
+          <div class="ag-stack ag-stack--user">
+            <div class="ag-bubble ag-bubble--user">{{ m.content }}</div>
+            @if (m.status === 'failed') {
+              <span class="ag-turn-state">Not sent</span>
+            } @else if (m.status === 'stopped') {
+              <span class="ag-turn-state">Stopped</span>
+            }
+          </div>
+        </div>
+      } @else {
+        <div class="ag-row">
+          <span class="ag-mark" aria-hidden="true">R</span>
+          <div class="ag-stack">
+            <div class="ag-bubble">{{ m.content }}</div>
+
+            @if (m.actions?.length) {
+              <div class="ag-action-list">
+                @for (a of m.actions; track a.route + a.label) {
+                  <a class="ag-action" [routerLink]="a.route">
+                    <span class="ag-action__arrow" aria-hidden="true">→</span>
+                    <span class="ag-action__text">
+                      <span class="ag-action__label">{{ a.label }}</span>
+                      <span class="ag-action__reason">{{ a.reason }}</span>
+                    </span>
+                  </a>
+                }
+              </div>
+            }
+
+            @if (m.sources?.length) {
+              <div class="ag-sources">
+                @for (s of m.sources; track s.label) {
+                  <span class="ag-source ag-source--{{ sourceTone(s) }}">Source: {{ s.label }}</span>
+                }
+              </div>
+            }
+
+            @if (m.limitations?.length) {
+              <div class="ag-limits">
+                @for (l of m.limitations; track l) {
+                  <p>{{ l }}</p>
+                }
+              </div>
+            }
+
+            <div class="ag-feedback">
+              <button type="button" class="ag-textbtn" (click)="copy(m)">
+                {{ copiedId() === m.id ? 'Copied' : 'Copy' }}
+              </button>
+              @if (m.runId) {
+                <span class="ag-votes">
+                  <button
+                    type="button"
+                    class="ag-vote"
+                    [class.ag-vote--on]="m.rating === 'HELPFUL'"
+                    [attr.aria-pressed]="m.rating === 'HELPFUL'"
+                    aria-label="Helpful"
+                    (click)="rate(m, 'HELPFUL')"
+                  >
+                    <span class="icon" aria-hidden="true">thumb_up</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="ag-vote"
+                    [class.ag-vote--on]="m.rating === 'NOT_HELPFUL'"
+                    [attr.aria-pressed]="m.rating === 'NOT_HELPFUL'"
+                    aria-label="Not helpful"
+                    (click)="rate(m, 'NOT_HELPFUL')"
+                  >
+                    <span class="icon" aria-hidden="true">thumb_down</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="ag-textbtn ag-textbtn--muted"
+                    [class.ag-textbtn--on]="m.rating === 'REPORT'"
+                    [attr.aria-pressed]="m.rating === 'REPORT'"
+                    (click)="rate(m, 'REPORT')"
+                  >
+                    <span class="icon" aria-hidden="true">flag</span>Report
+                  </button>
+                  @if (m.rating) {
+                    <span class="ag-thanks" role="status">Thanks for the feedback</span>
+                  }
+                </span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    }
+
+    @if (pending()) {
+      <div class="ag-row" aria-label="The REEP Agent is answering">
+        <span class="ag-mark" aria-hidden="true">R</span>
+        <div class="ag-typing">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    }
+
+    @if (isEmpty()) {
+      <div class="ag-empty">
+        <span class="ag-empty__mark" aria-hidden="true">R</span>
+        <p class="ag-empty__lead">How can I help today?</p>
+        <p>Deadlines, the placement process, how to read your dashboard — ask anything about REEP.</p>
+        <div class="ag-starters ag-starters--centred">
+          @for (s of starters; track s) {
+            <button type="button" class="ag-starter" (click)="useStarter(s)">{{ s }}</button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (!isEmpty() && historyState() !== 'loading') {
+    <div class="ag-starters ag-starters--row">
+      @for (s of starters; track s) {
+        <button type="button" class="ag-starter" [disabled]="pending()" (click)="useStarter(s)">
+          {{ s }}
+        </button>
+      }
+    </div>
+  }
+
+  <div class="ag-composer">
+    <textarea
+      #composer
+      rows="1"
+      placeholder="Message the REEP Agent…"
+      aria-label="Message the REEP Agent"
+      [value]="draft()"
+      (input)="onComposerInput($event)"
+      (keydown)="onComposerKeydown($event)"
+    ></textarea>
+    @if (pending()) {
+      <button type="button" class="ag-send ag-send--stop" (click)="stop()">
+        <span class="icon" aria-hidden="true">stop</span>Stop
+      </button>
+    } @else {
+      <button type="button" class="ag-send" [disabled]="!canSend()" (click)="submit()">
+        <span class="icon" aria-hidden="true">send</span>Send
+      </button>
+    }
+  </div>
+</div>
+
+<!-- Under the frame: the keyboard hint on the page; in the dock, Rule 1 in one
+     line and the Clear control, because the dock's header is the tab bar and
+     the page's disclaimer paragraph has no room here. -->
+@if (variant() === 'dock') {
+  <div class="ag-foot">
+    <span class="ag-foot__note">
+      @if (isStudent()) {
+        Does not see your marks, attendance or USN — for those, open
+        <a routerLink="/student/records">your records</a>.
+      } @else {
+        Answers on programme rules and how REEP works; it does not read student records.
+      }
+    </span>
+    <button type="button" class="ag-textbtn ag-textbtn--muted" [disabled]="!canClear()" (click)="clear()">
+      Clear
+    </button>
+  </div>
+} @else {
+  <p class="ag-hint">Enter to send · Shift+Enter for a new line</p>
+}

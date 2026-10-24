@@ -1,0 +1,267 @@
+name: CI
+
+# Provisions a DISPOSABLE Postgres so the DB-backed tests actually run.
+# Without it the suite still goes green while skipping conversations, voice,
+# retention and RBAC — REEP_REQUIRE_DB below turns that silent skip into a
+# hard failure, so "passed" means the product was genuinely exercised.
+
+on:
+  push:
+    branches: [main, stage, dev]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  # A newer push supersedes an in-flight run on the same ref -- ON A PULL
+  # REQUEST ONLY. On main, a run always finishes.
+  #
+  # Why the condition. A cancelled check run is neither `success` nor `failure`:
+  # its conclusion is `cancelled`, and a required status check that concludes
+  # `cancelled` never resolves. With `cancel-in-progress: true` on every ref, a
+  # burst of pushes to main leaves the superseded runs cancelled, and the moment
+  # these four jobs become REQUIRED checks (the ruleset in
+  # .github/rulesets/main.json, which an admin still has to apply) main wears a
+  # permanently amber check that no re-run clears. That reads as a flake, and the
+  # first person blocked by it goes looking for the bypass -- which is the same
+  # failure AGENTS.md names about the boot guard: a guard that trips when it
+  # should not is a guard somebody deletes on the afternoon they need to ship.
+  #
+  # It is not hypothetical here. Two of the last twelve runs of this workflow on
+  # main concluded `cancelled`: run 33178139295 on c9ef4f3, and run 33176873138
+  # on 543a265. That second one is the whole argument -- it was CREATED at
+  # 13:45:35Z and concluded `cancelled` at 13:46:34Z, and deploy run 33176879314
+  # shipped that same sha to production at 13:45:39Z: four seconds after its
+  # checks started, and fifty-five seconds before they stopped without a verdict.
+  # Nothing failed. Nothing passed. Nothing was waiting for either.
+  #
+  # On a pull request the superseding behaviour is what you want and costs
+  # nothing: the branch's final push is the one that has to be green, and an
+  # obsolete run cancelled on a PR blocks nothing.
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  api:
+    name: API (FastAPI + Postgres)
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        # pgvector, NOT stock postgres:17. Migration b7e2f4a19c33 runs
+        # `CREATE EXTENSION IF NOT EXISTS vector`, and IF NOT EXISTS only suppresses
+        # "already exists" -- it does not help when the extension is not installed on
+        # the server at all. On stock postgres:17 that statement raises, `alembic
+        # upgrade head` fails, and every DB-backed test behind it never runs.
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: reep
+          POSTGRES_PASSWORD: reep_dev_password
+          POSTGRES_DB: reep_py
+        ports:
+          - 5433:5432
+        # Without the healthcheck the job races the container and fails on a
+        # connection error that looks like a test bug.
+        options: >-
+          --health-cmd "pg_isready -U reep -d reep_py"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+
+    env:
+      DATABASE_URL: postgresql+psycopg://reep:reep_dev_password@localhost:5433/reep_py
+      AUTH_SECRET: ci-secret-not-used-outside-ci-0123456789abcdef
+      ENV: dev
+      # The point of this workflow: skipping DB tests is a FAILURE here.
+      REEP_REQUIRE_DB: "1"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: |
+            apps/api-py/requirements.txt
+            apps/api-py/requirements-dev.txt
+
+      # requirements-dev.txt `-r requirements.txt`, so this installs runtime +
+      # pytest. The image installs requirements.txt ALONE — that split is the
+      # point: production carries no test runner.
+      - name: Install dependencies
+        working-directory: apps/api-py
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Apply migrations
+        working-directory: apps/api-py
+        run: python -m alembic upgrade head
+
+      - name: Seed the dev dataset
+        working-directory: apps/api-py
+        run: python -m app.seed
+
+      - name: Run tests
+        working-directory: apps/api-py
+        run: python -m pytest -q
+
+  pii-gate:
+    name: Rule 1 (every model call declares its cargo)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      # No install step: this is a static AST walk over app/, not an import.
+      # It asks what the SOURCE says, and a keyword argument is visible without
+      # executing anything -- so it runs in seconds and cannot be defeated by a
+      # missing dependency.
+      #
+      # carries_student_data defaults to False, so an OMITTED argument silently
+      # asserts "this prompt holds no student record". That assertion is
+      # sometimes wrong and nothing fails when it is. This makes the assertion
+      # something a human had to type, where a reviewer can see it.
+      - name: Every complete_chat/stream_chat call declares carries_student_data
+        run: python tools/ci/check_pii_gate.py
+
+  api-imports:
+    name: API (dependency completeness)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: apps/api-py/requirements.txt
+
+      # requirements.txt ALONE — deliberately not -dev. This is the environment
+      # the Dockerfile builds, so a module in app/ that imports pytest is just as
+      # broken in production as one importing an undeclared third-party package;
+      # installing the dev extras here would hide exactly that.
+      - name: Install RUNTIME dependencies only
+        working-directory: apps/api-py
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Catches the failure app/interview_local.py shipped: it imported numpy
+      # with no requirements entry, and because the import is lazy — inside a
+      # request handler — the API still booted and every test still passed. The
+      # break was invisible until pytest could not COLLECT on a clean machine.
+      # The voice worker has had this guard since its own manifest shipped
+      # incomplete; the API did not.
+      - name: Import every module under app/
+        working-directory: apps/api-py
+        run: python ../../tools/ci/check_api_imports.py
+
+  web:
+    name: Web (Angular)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      # Four static checks over the web sources, before the slow steps: each
+      # takes seconds and each guards a rule that is invisible at the call site
+      # and so comes back on its own.
+      #
+      # MAGENTA is reserved for --primary-gradient, which is what makes the
+      # gradient mean "this is the one primary action here". It had leaked to
+      # 22 sites, two of them chart colours in TypeScript that a stylesheet
+      # grep would never have found.
+      #
+      # ONE OWNER PER GLOBAL CLASS. reep-v2-resume.scss loads after
+      # reep-v2.scss, so on every property they both set the resume sheet wins
+      # ACROSS THE WHOLE APP. Four selectors were declared in both, and in
+      # three of them neither written value was the one on screen.
+      #
+      # THE GRID AND CHART THEMES copy tokens as literals, because neither
+      # library reads CSS custom properties. The duplication is forced; the
+      # drift is not.
+      # NOTHING OWNS THIS FORM'S SUBMIT. `(ngSubmit)` is an output of
+      # [formGroup] or of NgForm, and a bare <form> in a component that imports
+      # only ReactiveFormsModule matches neither — so it compiles to a listener
+      # for an event nothing dispatches, the handler never runs, and the
+      # unprevented native submit reloads the page and REPLACES the query
+      # string. That is how a student pressing "Send me a code" on
+      # /onboard?token=… landed on /onboard? and was told their setup link was
+      # missing. `ng build` passes on all of it; only this can see it.
+      - name: Static guards over apps/web/src
+        run: |
+          python tools/ci/check_brand_magenta.py
+          python tools/ci/check_style_duplicates.py
+          python tools/ci/check_theme_tokens.py
+          python tools/ci/check_form_submit.py
+
+      - name: Install
+        working-directory: apps/web
+        run: npm ci
+
+      - name: Typecheck
+        working-directory: apps/web
+        run: npx tsc --noEmit -p tsconfig.app.json
+
+      # Enforceable only since the `ng new` scaffold spec was replaced: it
+      # asserted an <h1> reading "Hello, web" against a template that is just
+      # <router-outlet />, so `ng test` failed on a fresh checkout and could not
+      # be a gate. A permanently-red suite is worse than none — a real regression
+      # arrives as one more failure in a run nobody reads.
+      - name: Unit tests
+        working-directory: apps/web
+        run: npx ng test --watch=false
+
+      # The real production build, not just a typecheck. It used to fail the
+      # bundle budget (1.23 MB against a 1 MB cap) because every route was
+      # statically imported, so this step could not be enforced. Routes are lazy
+      # now — `main` is ~142 kB, ~419 kB initial once the framework chunks it
+      # imports are counted (Angular 22.2 counts them; 22.1 did not) — and the
+      # budget is a backstop against a heavy route or library going eager
+      # rather than shipping the whole app to the login screen again.
+      - name: Build (enforces the bundle budget)
+        working-directory: apps/web
+        run: npx ng build
+
+  cdk:
+    name: Infra (CDK synth guards)
+    runs-on: ubuntu-latest
+    # No AWS credentials: `Template.from_stack` synthesises in-process. What this
+    # gates is what the cutover left behind (docs/cdk-cutover.md): the import
+    # phase must add nothing CloudFormation cannot adopt, no MasterUserPassword
+    # may ever appear, the ECS half of harden must stay separable from the
+    # database half, and no stack may carry stack-level tags. The guards that
+    # compared physical names against infra/aws/*.tf skip themselves now that
+    # those files are gone (`requires_terraform`); the mirror is proven instead
+    # by the import and by drift detection, both recorded in the runbook.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: infra/cdk/requirements-dev.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install the CDK library
+        working-directory: infra/cdk
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+      - name: Synthesise and check every stack
+        working-directory: infra/cdk
+        run: python -m pytest -q

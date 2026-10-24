@@ -1,0 +1,231 @@
+/* Mentee Log — layout and the note cards' furniture. Every visual token comes
+   from the global reep-v2 classes (card, chip, btn, notice, icon). */
+:host {
+  display: block;
+}
+
+.ml-split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.ml-list {
+  flex: 1 1 210px;
+  max-width: 252px;
+  padding: 16px;
+}
+@media (max-width: 720px) {
+  .ml-list {
+    max-width: none;
+  }
+}
+.ml-main {
+  flex: 999 1 420px;
+  min-width: 0;
+}
+
+/* The handoff's card heading: 16/600 display face, no rule beneath. */
+.ml-card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+.ml-compose .ml-card-title {
+  margin-bottom: 14px;
+}
+
+.ml-search {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--hairline-45);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--ink);
+  box-shadow: inset 0 1px 2px rgba(58, 31, 82, 0.06);
+  margin-bottom: 10px;
+}
+.ml-search:focus {
+  outline: none;
+  border-color: var(--purple-mid);
+  box-shadow: var(--focus-ring);
+}
+
+.ml-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.ml-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  padding: 9px 11px;
+  border-radius: var(--r-btn);
+  border: 1px solid rgba(160, 138, 178, 0.35);
+  background: var(--surface);
+  color: #3a1f52;
+  font-family: var(--font);
+  cursor: pointer;
+}
+.ml-row strong {
+  font-size: 13px;
+  font-weight: 700;
+}
+.ml-row span {
+  font-size: 12px;
+  opacity: 0.8;
+}
+.ml-row:hover {
+  border-color: rgba(122, 47, 158, 0.45);
+}
+.ml-row.active {
+  background: var(--tint-2);
+  color: var(--brand-purple);
+  border-color: rgba(122, 47, 158, 0.5);
+}
+.ml-empty {
+  padding: 10px 2px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.ml-compose {
+  margin-bottom: 16px;
+}
+.ml-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.ml-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  min-width: 0;
+}
+.ml-opt {
+  font-weight: 400;
+  color: var(--muted);
+}
+.ml-field input,
+.ml-field select,
+.ml-field textarea {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--hairline-45);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink);
+  box-shadow: inset 0 1px 2px rgba(58, 31, 82, 0.06);
+}
+.ml-field textarea {
+  padding: 11px;
+  resize: vertical;
+}
+.ml-field input:focus,
+.ml-field select:focus,
+.ml-field textarea:focus {
+  outline: none;
+  border-color: var(--purple-mid);
+  box-shadow: var(--focus-ring);
+}
+.ml-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.ml-notice {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.ml-note {
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.ml-note__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+.ml-note__head strong {
+  font-size: 14px;
+  font-weight: 800;
+}
+.ml-note__meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+.ml-del {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-icon);
+  border: 1px solid rgba(160, 138, 178, 0.4);
+  background: var(--surface);
+  color: var(--muted);
+  padding: 0;
+}
+.ml-del .icon {
+  font-size: 16px;
+}
+.ml-del:hover:not([disabled]) {
+  background: rgba(173, 36, 82, 0.08);
+  color: var(--risk);
+  border-color: rgba(173, 36, 82, 0.3);
+}
+.ml-del[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.ml-note__text {
+  margin: 8px 0 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ink);
+  white-space: pre-wrap;
+  text-wrap: pretty;
+}
+.ml-note__flag {
+  margin-top: 10px;
+}
+
+.ml-empty-card {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* The compose card's title with the "Full record" link beside it, drawn only
+   for a holder of the record key. */
+.ml-card-title--row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}

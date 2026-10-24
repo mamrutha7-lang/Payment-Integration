@@ -1,0 +1,721 @@
+/*
+ * The sign-in screen, to the 2026-09 board (LoginRedesign / LoginStates /
+ * LoginMobile): the page wash runs edge to edge, the left panel sits ON it
+ * rather than being a dark slab of its own, and the card is white on top.
+ *
+ * WHY THE DARK PANEL WENT. It was the only surface in the product painted in
+ * inverted colours, so it carried its own copy of every rule the rest of the
+ * app states once -- a white-alpha logo tile, rgba(255,255,255,0.68) for muted
+ * text, a lilac for icons that exists nowhere else. Nine colours, none of them
+ * a token. On the wash the same elements read from --ink, --muted and
+ * --brand-purple like every other screen, and the file drops to tokens.
+ *
+ * It sits OUTSIDE the shell, so it uses the global tokens directly (defined
+ * once in styles/reep-v2.scss) and owns its own layout classes here. Nothing in
+ * this file redefines a global class.
+ */
+
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+.login {
+  min-height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: stretch;
+  /* NO BACKGROUND HERE, deliberately. This used to read
+     `background: var(--page-bg, #f6f1fb)` -- and there is no `--page-bg` token
+     in this codebase, so every login ever served painted the flat #f6f1fb
+     fallback ON TOP of the body's real `--page-wash`, which is the lilac-to-
+     pink gradient the board shows. The dark panel covered the left half and the
+     card covered the right, so nobody saw the difference until the panel went
+     light. Painting nothing lets the wash through, and there is one place that
+     decides what the page looks like. */
+}
+
+/* ---- brand panel ------------------------------------------------------- */
+
+.panel {
+  /* 560px on the board at 1440. `flex: 0 1 560px` rather than a fixed width:
+     the card must keep its 440px before this panel keeps its 560, and below
+     the wrap the panel goes full-width (see the 980px query). */
+  flex: 0 1 560px;
+  min-width: 320px;
+  color: var(--ink, #1e1b29);
+  padding: clamp(32px, 4vw, 48px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.panel__brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+/* The middle of the panel's three space-between children. Without this the
+   copy stacks under the brand and the panel reads top-heavy against the
+   card, which is centred in its own half. */
+.panel__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 430px;
+}
+
+.panel__logo {
+  /* The brand mark, the same one the shell's app bar carries: a gradient
+     square holding the letter, not an icon tile. */
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--primary-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  box-shadow: var(--sh-navpill);
+}
+
+.panel__reep {
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.panel__sub {
+  font-size: 12px;
+  color: var(--muted, #585566);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border-left: 1px solid var(--hairline, rgba(160, 138, 178, 0.42));
+  padding-left: 12px;
+}
+
+.panel__headline {
+  font-size: clamp(26px, 3.2vw, 34px);
+  font-weight: 800;
+  line-height: 1.15;
+  margin: 0;
+  letter-spacing: -0.02em;
+  text-wrap: pretty;
+  max-width: 22ch;
+}
+
+.panel__body {
+  font-size: 14px;
+  color: var(--muted, #585566);
+  line-height: 1.55;
+  margin: 0;
+  max-width: 44ch;
+}
+
+.panel__points {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--ink, #1e1b29);
+  }
+
+  /* The board sets each point's icon in a 30px tinted square, which is what
+     stops three different glyph widths from ragging the text beside them. */
+  .icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    background: var(--tint-1, #efe4f6);
+    color: var(--brand-purple, #552c7e);
+    font-size: 17px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+}
+
+.panel__foot {
+  font-size: 11.5px;
+  color: var(--muted, #585566);
+}
+
+/* ---- sign-in card ------------------------------------------------------ */
+
+.signin {
+  flex: 1 1 480px;
+  min-width: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 3vw, 40px);
+}
+
+.card-login {
+  width: 100%;
+  max-width: 440px;
+  background: var(--surface, #fff);
+  border: 1px solid var(--hairline, rgba(160, 138, 178, 0.38));
+  border-radius: var(--r-card, 16px);
+  padding: 24px 28px;
+  /* Softer than the old 50px drop: on the wash the card no longer has a dark
+     slab behind it to lift away from. */
+  box-shadow:
+    0 10px 26px rgba(58, 31, 82, 0.1),
+    inset 0 1px 0 #fff;
+}
+
+.card-login__brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink, #1e1b29);
+}
+
+/* The card's own mark: the panel's, at the card's scale. */
+.card-login__mark {
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: var(--primary-gradient);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+  box-shadow: var(--sh-navpill);
+}
+
+.card-login__title {
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ink, #1e1b29);
+}
+
+.card-login__sub {
+  font-size: 13.5px;
+  color: var(--muted, #585566);
+  margin: 5px 0 20px;
+}
+
+.portal-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--muted, #585566);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-bottom: 9px;
+}
+
+.portals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+  margin-bottom: 22px;
+}
+
+.portal {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  padding: 10px 10px 9px;
+  border-radius: 12px;
+  cursor: pointer;
+  font: inherit;
+  border: 1px solid var(--hairline, rgba(160, 138, 178, 0.42));
+  background: var(--surface, #fff);
+  color: var(--ink, #1e1b29);
+  box-shadow:
+    0 2px 6px rgba(58, 31, 82, 0.06),
+    inset 0 1px 0 #fff;
+
+  .icon {
+    font-size: 18px;
+    color: var(--brand-purple, #552c7e);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #7a2f9e;
+    outline-offset: 2px;
+  }
+}
+
+.portal__label {
+  font-size: 12.5px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.portal__desc {
+  font-size: 11px;
+  line-height: 1.35;
+  color: var(--muted, #585566);
+}
+
+.portal--on {
+  /* SELECTED IS OUTLINED, NOT FILLED, and that is the board's decision rather
+     than a taste one. The filled tile used --primary-gradient, which this
+     design reserves for the ONE primary action of a view -- and the primary
+     action here is Sign in, three elements below. Two gradients in one card
+     and neither reads as the thing to press. */
+  border-color: var(--brand-purple, #552c7e);
+  background: var(--tint-2, #f5edfa);
+  box-shadow: 0 0 0 2px rgba(85, 44, 126, 0.18);
+}
+
+/* ---- alerts ------------------------------------------------------------ */
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border-radius: 12px;
+  padding: 11px 13px;
+  margin: 0 0 16px;
+  font-size: 12.5px;
+  line-height: 1.4;
+
+  .icon {
+    font-size: 17px;
+    flex-shrink: 0;
+  }
+}
+
+.alert--error {
+  background: var(--risk-bg, rgba(173, 36, 82, 0.09));
+  color: var(--risk, #ad2452);
+}
+
+/* ---- Google ------------------------------------------------------------ */
+
+.google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 11px;
+  border-radius: 999px;
+  border: 1.5px solid var(--hairline-42, rgba(160, 138, 178, 0.42));
+  background: #fff;
+  color: var(--ink, #1e1b29);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  box-sizing: border-box;
+
+  &:hover {
+    background: #faf6fd;
+    border-color: rgba(122, 47, 158, 0.4);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #7a2f9e;
+    outline-offset: 2px;
+  }
+
+  &[disabled],
+  &.google--pending {
+    opacity: 0.6;
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.google__sub {
+  text-align: center;
+  font-size: 11px;
+  color: #716484; /* was #a596b3, 2.75:1 on white; AA needs 4.5 (DEF-010) */
+  margin: 6px 0 0;
+}
+
+/* ---- divider ----------------------------------------------------------- */
+
+.or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 0;
+  font-size: 11.5px;
+  color: #716484; /* was #a596b3, 2.75:1 on white; AA needs 4.5 (DEF-010) */
+  white-space: nowrap;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(160, 138, 178, 0.3);
+  }
+}
+
+/* ---- form -------------------------------------------------------------- */
+
+.field {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.field__label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted, #585566);
+  margin-bottom: 6px;
+}
+
+.field__input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--hairline-45, rgba(160, 138, 178, 0.45));
+  background: #fff;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink, #1e1b29);
+
+  &:focus {
+    outline: none;
+    border-color: #7a2f9e;
+    box-shadow: 0 0 0 3px rgba(122, 47, 158, 0.15);
+  }
+}
+
+.field__input--err {
+  border-color: var(--risk, #ad2452);
+}
+
+/* The eye sits ON the input, so it must stay above it. The global
+   `*:focus-visible { z-index: 1 }` (reep-theme.scss) lifts a focused input —
+   a flex item here, so the z-index applies without a position — over a
+   button left at `auto`, and a click on the eye then lands in the field.
+   `isolation` keeps the two numbers local to this row. */
+.field__pw {
+  position: relative;
+  display: flex;
+  align-items: center;
+  isolation: isolate;
+
+  .field__input {
+    padding-right: 44px;
+  }
+}
+
+.field__eye {
+  position: absolute;
+  z-index: 2;
+  right: 6px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: none;
+  color: var(--muted, #585566);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+
+  &:hover {
+    background: rgba(122, 47, 158, 0.1);
+    color: #7a2f9e;
+  }
+}
+
+.field__err {
+  font-size: 11.5px;
+  color: var(--risk, #ad2452);
+  margin: 0 0 8px;
+}
+
+.field__help {
+  font-size: 11.5px;
+  color: #716484; /* was #a596b3, 2.75:1 on white; AA needs 4.5 (DEF-010) */
+  margin: 0 0 16px;
+
+  &.centered {
+    text-align: center;
+    margin-bottom: 0;
+  }
+}
+
+.row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 20px;
+  flex-wrap: wrap;
+}
+
+.remember {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink, #1e1b29);
+  cursor: pointer;
+
+  input {
+    width: 15px;
+    height: 15px;
+    accent-color: #7a2f9e;
+    margin: 0;
+  }
+}
+
+.linkish {
+  border: none;
+  background: none;
+  color: #7a2f9e;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--muted, #585566);
+  background: #faf6fd;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  border-radius: 999px;
+  border: 1px solid var(--brand-purple, #552c7e);
+  background: var(--primary-gradient);
+  color: #fff;
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:hover {
+    box-shadow: 0 12px 26px rgba(85, 44, 126, 0.45);
+  }
+
+  &[disabled] {
+    opacity: 0.7;
+    cursor: default;
+  }
+}
+
+.help-foot {
+  text-align: center;
+  font-size: 12.5px;
+  color: var(--muted, #585566);
+  margin: 20px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgba(160, 138, 178, 0.25);
+
+  a {
+    color: #7a2f9e;
+    font-weight: 700;
+  }
+
+  /* The reset-password control is a <button> now, not an anchor, so it needs
+     the anchor's look put back: a bare button inherits none of it. */
+  .help-foot__link {
+    border: none;
+    background: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: inherit;
+    color: #7a2f9e;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+/* ---- spinner ----------------------------------------------------------- */
+
+.spinner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(122, 47, 158, 0.25);
+  border-top-color: #7a2f9e;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+.spinner--light {
+  border-color: rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}
+
+/* The "email confirmed" banner and the inline forgot form. */
+.note--good {
+  color: var(--good);
+  background: var(--good-bg);
+}
+.forgot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+/* The design's dashed Main Admin door under the portal grid. */
+.main-admin {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 13px;
+  margin: -12px 0 20px;
+  border-radius: 14px;
+  border: 1.5px dashed rgba(122, 47, 158, 0.4);
+  background: transparent;
+  color: #552c7e;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+
+  .icon {
+    font-size: 18px;
+  }
+
+  &:hover {
+    background: rgba(122, 47, 158, 0.06);
+  }
+
+  /* Chosen: the door reads as the selected portal, since no card can. */
+  &--on {
+    border-style: solid;
+    border-color: #7a2f9e;
+    background: rgba(122, 47, 158, 0.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #7a2f9e;
+    outline-offset: 2px;
+  }
+}
+
+/* The two doors under the card: register, or sign in once approved. */
+.doors {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(160, 138, 178, 0.25);
+  font-size: 12.5px;
+  font-weight: 700;
+
+  a,
+  .doors__approved {
+    color: #7a2f9e;
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+
+  a:hover,
+  .doors__approved:hover {
+    text-decoration: underline;
+  }
+}
+
+/* ==========================================================================
+ * THE FORM COMES FIRST ON A PHONE (2026-09-22)
+ *
+ * `.login` is a wrapping flex row: `.panel` (the brand hero) then `.signin`
+ * (the card). Above ~1040px they sit side by side; below, they wrap in source
+ * order — hero first — and measured in Chromium at 390x844 the first control
+ * a student can touch sat at 916px, past a 844px fold. So the sign-in screen
+ * opened on a full screen of marketing and the form was somewhere below it,
+ * on the one screen everybody has to get through.
+ *
+ * `order` and not a reordering of the markup: the source order is the reading
+ * order a screen reader and the tab sequence follow, and on a desktop, where
+ * the two are side by side, brand-then-form is the right one. This changes
+ * only where they are stacked anyway.
+ *
+ * 760px and not the ~1040px where they actually wrap: between those two the
+ * layout is the one this deployment already has, and the ask was to leave it
+ * exactly as it is. A tablet still meets the hero first.
+ * ======================================================================= */
+
+@media (max-width: 760px) {
+  .signin {
+    order: -1;
+  }
+
+  /* Three text links measured 15-18px tall. Padding rather than a min-height,
+     because these are inline words inside a sentence and a 44px box around
+     them would open gaps in the copy; the block padding gives the thumb its
+     area without moving the text. */
+  .doors a,
+  .doors__approved {
+    padding-block: 13px;
+  }
+
+  /* `.help-foot .help-foot__link` and not the flat class: the rule that zeroes
+     its padding is nested inside `.help-foot` at (0,2,0), so a bare
+     `.help-foot__link` at (0,1,0) lost and this link stayed 15px tall. */
+  .help-foot .help-foot__link {
+    /* 15px and not 13: measured at 41px tall with 13, which is short of the
+       44px floor by a hair. */
+    padding-block: 15px;
+  }
+}

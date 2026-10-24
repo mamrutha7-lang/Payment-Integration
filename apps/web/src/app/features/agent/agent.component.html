@@ -1,0 +1,108 @@
+<div class="agent">
+  <p class="crumb">REEP Agent</p>
+  <div class="ag-head">
+    <div class="ag-title">
+      <h1>REEP Agent</h1>
+      <p>
+        Ask about deadlines, the placement process, how to read your dashboard — anything about
+        REEP.
+      </p>
+    </div>
+    <div class="ag-actions">
+      <button type="button" class="ag-ghost" [disabled]="!canClear()" (click)="clear()">
+        Clear conversation
+      </button>
+    </div>
+  </div>
+
+  <!-- Rule 1 in one sentence. The link is a STUDENT screen, so staff get the
+       same disclaimer without it — the agent is the same helper for them. -->
+  <p class="ag-disclaimer notice accent">
+    <span class="icon" aria-hidden="true">info</span>
+    @if (isStudent()) {
+      The REEP Agent is a general helper — it does not see your private records, marks or
+      attendance. For your own figures, open <a routerLink="/student/records">your records</a>.
+      For anything it can't resolve, contact your mentor.
+    } @else {
+      The REEP Agent is a general helper — it answers on programme rules, deadlines and how REEP
+      works, and it does not read student records. Personalised answers are only available on
+      student accounts.
+    }
+  </p>
+
+  <!-- The thread and, for the Main Admin alone, the board's 320px rail beside
+       it. `.ag-body` and `.ag-thread` are plain blocks until `.ag-body--rail`
+       turns the row on, so the student and faculty renderings are unchanged:
+       a block wrapper around a full-width child moves nothing. -->
+  <div class="ag-body" [class.ag-body--rail]="isMainAdmin()">
+    <div class="ag-thread">
+      <app-agent-chat variant="page" />
+    </div>
+    <!-- MAIN ADMIN ONLY (board: design/admin/Agent.html, 02 §23). Everything in
+         here is read from the session this client already holds, or is a rule
+         written in the code — no endpoint reports a region, and none reports
+         whether this deployment allows a remote model to receive student data. -->
+    @if (isMainAdmin()) {
+      <aside class="ag-rail">
+        <section class="card ag-scope" aria-labelledby="ag-scope-title">
+          <h4 id="ag-scope-title">
+            <span class="icon" aria-hidden="true">visibility</span>What the agent can see
+          </h4>
+          <dl class="ag-scope__rows">
+            <dt>Signed in as</dt>
+            <dd>{{ readerName() }} · Main Admin</dd>
+
+            <dt>Functions</dt>
+            <dd>
+              @if (grantedFunctions().length > 0) {
+                <details class="ag-scope__functions">
+                  <summary>
+                    {{ grantedFunctions().length }} on this account, resolved by the server
+                  </summary>
+                  <div class="ag-scope__chips">
+                    @for (grantedFunction of grantedFunctions(); track grantedFunction) {
+                      <span class="chip neutral">{{ grantedFunction }}</span>
+                    }
+                  </div>
+                </details>
+              } @else {
+                This session carries no functions.
+              }
+            </dd>
+
+            <dt>Records</dt>
+            <dd>
+              Approved Knowledge-Base policy text, and general questions about how REEP works.
+              The personalised student-record tools answer on a student's own account only, so
+              an answer here states that limitation instead of reading a record.
+            </dd>
+
+            <dt>Never</dt>
+            <dd>Interview transcripts, interview audio, passwords.</dd>
+
+            <dt>This screen sends</dt>
+            <dd>
+              The message you type, and nothing else — no student record is composed into the
+              request.
+            </dd>
+
+            <dt>Rule 1</dt>
+            <dd>
+              <span class="chip neutral dot">Not reported yet</span>
+              A model on this machine may receive student data; anything off this machine is
+              refused unless the deployment sets LLM_ALLOW_REMOTE_STUDENT_DATA. This screen
+              cannot read that setting, so it states the rule and claims no region.
+            </dd>
+          </dl>
+          <div class="notice accent ag-scope__note">
+            <span class="icon" aria-hidden="true">info</span>
+            <span
+              >The server will state this card itself — the caller's scope, and Rule 1's setting
+              as a live value — with Phase 3.</span
+            >
+          </div>
+        </section>
+      </aside>
+    }
+  </div>
+</div>

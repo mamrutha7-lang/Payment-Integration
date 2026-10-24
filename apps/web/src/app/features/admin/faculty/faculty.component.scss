@@ -1,0 +1,271 @@
+/* Faculty directory — this screen's LAYOUT only.
+ *
+ * `.panel` `.card` `.chip` `.btn` `.select` `.field` `.ctrl` `.notice`
+ * `.tabs` `.dt-header` `.dt-title` `.dt-sub` `.dt-toolbar` `.dt-frame`
+ * `.dt-gridbar` `.dt-quickfilter` `.dt-statusbar` `.crumb` `.avatar` `.icon`
+ * are global (styles/reep-v2.scss) and are used as they are; the dialog chrome
+ * comes from ./disable-faculty-dialog.scss, which this component loads
+ * alongside this file so the offboarding dialog wears one shape with the
+ * screen.
+ *
+ * What is here is the shape of this board: the filter row, the grid beside its
+ * 380px drawer, the grid bar's Columns popover, and the drawer's own stack.
+ */
+
+:host {
+  display: block;
+}
+
+/* --- the board's filter row --------------------------------------------- */
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.filters .select {
+  max-width: 240px;
+}
+
+/* A filter that cannot narrow anything because the list it reads was refused —
+   today only Function, when `GET /api/admin/mentor-load` comes back 403. The
+   <select> carries the real `disabled` and the reason in its title; this is the
+   matching dimming, because the opacity rules in reep-v2.scss reach buttons
+   only. It is NOT the pending directive's grey: nothing is being waited for. */
+.filters .select.is-muted {
+  opacity: 0.55;
+}
+
+.filters-end {
+  margin-left: auto;
+}
+
+.columns-note {
+  margin-bottom: 10px;
+}
+
+/* --- grid beside its drawer ---------------------------------------------- */
+
+.directory {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.directory-grid {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* The grid bar has to be able to hold the Columns popover. */
+  position: relative;
+}
+
+.directory-ag {
+  display: block;
+  width: 100%;
+  height: clamp(380px, calc(100vh - 380px), 760px);
+}
+
+/* Loading, empty and error all sit where the grid would, in main's own words. */
+.directory-state {
+  margin: 0;
+  padding: 28px 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.gridbar-end {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* --- the Columns popover -------------------------------------------------- */
+/* AG Grid's own side panel is an Enterprise feature; this is the Community
+   equivalent of the board's Columns tab, driven by setColumnsVisible. */
+.columns-panel {
+  position: absolute;
+  top: 46px;
+  right: 10px;
+  z-index: 5;
+  width: 200px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-card);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.columns-panel__title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin-bottom: 2px;
+}
+
+.columns-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+/* --- the status bar's page-size control ---------------------------------- */
+
+.pagesize {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pagesize select {
+  height: 24px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-seg);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 11.5px;
+  color: var(--ink);
+  padding: 0 4px;
+}
+
+/* --- the 380px drawer (01-design-system.md §3) --------------------------- */
+
+.drawer {
+  flex: 0 0 380px;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  background: var(--card-gradient);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--sh-card);
+  overflow: hidden;
+}
+
+.drawer--empty {
+  padding: 14px;
+  justify-content: flex-start;
+}
+
+.drawer-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.drawer-who {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.drawer-name {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.drawer-sub {
+  font-size: 11.5px;
+  color: var(--faint);
+  line-height: 1.4;
+}
+
+.drawer .tabs {
+  padding: 10px 14px 0;
+}
+
+.drawer-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.drawer-card {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+/* .card-heading is global now (styles/reep-v2.scss): the display face, 700,
+   the colour and margin 0 all come from there. Only the drawer's own scale is
+   local — 380px of column reads at 12.5px, not the global 13.5px a full-width
+   card is set for. */
+.card-heading {
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+}
+
+/* A checkbox that reads as one line with its own label, for the drawer's
+   "outside the college's domains" tick. `.field label` is the stacked form
+   label, which is why this is a row of its own rather than a bare label. */
+.inline-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.inline-check input {
+  margin: 1px 0 0;
+  flex: none;
+}
+
+.drawer-line {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.faint-line {
+  color: var(--faint);
+  font-size: 11.5px;
+}
+
+.minted {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.minted-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.drawer-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border-top: 1px solid var(--hairline);
+}

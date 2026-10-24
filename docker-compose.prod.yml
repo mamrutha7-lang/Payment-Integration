@@ -1,0 +1,399 @@
+# REEP — production-shaped composition.
+#
+# Deliberately NOT `docker-compose.yml` (that stays a dev Postgres only). Run:
+#   docker compose -f docker-compose.prod.yml up -d
+#
+# Secrets come from the ENVIRONMENT, never from a committed file and never baked
+# into an image. Every value below without a default is required — compose fails
+# loudly on a missing one rather than starting a half-configured stack.
+
+name: reep
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: reep_py
+    # Stock postgres ships tuned for hardware from another decade; this
+    # container has a 2G limit and was running on the 128MB defaults. Flags
+    # rather than a mounted postgresql.conf, so the tuning is versioned right
+    # next to the memory limit it is sized against.
+    command:
+      - postgres
+      # 25% of the container's memory — the standard starting point for
+      # Postgres's own page cache. The 128MB default surrenders three quarters
+      # of the RAM this service is granted.
+      - -c
+      - shared_buffers=512MB
+      # A planner HINT, not an allocation: shared_buffers plus the OS page
+      # cache it can expect. Too low and the planner prices index scans as
+      # unaffordable and falls back to sequential scans of student tables.
+      - -c
+      - effective_cache_size=1536MB
+      # Must stay ABOVE the sum of everything that connects: the api's
+      # 4 workers × (10 pool + 10 overflow) = 80, the one-shot migrate, the
+      # retention sidecar, the nightly pg_dump, and a human's psql. 200 leaves
+      # that headroom without the per-connection memory cost of the four-digit
+      # values people reach for on a whim.
+      - -c
+      - max_connections=200
+      # Every statement slower than 500ms is logged WITH its text. The audit
+      # found zero query observability; this is the cheapest possible fix, and
+      # 500ms is slow enough that a healthy dashboard query never appears.
+      - -c
+      - log_min_duration_statement=500
+    volumes:
+      - reep_pgdata:/var/lib/postgresql/data
+      - ./docker/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d reep_py"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    deploy:
+      resources:
+        limits: { cpus: "2", memory: 2G }
+    # No published port: only the API needs the database, and it reaches it over
+    # the compose network. Publishing 5432 would expose student records to the
+    # host.
+
+  # Nightly logical backup of reep_py — before this service there were NO
+  # backups of any kind, and the one reep_pgdata volume held every student's
+  # marks and the legally load-bearing interview_consents rows. Same image as
+  # the db so pg_dump is always the server's own major version.
+  db-backup:
+    image: pgvector/pgvector:pg17
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      # The same environment values the db service reads, arriving as libpq's
+      # PG* variables so pg_dump needs no flags and no second secret.
+      PGHOST: db
+      PGDATABASE: reep_py
+      PGUSER: ${POSTGRES_USER:?set POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - reep_backups:/backups
+    # pg_dump -Fc (custom format: compressed, and restorable table-by-table)
+    # once a day, keeping 14 days. The FIRST dump runs at start, not after the
+    # first sleep, so a fresh deploy proves the whole path works before anyone
+    # trusts it. Write to `.partial` and rename only on success: a dump the
+    # process died in the middle of must never be mistakable for a good one.
+    # One plain OK/FAILED line per attempt, so a log aggregator that keeps
+    # nothing else still answers "when did backups last succeed". (`$$` is
+    # compose escaping for a literal `$` in the shell.)
+    command:
+      - sh
+      - -c
+      - |
+        while true; do
+          ts=$$(date -u +%Y%m%dT%H%M%SZ)
+          f="/backups/reep_py-$$ts.dump"
+          if pg_dump -Fc -f "$$f.partial" && mv "$$f.partial" "$$f"; then
+            echo "db-backup OK: $$f ($$(wc -c < "$$f") bytes)"
+          else
+            rm -f "$$f.partial"
+            echo "db-backup FAILED: $$ts — reep_py has no new backup" >&2
+          fi
+          find /backups -name 'reep_py-*.dump' -mtime +14 -delete
+          sleep 86400
+        done
+    deploy:
+      resources:
+        limits: { cpus: "1", memory: 256M }
+    # reep_backups lives on the SAME host as the database it protects, so it
+    # answers "we dropped a table", not "the machine died". The operator's next
+    # step is off-box replication of this volume (rsync/rclone/object storage),
+    # and a restore MUST be rehearsed before it is needed:
+    #   pg_restore -d reep_py <file>
+    # A backup that has never been restored is a hope, not a backup.
+
+  # Migrations run ONCE, as their own unit — never from the API entrypoint.
+  # Every API replica running `alembic upgrade head` on boot races on the version
+  # table, and the loser can fail in ways that leave the schema half-applied.
+  migrate:
+    build:
+      context: ./apps/api-py
+      dockerfile: Dockerfile
+    restart: "no"
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET}
+      ENV: prod
+    command: ["python", "-m", "alembic", "upgrade", "head"]
+
+  # One-shot ownership fix for the interview-audio volume. A named volume whose
+  # mountpoint does not exist in the image is created ROOT-owned by the docker
+  # daemon, and the api runs as uid 10001 — without this chown the recorder's
+  # very first mkdir fails and audio capture silently stays off, which is
+  # exactly the durability hole the volume exists to close. 700 because the
+  # contents are named students' recorded voices. The image is the db's only
+  # because it is already pulled and has chown; nothing database-ish happens.
+  interview-audio-init:
+    image: pgvector/pgvector:pg17
+    restart: "no"
+    user: "0:0"
+    entrypoint:
+      [
+        "sh",
+        "-c",
+        "chown 10001:10001 /var/reep/interview-audio && chmod 700 /var/reep/interview-audio",
+      ]
+    volumes:
+      - reep_interview_audio:/var/reep/interview-audio
+
+  api:
+    build:
+      context: ./apps/api-py
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+      interview-audio-init: { condition: service_completed_successfully }
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
+      # No default. config.py ships a dev fallback secret; inheriting it in
+      # production would let anyone who has read the repo forge a session cookie.
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET}
+      WEB_ORIGIN: ${WEB_ORIGIN:?set WEB_ORIGIN}
+      # prod marks the session cookie Secure — which REQUIRES TLS in front of
+      # this. Without HTTPS the browser silently drops the cookie and every
+      # login appears to succeed and then behaves as logged-out.
+      ENV: prod
+      # ---- Scale: 4 workers × 50 interview slots = the 200-interview fleet. --
+      # uvicorn (0.52.3, pinned in requirements.txt) reads $WEB_CONCURRENCY as
+      # the default for --workers whenever the flag is absent — and the
+      # Dockerfile CMD deliberately leaves it absent, so the image stays
+      # single-worker on a laptop and scales here without a rebuild. One worker
+      # was the fleet cap: every per-worker limit in config.py multiplied by 1.
+      WEB_CONCURRENCY: "4"
+      # PER-WORKER, as config.py says on the setting: 4 workers × 50 = 200
+      # concurrent interviews across the fleet, the stated target. Leaving the
+      # default 100 would quietly advertise 400 — twice the budget in upstream
+      # audio-token spend. (Each worker also reruns the idempotent orphan sweep
+      # at boot; `status = 'running'` makes the four of them race safely.)
+      INTERVIEW_MAX_SESSIONS: "50"
+      # Connection budget, sized against max_connections=200 on the db service:
+      # 4 workers × (10 pool + 10 overflow) = 80 connections at full burst,
+      # leaving 120 for the sidecars, migrations and humans. The 5s timeout
+      # turns a saturated pool into a fast 500 instead of a request that hangs
+      # for the default 30s while the student watches a spinner.
+      DB_POOL_SIZE: "10"
+      DB_MAX_OVERFLOW: "10"
+      DB_POOL_TIMEOUT_S: "5"
+      # Interview audio lands HERE, on the mounted volume below — not in the
+      # code default (a sibling of uploads that resolves inside the container
+      # layer, where a redeploy destroys every recording). Recording itself
+      # still requires the flag below AND the student's scope_store_audio
+      # grant; this only makes what IS captured durable.
+      INTERVIEW_AUDIO_DIR: /var/reep/interview-audio
+      INTERVIEW_RECORDING_ENABLED: ${INTERVIEW_RECORDING_ENABLED:-false}
+      # THE INTERVIEWER TAKES NO API KEY. It is Amazon Nova 2 Sonic on Bedrock,
+      # signed with SigV4 from the task's own AWS chain — see AGENTS.md. What
+      # must resolve is NOVA_SONIC_REGION (falling back to BEDROCK_REGION, then
+      # AWS_REGION), not a secret. `OPENAI_API_KEY`, `LIVEKIT_URL`,
+      # `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` and `VOICE_WORKER_SECRET` all
+      # stood here until Phase 5 and NOTHING READ ANY OF THEM: the relay engine
+      # and the LiveKit worker were deleted in 2026-09. VOICE_WORKER_SECRET was
+      # the expensive one — a `:?` hard-fail, so `docker compose up` refused the
+      # whole production stack over a secret no process looks at.
+      #
+      # GROQ_API_KEY stays and is live: it is one of the LLM adapter's providers
+      # (app/ai/llm.py), nothing to do with voice.
+      GROQ_API_KEY: ${GROQ_API_KEY:-}
+      # THE PERMANENT DOCUMENT ARCHIVE, AND ON THIS STACK IT IS OPT-IN.
+      #
+      # Blank is the default and it is a REAL CHOICE with a real cost, not a
+      # placeholder: with no bucket, the only copy of every marksheet,
+      # certificate, resume, signature and recording is `reep_uploads` below,
+      # and a file a student deletes from the website is gone the moment the
+      # unlink returns. The AWS deployment has EFS snapshots behind it; a
+      # self-hosted volume has whatever the operator arranged, which is often
+      # nothing.
+      #
+      # It was absent entirely until an audit pointed out the consequence: this
+      # file enumerates its environment explicitly, with no pass-through, so a
+      # `DOCUMENT_ARCHIVE_BUCKET` in the operator's `.env` reached nothing and
+      # every upload still returned 201. The deployment was indistinguishable
+      # from an archived one. The api now says which of the two states it is in
+      # at boot, and the `archive` sidecar below repeats it nightly.
+      DOCUMENT_ARCHIVE_BUCKET: ${DOCUMENT_ARCHIVE_BUCKET:-}
+      DOCUMENT_ARCHIVE_PREFIX: ${DOCUMENT_ARCHIVE_PREFIX:-}
+      DOCUMENT_ARCHIVE_REGION: ${DOCUMENT_ARCHIVE_REGION:-}
+      # libpq reads these directly, so TLS verification works regardless of what
+      # the DATABASE_URL query string carries.
+      PGSSLMODE: ${PGSSLMODE:-prefer}
+      PGSSLROOTCERT: ${PGSSLROOTCERT:-}
+    volumes:
+      # Uploads MUST outlive the container. Without this they land in the image
+      # layer and every redeploy destroys them.
+      - reep_uploads:/var/reep/uploads
+      # Same sentence for interview audio — a recording that evaporates on
+      # redeploy reads as "the system deleted my evidence".
+      - reep_interview_audio:/var/reep/interview-audio
+    healthcheck:
+      # LIVENESS only — /health touches no dependencies. Pointing this at /ready
+      # would restart every API container during a brief Postgres wobble and
+      # turn a recoverable blip into an outage.
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://127.0.0.1:3300/health',timeout=3)\""]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    # Above uvicorn's --timeout-graceful-shutdown 110 so it drains first.
+    stop_grace_period: 120s
+    deploy:
+      resources:
+        # Raised from 1G with the move to 4 workers: each worker is a full
+        # CPython process with litellm/google-adk resident, so the old limit
+        # was an OOM-kill loop waiting for the first busy afternoon. The RAM was
+        # freed by the LiveKit voice worker, which no longer started by default
+        # and which Phase 5 removed from this file altogether.
+        limits: { cpus: "2", memory: 2G }
+        reservations: { memory: 1G }
+
+  # The 180-day retention promise, finally EXECUTING. app/retention.py's
+  # purge_expired and redact_expired_runs were deliberately wired to nothing —
+  # "they delete student data on a clock, which is a deployment decision" — and
+  # this service is that decision being made: once a day, first run at start,
+  # via the `python -m app.retention_job` seam. Same image as the api, so retention and
+  # the code whose promises it keeps can never skew versions.
+  retention:
+    build:
+      context: ./apps/api-py
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+      interview-audio-init: { condition: service_completed_successfully }
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET}
+      ENV: prod
+      # Must MATCH the api's value: the reaper destroys expiring interview
+      # audio through the filesystem, so it has to look where the api writes.
+      INTERVIEW_AUDIO_DIR: /var/reep/interview-audio
+      PGSSLMODE: ${PGSSLMODE:-prefer}
+      PGSSLROOTCERT: ${PGSSLROOTCERT:-}
+    volumes:
+      # Without this mount the reaper would see an empty directory, read every
+      # missing file as "already deleted" (the audio store's idempotency
+      # contract), and hard-delete rows while the recordings live on in the
+      # api's volume — undiscoverable, and therefore undeletable.
+      - reep_interview_audio:/var/reep/interview-audio
+    # A failed run logs, exits non-zero, and is retried tomorrow — app/retention_job.py
+    # owns making the failure loud; this loop only owns the clock.
+    command: ["sh", "-c", "while true; do python -m app.retention_job; sleep 86400; done"]
+    deploy:
+      resources:
+        limits: { cpus: "1", memory: 512M }
+
+  # The permanent document archive's backstop sweep, and the ONLY thing on this
+  # stack that archives interview audio at all.
+  #
+  # `document_store.save_bytes` PUTs each file as it is accepted, but that write
+  # is best-effort by contract — it raises nothing, because an S3 blip must
+  # never be why a student is told their valid certificate was rejected. This
+  # loop is what makes the promise hold anyway. It is also the only writer that
+  # can archive a recording: the interviewer writes its WAVs incrementally and
+  # closes them in `run()`'s `finally`, so mid-call there is no complete file.
+  #
+  # IT RUNS BEFORE THE REAPER, deliberately, and the offset is the whole reason
+  # this is a separate service rather than a second command in `retention`.
+  # `app/retention.py` DELETES expiring audio off the volume; a sweep that ran
+  # after it has missed those bytes permanently, with both jobs green. The
+  # 3600s head start costs one hour of freshness and buys the ordering. The CDK
+  # deployment makes the same guarantee with two EventBridge schedules an hour
+  # apart, pinned by test_the_archive_sweep_runs_strictly_before_the_retention_sweep.
+  #
+  # WRITES ONLY. Nothing here deletes, renames or moves a file, on the volume or
+  # in the bucket — an object with no file behind it is the normal state of
+  # every document a student has since removed, which is the point.
+  archive:
+    build:
+      context: ./apps/api-py
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+      interview-audio-init: { condition: service_completed_successfully }
+    environment:
+      DATABASE_URL: ${DATABASE_URL:?set DATABASE_URL}
+      AUTH_SECRET: ${AUTH_SECRET:?set AUTH_SECRET}
+      ENV: prod
+      # Must MATCH the api's values: the sweep reads the DISK, so it has to look
+      # exactly where the api writes. The same argument the reaper's comment
+      # makes, and the same failure if they drift — a sweep pointed at an empty
+      # directory reports a healthy pass having archived nothing.
+      UPLOAD_DIR: /var/reep/uploads
+      INTERVIEW_AUDIO_DIR: /var/reep/interview-audio
+      DOCUMENT_ARCHIVE_BUCKET: ${DOCUMENT_ARCHIVE_BUCKET:-}
+      DOCUMENT_ARCHIVE_PREFIX: ${DOCUMENT_ARCHIVE_PREFIX:-}
+      DOCUMENT_ARCHIVE_REGION: ${DOCUMENT_ARCHIVE_REGION:-}
+      PGSSLMODE: ${PGSSLMODE:-prefer}
+      PGSSLROOTCERT: ${PGSSLROOTCERT:-}
+    volumes:
+      - reep_uploads:/var/reep/uploads
+      - reep_interview_audio:/var/reep/interview-audio
+    # THE 82800 IS 23 HOURS AND IT IS THE ORDERING, NOT A STAGGER.
+    #
+    # `retention` next to this one runs at T+0 and every 24h after. Sleeping
+    # 3600 first — which is what this said when it was written — puts the sweep
+    # an hour AFTER the reaper on every single day, which is precisely backwards:
+    # the reaper unlinks expiring audio, so a sweep behind it has missed those
+    # bytes permanently, with both loops green. 23 hours puts it an hour AHEAD
+    # of each subsequent reap instead.
+    #
+    # Day one has no sweep before the first reap, and that is safe rather than
+    # lucky: `purge_expired` only hard-deletes a record whose retention window
+    # AND the 30-day soft-delete grace have both elapsed, so nothing a
+    # day-old deployment holds is eligible.
+    #
+    # Unconfigured, `app.archive_documents` exits 0 after logging that this
+    # deployment keeps no permanent copy — so the loop is harmless when the
+    # feature is off and says so once a day rather than failing noisily.
+    command: ["sh", "-c", "sleep 82800; while true; do python -m app.archive_documents; sleep 86400; done"]
+    deploy:
+      resources:
+        limits: { cpus: "1", memory: 512M }
+
+  # The single front door, and the ONLY service with published ports. nginx
+  # serves the compiled Angular SPA and proxies /api (including the
+  # /api/interview WebSocket) to the api service — the session cookie is
+  # httpOnly SameSite=Lax, so the SPA and the API MUST be one origin, and this
+  # is where that origin lives. See apps/web/nginx.conf for the details and the
+  # TLS server block.
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api: { condition: service_started }
+    ports:
+      - "80:80"
+      # TLS terminates HERE (the Secure session cookie requires it — see the
+      # api service's ENV comment). Uncomment this mapping, the cert mount
+      # below, and the 443 server block in apps/web/nginx.conf together.
+      # - "443:443"
+    # volumes:
+    #   - ./certs:/etc/nginx/certs:ro
+    deploy:
+      resources:
+        limits: { cpus: "1", memory: 256M }
+
+volumes:
+  reep_pgdata:
+  reep_uploads:
+  reep_interview_audio:
+  reep_backups:

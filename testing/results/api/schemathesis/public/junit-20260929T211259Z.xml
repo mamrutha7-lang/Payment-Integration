@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites errors="0" failures="1" skipped="0" tests="4" time="0.207407">
+  <testsuite name="schemathesis" hostname="vm" errors="0" failures="1" skipped="0" tests="4" time="0.207407">
+    <testcase name="GET /health" time="0.122396" />
+    <testcase name="GET /api/interview/status" time="0.016464">
+      <failure type="failure">1. Test Case ID: qpg3yJ
+
+- Undocumented HTTP status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Sign in required."}`
+
+Reproduce with:
+
+    curl -X GET http://localhost:3300/api/interview/status</failure>
+    </testcase>
+    <testcase name="GET /api/auth/sso/status" time="0.020130" />
+    <testcase name="GET /api/register/hierarchy" time="0.048417" />
+  </testsuite>
+</testsuites>

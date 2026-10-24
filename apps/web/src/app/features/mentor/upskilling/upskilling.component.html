@@ -1,0 +1,132 @@
+<div class="panel" data-p="upskilling">
+  <div class="dt-header">
+    <div>
+      <h1 class="dt-title">Upskilling</h1>
+      <div class="dt-sub">Certificates for courses you have completed — your own record.</div>
+    </div>
+  </div>
+
+  <div class="card up-form">
+    <div class="up-card-title">Upload a certificate</div>
+    <div class="up-grid">
+      <label class="up-field">
+        Course / certificate name
+        <input
+          type="text"
+          placeholder="e.g. Business Analytics with Power BI"
+          maxlength="200"
+          [(ngModel)]="title"
+        />
+      </label>
+      <label class="up-field">
+        Provider <span class="up-opt">(optional)</span>
+        <input type="text" placeholder="Coursera, NPTEL…" maxlength="200" [(ngModel)]="provider" />
+      </label>
+      <label class="up-field">
+        Completed on
+        <input type="date" [(ngModel)]="completedOn" />
+      </label>
+    </div>
+    <div class="up-actions">
+      <button type="button" class="btn primary" [disabled]="uploading()" (click)="choose(picker)">
+        <span class="icon" aria-hidden="true">{{ uploading() ? 'progress_activity' : 'cloud_upload' }}</span>
+        {{ uploading() ? 'Uploading…' : 'Choose file & upload' }}
+      </button>
+      <span class="up-accepted">
+        Accepted: <strong>PDF, PNG, JPEG</strong> · up to <strong>10 MB</strong>
+      </span>
+      @if (uploadedFlash()) {
+        <span class="chip good"><span class="icon" aria-hidden="true">check_circle</span> Uploaded</span>
+      }
+      @if (nameFlash()) {
+        <span class="chip risk" role="alert"><span class="icon" aria-hidden="true">error</span> Name the certificate first</span>
+      }
+    </div>
+    <input
+      #picker
+      type="file"
+      accept="application/pdf,image/png,image/jpeg"
+      hidden
+      (change)="onPick($event)"
+    />
+    @if (uploadError()) {
+      <div class="notice up-notice" role="alert">
+        <span class="icon" aria-hidden="true">error</span>
+        <div><strong>Upload failed.</strong> {{ uploadError() }}</div>
+      </div>
+    }
+  </div>
+
+  @if (actionError()) {
+    <div class="notice up-notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      <div>{{ actionError() }}</div>
+    </div>
+  }
+
+  <div class="up-section">
+    Your certificates
+    @if (rows(); as list) {
+      <span class="up-count">· {{ list.length }} on file</span>
+    }
+  </div>
+
+  <div class="card">
+    @if (error()) {
+      <div class="notice" role="alert">
+        <span class="icon" aria-hidden="true">wifi_off</span>
+        <div>{{ error() }}</div>
+      </div>
+    } @else {
+      <div class="up-scroll">
+        <table class="up-table">
+          <thead>
+            <tr>
+              <th>Certificate</th>
+              <th>Provider</th>
+              <th>Completed</th>
+              <th>File</th>
+              <th><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @if (rows(); as list) {
+              @for (c of list; track c.id) {
+                <tr>
+                  <td>
+                    <strong>{{ c.title }}</strong>
+                    <div class="up-sub">Uploaded {{ c.uploaded_at | date: 'd MMM y' }}</div>
+                  </td>
+                  <td>{{ c.provider || '—' }}</td>
+                  <td class="up-num">{{ c.completed_on ? (c.completed_on | date: 'd MMM y') : '—' }}</td>
+                  <td class="up-file">{{ c.original_name }} · {{ formatSize(c.size_bytes) }}</td>
+                  <td class="up-cell-actions">
+                    <div class="up-row-actions">
+                      <a class="btn up-btn" [href]="fileUrl(c.id)" target="_blank" rel="noopener">View</a>
+                      <button
+                        type="button"
+                        class="btn up-btn up-btn--remove"
+                        [disabled]="removingId() === c.id"
+                        (click)="remove(c)"
+                      >
+                        {{ removingId() === c.id ? 'Removing…' : 'Remove' }}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="up-row-note">
+                    <strong>No certificates yet</strong> — upload the first course you have completed.
+                  </td>
+                </tr>
+              }
+            } @else {
+              <tr><td colspan="5" class="up-row-note">Loading your certificates…</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

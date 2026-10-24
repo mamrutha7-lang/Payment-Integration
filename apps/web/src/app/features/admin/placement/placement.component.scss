@@ -1,0 +1,236 @@
+/* Placement & offers — this screen's LAYOUT only.
+ *
+ * .panel .card .kpi .chip .btn .select .field .notice .tabs .crumb .avatar
+ * .card-head .card-heading .card-sub .card-actions .dt-header .dt-title
+ * .dt-sub .dt-toolbar .dt-quickfilter .dt-statusbar are global
+ * (styles/reep-v2.scss) and are used as they are. What is here is the shape of
+ * this board: the filter row, the funnel beside its three side cards, the
+ * drop-off rows, the rejection strip and the offers grid.
+ */
+:host {
+  display: block;
+}
+
+/* The screen-level error and confirmation notices, above the tabs. */
+.panel > .notice {
+  margin-bottom: 10px;
+}
+
+/* --- tabs: Jobs is a route, Placement is here, Offers is the table below --- */
+.placement-tabs {
+  margin-bottom: 12px;
+}
+.placement-tabs a.tab,
+.placement-tabs a.tab:hover {
+  text-decoration: none;
+}
+
+/* --- the board's filter row ---------------------------------------------- */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+/* A filter that cannot be used: the Track select, which has no endpoint to
+   narrow by, and the Batch or Period select while its list is empty or was
+   refused. The <select> inside is `disabled` with the reason in its title;
+   this dims the pill it sits in so the row reads as "nothing to choose" at a
+   glance rather than as a menu that will not open. */
+.filter-pending {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* --- the by-track split -------------------------------------------------- */
+.track-split {
+  width: 100%;
+}
+.track-split td.num,
+.track-split th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-note {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--faint);
+}
+
+/* --- the funnel beside the side cards, as the board splits them ----------- */
+.board-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+@media (max-width: 1080px) {
+  .board-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.funnel-card,
+.side-card,
+.offers-card {
+  padding: 14px;
+}
+.side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.funnel-chart {
+  width: 100%;
+  height: 190px;
+  min-height: 150px;
+}
+.funnel-rates {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+.funnel-rates b {
+  color: var(--ink);
+}
+
+.funnel-card .notice,
+.side-card .notice {
+  margin-top: 10px;
+}
+
+/* --- where students drop off --------------------------------------------- */
+.dropoff {
+  margin-top: 12px;
+}
+.dropoff-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-top: 1px solid var(--hairline-26);
+  font-size: 12.5px;
+  color: var(--ink);
+}
+.dropoff-text {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.dropoff-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--brand-purple);
+  font-weight: 600;
+  font-size: 12.5px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.dropoff-link .icon {
+  font-size: 15px;
+}
+.dropoff-link.as-button {
+  border: 0;
+  background: transparent;
+  font-family: var(--font);
+  cursor: pointer;
+  padding: 0;
+}
+
+/* --- this year, as four figures in one card ------------------------------ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 14px;
+}
+.kpi-grid .kpi {
+  font-size: 20px;
+}
+.kpi-sub {
+  font-size: 11px;
+  color: var(--faint);
+  margin-top: 2px;
+}
+
+.status-chart {
+  width: 100%;
+  height: 190px;
+  min-height: 160px;
+}
+
+.recruiters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* --- the offers grid and its decision strip ------------------------------ */
+.offers-card:focus {
+  outline: none;
+}
+.rejection {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.rejection-field {
+  flex: 1 1 320px;
+  min-width: 240px;
+  margin: 0;
+}
+.rejection-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--risk);
+}
+.rejection-error .icon {
+  font-size: 16px;
+}
+
+.grid-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.grid-count {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+.offers-grid {
+  display: block;
+  width: 100%;
+}
+.statusbar-note {
+  margin-left: auto;
+}
+
+.state-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.state-note .icon {
+  font-size: 16px;
+  color: var(--purple-mid);
+}

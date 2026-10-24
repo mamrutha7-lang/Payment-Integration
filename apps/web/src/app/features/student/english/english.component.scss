@@ -1,0 +1,467 @@
+/* English Proficiency Baseline — the handoff's layout for the hero dial, the
+ * four skill cards and the feedback pair. Cards, the eyebrow, the notice and
+ * the button family are the global reep-v2 classes; everything scoped here is
+ * the screen's own geometry (the dial, the 6px meters, the tinted feedback
+ * boxes) which the global sheet has no equivalent for. */
+
+:host {
+  display: block;
+}
+
+/* --- header --------------------------------------------------------------- */
+.eb-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.eb-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.005em;
+  line-height: 1.15;
+}
+.eb-sub {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+.eb-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.eb-btn {
+  padding: 10px 14px;
+  color: var(--ink-nav);
+  font-size: 13px;
+}
+.eb-btn--primary {
+  padding: 11px 18px;
+  font-size: 14px;
+  color: #fff;
+}
+.eb-btn--primary .icon {
+  font-size: 17px;
+}
+.eb-notice {
+  margin-bottom: 16px;
+}
+.eb-note {
+  color: var(--muted);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* --- hero ----------------------------------------------------------------- */
+.eb-hero {
+  padding: 20px 22px;
+  margin-bottom: 16px;
+}
+.eb-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(200px, 240px) 1fr;
+  gap: 24px;
+  align-items: center;
+}
+.eb-dial-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.eb-dial {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(85, 44, 126, 0.2);
+}
+.eb-dial__inner {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.eb-dial__score {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.eb-dial__score--pending {
+  color: #bfaed0;
+}
+.eb-dial__of {
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-top: 3px;
+  letter-spacing: 0.08em;
+}
+.eb-eyebrow {
+  margin-bottom: 0;
+}
+.eb-band {
+  font-size: 26px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--ink);
+  margin-top: 6px;
+  line-height: 1;
+}
+.eb-band-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.eb-hero__right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+.eb-hero__note {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+/* Pill chips at the handoff's 12px, a touch larger than the global .chip. */
+.eb-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.eb-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--tint-2);
+  color: var(--ink-nav);
+  white-space: nowrap;
+}
+.eb-chip--warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.eb-chip--good {
+  background: var(--good-bg);
+  color: var(--good);
+}
+
+/* --- 6px meters ----------------------------------------------------------- */
+.eb-meter-head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.eb-meter-head--sub {
+  margin-bottom: 4px;
+}
+.eb-meter-val {
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.eb-meter-val--pending {
+  color: #bfaed0;
+}
+.eb-meter {
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: rgba(58, 31, 82, 0.1);
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(58, 31, 82, 0.08);
+}
+.eb-meter i {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: linear-gradient(90deg, #a865c9, var(--purple-mid));
+  transition: width 0.3s ease;
+}
+.eb-meter--hero i {
+  background: var(--primary-gradient);
+}
+.eb-meter i.eb-meter__none {
+  background: transparent;
+}
+
+/* --- the four skill cards ------------------------------------------------- */
+.eb-sections {
+  display: grid;
+  /* `min(Npx, 100%)` and not a bare `Npx`: a minmax() track whose minimum is a
+     fixed length does NOT collapse when the container is narrower than it — the
+     track keeps its minimum and the grid overflows. On a 320px handset the
+     content box inside a card is about 260px, so every one of these was wider
+     than the screen it was drawn on. `min()` caps the minimum at the container,
+     which changes nothing at any width where the track already fitted. */
+  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.eb-skill {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.eb-skill__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+.eb-skill__id {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.eb-skill__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--tint-2);
+  border: 1px solid var(--hairline-42);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--purple-mid);
+  flex-shrink: 0;
+}
+.eb-skill__icon .icon {
+  font-size: 21px;
+}
+.eb-skill__name {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.eb-skill__meta {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.eb-skill__score {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+.eb-skill__big {
+  font-size: 30px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.eb-skill__big--pending {
+  color: #bfaed0;
+}
+.eb-skill__of {
+  font-size: 12px;
+  color: var(--muted);
+  padding-bottom: 3px;
+}
+.eb-skill__of strong {
+  color: var(--ink-nav);
+}
+.eb-subs {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.eb-report-btn,
+.eb-start-btn {
+  margin-top: auto;
+  padding: 8px 12px;
+  border-radius: var(--r-btn);
+  border: 1px solid rgba(160, 138, 178, 0.5);
+  background: var(--surface);
+  color: var(--ink-nav);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.eb-report-btn .icon,
+.eb-start-btn .icon {
+  font-size: 16px;
+}
+.eb-report-btn:hover {
+  background: var(--tint-3);
+  border-color: rgba(122, 47, 158, 0.45);
+}
+.eb-start-btn {
+  padding: 9px 12px;
+  border-color: #3a1f52;
+  background: var(--primary-gradient);
+  color: #fff;
+  box-shadow:
+    0 6px 16px rgba(85, 44, 126, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.eb-start-btn .icon {
+  font-size: 17px;
+}
+.eb-start-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.eb-report {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.eb-skill__noreport {
+  margin-top: auto;
+  font-size: 12px;
+  color: var(--faint);
+}
+
+/* --- AI feedback + recommended next --------------------------------------- */
+.eb-bottom {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 16px;
+}
+.eb-h4 {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+}
+.eb-h4 .icon {
+  font-size: 18px;
+  color: var(--purple-mid);
+}
+.eb-fb {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.eb-fb__box {
+  border-radius: 16px;
+  padding: 12px 14px;
+}
+.eb-fb__box--good {
+  background: rgba(19, 122, 74, 0.1);
+}
+.eb-fb__box--risk {
+  background: rgba(173, 36, 82, 0.1);
+}
+.eb-fb__lbl {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  margin-bottom: 7px;
+}
+.eb-fb__box--good .eb-fb__lbl,
+.eb-fb__box--good .eb-fb__dot {
+  color: var(--good);
+}
+.eb-fb__box--risk .eb-fb__lbl,
+.eb-fb__box--risk .eb-fb__dot {
+  color: var(--risk);
+}
+.eb-fb__row {
+  font-size: 13px;
+  color: var(--ink);
+  line-height: 1.5;
+  display: flex;
+  gap: 7px;
+}
+.eb-fb__dot {
+  font-weight: 700;
+}
+.eb-fb__empty {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.eb-next {
+  display: flex;
+  flex-direction: column;
+}
+.eb-next__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 0;
+  text-decoration: none;
+  color: inherit;
+}
+.eb-next__row + .eb-next__row {
+  border-top: 1px solid rgba(160, 138, 178, 0.32);
+}
+.eb-next__row:hover .eb-next__title {
+  color: var(--purple-mid);
+}
+.eb-next__row--static {
+  cursor: default;
+}
+.eb-next__row--static:hover .eb-next__title {
+  color: var(--ink);
+}
+.eb-next__arrow {
+  color: var(--purple-mid);
+  flex-shrink: 0;
+}
+.eb-next__arrow .icon {
+  font-size: 18px;
+}
+.eb-next__text {
+  flex: 1;
+  min-width: 0;
+}
+.eb-next__title {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.eb-next__sub {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+@media (max-width: 860px) {
+  .eb-hero__grid,
+  .eb-bottom {
+    grid-template-columns: 1fr;
+  }
+}

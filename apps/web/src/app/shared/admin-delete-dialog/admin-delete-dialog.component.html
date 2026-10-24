@@ -1,0 +1,152 @@
+<div class="dialog-backdrop" (click)="dismiss()">
+  <div
+    #panel
+    class="dialog"
+    role="dialog"
+    aria-modal="true"
+    tabindex="-1"
+    [attr.aria-labelledby]="titleId"
+    (click)="$event.stopPropagation()"
+  >
+    <header class="dialog-head">
+      <div>
+        <h2 class="dialog-title" [id]="titleId">{{ headline() }}</h2>
+        <p class="dialog-sub">{{ target().subLine }}</p>
+      </div>
+      <button type="button" class="btn ghost sm" aria-label="Close this dialog" (click)="dismiss()">
+        <span class="icon" aria-hidden="true">close</span>
+      </button>
+    </header>
+
+    <div class="dialog-body">
+      <!-- The two answers, as a choice. A college has only the second. -->
+      @if (!isCollege()) {
+        <div class="mode-choice" role="radiogroup" aria-label="What to do">
+          <label class="mode" [class.active]="mode() === 'remove'">
+            <input type="radio" name="admin-delete-mode" value="remove" [checked]="mode() === 'remove'" [disabled]="busy()" (change)="setMode('remove')" />
+            <span class="mode-text">
+              <span class="mode-title">Remove — keep the record</span>
+              <span class="mode-sub">Off every screen and unable to sign in; every row stays and Restore undoes it.</span>
+            </span>
+          </label>
+          <label class="mode" [class.active]="mode() === 'delete'">
+            <input type="radio" name="admin-delete-mode" value="delete" [checked]="mode() === 'delete'" [disabled]="busy()" (change)="setMode('delete')" />
+            <span class="mode-text">
+              <span class="mode-title">Delete for good</span>
+              <span class="mode-sub">Rows, files and recordings destroyed. Needs the code emailed to you. There is no undo.</span>
+            </span>
+          </label>
+        </div>
+      }
+
+      @if (mode() === 'remove') {
+        @for (sentence of removeConsequences(); track sentence) {
+          <div class="consequence kept">
+            <span class="icon" aria-hidden="true">check_circle</span>
+            <div>{{ sentence }}</div>
+          </div>
+        }
+      } @else {
+        @if (planError(); as problem) {
+          <div class="notice" role="alert">
+            <span class="icon" aria-hidden="true">error</span>{{ problem }}
+          </div>
+        } @else if (plan() === null) {
+          <p class="loading-line" role="status">Counting what would go…</p>
+        } @else {
+          @if (blocked(); as refusal) {
+            <div class="notice" role="alert">
+              <span class="icon" aria-hidden="true">block</span>{{ refusal }}
+            </div>
+          }
+          @for (sentence of planConsequences(); track sentence) {
+            <div class="consequence">
+              <span class="icon" aria-hidden="true">delete</span>
+              <div>{{ sentence }}</div>
+            </div>
+          } @empty {
+            <div class="consequence">
+              <span class="icon" aria-hidden="true">delete</span>
+              <div>The row itself and nothing else on record.</div>
+            </div>
+          }
+          @if (!isCollege()) {
+            <div class="consequence">
+              <span class="icon" aria-hidden="true">history</span>
+              <div>The audit trail keeps that this was done, by whom and why; the person's name leaves every other record.</div>
+            </div>
+          }
+        }
+      }
+
+      <div class="dialog-fields">
+        <div class="field">
+          <label for="admin-delete-reason">Reason</label>
+          <input
+            id="admin-delete-reason"
+            class="ctrl"
+            type="text"
+            required
+            placeholder="e.g. Left the college in August"
+            [value]="reason()"
+            [disabled]="busy()"
+            [attr.aria-invalid]="reasonIsUsable() ? null : 'true'"
+            aria-describedby="admin-delete-reason-help"
+            (input)="setReason($event)"
+          />
+          <span class="help" id="admin-delete-reason-help">Required. Recorded on the audit trail.</span>
+        </div>
+        @if (mode() === 'delete') {
+          <div class="field coded">
+            <label for="admin-delete-code">Code from your email</label>
+            <input
+              id="admin-delete-code"
+              class="ctrl"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              placeholder="6 digits"
+              maxlength="7"
+              [value]="code()"
+              [disabled]="busy()"
+              [attr.aria-invalid]="codeIsUsable() ? null : 'true'"
+              aria-describedby="admin-delete-code-help"
+              (input)="setCode($event)"
+            />
+            <span class="help" id="admin-delete-code-help">
+              <button type="button" class="link-btn" [disabled]="sendingCode() || busy()" (click)="sendCode()">
+                {{ sendingCode() ? 'Sending…' : codeNote() ? 'Send another code' : 'Email me a code' }}
+              </button>
+            </span>
+          </div>
+        }
+      </div>
+
+      @if (mode() === 'delete' && codeNote(); as note) {
+        <p class="note-line" role="status">
+          <span class="icon" aria-hidden="true">check_circle</span>{{ note }}
+        </p>
+      }
+
+      @if (error(); as message) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ message }}
+        </div>
+      }
+    </div>
+
+    <footer class="dialog-foot">
+      <button type="button" class="btn secondary" [disabled]="busy()" (click)="dismiss()">Cancel</button>
+      <button
+        type="button"
+        class="btn danger"
+        [disabled]="!canConfirm()"
+        [title]="reasonIsUsable() ? (mode() === 'delete' && !codeIsUsable() ? 'Type the six-digit code from your email first.' : '') : 'Give a reason first.'"
+        (click)="confirm()"
+      >
+        <span class="icon" aria-hidden="true">{{ mode() === 'remove' ? 'person_remove' : 'delete' }}</span>
+        {{ confirmLabel() }}
+      </button>
+    </footer>
+  </div>
+</div>

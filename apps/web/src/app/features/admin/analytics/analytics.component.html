@@ -1,0 +1,321 @@
+<div class="panel" data-p="analytics">
+  <div class="dt-header">
+    <div>
+      <div class="crumb"><span>Home</span><span class="sep">/</span><span>Charts &amp; numbers</span></div>
+      <h1 class="dt-title">Charts &amp; numbers</h1>
+      <div class="dt-sub">
+        @if (summary(); as figures) {
+          Programme-wide · {{ figures.students_total | plural: 'student' }} ·
+          {{ figures.mentors_total | plural: 'mentor' }} with a group
+          @if (figures.semester !== null) {
+            · semester {{ figures.semester }}
+          }
+          · counted {{ figures.generated_at | date: 'd MMM y, HH:mm' }}
+        } @else {
+          {{ summaryPlaceholderNote() }}
+        }
+      </div>
+    </div>
+    <div class="dt-toolbar">
+      @if (holds('admin.exports')) {
+        <a class="btn secondary" routerLink="/admin/exports">
+          <span class="icon" aria-hidden="true">download</span> Export
+        </a>
+      }
+      <!-- The board's primary action, and it is a link rather than a button:
+           the import wizard is its own screen (§11), behind its own capability.
+           Hidden rather than disabled for a reader who does not hold
+           `admin.imports`, because `capabilityGuard` would answer the click
+           with a silent redirect off this screen. -->
+      @if (holds('admin.imports')) {
+        <a class="btn primary" routerLink="/admin/imports">
+          <span class="icon" aria-hidden="true">upload_file</span> Import data
+        </a>
+      }
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>{{ error() }}
+    </div>
+  }
+
+  <div class="filters">
+
+    <!-- LIVE: `?weeks=` on both analytics endpoints, so one control moves the
+         strip and the chart together. -->
+    <div class="select">
+      <span class="lbl">Period</span>
+      <span class="val">{{ periodLabel() }}</span>
+      <select
+        aria-label="Period — the window the figures and the weekly chart are taken over"
+        (change)="selectPeriod($event)"
+      >
+        @for (choice of periods; track choice.weeks) {
+          <option [value]="choice.weeks" [selected]="choice.weeks === periodWeeks()">
+            {{ choice.label }}
+          </option>
+        }
+      </select>
+    </div>
+
+    @if (analyticsBusy()) {
+      <span class="filter-note" role="status">
+        <span class="icon" aria-hidden="true">hourglass_empty</span> Counting…
+      </span>
+    } @else {
+      <span class="filter-note">
+        Every comparison below is against the {{ periodWeeks() }} weeks before this one.
+      </span>
+    }
+  </div>
+
+  @if (kpiError()) {
+    <div class="notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      The figures for this window could not be counted, so the tiles below are the last window that
+      answered. {{ kpiError() }}
+    </div>
+  }
+
+  <!-- The KPI strip, in the server's own order. A tile the server could not
+       measure keeps its place and shows a dash and the reason it gave — a
+       confident zero where nothing was counted is the defect this strip was
+       rebuilt to remove. -->
+  <div class="kpi-row">
+    @for (tile of kpiTiles(); track tile.key) {
+      <div class="kpi-card">
+        <div class="kpi-head">
+          <div class="eyebrow">{{ tile.label }}</div>
+          <!-- `.delta` is the design system's own movement treatment
+               (reep-v2.scss), text and colour together: a direction word or a
+               signed figure beside the arrow, never an arrow alone. Absent
+               entirely when the server compared nothing — three of the seven
+               KPIs have no earlier measurement to compare against, and a green
+               arrow drawn from an absence is a lie in a glyph. -->
+          @if (tile.delta; as movement) {
+            <span class="delta {{ movement.tone }}">
+              <span class="icon" aria-hidden="true">{{ movement.icon }}</span>{{ movement.label }}
+            </span>
+          }
+        </div>
+        <div class="num">
+          {{ tile.figure }}@if (tile.unitSuffix) {
+            <span class="unit">{{ tile.unitSuffix }}</span>
+          }
+        </div>
+        <div class="sub">
+          @if (tile.link) {
+            <a [routerLink]="tile.link">{{ tile.linkText }}</a>
+            @if (tile.note) {
+              <span aria-hidden="true"> · </span>
+            }
+          }
+          {{ tile.note }}
+        </div>
+      </div>
+    } @empty {
+      <div class="kpi-card kpi-card--wide">
+        <div class="kpi-head"><div class="eyebrow">Key figures</div></div>
+        <div class="num">—</div>
+        <div class="sub">{{ kpiPlaceholderNote() }}</div>
+      </div>
+    }
+  </div>
+
+  <section class="card chart-card">
+    <div class="card-head">
+      <div>
+        <h2 class="card-heading">Placement health · weekly</h2>
+        <p class="card-sub">
+          @if (chartModel(); as model) {
+            {{ model.caption }} ·
+          }
+          @if (chartIsProgrammeWide()) {
+            percentages on the left axis, hours and counts on the right
+          } @else {
+            the last six weeks on record
+          }
+        </p>
+      </div>
+      <div class="card-actions">
+        @if (!chartIsProgrammeWide() && studentHasResume()) {
+          <a class="btn secondary sm" [href]="cvUrl()">
+            <span class="icon" aria-hidden="true">download</span> Download CV
+          </a>
+        }
+        <div class="select">
+          <span class="lbl">Drawn for</span>
+          <span class="val">{{ chartSubjectName() }}</span>
+          <select
+            aria-label="Who the weekly chart is drawn for"
+            (change)="selectChartSubject($event)"
+          >
+            <option [value]="everyStudent" [selected]="chartIsProgrammeWide()">
+              Every student in reach
+            </option>
+            @for (student of studentsWithAMentor(); track student.student_id) {
+              <option [value]="student.student_id" [selected]="student.student_id === chartSubject()">
+                {{ student.name }}
+              </option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    @if (seriesError()) {
+      <div class="notice" role="alert">
+        <span class="icon" aria-hidden="true">error</span>{{ seriesError() }}
+      </div>
+    }
+
+    <!-- A line the server could only partly measure says so IN WORDS, in its
+         own sentence, rather than simply stopping part way along the axis.
+         `partial` and `unavailable` are different facts and carry different
+         chips; neither is drawn as a flat zero. -->
+    @for (note of seriesNotes(); track note.key) {
+      <div class="notice accent series-note" role="status">
+        <span class="chip {{ seriesTone(note.source) }}">
+          {{ note.label }} · {{ seriesSourceLabel(note.source) }}
+        </span>
+        <span>
+          {{ note.note }}
+        </span>
+      </div>
+    }
+
+    @if (weeklyBusy() || (analyticsBusy() && !chartModel())) {
+      <p class="state-note" role="status">
+        <span class="icon" aria-hidden="true">hourglass_empty</span>Loading the weekly series…
+      </p>
+    }
+
+    @if (weeklyError(); as weeklyProblem) {
+      <div class="notice" role="alert">
+        <span class="icon" aria-hidden="true">error</span>{{ weeklyProblem }}
+      </div>
+    }
+
+    @if (chartModel(); as model) {
+      <div
+        #healthChart
+        class="health-chart"
+        role="img"
+        [attr.aria-label]="'Weekly placement health · ' + model.caption"
+      ></div>
+    } @else if (!analyticsBusy() && !weeklyBusy() && !seriesError() && !weeklyError()) {
+      <div class="notice warn">
+        <span class="icon" aria-hidden="true">warning</span>
+        There is nothing to plot for this window — no student in reach has a measurable week in it.
+      </div>
+    }
+  </section>
+
+  <div class="board-columns">
+    <section class="card grid-card">
+      <div class="card-head">
+        <div>
+          <!-- "faculty accounts", not "mentors": `/analytics-summary` counts
+               `Mentor` ROWS, which exist only once the office has assigned that
+               person a student, while this grid lists every MENTOR-role
+               account. Both said "mentors" and the header's figure was the
+               smaller of the two — one screen, one word, two numbers. -->
+          <h2 class="card-heading">
+            Mentor load@if (mentorLoadLoaded()) {
+              · {{ mentorRows().length | plural: 'faculty account' }}
+            }
+          </h2>
+          <p class="card-sub">Every faculty account, with the mean across their students.</p>
+        </div>
+        @if (holds('admin.mentors')) {
+          <a class="btn ghost sm" routerLink="/admin/mentors">
+            <span class="icon" aria-hidden="true">arrow_forward</span> Open mentor mapping
+          </a>
+        }
+      </div>
+
+      @if (mentorLoadFailed()) {
+        <div class="notice warn" role="alert">
+          <span class="icon" aria-hidden="true">warning</span>
+          Could not load the mentorship map, so this table is not the roster — it is nothing at all.
+        </div>
+      } @else if (rosterIsEmpty()) {
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">info</span>
+          No mentors on the roster yet, so there is nothing to map.
+        </div>
+      } @else if (!mentorLoadLoaded()) {
+        <p class="state-note" role="status">
+          <span class="icon" aria-hidden="true">hourglass_empty</span>Loading the mentorship map…
+        </p>
+      } @else {
+        <div class="grid-toolbar">
+          <input
+            class="dt-quickfilter"
+            type="search"
+            placeholder="Search mentors…"
+            aria-label="Search the mentor load table"
+            (input)="setQuickFilter($event)"
+          />
+        </div>
+        <ag-grid-angular
+          class="mentor-grid"
+          [theme]="gridTheme"
+          [rowData]="mentorRows()"
+          [columnDefs]="mentorColumns"
+          [defaultColDef]="defaultMentorColumn"
+          [quickFilterText]="quickFilter()"
+          [pagination]="true"
+          [paginationPageSize]="mentorsPerPage"
+          [paginationPageSizeSelector]="pageSizes"
+          [domLayout]="'autoHeight'"
+          [suppressCellFocus]="true"
+        />
+      }
+    </section>
+
+    <section class="card alerts-card">
+      <div class="card-head">
+        <div>
+          <h2 class="card-heading">Alerts · open</h2>
+          <p class="card-sub">Raised against the thresholds set behind Rules.</p>
+        </div>
+        <button type="button" class="btn ghost sm" (click)="openRules()">
+          <span class="icon" aria-hidden="true">tune</span> Rules
+        </button>
+      </div>
+
+      @if (alertsFailed()) {
+        <div class="notice warn" role="alert">
+          <span class="icon" aria-hidden="true">warning</span>
+          Could not load the alert feed, so this is not "nothing open" — it is not known.
+        </div>
+      } @else if (alertsAreEmpty()) {
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">info</span>
+          <div>
+            Nothing open.
+          </div>
+        </div>
+      } @else {
+        <ul class="alert-list">
+          @for (alert of openAlerts(); track alert.id) {
+            <li class="alert-row">
+              <span class="chip dot {{ alertTone(alert.severity) }}">{{ alertRuleLabel(alert.rule_triggered) }}</span>
+              <span class="alert-text">
+                {{ alert.message }}
+                <span class="alert-meta">· {{ alert.student_name }} · {{ alert.triggered_at | date: 'd MMM' }}</span>
+              </span>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  </div>
+
+  @if (rulesOpen()) {
+    <app-alert-rules-dialog (dismissed)="closeRules()" />
+  }
+</div>

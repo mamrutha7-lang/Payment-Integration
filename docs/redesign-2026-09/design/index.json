@@ -1,0 +1,359 @@
+{
+ "admin": [
+  [
+   "SignIn",
+   "Sign in (Main Admin door)",
+   true
+  ],
+  [
+   "Main",
+   "Analytics",
+   true
+  ],
+  [
+   "Colleges",
+   "Colleges (tenants)",
+   true
+  ],
+  [
+   "Institution",
+   "Institution structure",
+   true
+  ],
+  [
+   "Students",
+   "Students & batches",
+   true
+  ],
+  [
+   "StudentDetail",
+   "Student 360",
+   true
+  ],
+  [
+   "Faculty",
+   "Faculty directory",
+   true
+  ],
+  [
+   "AddFaculty",
+   "Add faculty (wizard)",
+   true
+  ],
+  [
+   "MentorMapping",
+   "Mentor mapping",
+   true
+  ],
+  [
+   "Registrations",
+   "Registrations",
+   true
+  ],
+  [
+   "DataImports",
+   "Data imports & criteria",
+   true
+  ],
+  [
+   "Catalogue",
+   "Catalogue",
+   true
+  ],
+  [
+   "Leave",
+   "Leave approvals",
+   true
+  ],
+  [
+   "JobsSheet",
+   "Jobs sheet",
+   true
+  ],
+  [
+   "Placement",
+   "Placement & offers",
+   true
+  ],
+  [
+   "InterviewBank",
+   "Interview question bank",
+   true
+  ],
+  [
+   "InterviewRecords",
+   "Interview records",
+   true
+  ],
+  [
+   "Swoc",
+   "SWOC notes",
+   true
+  ],
+  [
+   "Governance",
+   "Roles & functions",
+   true
+  ],
+  [
+   "FeatureSwitches",
+   "Student feature switches",
+   true
+  ],
+  [
+   "AuditLog",
+   "Audit log",
+   true
+  ],
+  [
+   "Exports",
+   "Exports",
+   true
+  ],
+  [
+   "Agent",
+   "REEP Agent",
+   true
+  ],
+  [
+   "Account",
+   "My account",
+   true
+  ],
+  [
+   "PromoteBatch",
+   "Promote batch (dialog)",
+   true
+  ],
+  [
+   "GraduateBatch",
+   "Graduate batch (dialog)",
+   true
+  ],
+  [
+   "OffboardFaculty",
+   "Disable faculty (dialog)",
+   true
+  ],
+  [
+   "DesignSystem",
+   "Design system",
+   true
+  ],
+  [
+   "Coverage",
+   "Coverage board",
+   true
+  ],
+  [
+   "Compatibility",
+   "Compatibility board",
+   true
+  ]
+ ],
+ "student": [
+  [
+   "LoginRedesign",
+   "Sign in \u00b7 redesign",
+   1440,
+   900,
+   true
+  ],
+  [
+   "LoginStates",
+   "Sign in \u00b7 states",
+   1440,
+   900,
+   true
+  ],
+  [
+   "LoginMobile",
+   "Sign in \u00b7 mobile 390",
+   390,
+   844,
+   true
+  ],
+  [
+   "SkillingRedesign",
+   "Skilling \u00b7 redesign (claim card unchanged)",
+   1440,
+   2650,
+   true
+  ],
+  [
+   "TimeSheetRedesign",
+   "Time Sheet \u00b7 restyle",
+   1440,
+   990,
+   true
+  ],
+  [
+   "LeaderboardsRedesign",
+   "Leaderboards \u00b7 restyle",
+   1440,
+   900,
+   true
+  ],
+  [
+   "MentorLogRedesign",
+   "Faculty / TPO Log \u00b7 restyle",
+   1440,
+   900,
+   true
+  ],
+  [
+   "MentorLogRequest",
+   "Faculty / TPO Log \u00b7 request a meeting",
+   1440,
+   900,
+   true
+  ],
+  [
+   "InterviewStart",
+   "Mock interview \u00b7 start (future plan)",
+   1440,
+   1310,
+   true
+  ],
+  [
+   "InterviewLive",
+   "Mock interview \u00b7 live session (future plan)",
+   1440,
+   1020,
+   true
+  ],
+  [
+   "InterviewReport",
+   "Mock interview \u00b7 practice report (future plan)",
+   1440,
+   1520,
+   true
+  ],
+  [
+   "InterviewHistory",
+   "Mock interviews \u00b7 history (future plan)",
+   1440,
+   1980,
+   true
+  ],
+  [
+   "AgentRedesign",
+   "REEP Agent \u00b7 restyle",
+   1440,
+   1680,
+   true
+  ],
+  [
+   "ResumeRedesign",
+   "Resume \u00b7 Basic Details",
+   1440,
+   1223,
+   true
+  ],
+  [
+   "ResumeContact",
+   "Resume \u00b7 Contact Details",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeFamily",
+   "Resume \u00b7 Family Details",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeEducation",
+   "Resume \u00b7 Education",
+   1440,
+   1660,
+   true
+  ],
+  [
+   "ResumeAttachments",
+   "Resume \u00b7 Attachments",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeEvidence",
+   "Resume \u00b7 Evidence-backed Skills",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeExperience",
+   "Resume \u00b7 Professional Experience",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeInternship",
+   "Resume \u00b7 Internship",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeProjects",
+   "Resume \u00b7 Projects",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumePublications",
+   "Resume \u00b7 Publications / Research",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeSeminars",
+   "Resume \u00b7 Seminars / Trainings",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeCertifications",
+   "Resume \u00b7 Certification / Assessments",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumePOR",
+   "Resume \u00b7 Positions of Responsibility",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeOther",
+   "Resume \u00b7 Other Details",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumeReferences",
+   "Resume \u00b7 References",
+   1440,
+   1180,
+   true
+  ],
+  [
+   "ResumePolicy",
+   "Resume \u00b7 Placement Policy",
+   1440,
+   1180,
+   true
+  ]
+ ]
+}

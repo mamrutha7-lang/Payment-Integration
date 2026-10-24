@@ -1,0 +1,7 @@
+{
+  "EdgeAcl": {
+    "Name": "reep-edge",
+    "Id": "452a8dc8-6b3e-4ea8-a24f-b6aca6c9abc2",
+    "Scope": "CLOUDFRONT"
+  }
+}

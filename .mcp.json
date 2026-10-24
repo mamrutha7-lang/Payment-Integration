@@ -1,0 +1,42 @@
+{
+  "mcpServers": {
+    "angular-cli": {
+      "command": "npx",
+      "args": ["-y", "@angular/cli", "mcp"]
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "postgres": {
+      "command": "uvx",
+      "args": [
+        "--python", "3.12",
+        "--with", "mcp<2",
+        "--from", "postgres-mcp",
+        "postgres-mcp",
+        "--access-mode=restricted"
+      ],
+      "env": {
+        "DATABASE_URI": "postgresql://reep:reep_dev_password@localhost:5433/reep_py"
+      }
+    },
+    "reep-api": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "http://localhost:3300/mcp",
+        "--header-file",
+        "${REEP_DEV_SESSION_HEADERS}"
+      ]
+    },
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp",
+      "headers": {
+        "Authorization": "Sentry-Bearer ${SENTRY_ACCESS_TOKEN}"
+      }
+    }
+  }
+}

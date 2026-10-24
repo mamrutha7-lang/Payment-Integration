@@ -1,0 +1,123 @@
+== schemathesis: public (^/(health|api/(auth/sso/status|register/hierarchy|interview/status))$)
+    
+    st replay 1NQKmp
+
+=================================== WARNINGS ===================================
+
+Authentication failed: 1 operation returned authentication errors
+
+401 Unauthorized (1 operation):
+  - GET /api/interview/status
+
+💡 Ensure valid authentication credentials are set via --auth or -H
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 4/370
+  Tested: 4
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ Undocumented HTTP status code: 1
+
+Warnings:
+  ⚠️ Missing authentication: 1 operation returned only 401/403 responses
+
+Test cases:
+  20 generated, 1 found 1 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis-after-fixes/public/junit-20260930T063346Z.xml
+  - NDJSON: results/api/schemathesis-after-fixes/public/ndjson-20260930T063346Z.ndjson
+
+Seed: 30235679024341914118121869969206772558
+
+======================== 1 failure, 1 warning in 0.33s =========================
+== schemathesis: student (^/api/student/)
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Resume not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/resume/0/pdf?appendix=false'
+    
+    st replay 4jxgGg
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 34/370
+  Tested: 34
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ Undocumented HTTP status code: 1
+
+Test cases:
+  308 generated, 1 found 1 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis-after-fixes/student/junit-20260930T063350Z.xml
+  - NDJSON: results/api/schemathesis-after-fixes/student/ndjson-20260930T063350Z.ndjson
+
+Seed: 127633210444195874510349789846002932649
+
+============================== 1 failure in 2.41s ==============================
+== schemathesis: admin (^/api/admin/)
+    
+    st replay YlOO0V
+
+=================================== WARNINGS ===================================
+
+Schema validation mismatch: 1 operation mostly rejected generated data due to validation errors, indicating schema constraints don't match API validation
+
+  - GET /api/admin/interview-questions
+
+💡 Check your schema constraints - API validation may be stricter than documented
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 64/370
+  Tested: 64
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ Undocumented Content-Type: 1
+  ❌ Undocumented HTTP status code: 21
+
+Warnings:
+  ⚠️ Schema validation mismatch: 1 operation mostly rejected generated data
+
+Test cases:
+  1802 generated, 22 found 22 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis-after-fixes/admin/junit-20260930T063354Z.xml
+  - NDJSON: results/api/schemathesis-after-fixes/admin/ndjson-20260930T063354Z.ndjson
+
+Seed: 73578264691487982389941318932534530406
+
+======================= 22 failures, 1 warning in 19.03s =======================

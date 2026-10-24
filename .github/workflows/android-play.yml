@@ -1,0 +1,241 @@
+# Publish the REEP Android app to Google Play, from feature/mobile-app ONLY.
+#
+# main does not build or ship the phone app. The owner's decision: the app
+# lives on feature/mobile-app and is published from there, and main stays the
+# website. So this workflow is triggered by a PUSH to that branch (a push runs
+# the workflow file from the pushed commit, so nothing about it has to be on
+# main), and its first job refuses any other ref even if a trigger is added
+# later.
+#
+# WHAT A RUN DOES: builds the website, copies it into the Android project,
+# builds a RELEASE bundle (.aab) signed with the Play upload key, keeps the
+# bundle as a download on the run ("reep-play-aab"), and, once PLAY_UPLOAD is
+# true, uploads it to Google Play through tools/play/upload_bundle.py. The
+# default is the INTERNAL testing track, rolled out at once: Google does not
+# hold internal tests for its standard review, they reach the (at most 100)
+# testers the owner listed within minutes, and the 12-tester closed-test rule
+# for new personal accounts gates production only. Every other track defaults
+# to a DRAFT, which waits for "Start rollout" in Play Console.
+#
+# The one-time setup (Play Console app, upload key, service account, the
+# play-store environment and its secrets) is docs/mobile-app.md, "Publish to
+# Google Play". The FIRST bundle must be uploaded by hand in Play Console:
+# Google refuses its API for an app that has never had one.
+#
+# WHAT IT IS NOT. Not a CI job (tests/test_codebase_guards.py §34 pins ci.yml's
+# five job names against the ruleset), and it holds no AWS credential. The
+# secrets live in the play-store ENVIRONMENT, not the repository: environment
+# secrets reach only a job that names the environment, and the environment's
+# deployment-branch rule admits feature/mobile-app alone.
+
+name: Android app to Google Play
+
+on:
+  push:
+    branches: [feature/mobile-app]
+    paths:
+      - "apps/web/**"
+      - "tools/play/**"
+      - ".github/workflows/android-play.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  # One release at a time, and never cancelled halfway: a cancelled upload
+  # leaves an open edit in Play Console.
+  group: android-play
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    name: Owner and branch check
+    runs-on: ubuntu-latest
+    steps:
+      # The house rule for anything that ships (deploy.yml, cdk-deploy.yml,
+      # ops-task.yml): a write collaborator can push to this branch, so the
+      # pusher is checked. triggering_actor, not actor: a re-run is judged by
+      # whoever pressed Re-run.
+      - name: Only the repository owner may publish the app
+        env:
+          ACTOR: ${{ github.triggering_actor }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          if [ "$ACTOR" != "$OWNER" ]; then
+            echo "::error::Only $OWNER may publish the app. This run was started by $ACTOR. Nothing was built or uploaded."
+            exit 1
+          fi
+
+      - name: Only feature/mobile-app is published
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/feature/mobile-app" ]; then
+            echo "::error::The phone app is published from feature/mobile-app only, never from $REF."
+            exit 1
+          fi
+
+  release:
+    name: Build, sign and upload
+    needs: guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: play-store
+    defaults:
+      run:
+        working-directory: apps/web
+    env:
+      API_ORIGIN: ${{ vars.REEP_API_ORIGIN }}
+      PLAY_TRACK: ${{ vars.PLAY_TRACK || 'internal' }}
+      # Internal testing goes out at once; any other track waits as a draft
+      # unless PLAY_RELEASE_STATUS says otherwise.
+      PLAY_RELEASE_STATUS: ${{ vars.PLAY_RELEASE_STATUS || ((vars.PLAY_TRACK || 'internal') == 'internal' && 'completed' || 'draft') }}
+      BUNDLE: android/app/build/outputs/bundle/release/app-release.aab
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Check the settings
+        env:
+          HAS_KEYSTORE: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 != '' }}
+          HAS_STORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_PASSWORD != '' }}
+          HAS_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS != '' }}
+          HAS_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD != '' }}
+          HAS_SERVICE_ACCOUNT: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
+          PLAY_UPLOAD: ${{ vars.PLAY_UPLOAD }}
+        run: |
+          missing=""
+          [ -n "$API_ORIGIN" ] || missing="$missing variable:REEP_API_ORIGIN"
+          [ "$HAS_KEYSTORE" = true ] || missing="$missing secret:ANDROID_UPLOAD_KEYSTORE_BASE64"
+          [ "$HAS_STORE_PASSWORD" = true ] || missing="$missing secret:ANDROID_UPLOAD_KEYSTORE_PASSWORD"
+          [ "$HAS_ALIAS" = true ] || missing="$missing secret:ANDROID_UPLOAD_KEY_ALIAS"
+          [ "$HAS_KEY_PASSWORD" = true ] || missing="$missing secret:ANDROID_UPLOAD_KEY_PASSWORD"
+          if [ "$PLAY_UPLOAD" = true ] && [ "$HAS_SERVICE_ACCOUNT" != true ]; then
+            missing="$missing secret:PLAY_SERVICE_ACCOUNT_JSON"
+          fi
+          if [ -n "$missing" ]; then
+            echo "::error::The play-store environment is missing:$missing. docs/mobile-app.md, 'Publish to Google Play', says how to add each one."
+            exit 1
+          fi
+          case "$API_ORIGIN" in
+            https://*) ;;
+            *) echo "::error::REEP_API_ORIGIN must start with https:// (Android blocks plain http from the app)"; exit 1 ;;
+          esac
+          case "$API_ORIGIN" in
+            */) echo "::error::REEP_API_ORIGIN must not end with /"; exit 1 ;;
+            *\'*|*\ *) echo "::error::REEP_API_ORIGIN must be a plain address"; exit 1 ;;
+          esac
+          case "$PLAY_TRACK" in
+            internal|alpha|beta|production) ;;
+            *) echo "::error::PLAY_TRACK must be internal, alpha, beta or production, not '$PLAY_TRACK'"; exit 1 ;;
+          esac
+          case "$PLAY_RELEASE_STATUS" in
+            draft|completed) ;;
+            *) echo "::error::PLAY_RELEASE_STATUS must be draft or completed, not '$PLAY_RELEASE_STATUS'"; exit 1 ;;
+          esac
+
+      # Google Play refuses a versionCode it has already seen. The run number
+      # only ever grows, and the attempt keeps a re-run from colliding with a
+      # bundle its first attempt already uploaded. If this file is ever
+      # renamed, the run number restarts at 1: add the old highest code here.
+      - name: Number this version
+        run: |
+          echo "VERSION_CODE=$(( GITHUB_RUN_NUMBER * 100 + GITHUB_RUN_ATTEMPT ))" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=1.0.$GITHUB_RUN_NUMBER" >> "$GITHUB_ENV"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      # Capacitor 8's Android project needs Java 21.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install
+        run: npm ci
+
+      - name: Point the app at the server
+        run: |
+          sed -i "s#apiOrigin: ''#apiOrigin: '${API_ORIGIN}'#" src/environments/native.ts
+          grep -q "apiOrigin: '${API_ORIGIN}'" src/environments/native.ts
+
+      - name: Build the website files
+        run: npx ng build
+
+      - name: Copy them into the Android project
+        run: npx cap sync android
+
+      - name: Build the signed bundle
+        working-directory: apps/web/android
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_BASE64 }}
+          REEP_UPLOAD_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_PASSWORD }}
+          REEP_UPLOAD_KEY_ALIAS: ${{ secrets.ANDROID_UPLOAD_KEY_ALIAS }}
+          REEP_UPLOAD_KEY_PASSWORD: ${{ secrets.ANDROID_UPLOAD_KEY_PASSWORD }}
+        run: |
+          export REEP_UPLOAD_KEYSTORE="$RUNNER_TEMP/upload.jks"
+          printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$REEP_UPLOAD_KEYSTORE"
+          ./gradlew bundleRelease --no-daemon \
+            -PreepVersionCode="$VERSION_CODE" -PreepVersionName="$VERSION_NAME"
+
+      - name: Remove the key from the runner
+        if: always()
+        working-directory: .
+        run: rm -f "$RUNNER_TEMP/upload.jks"
+
+      # An unsigned bundle, or one signed with Android's debug key, is refused
+      # by Google Play after the upload; refusing it here says why. The output
+      # is read whole rather than piped into `grep -q`: under pipefail a grep
+      # that exits early can turn a match into a pass.
+      - name: Check the bundle is signed with the upload key
+        run: |
+          # jarsigner prints a warning line per entry of a bundle; only the
+          # verdict matters, and the whole text is shown only on a refusal.
+          verified="$(jarsigner -verify "$BUNDLE")"
+          case "$verified" in
+            *"jar verified"*) echo "Signed." ;;
+            *) echo "$verified"; echo "::error::$BUNDLE is not signed"; exit 1 ;;
+          esac
+          certs="$(keytool -printcert -jarfile "$BUNDLE")"
+          case "$certs" in
+            *"CN=Android Debug"*) echo "::error::$BUNDLE is signed with the Android DEBUG key, not the upload key"; exit 1 ;;
+          esac
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: reep-play-aab
+          path: apps/web/${{ env.BUNDLE }}
+          if-no-files-found: error
+          retention-days: 30
+
+      - uses: actions/setup-python@v5
+        if: vars.PLAY_UPLOAD == 'true'
+        with:
+          python-version: "3.12"
+
+      # The script writes the run summary itself, because only it knows the
+      # status Google actually accepted (a first release can only be a draft).
+      - name: Upload to Google Play
+        if: vars.PLAY_UPLOAD == 'true'
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+        run: |
+          python -m pip install --quiet "google-auth==2.59.1" "requests==2.34.2"
+          python ../../tools/play/upload_bundle.py --bundle "$BUNDLE" \
+            --track "$PLAY_TRACK" --status "$PLAY_RELEASE_STATUS" --release-name "$VERSION_NAME"
+
+      - name: Say why nothing was uploaded
+        if: vars.PLAY_UPLOAD != 'true'
+        run: |
+          echo "::notice::Built and signed version $VERSION_NAME (code $VERSION_CODE), NOT uploaded: PLAY_UPLOAD is not true."
+          {
+            echo "### Built, not uploaded"
+            echo "Version $VERSION_NAME (code $VERSION_CODE) is signed and attached to this run as **reep-play-aab**."
+            echo "It was not sent to Google Play because the play-store environment's PLAY_UPLOAD variable is not \`true\`."
+            echo "For the app's first release, download it and upload it by hand in Play Console, then set PLAY_UPLOAD to true."
+          } >> "$GITHUB_STEP_SUMMARY"

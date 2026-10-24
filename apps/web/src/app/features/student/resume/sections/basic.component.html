@@ -1,0 +1,187 @@
+<!-- data-p="basic" — Identity + Personal. Global reep-v2 classes only. -->
+<div class="notice info">
+  <span class="icon" aria-hidden="true">lock</span>
+  <div>
+    <b>Locked fields come from the university student record.</b> USN, name, course and
+    specialization cannot be edited here — raise a correction request with the registrar if any are
+    wrong.
+  </div>
+</div>
+
+<div class="card">
+  <h3>Identity</h3>
+  <div style="display: flex; gap: 22px">
+    <div style="width: 190px; flex: 0 0 auto">
+      <div class="field">
+        <label>Photo</label>
+        @if (photoUrl(); as url) {
+          <img [src]="url" alt="Profile photo" class="photo-preview" />
+        }
+        <button
+          type="button"
+          class="dropzone dropzone--action"
+          [disabled]="uploadingPhoto()"
+          (click)="photoPicker.click()"
+        >
+          <span class="icon" aria-hidden="true">add_a_photo</span>
+          {{ uploadingPhoto() ? 'Uploading…' : photoUrl() ? 'Replace photo' : 'Click to upload' }}
+          <small>PNG or JPEG</small>
+        </button>
+        <input
+          #photoPicker
+          type="file"
+          accept="image/png,image/jpeg"
+          hidden
+          (change)="onPhotoFile($event)"
+        />
+        <!-- role="alert" because @if INSERTS this after load: without a live
+             region the student presses the photo button, the upload is refused
+             (wrong format, over 10 MB, server unreachable) and a screen reader
+             announces nothing at all — the button simply stops saying
+             "Uploading…" and the resume keeps the old headshot. Every other
+             upload error in this app is already a live region — the register
+             form's, /mentor/signature's, all three on /student/uploads — and
+             this was the holdout. No aria-invalid to go with it: the control
+             here is a button opening a hidden picker, and ARIA does not carry
+             that state on a button; the screens that set it set it on text
+             inputs and selects. -->
+        @if (photoError()) {
+          <small class="photo-err" role="alert">{{ photoError() }}</small>
+        }
+      </div>
+    </div>
+    <div style="flex: 1">
+      <div class="field">
+        <label>USN <span class="req">*</span><span class="lock">Synced</span></label>
+        <input class="ctrl" [value]="usn()" placeholder="—" disabled />
+      </div>
+      <div class="grid3">
+        <div class="field">
+          <label>First name<span class="lock">Synced</span></label>
+          <input class="ctrl" [value]="firstName()" placeholder="—" disabled />
+        </div>
+        <div class="field">
+          <label>Middle name</label>
+          <input
+            class="ctrl"
+            placeholder="Middle name"
+            [ngModel]="m.middle_name"
+            (ngModelChange)="m.middle_name = $event; push()"
+          />
+        </div>
+        <div class="field">
+          <label>Last name<span class="lock">Synced</span></label>
+          <input class="ctrl" [value]="lastName()" placeholder="—" disabled />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label>Course<span class="lock">Synced</span></label>
+      <input class="ctrl" [value]="courseName()" placeholder="—" disabled />
+    </div>
+    <div class="field">
+      <label>Primary specialization<span class="lock">Synced</span></label>
+      <input class="ctrl" [value]="specializationName()" placeholder="—" disabled />
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Personal</h3>
+  <div class="grid2">
+    <div class="field">
+      <label
+        >Gender <span class="req">*</span
+        ><span class="reqp">Required for placement profile</span></label
+      >
+      <select class="ctrl" [ngModel]="m.gender" (ngModelChange)="m.gender = $event; push()">
+        <option value="">Select</option>
+        <option value="Female">Female</option>
+        <option value="Male">Male</option>
+        <option value="Prefer not to say">Prefer not to say</option>
+      </select>
+    </div>
+    <div class="field">
+      <label
+        >Date of birth <span class="req">*</span
+        ><span class="reqp">Required for placement profile</span></label
+      >
+      <input class="ctrl" type="date" [ngModel]="m.dob" (ngModelChange)="m.dob = $event; push()" />
+      <small class="field-note">
+        Used for placement eligibility only — not shown on your exported resume.
+      </small>
+    </div>
+    <div class="field">
+      <label>Blood group</label>
+      <select
+        class="ctrl"
+        [ngModel]="m.blood_group"
+        (ngModelChange)="m.blood_group = $event; push()"
+      >
+        <option value="">Select</option>
+        <option>A+</option>
+        <option>A-</option>
+        <option>B+</option>
+        <option>B-</option>
+        <option>O+</option>
+        <option>O-</option>
+        <option>AB+</option>
+        <option>AB-</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Marital status</label>
+      <select
+        class="ctrl"
+        [ngModel]="m.marital_status"
+        (ngModelChange)="m.marital_status = $event; push()"
+      >
+        <option value="">Select</option>
+        <option>Single</option>
+        <option>Married</option>
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label>Known languages</label>
+    <div class="taginput">
+      @for (lang of m.languages; track $index) {
+        <span class="chipx"
+          >{{ lang }} <span class="icon" (click)="removeLanguage($index)" aria-hidden="true">close</span></span
+        >
+      }
+      <input
+        placeholder="Type a language and press Enter"
+        [(ngModel)]="langDraft"
+        (keydown.enter)="addLanguage($event)"
+      />
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="field">
+      <label>Dream company</label>
+      <input
+        class="ctrl"
+        placeholder="e.g. Deloitte"
+        [ngModel]="m.dream_company"
+        (ngModelChange)="m.dream_company = $event; push()"
+      />
+    </div>
+    <div class="field">
+      <label>Medical history</label>
+      <small class="sensitive-note">
+        <span class="icon" aria-hidden="true">info</span>
+        Optional. Collected only so the placement office can arrange reasonable accommodations;
+        visible to your mentor and the placement office, never to recruiters.
+      </small>
+      <input
+        class="ctrl"
+        placeholder="Anything the placement office should know"
+        [ngModel]="m.medical_history"
+        (ngModelChange)="m.medical_history = $event; push()"
+      />
+    </div>
+  </div>
+</div>

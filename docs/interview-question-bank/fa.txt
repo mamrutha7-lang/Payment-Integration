@@ -1,0 +1,57 @@
+# FA — Financial Analytics
+# Track code: fa   Interviewer: a sharp, risk-conscious Managing Director / CFO
+# (voice: matthew)
+# Paste into Main Admin -> Interview questions -> Financial Analytics -> Add many.
+# Frameworks the persona already carries: DCF modelling, financial ratios, risk
+# mitigation, valuation techniques, M&A frameworks.
+
+# ---------------------------------------------------------------- opening --
+[opening] Tell me about yourself and why finance rather than one of the other specialisations.
+[opening] Walk me through your resume, and stop at the point where you first worked with a real set of financial statements.
+[opening] Which area interests you most — valuation, risk, corporate finance or financial planning and analysis — and why?
+[opening] Tell me about a company whose financials you have actually read. What stood out?
+[opening] What is happening in the markets this week that a finance graduate should have an opinion on?
+
+# ---------------------------------------------------------------- probing --
+[probing] Walk me through how a ten rupee depreciation expense flows through the three financial statements.
+[probing] A company is profitable and running out of cash. Give me three ways that happens.
+[probing] What is the difference between the direct and indirect methods of building a cash flow statement?
+[probing] Explain working capital, and tell me what a rising working capital requirement says about a growing business.
+[probing] What is EBITDA, why do people use it, and what does it deliberately hide?
+[probing] Explain the difference between enterprise value and equity value, and how you bridge one to the other.
+[probing] Which three ratios would you look at first to judge whether a company can service its debt?
+[probing] Explain return on equity, and then break it down using the DuPont identity.
+[probing] What is the difference between operating leverage and financial leverage, and which is more dangerous in a downturn?
+[probing] Explain the time value of money to someone who has never taken a finance class.
+[probing] What is WACC, what goes into it, and why does it rise when a company takes on too much debt?
+[probing] Explain beta, and tell me what it does and does not measure about a company's risk.
+[probing] Why is the cost of debt usually lower than the cost of equity?
+[probing] What is the difference between a bond's coupon and its yield, and what happens to the price when rates rise?
+[probing] Explain accrual accounting versus cash accounting with an example where the two give opposite pictures.
+[probing] What is deferred revenue, where does it sit, and why do investors watch it?
+[probing] Explain the difference between a strategic buyer and a financial buyer, and why they pay different prices.
+[probing] What is due diligence, and name three things you would look for that do not appear in the financial statements.
+[probing] How would you build a simple three-statement model, and in what order?
+[probing] What is sensitivity analysis, and what question is it actually answering for the decision maker?
+
+# -------------------------------------------------------------- deep_dive --
+[deep_dive] Walk me through a discounted cash flow valuation from the first line to the equity value per share.
+[deep_dive] Your DCF says the company is worth four hundred crore and the market says nine hundred. Which is wrong, and how would you find out?
+[deep_dive] How do you calculate terminal value, and why do the two standard methods often disagree by so much?
+[deep_dive] A company wants to acquire a competitor at a thirty percent premium. Tell me how you would decide whether that is a good deal.
+[deep_dive] Explain accretion and dilution in an all-stock acquisition, and what would make you advise against it even if it is accretive.
+[deep_dive] A business unit earns a twelve percent return on capital against a cost of capital of fourteen. It is growing quickly. What do you recommend?
+[deep_dive] How would you value a company with negative earnings and eighty percent revenue growth?
+[deep_dive] The CFO wants to change a revenue recognition policy in a way that is technically permitted and materially flattering. What do you do?
+[deep_dive] Walk me through the risks you would flag before signing off on a large foreign currency borrowing.
+[deep_dive] A portfolio company breaches a debt covenant next quarter on current projections. Take me through the options, in the order you would attempt them.
+[deep_dive] Build the case for and against a share buyback for a company sitting on a large cash balance and a falling share price.
+[deep_dive] How would you stress test a business plan, and which assumption would you break first?
+[deep_dive] Two divisions want the same capital and both have positive net present value. How do you choose, and what non-financial factor could override your maths?
+[deep_dive] You find an inconsistency in a model that a deal team has already presented to the client. Walk me through exactly what you do.
+
+# ---------------------------------------------------------------- wrap_up --
+[wrap_up] Which part of finance do you find hardest, and how are you working on it?
+[wrap_up] What would you want to be genuinely good at by the end of your first year here?
+[wrap_up] Tell me the one thing about your candidacy that you think I have underestimated.
+[wrap_up] What questions do you have for us about the role, the team, or the deals you would work on?

@@ -1,0 +1,230 @@
+<div class="dt-header">
+  <div>
+    <h1 class="dt-title">Mock interviews</h1>
+    <div class="dt-sub">
+      Every practice interview you have taken, with its transcript and its practice report.
+    </div>
+  </div>
+  <div class="dt-toolbar">
+    <a class="dt-btn primary" routerLink="/student/assistant">Start a new interview</a>
+  </div>
+</div>
+
+<!--
+  The disclosure the consent panel made, restated where the record actually is.
+  It is not a footnote: the student agreed to a transcript being kept and read by
+  staff, and this line is the standing reminder of what that means, on the screen
+  where they can see the kept thing.
+-->
+<p class="iv-scope">
+  These are kept on the college's server as part of your interview record. Your mentor and the
+  placement office can read them. Clearing your conversation on the interview screen does
+  <strong>not</strong> delete them — ask the placement cell if you need one removed.
+</p>
+
+@if (error()) {
+  <p class="iv-err" role="alert">{{ error() }}</p>
+}
+
+@if (loading()) {
+  <p class="iv-note">Loading your interviews…</p>
+} @else if (sessions().length === 0) {
+  <div class="card iv-empty">
+    <div class="iv-empty__title">No mock interviews yet</div>
+    <p class="iv-note">
+      The AI interviewer asks one question at a time, out loud, and writes you a practice report at
+      the end. Nothing here is graded and nothing counts towards placement.
+    </p>
+    <a class="dt-btn primary" routerLink="/student/assistant">Take your first interview</a>
+  </div>
+} @else {
+  <div class="dense-grid iv-stats">
+    <div class="dense-stat">
+      <div class="lbl">Interviews taken</div>
+      <div class="val">{{ totalCount() }}</div>
+    </div>
+    <div class="dense-stat">
+      <div class="lbl">Completed to the end</div>
+      <div class="val">{{ completedCount() }}</div>
+    </div>
+    <div class="dense-stat">
+      <div class="lbl">Reports written</div>
+      <div class="val">{{ reportCount() }}</div>
+    </div>
+  </div>
+
+  <table class="dt-table iv-table">
+    <thead>
+      <tr>
+        <th scope="col">Date</th>
+        <th scope="col">Track</th>
+        <th scope="col">Status</th>
+        <th scope="col">Answers</th>
+        <th scope="col">Length</th>
+        <th scope="col">Report</th>
+        <th scope="col"><span class="iv-sr">Open</span></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of sessions(); track row.id) {
+        <tr [class.iv-row--open]="selectedId() === row.id">
+          <td>
+            <div class="iv-date">{{ fmtDate(row.started_at) }}</div>
+            <div class="iv-time">{{ fmtTime(row.started_at) }}</div>
+          </td>
+          <td>{{ trackLabel(row.specialization) }}</td>
+          <td>
+            @if (statusChip(row.status); as chip) {
+              <span class="chip {{ chip.tone }}"
+                ><span class="icon" aria-hidden="true">{{ chip.icon }}</span
+                >{{ chip.label }}</span
+              >
+            }
+            <!-- Only when a recording actually exists. This reads
+                 `audio_recorded`, never a NULL check on a path: "capture was
+                 off", "consent was refused", "the write failed" and "this
+                 interview predates capture" are four different facts and a NULL
+                 flattens them into one. -->
+            @if (row.audio_recorded) {
+              <span class="chip neutral iv-chip2"
+                ><span class="icon" aria-hidden="true">graphic_eq</span>Audio saved</span
+              >
+            }
+          </td>
+          <td class="iv-num">{{ row.answers_accepted }}</td>
+          <td class="iv-num">{{ durationLabel(row) ?? '—' }}</td>
+          <td>
+            @if (reportChip(row.report_status); as chip) {
+              <span class="chip {{ chip.tone }}"
+                ><span class="icon" aria-hidden="true">{{ chip.icon }}</span
+                >{{ chip.label }}</span
+              >
+            } @else {
+              <span class="iv-muted">—</span>
+            }
+          </td>
+          <td class="iv-open">
+            <button
+              type="button"
+              class="dt-btn"
+              aria-controls="iv-detail"
+              [attr.aria-expanded]="selectedId() === row.id"
+              (click)="select(row.id)"
+            >
+              {{ selectedId() === row.id ? 'Close' : 'Open' }}
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if (selectedId()) {
+    <section id="iv-detail" class="iv-detail" aria-label="Interview detail">
+      @if (detailLoading()) {
+        <p class="iv-note">Loading that interview…</p>
+      }
+      @if (detailError()) {
+        <p class="iv-err" role="alert">{{ detailError() }}</p>
+      }
+
+      @if (detail(); as row) {
+        <div class="iv-detail__head">
+          <div>
+            <h2 class="dt-title">{{ trackLabel(row.specialization) }}</h2>
+            <div class="dt-sub">
+              {{ fmtDate(row.started_at) }} at {{ fmtTime(row.started_at) }}
+              @if (durationLabel(row); as len) {
+                · {{ len }}
+              }
+              @if (phaseLabel(row.final_phase); as phase) {
+                · reached {{ phase }}
+              }
+            </div>
+          </div>
+          @if (statusChip(row.status); as chip) {
+            <span class="chip {{ chip.tone }}"
+              ><span class="icon" aria-hidden="true">{{ chip.icon }}</span
+              >{{ chip.label }}</span
+            >
+          }
+        </div>
+
+        <!-- Only when it says something. On a clean run the relay's reason is
+             "Interview complete", which repeats the chip beside it. -->
+        @if (row.status !== 'completed' && row.terminal_reason) {
+          <p class="iv-note">Ended because: {{ row.terminal_reason }}</p>
+        }
+
+        <!--
+          Said out loud on EVERY interview, both ways round. The consent panel
+          asks for permission to keep a recording; permission is not the same
+          fact as a recording, because the college also has to have capture
+          switched on. A student who ticked that box must be able to read which
+          of the two happened for this interview instead of inferring it from a
+          chip that is simply absent — absence is what "unknown" looks like, and
+          this is the one screen that knows.
+        -->
+        <p class="iv-note">
+          @if (row.audio_recorded) {
+            A recording of your voice is kept for this interview. Your mentor and the placement
+            placement office can listen to it; it is deleted with the rest of this record.
+          } @else {
+            No recording of your voice was kept for this interview — the transcript below is the
+            whole of what was saved.
+          }
+        </p>
+
+        @if (reportView(); as view) {
+          <interview-report-card [view]="view" />
+        } @else if (reportMissing()) {
+          <div class="card iv-noreport">
+            <h4 class="iv-noreport__title">No report for this interview</h4>
+            <p class="iv-note">
+              @if (row.status === 'running') {
+                This interview is still open. The report is written when it finishes.
+              } @else {
+                Nothing was recorded for it — this interview predates the practice report, or it
+                ended before one could be written. Your transcript is below.
+              }
+            </p>
+          </div>
+        }
+
+        <h3 class="iv-h3">Transcript</h3>
+        @if (turnViews().length === 0) {
+          <p class="iv-note">No turns were saved for this interview.</p>
+        } @else {
+          <div class="iv-log">
+            @for (turn of turnViews(); track turn.seq) {
+              @if (turn.phaseStart && phaseLabel(turn.phase)) {
+                <p class="iv-phase">{{ phaseLabel(turn.phase) }}</p>
+              }
+              <div class="iv-turn" [attr.data-speaker]="turn.speaker">
+                <span class="iv-turn__who">{{
+                  turn.speaker === 'student' ? 'You' : 'Interviewer'
+                }}</span>
+                <span class="iv-turn__body">
+                  @if (turn.unheard) {
+                    <!-- An empty `content` is a transcription that timed out or
+                         failed, never "they said nothing". The row exists to say
+                         which, so say it. -->
+                    <em class="iv-unheard">{{ turn.unheard }}</em>
+                  } @else {
+                    <span class="iv-turn__text">{{ turn.content }}</span>
+                  }
+                  @if (turn.is_partial) {
+                    <span class="iv-flag">cut off — you spoke over it</span>
+                  }
+                  @if (turn.discounted) {
+                    <span class="iv-flag">{{ turn.discounted }}</span>
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        }
+      }
+    </section>
+  }
+}

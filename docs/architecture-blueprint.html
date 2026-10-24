@@ -1,0 +1,1696 @@
+<title>REEP Stack Blueprint</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap">
+
+<style>
+  :root {
+    --ground:      #f4f6f6;
+    --surface:     #ffffff;
+    --surface-2:   #e9eeee;
+    --ink:         #101a1d;
+    --ink-2:       #435a60;
+    --ink-3:       #6f868d;
+    --rule:        #d0dadb;
+    --rule-soft:   #e2e9e9;
+    --accent:      #10615d;
+    --accent-soft: #dcedea;
+    --store:       #8a6410;
+    --store-soft:  #f5ead0;
+    --ext:         #6a4a8e;
+    --ext-soft:    #ece3f4;
+    --guard:       #a62f2a;
+    --guard-soft:  #f8dfdd;
+
+    --f-display: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+    --f-body:    'Newsreader', Georgia, 'Times New Roman', serif;
+    --f-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:      #0c1315;
+      --surface:     #121b1e;
+      --surface-2:   #182427;
+      --ink:         #e3ebeb;
+      --ink-2:       #a6babe;
+      --ink-3:       #7b9096;
+      --rule:        #26383c;
+      --rule-soft:   #1c2b2e;
+      --accent:      #5ac6bb;
+      --accent-soft: #10312e;
+      --store:       #d8a944;
+      --store-soft:  #33280e;
+      --ext:         #b492d7;
+      --ext-soft:    #241a32;
+      --guard:       #f18a84;
+      --guard-soft:  #381715;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground:      #0c1315;
+    --surface:     #121b1e;
+    --surface-2:   #182427;
+    --ink:         #e3ebeb;
+    --ink-2:       #a6babe;
+    --ink-3:       #7b9096;
+    --rule:        #26383c;
+    --rule-soft:   #1c2b2e;
+    --accent:      #5ac6bb;
+    --accent-soft: #10312e;
+    --store:       #d8a944;
+    --store-soft:  #33280e;
+    --ext:         #b492d7;
+    --ext-soft:    #241a32;
+    --guard:       #f18a84;
+    --guard-soft:  #381715;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 28px 120px;
+  }
+
+  /* ---------- masthead ---------- */
+  .masthead {
+    border-bottom: 2px solid var(--ink);
+    padding: 56px 0 24px;
+    margin-bottom: 40px;
+  }
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 18px;
+  }
+  h1 {
+    font-family: var(--f-display);
+    font-weight: 800;
+    font-size: clamp(38px, 6.2vw, 76px);
+    line-height: .96;
+    letter-spacing: -.03em;
+    margin: 0 0 20px;
+    text-wrap: balance;
+  }
+  .standfirst {
+    font-size: clamp(18px, 2vw, 21px);
+    line-height: 1.5;
+    color: var(--ink-2);
+    max-width: 64ch;
+    margin: 0 0 30px;
+  }
+  .standfirst strong { color: var(--ink); font-weight: 600; }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  .fact { background: var(--ground); padding: 14px 16px 16px; }
+  .fact dt {
+    font-family: var(--f-mono);
+    font-size: 10px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin: 0 0 6px;
+  }
+  .fact dd {
+    margin: 0;
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 21px;
+    letter-spacing: -.01em;
+    line-height: 1.1;
+  }
+  .fact dd span {
+    display: block;
+    font-family: var(--f-mono);
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0;
+    margin-top: 4px;
+  }
+
+  /* ---------- layout ---------- */
+  .layout { display: block; }
+  @media (min-width: 1080px) {
+    .layout {
+      display: grid;
+      grid-template-columns: 196px minmax(0, 1fr);
+      gap: 52px;
+      align-items: start;
+    }
+  }
+
+  nav.index {
+    display: none;
+  }
+  @media (min-width: 1080px) {
+    nav.index {
+      display: block;
+      position: sticky;
+      top: 24px;
+      font-family: var(--f-mono);
+      font-size: 11.5px;
+      line-height: 1.45;
+      border-left: 1px solid var(--rule);
+    }
+    nav.index a {
+      display: block;
+      padding: 7px 0 7px 14px;
+      margin-left: -1px;
+      border-left: 2px solid transparent;
+      color: var(--ink-3);
+      text-decoration: none;
+    }
+    nav.index a:hover,
+    nav.index a:focus-visible { color: var(--accent); border-left-color: var(--accent); }
+    nav.index b {
+      display: block;
+      padding: 14px 0 6px 14px;
+      color: var(--ink);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+  }
+
+  main { min-width: 0; }
+
+  section { margin: 0 0 76px; scroll-margin-top: 20px; }
+  section > h2 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: clamp(25px, 3vw, 34px);
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    margin: 0 0 6px;
+    text-wrap: balance;
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+  }
+  section > h2 .num {
+    font-family: var(--f-mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: .08em;
+    flex: none;
+  }
+  .deck {
+    color: var(--ink-2);
+    max-width: 68ch;
+    margin: 0 0 26px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--rule);
+  }
+  p { max-width: 68ch; }
+  h3 {
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: .01em;
+    margin: 36px 0 10px;
+  }
+  a { color: var(--accent); }
+
+  code, .mono { font-family: var(--f-mono); font-size: .855em; }
+  p code, li code, td code, th code, dd code {
+    background: var(--surface-2);
+    border-radius: 3px;
+    padding: .1em .34em;
+  }
+  strong { font-weight: 600; }
+
+  /* ---------- figures ---------- */
+  figure { margin: 30px 0; }
+  .figframe {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    padding: 18px;
+    overflow-x: auto;
+  }
+  figcaption {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    line-height: 1.55;
+    color: var(--ink-3);
+    margin-top: 12px;
+    padding-left: 14px;
+    border-left: 2px solid var(--accent);
+    max-width: 90ch;
+  }
+  figcaption b { color: var(--ink-2); font-weight: 700; }
+
+  .dg { display: block; width: 100%; min-width: 640px; height: auto; }
+  .dg text { font-family: var(--f-mono); fill: var(--ink); }
+  .t-h    { font-family: var(--f-display); font-weight: 700; font-size: 12.5px; letter-spacing: .05em; }
+  .t-lab  { font-size: 11.5px; fill: var(--ink-2); }
+  .t-mini { font-size: 10.5px; fill: var(--ink-3); }
+  .t-tiny { font-size: 9.5px;  fill: var(--ink-3); letter-spacing: .04em; }
+  .t-c    { text-anchor: middle; }
+  .t-e    { text-anchor: end; }
+
+  .bx      { fill: var(--surface);   stroke: var(--rule);   stroke-width: 1.4; }
+  .bx-out  { fill: none;             stroke: var(--ink-3);  stroke-width: 1.4; stroke-dasharray: 5 4; }
+  .bx-acc  { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.8; }
+  .bx-accl { fill: none;             stroke: var(--accent); stroke-width: 2.2; }
+  .bx-store{ fill: var(--store-soft); stroke: var(--store); stroke-width: 1.6; }
+  .bx-ext  { fill: var(--ext-soft);   stroke: var(--ext);   stroke-width: 1.6; }
+  .bx-guard{ fill: var(--guard-soft); stroke: var(--guard); stroke-width: 1.8; }
+  .bx-flat { fill: var(--surface-2);  stroke: var(--rule);  stroke-width: 1.2; }
+
+  .ed      { fill: none; stroke: var(--ink-3);  stroke-width: 1.6; marker-end: url(#ah); }
+  .ed-acc  { fill: none; stroke: var(--accent); stroke-width: 1.8; marker-end: url(#ah-acc); }
+  .ed-ext  { fill: none; stroke: var(--ext);    stroke-width: 1.8; marker-end: url(#ah-ext); }
+  .ed-guard{ fill: none; stroke: var(--guard);  stroke-width: 2;   marker-end: url(#ah-guard); }
+  .ed-dash { fill: none; stroke: var(--ink-3);  stroke-width: 1.4; stroke-dasharray: 5 4; marker-end: url(#ah); }
+  .life    { stroke: var(--rule); stroke-width: 1.2; stroke-dasharray: 3 4; }
+
+  .mk       { fill: var(--ink-3); }
+  .mk-acc   { fill: var(--accent); }
+  .mk-ext   { fill: var(--ext); }
+  .mk-guard { fill: var(--guard); }
+
+  .swatch { fill: none; stroke-width: 2.5; }
+
+  /* ---------- tables ---------- */
+  .tw { overflow-x: auto; margin: 22px 0; border: 1px solid var(--rule); background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-family: var(--f-mono); font-size: 12.5px; }
+  th {
+    text-align: left;
+    font-family: var(--f-display);
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 11px 14px;
+    border-bottom: 1.5px solid var(--ink-3);
+    white-space: nowrap;
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--rule-soft); vertical-align: top; line-height: 1.5; }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.n { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink); }
+  td.k { color: var(--ink); font-weight: 500; white-space: nowrap; }
+  td.d { font-family: var(--f-body); font-size: 15.5px; color: var(--ink-2); }
+  tr.hot td { background: var(--guard-soft); }
+  tr.hot td.k, tr.hot td.n { color: var(--guard); font-weight: 700; }
+
+  /* ---------- misc blocks ---------- */
+  .callout {
+    border-left: 3px solid var(--guard);
+    background: var(--guard-soft);
+    padding: 16px 20px;
+    margin: 26px 0;
+    max-width: 80ch;
+  }
+  .callout.calm { border-left-color: var(--accent); background: var(--accent-soft); }
+  .callout h4 {
+    font-family: var(--f-display);
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+    color: var(--guard);
+  }
+  .callout.calm h4 { color: var(--accent); }
+  .callout p { margin: 0; font-size: 16px; }
+  .callout p + p { margin-top: 10px; }
+
+  pre {
+    font-family: var(--f-mono);
+    font-size: 12.5px;
+    line-height: 1.65;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--ink-3);
+    padding: 16px 18px;
+    overflow-x: auto;
+    margin: 22px 0;
+  }
+  pre .cm { color: var(--ink-3); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 8px; }
+  .chip {
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    padding: 4px 9px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    color: var(--ink-2);
+  }
+  .chip.hi { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .chip.gd { border-color: var(--guard); color: var(--guard); background: var(--guard-soft); }
+
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--rule); border: 1px solid var(--rule); margin: 24px 0; }
+  .cols > div { background: var(--surface); padding: 16px 18px; }
+  .cols h5 {
+    font-family: var(--f-display);
+    font-size: 11px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    margin: 0 0 8px;
+    color: var(--accent);
+  }
+  .cols p { font-size: 15px; margin: 0; color: var(--ink-2); }
+  .cols ul { margin: 0; padding-left: 18px; font-family: var(--f-mono); font-size: 12px; color: var(--ink-2); line-height: 1.7; }
+
+  ol.ladder { list-style: none; counter-reset: st; padding: 0; margin: 24px 0; max-width: 84ch; }
+  ol.ladder li {
+    counter-increment: st;
+    position: relative;
+    padding: 12px 0 12px 52px;
+    border-bottom: 1px solid var(--rule-soft);
+    font-size: 15.5px;
+    color: var(--ink-2);
+  }
+  ol.ladder li::before {
+    content: counter(st, decimal-leading-zero);
+    position: absolute; left: 0; top: 13px;
+    font-family: var(--f-mono);
+    font-size: 11px;
+    color: var(--accent);
+    border: 1px solid var(--rule);
+    padding: 2px 6px;
+  }
+  ol.ladder li b { color: var(--ink); font-weight: 600; }
+  ol.ladder li.refuse::before { color: var(--guard); border-color: var(--guard); }
+
+  footer {
+    border-top: 2px solid var(--ink);
+    padding-top: 20px;
+    font-family: var(--f-mono);
+    font-size: 11.5px;
+    color: var(--ink-3);
+    line-height: 1.7;
+  }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div style="max-width:1100px;margin:16px auto;padding:14px 18px;border:2px solid #b4341f;border-radius:8px;background:#fdeeea;color:#5a1a0e;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;font-size:14px;line-height:1.55">
+  <strong style="display:block;font-size:15px;margin-bottom:6px">PARTLY STALE &mdash; drawn 2026-08. <code>AGENTS.md</code> is the current truth.</strong>
+  The diagram below still shows the <strong>LiveKit voice worker</strong> (<code>Dockerfile.voice</code>,
+  <code>voice_agent.py</code>, <code>.venv-voice</code>, <code>/api/voice/*</code>) and the
+  <strong>&ldquo;Voice worker (dependency completeness)&rdquo;</strong> CI job. Both were removed in 2026-09.
+  There is no fourth process and no second venv: the one voice experience is <code>/student/assistant</code>,
+  a WebSocket <em>inside</em> the API process speaking to Amazon Nova 2 Sonic on Bedrock, with no API key.
+  CI has five jobs &mdash; <code>api</code>, <code>pii-gate</code>, <code>api-imports</code>, <code>web</code>, <code>cdk</code>.
+  The <strong>DIRECTOR role</strong> was removed on 2026-09-10; there is one office account, role ADMIN. The labels on this sheet were corrected on 2026-10-08 to the product's words — <strong>Main Admin (role ADMIN)</strong>, the placement office; <strong>Faculty (role MENTOR)</strong>, a mentor only once assigned a mentee; <code>/api/admin</code> and <code>require_admin</code> — see <code>AGENTS.md</code> &ldquo;Who is who&rdquo;.
+</div>
+
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <polygon class="mk" points="0,1 10,5 0,9" />
+    </marker>
+    <marker id="ah-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <polygon class="mk-acc" points="0,1 10,5 0,9" />
+    </marker>
+    <marker id="ah-ext" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <polygon class="mk-ext" points="0,1 10,5 0,9" />
+    </marker>
+    <marker id="ah-guard" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <polygon class="mk-guard" points="0,1 10,5 0,9" />
+    </marker>
+  </defs>
+</svg>
+
+<div class="page">
+
+  <header class="masthead">
+    <p class="eyebrow">Placement-readiness dashboard · architecture of record · august 2026</p>
+    <h1>REEP Stack Blueprint</h1>
+    <p class="standfirst">
+      An <strong>Angular 22 SPA</strong> talking same-origin to a <strong>Python 3.14 / FastAPI</strong>
+      monolith on <strong>PostgreSQL 17 + pgvector</strong>. Every version, port, table, close code and
+      guard below was read out of the repository — not sketched from memory.
+    </p>
+    <dl class="facts">
+      <div class="fact"><dt>Processes</dt><dd>3 + 1<span>API · DB · web (+ optional voice)</span></dd></div>
+      <div class="fact"><dt>Tables</dt><dd>55<span>42 Alembic migrations</span></dd></div>
+      <div class="fact"><dt>Initial bundle</dt><dd>~142 kB<span>was 1.23 MB, all eager</span></dd></div>
+      <div class="fact"><dt>API port</dt><dd>3300<span>Postgres on host 5433</span></dd></div>
+      <div class="fact"><dt>Close codes</dt><dd>4001–4014<span>one shared vocabulary</span></dd></div>
+      <div class="fact"><dt>Test modules</dt><dd>33<span>DB-backed, enforced in CI</span></dd></div>
+    </dl>
+  </header>
+
+  <div class="layout">
+
+    <nav class="index" aria-label="Section index">
+      <b>Blueprint</b>
+      <a href="#topology">01 Runtime topology</a>
+      <a href="#web">02 Front end</a>
+      <a href="#api">03 Back end</a>
+      <a href="#data">04 Data layer</a>
+      <a href="#auth">05 Identity &amp; scope</a>
+      <a href="#gate">06 The egress gate</a>
+      <a href="#interview">07 Interview engine</a>
+      <a href="#voice">08 Voice stack</a>
+      <a href="#config">09 Configuration</a>
+      <a href="#ci">10 Build &amp; CI</a>
+      <a href="#prod">11 Production</a>
+      <a href="#invariants">12 Invariants</a>
+    </nav>
+
+    <main>
+
+      <!-- ============ 01 ============ -->
+      <section id="topology">
+        <h2><span class="num">01</span> Runtime topology</h2>
+        <p class="deck">
+          Four boxes people routinely miscount. The mock interviewer is <em>not</em> a separate service —
+          it runs inside the API process. The voice worker <em>is</em> separate, on a different Python,
+          in a different virtualenv, and is optional.
+        </p>
+
+        <figure>
+          <div class="figframe">
+            <svg class="dg" viewBox="0 0 1360 1050" role="img"
+                 aria-label="Full runtime topology: an Angular browser client reaching a FastAPI process through a same-origin proxy; the API process holds routers, the in-process interview relay, services, the AI adapter and the ORM; it writes to Postgres, an upload store and an interview audio store, and reaches Google Identity, the OpenAI Realtime API, model providers and LiveKit; an optional voice worker joins LiveKit and posts transcripts back to the API.">
+
+              <!-- ===== BROWSER ===== -->
+              <rect class="bx" x="30" y="30" width="930" height="150" />
+              <text class="t-h" x="44" y="52">① BROWSER — STUDENT · FACULTY (role MENTOR) · MAIN ADMIN (role ADMIN) · ALUMNI</text>
+
+              <rect class="bx-flat" x="44" y="66" width="384" height="100" />
+              <text class="t-lab" x="56" y="86" style="font-weight:700">Angular 22.1 SPA</text>
+              <text class="t-mini" x="56" y="103">standalone components · signals · ReactiveForms</text>
+              <text class="t-mini" x="56" y="119">@angular/build (esbuild) · TypeScript 6.0 · SCSS</text>
+              <text class="t-mini" x="56" y="135">lazy loadComponent routes → ~142 kB initial</text>
+              <text class="t-mini" x="56" y="151">apexcharts · livekit-client · rxjs 7.8</text>
+
+              <rect class="bx-flat" x="440" y="66" width="250" height="100" />
+              <text class="t-lab" x="452" y="86" style="font-weight:700">AudioWorklet 'pcm-recorder'</text>
+              <text class="t-mini" x="452" y="103">mic → PCM16 LE mono 24 kHz</text>
+              <text class="t-mini" x="452" y="119">44.1k → 24k resample, 20 ms chunks</text>
+              <text class="t-mini" x="452" y="135">uplink cap 24 000 buffered bytes</text>
+              <text class="t-mini" x="452" y="151">secure context required</text>
+
+              <rect class="bx-flat" x="702" y="66" width="244" height="100" />
+              <text class="t-lab" x="714" y="86" style="font-weight:700">PCM playback scheduler</text>
+              <text class="t-mini" x="714" y="103">AudioContext @ 24 kHz</text>
+              <text class="t-mini" x="714" y="119">jitter buffer · underrun counter</text>
+              <text class="t-mini" x="714" y="135">flush on barge-in</text>
+              <text class="t-mini" x="714" y="151">close-code → student sentence</text>
+
+              <!-- browser <-> edge -->
+              <path class="ed" d="M240,180 V228" />
+              <text class="t-tiny" x="250" y="206">HTTPS/JSON · credentials:'include'</text>
+              <path class="ed" d="M565,180 V228" />
+              <text class="t-tiny" x="575" y="206">WS binary PCM frames</text>
+              <path class="ed" d="M830,232 V184" />
+              <text class="t-tiny t-e" x="822" y="206">audio deltas</text>
+
+              <!-- ===== EDGE ===== -->
+              <rect class="bx-out" x="30" y="232" width="930" height="60" />
+              <text class="t-mini" x="44" y="255"><tspan style="font-weight:700;fill:var(--ink-2)">DEV</tspan>   ng serve :4200 → proxy.conf.json  /api → http://localhost:3300  (ws:true, changeOrigin) — same origin, so the httpOnly cookie rides along</text>
+              <text class="t-mini" x="44" y="277"><tspan style="font-weight:700;fill:var(--ink-2)">PROD</tspan>  TLS reverse proxy — mandatory: ENV=prod marks reep_session Secure, and without HTTPS the browser drops it silently</text>
+
+              <path class="ed" d="M495,292 V326" />
+
+              <!-- ===== API PROCESS ===== -->
+              <rect class="bx-accl" x="30" y="330" width="930" height="372" />
+              <text class="t-h" x="44" y="354" style="fill:var(--accent)">② REEP API — python:3.14-slim · uvicorn 0.52.3 · :3300 · USER 10001 · --proxy-headers · graceful-shutdown 110 s</text>
+
+              <rect class="bx-flat" x="44" y="366" width="902" height="34" />
+              <text class="t-mini" x="56" y="387">lifespan gates, in order:  pin websockets logger to INFO  ›  production_boot_failures() → RuntimeError, uvicorn never binds  ›  blank VOICE_WORKER_SECRET warning  ›  sweep orphaned interviews   |   shutdown: close live interviews</text>
+
+              <rect class="bx" x="44" y="412" width="560" height="112" />
+              <text class="t-lab" x="56" y="431" style="font-weight:700">app/routers/ — the entire client surface lives under /api</text>
+              <text class="t-mini" x="56" y="449">/api/auth   login (403 in prod) · sso/status · sso/google · callback · me · logout</text>
+              <text class="t-mini" x="56" y="464">/api/student   43 endpoints — dashboard results attendance swoc mocks skills</text>
+              <text class="t-mini" x="56" y="479">   streak timesheet academics jobs offers resume uploads leaderboards courses</text>
+              <text class="t-mini" x="56" y="494">/api/mentor · /api/admin · /api/leaves · /api/register · /api/agent · /api/voice</text>
+              <text class="t-mini" x="56" y="509">/health liveness (no deps)   /ready per-dependency, 503 only on the DB</text>
+
+              <rect class="bx" x="616" y="412" width="330" height="112" />
+              <text class="t-lab" x="628" y="431" style="font-weight:700">app/interview_relay.py — in-process</text>
+              <text class="t-mini" x="628" y="449">browser WS ⇄ here ⇄ OpenAI Realtime</text>
+              <text class="t-mini" x="628" y="464">turn_detection.create_response = false</text>
+              <text class="t-mini" x="628" y="479">exactly ONE response.create call site</text>
+              <text class="t-mini" x="628" y="494">14 close codes, mirrored by the client</text>
+              <text class="t-mini" x="628" y="509">instructions carry no student text</text>
+
+              <rect class="bx" x="44" y="536" width="902" height="62" />
+              <text class="t-lab" x="56" y="555" style="font-weight:700">services</text>
+              <text class="t-mini" x="56" y="572">conversations (the one writer) · knowledge (hybrid pgvector + full-text) · document_store (magic-byte typing) · retention · mailer (dedupe_key)</text>
+              <text class="t-mini" x="56" y="588">redaction · resume_pdf (local ReportLab) · security (scrypt + HS256 + token_version) · google_auth (FastAPI-free) · interview_matrix · interview_audio</text>
+
+              <rect class="bx" x="44" y="610" width="560" height="76" />
+              <text class="t-lab" x="56" y="629" style="font-weight:700">app/ai/</text>
+              <text class="t-mini" x="56" y="646">llm.py — provider auto-select + STUDENT-DATA EGRESS GATE</text>
+              <text class="t-mini" x="56" y="661">embeddings.py — explicit EMBEDDING_*, else Mistral, else full-text only</text>
+              <text class="t-mini" x="56" y="676">orchestrator.py (retained) · adk.py + agents.py — google-adk via litellm</text>
+
+              <rect class="bx" x="616" y="610" width="330" height="76" />
+              <text class="t-lab" x="628" y="629" style="font-weight:700">persistence</text>
+              <text class="t-mini" x="628" y="646">SQLAlchemy 2.0.52 — models are the schema</text>
+              <text class="t-mini" x="628" y="661">Alembic 1.19.1 · Pydantic 2.13.4</text>
+              <text class="t-mini" x="628" y="676">psycopg[binary] 3.3.4 — postgresql+psycopg://</text>
+
+              <!-- API -> data -->
+              <path class="ed-acc" d="M222,702 V746" />
+              <text class="t-tiny" x="232" y="730">psycopg 3</text>
+              <path class="ed-acc" d="M564,702 V746" />
+              <text class="t-tiny" x="574" y="730">bytes on disk</text>
+              <path class="ed-acc" d="M837,702 V746" />
+              <text class="t-tiny" x="847" y="730">WAV ×2</text>
+
+              <!-- ===== DATA ===== -->
+              <rect class="bx-store" x="30" y="750" width="384" height="120" />
+              <text class="t-h" x="44" y="772" style="fill:var(--store)">POSTGRESQL 17</text>
+              <text class="t-mini" x="44" y="791">image pgvector/pgvector:pg17</text>
+              <text class="t-mini" x="44" y="807">container reep-postgres · host 5433 → 5432</text>
+              <text class="t-mini" x="44" y="823">database reep_py · 55 tables</text>
+              <text class="t-mini" x="44" y="839">CREATE EXTENSION vector (superuser, initdb)</text>
+              <text class="t-mini" x="44" y="855">volume reep_pgdata</text>
+
+              <rect class="bx-store" x="444" y="750" width="240" height="120" />
+              <text class="t-h" x="458" y="772" style="fill:var(--store)">UPLOAD STORE</text>
+              <text class="t-mini" x="458" y="791">UPLOAD_DIR → /var/reep/uploads</text>
+              <text class="t-mini" x="458" y="807">volume reep_uploads</text>
+              <text class="t-mini" x="458" y="823">PDF / PNG / JPEG only, ≤ 10 MB</text>
+              <text class="t-mini" x="458" y="839">typed by MAGIC BYTES, not filename</text>
+              <text class="t-mini" x="458" y="855">random stored_name — no traversal</text>
+
+              <rect class="bx-store" x="714" y="750" width="246" height="120" />
+              <text class="t-h" x="728" y="772" style="fill:var(--store)">INTERVIEW AUDIO — OFF</text>
+              <text class="t-mini" x="728" y="791">two independent switches, both false</text>
+              <text class="t-mini" x="728" y="807">INTERVIEW_RECORDING_ENABLED</text>
+              <text class="t-mini" x="728" y="823">AND a live scope_store_audio grant</text>
+              <text class="t-mini" x="728" y="839">2 WAV per interview, never mixed</text>
+              <text class="t-mini" x="728" y="855">≤ 64 MB, truncation flagged · 180 days</text>
+
+              <!-- worker -> api -->
+              <path class="ed" d="M429,906 V706" />
+              <text class="t-tiny" x="439" y="898">POST /api/voice/transcript · /api/voice/heartbeat  (X-Worker-Secret)</text>
+
+              <!-- ===== WORKER ===== -->
+              <rect class="bx-out" x="30" y="910" width="930" height="112" />
+              <text class="t-h" x="44" y="932">④ VOICE WORKER — OPTIONAL, SEPARATE PROCESS</text>
+              <text class="t-mini" x="44" y="951">python:3.12-slim in its own venv (livekit-agents declares Requires-Python &lt;3.15) · livekit-agents 1.6.10 · reads the same apps/api-py/.env</text>
+              <text class="t-mini" x="44" y="969">NO database driver, NO HTTP library — stdlib urllib only · heartbeat thread every ~15 s · final beat sends draining:true</text>
+              <text class="t-mini" x="44" y="990">cascade (not native speech-to-speech):  BVC noise-cancellation → Silero VAD → Groq whisper-large-v3-turbo → Groq llama-3.3-70b-versatile → Groq TTS</text>
+              <text class="t-mini" x="44" y="1008" style="fill:var(--guard)">retained and mounted, but NO UI caller — this is the rollback path, not dead code</text>
+
+              <path class="ed-ext" d="M960,924 H1096" />
+              <path class="ed-ext" d="M960,994 H1096" />
+
+              <!-- ===== EXTERNAL RAIL ===== -->
+              <rect class="bx-ext" x="1100" y="60" width="245" height="100" />
+              <text class="t-h" x="1112" y="82" style="fill:var(--ext)">GOOGLE IDENTITY</text>
+              <text class="t-mini" x="1112" y="101">accounts.google.com — authorize</text>
+              <text class="t-mini" x="1112" y="117">oauth2.googleapis.com/token</text>
+              <text class="t-mini" x="1112" y="133">JWKS — RS256 verification</text>
+              <text class="t-mini" x="1112" y="151">the users table is the allowlist</text>
+
+              <rect class="bx-ext" x="1100" y="180" width="245" height="104" />
+              <text class="t-h" x="1112" y="202" style="fill:var(--ext)">OPENAI REALTIME</text>
+              <text class="t-mini" x="1112" y="221">wss://api.openai.com/v1/realtime</text>
+              <text class="t-mini" x="1112" y="237">PCM16 24 kHz duplex</text>
+              <text class="t-mini" x="1112" y="253">server VAD, relay-driven turns</text>
+              <text class="t-mini" x="1112" y="269">the browser never talks to it</text>
+
+              <rect class="bx-ext" x="1100" y="304" width="245" height="250" />
+              <text class="t-h" x="1112" y="326" style="fill:var(--ext)">MODEL PROVIDERS</text>
+              <text class="t-mini" x="1112" y="345">OpenAI-compatible /chat/completions</text>
+              <text class="t-mini" x="1112" y="365">1  sakana      fugu-ultra</text>
+              <text class="t-mini" x="1112" y="381">2  groq        llama-3.3-70b-versatile</text>
+              <text class="t-mini" x="1112" y="397">3  mistral     mistral-small-latest</text>
+              <text class="t-mini" x="1112" y="413">4  openrouter  llama-3.3-70b:free</text>
+              <text class="t-mini" x="1112" y="429">5  gemini      gemini-2.5-flash</text>
+              <text class="t-mini" x="1112" y="445">6  cohere      command-r</text>
+              <text class="t-mini" x="1112" y="470">embeddings  mistral-embed</text>
+              <text class="t-mini" x="1112" y="492">— or an explicit LLM_BASE_URL —</text>
+              <text class="t-mini" x="1112" y="514" style="fill:var(--accent)">Ollama gemma3:12b @ 127.0.0.1:11434</text>
+              <text class="t-mini" x="1112" y="530" style="fill:var(--accent)">num_ctx 16384 · loopback</text>
+              <text class="t-mini" x="1112" y="546" style="fill:var(--accent)">⇒ always allowed by the gate</text>
+
+              <!-- legend -->
+              <rect class="bx" x="1100" y="584" width="245" height="290" />
+              <text class="t-h" x="1112" y="606">LEGEND</text>
+              <rect class="bx-accl" x="1112" y="620" width="26" height="16" />
+              <text class="t-mini" x="1148" y="632">a process we run</text>
+              <rect class="bx-store" x="1112" y="648" width="26" height="16" />
+              <text class="t-mini" x="1148" y="660">data at rest</text>
+              <rect class="bx-ext" x="1112" y="676" width="26" height="16" />
+              <text class="t-mini" x="1148" y="688">off-machine service</text>
+              <rect class="bx-out" x="1112" y="704" width="26" height="16" />
+              <text class="t-mini" x="1148" y="716">optional / dev-only</text>
+              <line class="ed-acc" x1="1112" y1="740" x2="1138" y2="740" />
+              <text class="t-mini" x="1148" y="744">internal call</text>
+              <line class="ed-ext" x1="1112" y1="766" x2="1138" y2="766" />
+              <text class="t-mini" x="1148" y="770">crosses the machine</text>
+              <line class="ed-guard" x1="1112" y1="792" x2="1138" y2="792" />
+              <text class="t-mini" x="1148" y="796">carries a credential</text>
+              <text class="t-mini" x="1112" y="826">Every arrow is labelled with what</text>
+              <text class="t-mini" x="1112" y="842">actually moves along it. Anything</text>
+              <text class="t-mini" x="1112" y="858">unlabelled would just mean</text>
+              <text class="t-mini" x="1112" y="874">"related somehow".</text>
+
+              <rect class="bx-ext" x="1100" y="894" width="245" height="60" />
+              <text class="t-h" x="1112" y="916" style="fill:var(--ext)">LIVEKIT SFU</text>
+              <text class="t-mini" x="1112" y="935">WebRTC rooms · room = identity =</text>
+              <text class="t-mini" x="1112" y="949">the server-owned conversation id</text>
+
+              <rect class="bx-ext" x="1100" y="966" width="245" height="56" />
+              <text class="t-h" x="1112" y="988" style="fill:var(--ext)">GROQ</text>
+              <text class="t-mini" x="1112" y="1006">whisper-large-v3-turbo · llama-3.3</text>
+              <text class="t-mini" x="1112" y="1020">70b-versatile · TTS — one key</text>
+
+              <!-- API -> rail -->
+              <path class="ed-guard" d="M960,410 H990 V236 H1096" />
+              <text class="t-tiny" transform="rotate(-90 982 330)" x="982" y="330" text-anchor="middle" style="fill:var(--guard)">Bearer OPENAI_API_KEY — never logged</text>
+
+              <path class="ed-ext" d="M960,470 H1020 V114 H1096" />
+              <text class="t-tiny" transform="rotate(-90 1012 300)" x="1012" y="300" text-anchor="middle">OIDC: code → token → JWKS verify</text>
+
+              <path class="ed-ext" d="M960,640 H1050 V429 H1096" />
+              <text class="t-tiny" transform="rotate(-90 1042 540)" x="1042" y="540" text-anchor="middle">POST /chat/completions — gated</text>
+
+              <path class="ed-ext" d="M960,690 H1080 V910 H1096" />
+              <text class="t-tiny" transform="rotate(-90 1072 800)" x="1072" y="800" text-anchor="middle">mint AccessToken (livekit-api)</text>
+            </svg>
+          </div>
+          <figcaption>
+            <b>Figure 1 — the whole machine.</b> The API process is the only one holding credentials: the
+            OpenAI key is attached to exactly one outbound socket and is never serialised downstream, echoed
+            in a browser-visible error, or logged (the <code>websockets</code> logger is pinned to INFO at
+            boot precisely because DEBUG prints that header). The voice worker holds no database driver at
+            all — it posts turns back over HTTP so persistence policy stays in one place.
+          </figcaption>
+        </figure>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>#</th><th>Process</th><th>Runtime</th><th>Required</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td class="n">1</td><td class="k">PostgreSQL 17 + pgvector</td><td class="k">container</td><td class="k">yes</td><td class="d"><code>docker compose up -d</code> — host port <b>5433</b> so it never collides with a local 5432</td></tr>
+              <tr><td class="n">2</td><td class="k">FastAPI API</td><td class="k">Python 3.14, <code>.venv</code></td><td class="k">yes</td><td class="d"><code>uvicorn app.main:app --port 3300</code>. Contains the interview relay.</td></tr>
+              <tr><td class="n">3</td><td class="k">Angular dev server</td><td class="k">Node 22, npm 11.16</td><td class="k">dev only</td><td class="d">production serves the built bundle statically behind the TLS proxy</td></tr>
+              <tr><td class="n">4</td><td class="k">LiveKit voice worker</td><td class="k">Python 3.12, <code>.venv-voice</code></td><td class="k">optional</td><td class="d">a student pressing “Start voice” with no worker running is the single most common “why is it broken” report</td></tr>
+              <tr><td class="n">—</td><td class="k">Ollama</td><td class="k">native</td><td class="k">optional</td><td class="d">loopback model; the one provider exempt from the egress gate by construction</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 02 ============ -->
+      <section id="web">
+        <h2><span class="num">02</span> Front end</h2>
+        <p class="deck">
+          Standalone components and signals throughout, no NgModules. The one structural rule is that
+          routes are lazy — and the bundle budget in CI is what keeps it true.
+        </p>
+
+        <div class="cols">
+          <div>
+            <h5>Bootstrap &amp; core</h5>
+            <ul>
+              <li>main.ts → bootstrapApplication</li>
+              <li>app.config.ts — router + HttpClient</li>
+              <li>core/auth.guard.ts <em>(eager)</em></li>
+              <li>core/auth.service.ts — signal&lt;SessionPayload&gt;</li>
+              <li>core/interview.service.ts</li>
+              <li>core/chat-voice.service.ts</li>
+              <li>core/theme.service.ts · session.ts</li>
+            </ul>
+          </div>
+          <div>
+            <h5>Feature chunks — all lazy</h5>
+            <ul>
+              <li>login · register</li>
+              <li>student/: overview academics certifications</li>
+              <li>skilling time-log courses records</li>
+              <li>leaderboards uploads jobs offers profile</li>
+              <li>student/resume — 17 section components</li>
+              <li>student/interviews — history + report card</li>
+              <li>assistant/ — one chunk, three routes</li>
+              <li>admin/ — the Main Admin console (was director/)</li>
+            </ul>
+          </div>
+          <div>
+            <h5>Design system</h5>
+            <ul>
+              <li>styles/reep-v2.scss — global classes</li>
+              <li>.card .dt-table .dense-*</li>
+              <li>.chip good / warn / risk / neutral</li>
+              <li>reep-theme.scss · reep-v2-resume.scss</li>
+              <li>shared/kit · icon · bar-chart</li>
+              <li>shared/voice-visualizer</li>
+              <li>status = text + colour, never colour alone</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Concern</th><th>Detail</th></tr></thead>
+            <tbody>
+              <tr><td class="k">Framework</td><td class="d">Angular <b>22.1</b> — standalone components, signals, ReactiveForms</td></tr>
+              <tr><td class="k">Build</td><td class="d"><code>@angular/build:application</code> (esbuild), TypeScript <code>~6.0.2</code>, <code>outputHashing: all</code></td></tr>
+              <tr><td class="k">Bundle budget</td><td class="d">initial warn <b>250 kB</b> / error <b>400 kB</b>; any component style 16 kB / 32 kB</td></tr>
+              <tr><td class="k">Why lazy matters</td><td class="d">every route was once a static <code>component:</code> reference → one <b>1.23 MB</b> main chunk. A student on a phone downloaded the mentor screens, the director screens, the resume builder and the assistant before the login form could paint.</td></tr>
+              <tr><td class="k">API access</td><td class="d"><code>fetch(`${environment.apiBase}/...`, { credentials: 'include' })</code>, <code>apiBase = '/api'</code></td></tr>
+              <tr><td class="k">Dev proxy</td><td class="d"><code>/api → http://localhost:3300</code>, <code>ws: true</code>, <code>changeOrigin: true</code> — same-origin, so no CORS friction on the cookie</td></tr>
+              <tr><td class="k">Realtime audio</td><td class="d"><code>AudioContext({ sampleRate: 24000 })</code> + AudioWorklet; drift-free resampling at 44100/24000</td></tr>
+              <tr><td class="k">Charts</td><td class="d">apexcharts 6.8 · ng-apexcharts 3.0</td></tr>
+              <tr><td class="k">Test &amp; format</td><td class="d">vitest 4 + jsdom 28 · prettier 3.8 · <code>npx ng test --watch=false</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 03 ============ -->
+      <section id="api">
+        <h2><span class="num">03</span> Back end</h2>
+        <p class="deck">
+          One FastAPI process, mounted so that everything the Angular client calls lives under a single
+          <code>/api</code> prefix — matching <code>environment.apiBase</code> and the dev proxy, with no
+          path rewriting anywhere.
+        </p>
+
+        <h3>Runtime pins — <code>requirements.txt</code>, exact <code>==</code></h3>
+        <p>
+          Pinned rather than bounded because <code>&gt;=</code> meant a rebuild three months later resolved a
+          dependency set nobody had run the suite against, and the first sign of it was a production-only
+          failure no one could reproduce.
+        </p>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Package</th><th>Version</th><th>Why it is pinned here</th></tr></thead>
+            <tbody>
+              <tr><td class="k">fastapi</td><td class="n">0.141.1</td><td class="d">app framework</td></tr>
+              <tr><td class="k">uvicorn[standard]</td><td class="n">0.52.3</td><td class="d">ASGI server; image runs <code>--timeout-graceful-shutdown 110</code></td></tr>
+              <tr class="hot"><td class="k">websockets</td><td class="n">15.0.1</td><td class="d">the relay uses <code>additional_headers=</code> (renamed in ≥14) and the modern asyncio client. A free resolver breaks it at <b>connect</b> time — surviving CI, failing on a student's first call.</td></tr>
+              <tr><td class="k">sqlalchemy</td><td class="n">2.0.52</td><td class="d">ORM, <code>Mapped[…]</code> style</td></tr>
+              <tr><td class="k">alembic</td><td class="n">1.19.1</td><td class="d">42 migrations</td></tr>
+              <tr><td class="k">pydantic / -settings</td><td class="n">2.13.4 / 2.15.0</td><td class="d">schemas and <code>Settings</code></td></tr>
+              <tr><td class="k">psycopg[binary]</td><td class="n">3.3.4</td><td class="d"><code>postgresql+psycopg://</code></td></tr>
+              <tr><td class="k">pgvector</td><td class="n">0.5.0</td><td class="d"><code>vector</code> column type + SQLAlchemy adapter</td></tr>
+              <tr><td class="k">pyjwt[crypto]</td><td class="n">2.13.0</td><td class="d">HS256 for our session <em>and</em> RS256 for Google's ID token — without <code>[crypto]</code> that fails at callback time only</td></tr>
+              <tr><td class="k">cryptography</td><td class="n">50.0.0</td><td class="d">pinned directly: it reaches this environment today only transitively</td></tr>
+              <tr><td class="k">python-multipart</td><td class="n">0.0.32</td><td class="d">uploads</td></tr>
+              <tr><td class="k">httpx</td><td class="n">0.28.1</td><td class="d">LLM calls, OAuth token exchange, JWKS fetch</td></tr>
+              <tr><td class="k">reportlab</td><td class="n">5.0.0</td><td class="d">resume PDF, rendered locally — no network, so the egress gate does not apply</td></tr>
+              <tr><td class="k">google-adk / litellm</td><td class="n">2.7.0 / 1.96.2</td><td class="d">agent framework, reaching non-Gemini providers</td></tr>
+              <tr><td class="k">livekit-api</td><td class="n">1.2.0</td><td class="d">mints room tokens for <code>/api/voice/token</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout calm">
+          <h4>Two requirements files, and the split is the point</h4>
+          <p>
+            <code>requirements-dev.txt</code> is <code>-r requirements.txt</code> plus <b>pytest 9.1.1</b> and
+            nothing else. The Dockerfile installs <code>requirements.txt</code> alone — a production image has
+            no reason to carry a test runner, and it is extra attack surface plus a bigger download for nothing.
+          </p>
+        </div>
+
+        <h3>Boot: gates before service</h3>
+        <ol class="ladder">
+          <li><b>Clamp the logs.</b> The <code>websockets</code> logger is pinned to INFO. At DEBUG the library prints the outbound handshake header by header and redacts nothing — and one of those headers carries <code>OPENAI_API_KEY</code>, beside student traffic, in whatever aggregator the deployment ships to.</li>
+          <li class="refuse"><b>Refuse repo credentials in production.</b> <code>production_boot_failures()</code> is raised from the lifespan, so uvicorn never binds a port and the log names every problem it found. It fires on an <code>AUTH_SECRET</code> that is blank, still the published value, an obvious placeholder, or shorter than 32 characters — and on a <code>DATABASE_URL</code> still carrying this repo's dev password.</li>
+          <li><b>Warn on an open voice ingress.</b> A blank <code>VOICE_WORKER_SECRET</code> on a non-development <code>ENV</code> leaves the heartbeat and transcript endpoints unauthenticated: a forged heartbeat makes voice report itself available with no worker behind it. A warning, not a refusal — most deployments never enable voice.</li>
+          <li><b>Sweep the orphans.</b> Any <code>interview_sessions</code> row a killed process left <code>running</code> is finalized, on a worker thread so a slow database degrades to “swept next restart”, never to “no dashboard”.</li>
+        </ol>
+
+        <div class="callout">
+          <h4>Why the boot guard is fatal and has no override flag</h4>
+          <p>
+            <code>AUTH_SECRET</code> signs the <code>reep_session</code> cookie. A production host running on the
+            repo default is one forged <code>{"role":"ADMIN"}</code> cookie away from every student's marks,
+            attendance and USN — no login, no Google round-trip, no database row involved. A warning about that
+            is a line in a log nobody reads.
+          </p>
+          <p>
+            And on every development <code>ENV</code> the check returns nothing at all. <code>test_boot_guard.py</code>
+            pins that just as hard as it pins the refusal: a guard that trips on a laptop gets deleted by whoever
+            is trying to ship that afternoon.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ 04 ============ -->
+      <section id="data">
+        <h2><span class="num">04</span> Data layer</h2>
+        <p class="deck">
+          55 tables, all declared in <code>apps/api-py/app/models/</code> — the schema's source of truth —
+          and each new module imported in <code>models/__init__.py</code> so Alembic autogenerate can see it.
+        </p>
+
+        <div class="chips">
+          <span class="chip">academic_gaps</span>
+          <span class="chip">academic_qualifications</span>
+          <span class="chip">agent_runs</span>
+          <span class="chip">alert_rule_configs</span>
+          <span class="chip">alerts</span>
+          <span class="chip">assistant_feedback</span>
+          <span class="chip">attendance_records</span>
+          <span class="chip">certification_progress</span>
+          <span class="chip">certifications</span>
+          <span class="chip">cohorts</span>
+          <span class="chip hi">conversations</span>
+          <span class="chip">courses</span>
+          <span class="chip">email_verifications</span>
+          <span class="chip gd">english_baseline_sections</span>
+          <span class="chip gd">english_baselines</span>
+          <span class="chip">enrollments</span>
+          <span class="chip gd">interview_consents</span>
+          <span class="chip gd">interview_evaluations</span>
+          <span class="chip gd">interview_sessions</span>
+          <span class="chip gd">interview_turns</span>
+          <span class="chip">job_applications</span>
+          <span class="chip">job_import_runs</span>
+          <span class="chip">jobs</span>
+          <span class="chip hi">knowledge_chunks</span>
+          <span class="chip hi">knowledge_documents</span>
+          <span class="chip">lab_sessions</span>
+          <span class="chip">leave_requests</span>
+          <span class="chip">login_days</span>
+          <span class="chip">mail_logs</span>
+          <span class="chip">mentor_notes</span>
+          <span class="chip">mentors</span>
+          <span class="chip hi">messages</span>
+          <span class="chip">mock_attempts</span>
+          <span class="chip">placement_criteria</span>
+          <span class="chip">placement_offers</span>
+          <span class="chip">registration_rules</span>
+          <span class="chip">registrations</span>
+          <span class="chip">resume_profiles</span>
+          <span class="chip">resumes</span>
+          <span class="chip">schedule_items</span>
+          <span class="chip">semester_results</span>
+          <span class="chip">skill_claims</span>
+          <span class="chip">skills</span>
+          <span class="chip gd">student_milestones</span>
+          <span class="chip">student_profiles</span>
+          <span class="chip">student_skills</span>
+          <span class="chip">students</span>
+          <span class="chip">subject_marks</span>
+          <span class="chip">swoc_entries</span>
+          <span class="chip gd">time_ledger_cells</span>
+          <span class="chip gd">time_ledger_days</span>
+          <span class="chip">time_sheet_entries</span>
+          <span class="chip">uploads</span>
+          <span class="chip">users</span>
+          <span class="chip">voice_worker_heartbeats</span>
+        </div>
+
+        <h3>Knowledge base — hybrid retrieval, and it degrades honestly</h3>
+        <figure>
+          <div class="figframe">
+            <svg class="dg" viewBox="0 0 940 300" role="img"
+                 aria-label="A query fans out to Postgres full-text ranking and pgvector cosine search; the vector arm is gated by a maximum cosine distance of 0.32, and the two are blended fifty-fifty. With no embedder configured only the full-text arm runs.">
+              <rect class="bx" x="20" y="118" width="150" height="58" />
+              <text class="t-lab t-c" x="95" y="144">question text</text>
+              <text class="t-mini t-c" x="95" y="162">(no PII leaves to route it)</text>
+
+              <path class="ed" d="M170,132 H250" />
+              <path class="ed" d="M170,162 H250" />
+
+              <rect class="bx-acc" x="252" y="60" width="270" height="80" />
+              <text class="t-lab" x="266" y="84" style="font-weight:700">Postgres full-text</text>
+              <text class="t-mini" x="266" y="103">ts_rank over to_tsvector('english', …)</text>
+              <text class="t-mini" x="266" y="121">always runs — the KB never stops working</text>
+
+              <rect class="bx-acc" x="252" y="156" width="270" height="96" />
+              <text class="t-lab" x="266" y="180" style="font-weight:700">pgvector cosine</text>
+              <text class="t-mini" x="266" y="199">ORDER BY embedding &lt;=&gt; :query_vec</text>
+              <text class="t-mini" x="266" y="217">dimensionless `vector` column</text>
+              <text class="t-mini" x="266" y="235">embedder: EMBEDDING_* else mistral-embed</text>
+
+              <path class="ed-guard" d="M522,204 H600" />
+              <rect class="bx-guard" x="602" y="170" width="150" height="68" />
+              <text class="t-mini t-c" x="677" y="194" style="fill:var(--guard);font-weight:700">DISTANCE FLOOR</text>
+              <text class="t-mini t-c" x="677" y="212">cosine ≤ 0.32</text>
+              <text class="t-mini t-c" x="677" y="230">or the match is dropped</text>
+
+              <path class="ed-acc" d="M522,100 H790 V128" />
+              <path class="ed-acc" d="M752,204 H790 V176" />
+
+              <rect class="bx-accl" x="700" y="128" width="220" height="48" />
+              <text class="t-lab t-c" x="810" y="150" style="font-weight:700">0.5 · cosine + 0.5 · ts_rank</text>
+              <text class="t-mini t-c" x="810" y="167">blended score</text>
+
+              <text class="t-mini" x="252" y="278" style="fill:var(--ink-3)">no embedder configured ⇒ full-text only · an off-topic query hits the honest “no approved answer” fallback instead of its nearest neighbour</text>
+            </svg>
+          </div>
+          <figcaption>
+            <b>Figure 2 — why the floor exists.</b> Vector KNN <em>always</em> returns a nearest chunk, however
+            unrelated. Gating on cosine distance is what preserves the honest refusal. KB content is approved
+            public policy text, which is why embedding it sits outside the student-data egress gate.
+          </figcaption>
+        </figure>
+
+        <div class="callout">
+          <h4>Alembic enum gotchas — hit repeatedly, so they are written down</h4>
+          <p><b>a.</b> Adding an enum <em>column</em> to an existing table does not auto-<code>CREATE TYPE</code> — create it first.</p>
+          <p><b>b.</b> A <em>new table</em> reusing an <em>existing</em> enum must use <code>postgresql.ENUM(..., name='x', create_type=False)</code>; autogenerate emits a bare <code>sa.Enum</code> that errors “type already exists”. Hand-fix it.</p>
+          <p><b>c.</b> Two columns sharing one enum reuse a single <code>Enum</code> instance.</p>
+        </div>
+      </section>
+
+      <!-- ============ 05 ============ -->
+      <section id="auth">
+        <h2><span class="num">05</span> Identity &amp; scope</h2>
+        <p class="deck">
+          Sign-in is Google, for every role, and the roster is the access control. What Google issues is the
+          same session the password path issued — byte for byte — so the <code>require_*</code> dependencies
+          cannot tell the two apart, and did not change.
+        </p>
+
+        <ol class="ladder">
+          <li><b>GET /api/auth/sso/status</b> — a blank client id makes the login screen's Google button render <em>disabled, with the reason</em>. Nothing else is affected.</li>
+          <li><b>GET /api/auth/sso/google</b> → 302 to Google, setting a single-use <code>state</code> cookie (its key derived from <code>AUTH_SECRET</code>) and a nonce.</li>
+          <li><b>Callback</b> — state cookie checked, then a server-to-server code exchange at <code>oauth2.googleapis.com/token</code>.</li>
+          <li><b>Verify the ID token properly</b> — RS256 signature against Google's JWKS, <code>aud</code> = our client id, <code>iss</code> = accounts.google.com, unexpired, <code>email_verified</code> true, nonce matches.</li>
+          <li class="refuse"><b>Look the verified email up in <code>users</code>.</b> No matching row ⇒ <code>302 /login?error=sso_not_enrolled</code>. Nothing self-provisions and no role is ever guessed. <code>GOOGLE_ALLOWED_DOMAIN</code> is a label, not a fence — the row is the whole of the access control.</li>
+          <li><b>Issue the session</b> — HS256 JWT, 12 h, claims <code>userId, email, name, role, studentId?, mentorId?</code>, in the httpOnly <code>reep_session</code> cookie, <code>Secure</code> on every non-development <code>ENV</code>.</li>
+        </ol>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Element</th><th>Detail</th></tr></thead>
+            <tbody>
+              <tr><td class="k">Passwords</td><td class="d"><code>scrypt:&lt;salt_hex&gt;:&lt;digest_hex&gt;</code>, N=16384 r=8 p=1 dklen=64, salt passed as its hex <b>string</b> — exactly what Node's <code>scryptSync</code> does, so hashes migrated without a reset</td></tr>
+              <tr><td class="k">Revocation</td><td class="d"><code>users.token_version</code> rides in the token. <code>AUTH_REVOCATION_CACHE_SECONDS</code> (default 60) bounds how long a logged-out token still works; a DB read failure <b>admits</b> the session and logs — fails open on purpose.</td></tr>
+              <tr class="hot"><td class="k">Password login</td><td class="d"><code>POST /api/auth/login</code> is kept and refused with 403 in production. The guard is <code>settings.password_login_allowed</code> — an <b>allowlist of dev/CI environment names</b>, not <code>not is_prod</code>, so an unrecognised <code>ENV</code> (“staging”, “uat”, a typo, a blank from a half-written deploy template) shuts the password door rather than opening it. Six test modules authenticate through it, so deleting it would take the DB-backed suite and CI with it.</td></tr>
+              <tr><td class="k">Roster</td><td class="d"><code>python -m app.seed_roster</code> derives the email from the USN — <code>1MP25MDM01 → 1mp25mdm01@bgscet.ac.in</code> — so a student's USN is already on their profile and they never type it. <code>--rekey-domain</code> moves an already-seeded batch.</td></tr>
+              <tr><td class="k">Docs surface</td><td class="d"><code>/docs</code>, <code>/redoc</code>, <code>/openapi.json</code> follow <code>docs_exposed</code>: on in dev, off in production unless <code>DOCS_ENABLED</code> is set deliberately. Not a security control — the endpoints stay authenticated — but an open schema hands out the <b>map</b>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Rule 2 — staff scope is decided by role, never by a missing field</h3>
+        <figure>
+          <div class="figframe">
+            <svg class="dg" viewBox="0 0 960 330" role="img"
+                 aria-label="A request's session cookie resolves to a role. require_mentor admits MENTOR (Faculty) and ADMIN (the Main Admin); narrowing to students goes through _assert_can_access_student, where a MENTOR sees only their own group and a MENTOR with no group sees nobody, while the Main Admin (ADMIN) sees all students.">
+              <rect class="bx" x="20" y="132" width="150" height="56" />
+              <text class="t-lab t-c" x="95" y="156">request +</text>
+              <text class="t-lab t-c" x="95" y="174">reep_session</text>
+
+              <path class="ed" d="M170,160 H236" />
+
+              <rect class="bx" x="238" y="122" width="176" height="76" />
+              <text class="t-lab t-c" x="326" y="146" style="font-weight:700">identity.py</text>
+              <text class="t-mini t-c" x="326" y="165">get_current_session (HTTP)</text>
+              <text class="t-mini t-c" x="326" y="183">get_ws_session (WebSocket)</text>
+
+              <path class="ed" d="M414,144 H478" />
+              <path class="ed" d="M414,180 H478" />
+
+              <rect class="bx-acc" x="480" y="42" width="200" height="72" />
+              <text class="t-lab t-c" x="580" y="66" style="font-weight:700">require_admin</text>
+              <text class="t-mini t-c" x="580" y="85">ADMIN ✓ only</text>
+              <text class="t-mini t-c" x="580" y="103">everything else 403</text>
+
+              <rect class="bx-acc" x="480" y="128" width="200" height="72" />
+              <text class="t-lab t-c" x="580" y="152" style="font-weight:700">require_mentor</text>
+              <text class="t-mini t-c" x="580" y="171">MENTOR ✓ ADMIN ✓</text>
+              <text class="t-mini t-c" x="580" y="189">admits staff, not a scope</text>
+
+              <path class="ed" d="M580,200 V244 H620" />
+              <rect class="bx-guard" x="330" y="232" width="290" height="72" />
+              <text class="t-lab t-c" x="475" y="256" style="font-weight:700;fill:var(--guard)">_assert_can_access_student()</text>
+              <text class="t-mini t-c" x="475" y="275">routers/mentor.py — the actual narrowing</text>
+              <text class="t-mini t-c" x="475" y="293">reads the Mentor group, never a blank field</text>
+
+              <path class="ed-acc" d="M680,78 H780 V150 H756" />
+              <rect class="bx" x="700" y="128" width="240" height="52" />
+              <text class="t-lab t-c" x="820" y="152">ADMIN · the Main Admin</text>
+              <text class="t-mini t-c" x="820" y="170">all students</text>
+
+              <path class="ed-guard" d="M620,268 H698" />
+              <rect class="bx-guard" x="700" y="222" width="240" height="86" />
+              <text class="t-lab t-c" x="820" y="246" style="fill:var(--guard);font-weight:700">MENTOR · Faculty</text>
+              <text class="t-mini t-c" x="820" y="265">only students in their own group</text>
+              <text class="t-mini t-c" x="820" y="285" style="fill:var(--guard)">no group ⇒ NOBODY</text>
+              <text class="t-mini t-c" x="820" y="302">never “the whole programme”</text>
+            </svg>
+          </div>
+          <figcaption>
+            <b>Figure 3 — the difference that matters.</b> <code>require_mentor</code> answers “is this staff?”,
+            not “which students?”. Reading an empty mentor group as “unfiltered” is the failure this split
+            exists to prevent.
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ 06 ============ -->
+      <section id="gate">
+        <h2><span class="num">06</span> The student-data egress gate</h2>
+        <p class="deck">
+          <code>LLM_BASE_URL</code> is a URL, not a promise — it may point at a free model that trains on
+          submissions. A resume brief carries a student's name, USN, marks and attendance.
+        </p>
+
+        <figure>
+          <div class="figframe">
+            <svg class="dg" viewBox="0 0 900 480" role="img"
+                 aria-label="Any path carrying student PII must call complete_chat with carries_student_data set. The gate allows loopback hosts always, and remote hosts only when LLM_ALLOW_REMOTE_STUDENT_DATA is true; otherwise it refuses before anything leaves the process and the resume is composed deterministically.">
+              <rect class="bx" x="290" y="20" width="320" height="58" />
+              <text class="t-lab t-c" x="450" y="43">any path carrying a student's</text>
+              <text class="t-mini t-c" x="450" y="63">name · USN · marks · attendance · resume text</text>
+
+              <path class="ed" d="M450,78 V112" />
+
+              <rect class="bx-accl" x="270" y="114" width="360" height="62" />
+              <text class="t-lab t-c" x="450" y="138" style="font-weight:700">complete_chat(… carries_student_data=True)</text>
+              <text class="t-mini t-c" x="450" y="158">or stream_chat(…) — apps/api-py/app/ai/llm.py</text>
+
+              <path class="ed" d="M450,176 V210" />
+
+              <rect class="bx" x="300" y="212" width="300" height="54" />
+              <text class="t-lab t-c" x="450" y="234">llm_config() → base_url</text>
+              <text class="t-mini t-c" x="450" y="253">explicit LLM_BASE_URL, else first configured provider</text>
+
+              <path class="ed" d="M450,266 V292" />
+
+              <polygon class="bx-guard" points="300,294 600,294 636,330 600,366 300,366 264,330" />
+              <text class="t-lab t-c" x="450" y="326" style="font-weight:700">student_data_egress_allowed(base_url)</text>
+              <text class="t-mini t-c" x="450" y="346">evaluated before a single byte is written to the socket</text>
+
+              <path class="ed-guard" d="M264,330 H150 V404" />
+              <text class="t-tiny" x="120" y="322">remote, flag unset</text>
+              <path class="ed-acc" d="M636,330 H752 V404" />
+              <text class="t-tiny t-e" x="782" y="322">loopback, or flag true</text>
+
+              <rect class="bx-guard" x="20" y="406" width="380" height="66" />
+              <text class="t-lab" x="34" y="428" style="font-weight:700;fill:var(--guard)">REFUSED — StudentDataEgressRefused</text>
+              <text class="t-mini" x="34" y="446">nothing left the process. /student/resume/generate</text>
+              <text class="t-mini" x="34" y="463">composes deterministically and says so: used_ai=false</text>
+
+              <rect class="bx-acc" x="500" y="406" width="380" height="66" />
+              <text class="t-lab" x="514" y="428" style="font-weight:700;fill:var(--accent)">ALLOWED</text>
+              <text class="t-mini" x="514" y="446">hostname ∈ {127.0.0.1, localhost, ::1, 0.0.0.0}</text>
+              <text class="t-mini" x="514" y="463">OR LLM_ALLOW_REMOTE_STUDENT_DATA=true → POST /chat/completions</text>
+            </svg>
+          </div>
+          <figcaption>
+            <b>Figure 4 — refusal is a feature, not an error path.</b> Public data (a job posting, an approved
+            knowledge chunk) does not need the gate; a student's private record does. Route every <em>new</em>
+            student-PII-to-model path through it. <code>resume_pdf.py</code> renders locally with ReportLab —
+            no network, so the gate does not apply, and nothing remote may be added to that module.
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ 07 ============ -->
+      <section id="interview">
+        <h2><span class="num">07</span> The mock interviewer — Interview Engine v3</h2>
+        <p class="deck">
+          <code>/student/assistant</code> is a WebSocket to <code>/api/interview</code> relaying 24 kHz PCM to
+          the OpenAI Realtime API and back, <em>inside</em> the API process. The v3 change is structural: the
+          relay owns the turn.
+        </p>
+
+        <figure>
+          <div class="figframe">
+            <svg class="dg" viewBox="0 0 1120 660" role="img"
+                 aria-label="Sequence of one interview turn across three lanes. The browser sends PCM frames; the relay forwards them, waits for the transcript on a deadline, applies a word-count gate, ticks the phase machine, sends an instructions-only session update, then issues exactly one response.create; audio deltas return to the browser and turns are persisted fire-and-forget.">
+              <rect class="bx" x="40" y="20" width="240" height="46" />
+              <text class="t-lab t-c" x="160" y="49" style="font-weight:700">BROWSER</text>
+              <rect class="bx-accl" x="400" y="20" width="320" height="46" />
+              <text class="t-lab t-c" x="560" y="49" style="font-weight:700;fill:var(--accent)">RELAY (in the API process)</text>
+              <rect class="bx-ext" x="840" y="20" width="240" height="46" />
+              <text class="t-lab t-c" x="960" y="49" style="font-weight:700;fill:var(--ext)">OPENAI REALTIME</text>
+
+              <line class="life" x1="160" y1="66" x2="160" y2="600" />
+              <line class="life" x1="560" y1="66" x2="560" y2="600" />
+              <line class="life" x1="960" y1="66" x2="960" y2="600" />
+
+              <rect class="bx-guard" x="404" y="80" width="312" height="34" />
+              <text class="t-mini t-c" x="560" y="102" style="fill:var(--guard)">handshake: turn_detection.create_response = false</text>
+
+              <path class="ed" d="M160,146 H556" />
+              <text class="t-tiny" x="172" y="140">PCM16 24 kHz frames (binary)</text>
+
+              <path class="ed-ext" d="M560,182 H956" />
+              <text class="t-tiny" x="572" y="176">input_audio_buffer.append</text>
+
+              <path class="ed-ext" d="M960,222 H564" />
+              <text class="t-tiny t-e" x="948" y="216">speech_stopped · input_audio_buffer.committed</text>
+
+              <path class="ed-ext" d="M960,262 H564" />
+              <text class="t-tiny t-e" x="948" y="256">conversation.item.input_audio_transcription.completed | .failed</text>
+
+              <path class="ed-acc" d="M560,290 H660 V318 H564" />
+              <text class="t-tiny" x="672" y="300">wait on a deadline — 8 000 ms</text>
+              <text class="t-tiny" x="672" y="314">(a wait nobody bounds is an interview that never continues)</text>
+
+              <path class="ed-acc" d="M560,346 H660 V374 H564" />
+              <text class="t-tiny" x="672" y="356">deterministic word-count gate: ≥ 4 words</text>
+              <text class="t-tiny" x="672" y="370">no hot-path model call to judge an answer</text>
+
+              <path class="ed-acc" d="M560,402 H660 V430 H564" />
+              <text class="t-tiny" x="672" y="420">phase machine .advance() on an ACCEPTED answer</text>
+
+              <path class="ed-ext" d="M560,466 H956" />
+              <text class="t-tiny" x="572" y="460">session.update — instructions only (phase directive)</text>
+
+              <path class="ed-guard" d="M560,506 H956" />
+              <rect class="bx-guard" x="600" y="482" width="290" height="20" />
+              <text class="t-tiny t-c" x="745" y="496" style="fill:var(--guard);font-weight:700">response.create — THE ONE CALL SITE</text>
+
+              <path class="ed-ext" d="M960,544 H564" />
+              <text class="t-tiny t-e" x="948" y="538">response audio deltas</text>
+
+              <path class="ed" d="M560,580 H164" />
+              <text class="t-tiny t-e" x="548" y="574">deltas → playback scheduler</text>
+
+              <rect class="bx-flat" x="40" y="612" width="1040" height="34" />
+              <text class="t-mini" x="54" y="634">fire-and-forget after every turn: messages(channel='interview') + interview_turns — a bad write must never kill a live call, so a drop logs “Dropped interview turn”</text>
+            </svg>
+          </div>
+          <figcaption>
+            <b>Figure 5 — why one call site is the whole design.</b> Upstream used to ask the next question by
+            itself the moment the student stopped speaking, which made the phase directive structurally one
+            response late and let a cough create a question. With <code>create_response: false</code> and a
+            single <code>response.create</code>, “one open question at a time” becomes a property of the call
+            graph rather than a sentence in the persona. <b>If a second call site ever appears after the
+            handshake, that invariant is gone and no test will notice.</b>
+          </figcaption>
+        </figure>
+
+        <h3>The arc, and who is asking</h3>
+        <figure>
+          <div class="figframe">
+            <svg class="dg" viewBox="0 0 980 250" role="img"
+                 aria-label="Phase state machine: opening advances to probing, probing to deep dive, deep dive to wrap up, and wrap up to ended; opening, probing and deep dive can also jump straight to wrap up or to ended.">
+              <rect class="bx-acc" rx="4" x="20" y="76" width="150" height="52" />
+              <text class="t-lab t-c" x="95" y="100" style="font-weight:700">opening</text>
+              <text class="t-mini t-c" x="95" y="117">intro + sample Q</text>
+
+              <rect class="bx-acc" rx="4" x="220" y="76" width="150" height="52" />
+              <text class="t-lab t-c" x="295" y="100" style="font-weight:700">probing</text>
+              <text class="t-mini t-c" x="295" y="117">framework follow-ups</text>
+
+              <rect class="bx-acc" rx="4" x="420" y="76" width="150" height="52" />
+              <text class="t-lab t-c" x="495" y="100" style="font-weight:700">deep_dive</text>
+              <text class="t-mini t-c" x="495" y="117">one hard scenario</text>
+
+              <rect class="bx-acc" rx="4" x="620" y="76" width="150" height="52" />
+              <text class="t-lab t-c" x="695" y="100" style="font-weight:700">wrap_up</text>
+              <text class="t-mini t-c" x="695" y="117">spoken verdict, no new Qs</text>
+
+              <rect class="bx" rx="4" x="830" y="76" width="130" height="52" />
+              <text class="t-lab t-c" x="895" y="106" style="font-weight:700">ended</text>
+
+              <path class="ed-acc" d="M170,102 H216" />
+              <path class="ed-acc" d="M370,102 H416" />
+              <path class="ed-acc" d="M570,102 H616" />
+              <path class="ed-acc" d="M770,102 H826" />
+              <text class="t-tiny t-c" x="193" y="94">accepted</text>
+              <text class="t-tiny t-c" x="393" y="94">accepted</text>
+              <text class="t-tiny t-c" x="593" y="94">accepted</text>
+
+              <path class="ed-dash" d="M95,128 V172 H695 V132" />
+              <text class="t-tiny" x="120" y="166">force_wrap_up — cap reached, or the student ends it</text>
+
+              <path class="ed-dash" d="M295,128 V208 H895 V132" />
+              <text class="t-tiny" x="320" y="202">any phase → ended on close, at any time</text>
+
+              <text class="t-mini" x="20" y="42">the student picks a specialization; the client sends it as ?specialization= on the handshake</text>
+              <text class="t-mini" x="20" y="60" style="fill:var(--guard)">no param ⇒ the generic interview, which never reaches wrap-up and so never produces a report · an unknown key ⇒ close 4010</text>
+            </svg>
+          </div>
+          <figcaption>
+            <b>Figure 6 — the arc advances on <em>accepted</em> answers only</b>, steered by an
+            instructions-only <code>session.update</code> per phase change.
+          </figcaption>
+        </figure>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Key</th><th>Label</th><th>Persona the model is given</th></tr></thead>
+            <tbody>
+              <tr><td class="k">hr</td><td class="k">Human Resources</td><td class="d">a senior HR / people-function interviewer</td></tr>
+              <tr><td class="k">dm</td><td class="k">Digital Marketing</td><td class="d">a growth-oriented, data-driven Chief Marketing Officer</td></tr>
+              <tr><td class="k">ba</td><td class="k">Business Analytics</td><td class="d">a highly technical, problem-solving Director of Analytics</td></tr>
+              <tr><td class="k">fa</td><td class="k">Financial Analytics</td><td class="d">a sharp, risk-conscious Managing Director / CFO</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout calm">
+          <h4>What is composed into the model's instructions</h4>
+          <p>
+            The base persona <b>verbatim</b>, plus a fixed specialization block, a phase directive and a fixed
+            clarification override. <b>No student transcript is ever composed into them.</b> That is a guardrail
+            of shape rather than of necessity — the moment student text goes into an instruction string, the
+            next editor puts a resume there.
+          </p>
+        </div>
+
+        <h3>Close-code vocabulary — one list, mirrored by the client</h3>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Code</th><th>Meaning</th><th>Why it is its own number</th></tr></thead>
+            <tbody>
+              <tr><td class="n">1000</td><td class="k">interview complete</td><td class="d">the normal end</td></tr>
+              <tr><td class="n">1001</td><td class="k">server shutting down</td><td class="d">lifespan backstop, honestly labelled</td></tr>
+              <tr><td class="n">1011</td><td class="k">internal error</td><td class="d">our side</td></tr>
+              <tr><td class="n">1012</td><td class="k">restarting</td><td class="d">uvicorn queues this before lifespan shutdown; the client already has a sentence for it</td></tr>
+              <tr><td class="n">1013</td><td class="k">worker at capacity</td><td class="d"><code>INTERVIEW_MAX_SESSIONS</code> = 100</td></tr>
+              <tr><td class="n">4001</td><td class="k">not configured / upstream 401</td><td class="d">blank <code>OPENAI_API_KEY</code></td></tr>
+              <tr><td class="n">4002</td><td class="k">upstream unavailable</td><td class="d">403 / 429 / 5xx / handshake — “retry shortly”</td></tr>
+              <tr><td class="n">4003</td><td class="k">forbidden origin</td><td class="d">not in <code>WEB_ORIGIN</code></td></tr>
+              <tr><td class="n">4008</td><td class="k">idle</td><td class="d">no inbound audio for <code>INTERVIEW_IDLE_SECONDS</code> = 120</td></tr>
+              <tr><td class="n">4009</td><td class="k">wall-clock cap</td><td class="d"><code>INTERVIEW_MAX_SECONDS</code> = 900</td></tr>
+              <tr><td class="n">4010</td><td class="k">unknown specialization</td><td class="d">refused rather than silently generic</td></tr>
+              <tr><td class="n">4011</td><td class="k">turn stalled</td><td class="d">deliberately not 4002 — a working socket on which <em>our</em> sequencing came apart. Different diagnosis, different sentence.</td></tr>
+              <tr><td class="n">4012</td><td class="k">your other interview is open</td><td class="d">deliberately not 1013 — “everyone is affected” reads as a capacity incident where there is none</td></tr>
+              <tr class="hot"><td class="n">4013</td><td class="k">consent required</td><td class="d">refused <b>before anything is written</b></td></tr>
+              <tr class="hot"><td class="n">4014</td><td class="k">consent revoked mid-interview</td><td class="d">the heartbeat notices within a minute</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Three layers close the record, one predicate makes them safe</h3>
+        <figure>
+          <div class="figframe">
+            <svg class="dg" viewBox="0 0 940 300" role="img"
+                 aria-label="Three independent finalizers — the relay's own, the router's finally backstop, and retention's boot-time orphan sweeper — all issue the same update guarded by status equals running, which makes them idempotent against each other.">
+              <rect class="bx-acc" x="20" y="20" width="380" height="66" />
+              <text class="t-lab" x="34" y="43" style="font-weight:700">Layer 1 — the relay's own finalizer</text>
+              <text class="t-mini" x="34" y="61">normal end: writes the terminal status and the audio_* columns</text>
+              <text class="t-mini" x="34" y="78">in the SAME update, never a second write that could fail alone</text>
+
+              <rect class="bx-acc" x="20" y="102" width="380" height="66" />
+              <text class="t-lab" x="34" y="125" style="font-weight:700">Layer 2 — the router's finally: backstop</text>
+              <text class="t-mini" x="34" y="143">exception, disconnect, anything the relay did not handle</text>
+              <text class="t-mini" x="34" y="160">still needs this process to be alive</text>
+
+              <rect class="bx-acc" x="20" y="184" width="380" height="82" />
+              <text class="t-lab" x="34" y="207" style="font-weight:700">Layer 3 — retention's orphan sweeper</text>
+              <text class="t-mini" x="34" y="225">runs once per boot: kill -9, OOM, a container cut mid-interview</text>
+              <text class="t-mini" x="34" y="242">grace INTERVIEW_ORPHAN_GRACE_SECONDS = 1200 makes it safe</text>
+              <text class="t-mini" x="34" y="259">to run with other workers live (a healthy heartbeat is ~1 min old)</text>
+
+              <path class="ed-acc" d="M400,53 H520 V128" />
+              <path class="ed-acc" d="M400,135 H516" />
+              <path class="ed-acc" d="M400,225 H520 V152" />
+
+              <rect class="bx-guard" x="520" y="98" width="400" height="76" />
+              <text class="t-lab t-c" x="720" y="124" style="font-weight:700;fill:var(--guard)">UPDATE interview_sessions …</text>
+              <text class="t-lab t-c" x="720" y="146" style="font-weight:700;fill:var(--guard)">WHERE status = 'running'</text>
+              <text class="t-mini t-c" x="720" y="165">one predicate ⇒ all three are idempotent against each other</text>
+
+              <path class="ed" d="M720,174 V216" />
+              <text class="t-mini t-c" x="720" y="238">a `running` row that is never closed is worse than no row —</text>
+              <text class="t-mini t-c" x="720" y="256">it is a record that lies, on a student's history screen,</text>
+              <text class="t-mini t-c" x="720" y="274">sitting next to their real interviews</text>
+            </svg>
+          </div>
+          <figcaption>
+            <b>Figure 7 — nothing here is a retry of the others.</b> Layers 1 and 2 both need this process to
+            survive; only Layer 3 covers the process that was killed. Startup is where it belongs — a worker
+            that has just booted is precisely the process that knows the previous one died.
+          </figcaption>
+        </figure>
+
+        <div class="cols">
+          <div>
+            <h5>Consent is a row, not a claim</h5>
+            <p>
+              Three separate booleans — live AI, store transcript, store audio — because they are three
+              different disclosures and one boolean makes “they consented” unfalsifiable.
+              <code>interview_sessions.consent_id</code> pins the exact grant, so <em>“was this student
+              consented, to what wording, at the time of interview X”</em> stays answerable after it has
+              been revoked.
+            </p>
+          </div>
+          <div>
+            <h5>Two directions of failure, chosen deliberately</h5>
+            <p>
+              Opening fails <b>closed</b> (4013) and the mid-interview check fails <b>open</b> (only a real
+              revocation closes with 4014). “We could not check whether they agreed” must never <em>start</em>
+              an interview — and a database hiccup must never <em>end</em> one that a real grant authorised.
+            </p>
+          </div>
+          <div>
+            <h5>The four record tables</h5>
+            <p>
+              <code>interview_sessions</code> (terminal status, phase reached, <code>turns_emitted</code> vs
+              <code>turns_persisted</code>, the consent grant), <code>interview_turns</code> (phase, whether the
+              transcriber heard it, whether it advanced the arc — an empty <code>content</code> is legal and
+              means exactly that), <code>interview_evaluations</code> (<b>nullable</b> scores: a missing score
+              and a zero mean opposite things to a mentor), <code>interview_consents</code>.
+            </p>
+          </div>
+          <div>
+            <h5>Audio, and the column you must branch on</h5>
+            <p>
+              Two WAVs per interview, one per speaker, <b>never mixed</b> — the two directions are not
+              time-aligned. PCM16 LE mono 24 kHz already crosses the relay, so stdlib <code>wave</code> writes
+              the 44-byte header and nothing is encoded. Branch on
+              <code>interview_sessions.audio_recorded</code>, <b>never</b> on <code>audio_path IS NOT NULL</code>
+              — a NULL path collapses four different facts into one.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 08 ============ -->
+      <section id="voice">
+        <h2><span class="num">08</span> Voice stack — retained, mounted, no UI caller</h2>
+        <p class="deck">
+          The LiveKit cascade and the text orchestrator behind <code>POST /api/agent/ask</code> are the
+          rollback path, not dead code. Do not run the voice worker expecting a button, and do not delete
+          either until the interviewer has held up in front of real students.
+        </p>
+
+        <div class="callout">
+          <h4>Runbook — the call sounded fine and saved nothing</h4>
+          <p>
+            The worst failure mode in this stack is silent: the conversation is perfect in the room and empty
+            in the database, because transcript POSTs are <em>deliberately</em> fire-and-forget so a bad write
+            can never kill a live call.
+          </p>
+        </div>
+
+<pre><span class="cm">-- after a test call:</span>
+select channel, count(*), max(created_at) from messages group by channel;</pre>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Symptom</th><th>Cause, in order of likelihood</th><th>Now visible as</th></tr></thead>
+            <tbody>
+              <tr><td class="k">no <code>voice</code> rows,<br>or a stale max(created_at)</td><td class="d"><b>1.</b> <code>VOICE_WORKER_SECRET</code> differs between the API and the worker → every POST 401s. The worker still connects to LiveKit and answers normally, so nothing looks wrong from the outside.</td><td class="d"><code>ERROR POST /api/voice/transcript -&gt; HTTP 401: …</code> — with the status code, where it used to be one WARNING folding every cause into a line</td></tr>
+              <tr><td class="k"></td><td class="d"><b>2.</b> <code>REEP_API_URL</code> is wrong — usually <code>localhost</code> from inside a container, where it should be the compose service name.</td><td class="d">same log line, connection error instead of 401</td></tr>
+              <tr><td class="k">no <code>interview</code> rows</td><td class="d">the same shape, same reason — the interview writes are fire-and-forget too.</td><td class="d"><code>Dropped interview turn</code></td></tr>
+              <tr><td class="k">voice “available” but silent</td><td class="d">a forged heartbeat on a blank <code>VOICE_WORKER_SECRET</code>: students are handed tokens into rooms no agent ever joins.</td><td class="d">the boot warning in <code>main.py</code></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Status semantics — three different answers</h3>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Condition</th><th>GET /api/voice/status</th><th>POST /api/voice/token</th></tr></thead>
+            <tbody>
+              <tr><td class="k">no worker heartbeat</td><td class="d"><code>worker_healthy: false</code></td><td class="d"><b>409</b></td></tr>
+              <tr><td class="k">missing LIVEKIT_* / GROQ_API_KEY</td><td class="d">unavailable, with the reason</td><td class="d"><b>503</b></td></tr>
+              <tr><td class="k">non-blank VOICE_MAINTENANCE_MESSAGE</td><td class="d">the operator's message</td><td class="d"><b>503</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout calm">
+          <h4>The supersession no longer reads as a live zero</h4>
+          <p>
+            No <code>AgentRun</code> rows are written any more, so <code>POST /api/agent/feedback</code> 404s on
+            every request and the <code>AgentRun</code>-derived counters in <code>GET /api/agent/metrics</code>
+            read 0. Both now <em>say so</em>: <code>AGENT_RUNS_COLLECTED = False</code> gates a 404 detail naming
+            the supersession and a <code>collected: false</code> on the metrics payload. Flip that one constant
+            back to <code>True</code> on rollback and both revert with no second edit.
+            <code>voice_turns</code> (off <code>Message.channel</code>) keeps working.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ 09 ============ -->
+      <section id="config">
+        <h2><span class="num">09</span> Configuration surface</h2>
+        <p class="deck">
+          <code>pydantic-settings</code> over <code>apps/api-py/.env</code>. The voice worker reads the
+          <em>same</em> file, so credentials are entered once.
+        </p>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>Group</th><th>Keys and defaults</th></tr></thead>
+            <tbody>
+              <tr><td class="k">Core</td><td class="d"><code>DATABASE_URL</code> · <code>AUTH_SECRET</code> · <code>WEB_ORIGIN</code> (<code>http://localhost:4200</code>) · <code>ENV</code> (<code>dev</code>) · <code>DOCS_ENABLED</code> · <code>AUTH_REVOCATION_CACHE_SECONDS</code> (60) · <code>UPLOAD_DIR</code></td></tr>
+              <tr><td class="k">Google</td><td class="d"><code>GOOGLE_CLIENT_ID</code> · <code>GOOGLE_CLIENT_SECRET</code> · <code>GOOGLE_REDIRECT_URI</code> · <code>GOOGLE_ALLOWED_DOMAIN</code> · <code>ROSTER_EMAIL_DOMAIN</code> (alias <code>COLLEGE_EMAIL_DOMAIN</code>)</td></tr>
+              <tr><td class="k">LLM</td><td class="d"><code>LLM_BASE_URL</code> · <code>LLM_MODEL</code> · <code>LLM_API_KEY</code> · <code>LLM_TIMEOUT_MS</code> (300000) · <b><code>LLM_ALLOW_REMOTE_STUDENT_DATA</code></b></td></tr>
+              <tr><td class="k">Provider keys</td><td class="d"><code>SAKANA_API_KEY</code> · <code>GROQ_API_KEY</code> · <code>MISTRAL_API_KEY</code> · <code>OPENROUTER_API_KEY</code> · <code>GEMINI_API_KEY</code> · <code>COHERE_API_KEY</code></td></tr>
+              <tr><td class="k">Embeddings</td><td class="d"><code>EMBEDDING_BASE_URL</code> · <code>EMBEDDING_MODEL</code> · <code>EMBEDDING_API_KEY</code></td></tr>
+              <tr><td class="k">Voice</td><td class="d"><code>LIVEKIT_URL</code> · <code>LIVEKIT_API_KEY</code> · <code>LIVEKIT_API_SECRET</code> · <code>VOICE_WORKER_SECRET</code> · <code>VOICE_MAINTENANCE_MESSAGE</code> · <code>VOICE_MAX_SESSIONS_PER_USER</code> (2) · <code>VOICE_MAX_CALL_SECONDS</code> (900) · worker-side: <code>VOICE_TTS</code> (<code>groq</code>) · <code>REEP_API_URL</code> · <code>VOICE_WORKER_ID</code></td></tr>
+              <tr><td class="k">Interview</td><td class="d"><code>OPENAI_API_KEY</code> · <code>OPENAI_REALTIME_MODEL</code> · <code>OPENAI_REALTIME_BASE_URL</code> · <code>OPENAI_REALTIME_VOICE</code> (<code>alloy</code>) · <code>OPENAI_REALTIME_BETA_HEADER</code> · <code>INTERVIEW_MAX_SECONDS</code> (900) · <code>INTERVIEW_IDLE_SECONDS</code> (120) · <code>INTERVIEW_MAX_SESSIONS</code> (100) · <code>INTERVIEW_MAX_SESSIONS_PER_USER</code> (2) · <code>INTERVIEW_VAD_THRESHOLD</code> (0.5) · <code>INTERVIEW_VAD_PREFIX_PADDING_MS</code> (300) · <code>INTERVIEW_VAD_SILENCE_DURATION_MS</code> (700) · <code>INTERVIEW_TRANSCRIPTION_MODEL</code> · <code>INTERVIEW_TRANSCRIPTION_TIMEOUT_MS</code> (8000) · <code>INTERVIEW_RESPONSE_CREATE_TIMEOUT_MS</code> (10000) · <code>INTERVIEW_MIN_ANSWER_WORDS</code> (4) · <code>INTERVIEW_MAX_CLARIFICATIONS_PER_QUESTION</code> (1) · <code>INTERVIEW_REPORT_TIMEOUT_MS</code> (20000) · <code>INTERVIEW_RECORDING_ENABLED</code> (false) · <code>INTERVIEW_RECORDING_MAX_BYTES</code> (64 000 000) · <code>INTERVIEW_RETENTION_DAYS</code> (180) · <code>INTERVIEW_ORPHAN_GRACE_SECONDS</code> (1200) · <code>INTERVIEW_CONSENT_VERSION</code> (<code>2026-08</code>)</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Four switches keyed on one dev-environment allowlist</h3>
+        <p>
+          <code>_is_dev_env()</code> is an allowlist, not a negation. Anything unrecognised — “staging”, “uat”,
+          a typo, an empty string from a half-written deploy template — is treated as production-like: it loses
+          the password door, it gets <code>Secure</code> cookies, and it must authenticate its voice worker.
+        </p>
+        <div class="chips">
+          <span class="chip hi">password_login_allowed</span>
+          <span class="chip hi">insecure_cookies_allowed</span>
+          <span class="chip hi">worker_auth_optional</span>
+          <span class="chip hi">docs_exposed</span>
+        </div>
+
+        <h3>Seeds — three commands, one of which must never reach production</h3>
+        <div class="tw">
+          <table>
+            <thead><tr><th>Command</th><th>Safe in prod?</th><th>What it does</th></tr></thead>
+            <tbody>
+              <tr class="hot"><td class="k">python -m app.seed</td><td class="k">refuses</td><td class="d">creates the demo logins — including the Main Admin (role ADMIN), who by rule 2 reads every student's marks, attendance and USN — behind passwords published in <code>AGENTS.md</code>. That account must never exist on a production host, so there is <b>no override flag</b>.</td></tr>
+              <tr><td class="k">python -m app.seed_kb</td><td class="k">yes</td><td class="d">the Knowledge Base, no accounts. Production needs it — without it the grounded assistant has nothing to ground against — and never needs the demo users, which is why they no longer travel together.</td></tr>
+              <tr><td class="k">python -m app.seed_roster</td><td class="k">yes</td><td class="d">idempotent student roster from USNs, no passwords</td></tr>
+              <tr><td class="k">python -m app.grant_access</td><td class="k">yes</td><td class="d">one person, one row — the single-account counterpart for people a roster never contains</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ============ 10 ============ -->
+      <section id="ci">
+        <h2><span class="num">10</span> Build &amp; CI</h2>
+        <p class="deck">
+          Three jobs, each guarding a failure that actually shipped once.
+        </p>
+
+        <div class="cols">
+          <div>
+            <h5>api — FastAPI + Postgres</h5>
+            <ul>
+              <li>service: pgvector/pgvector:pg17</li>
+              <li>NOT stock pg17 — a migration runs</li>
+              <li>CREATE EXTENSION vector, and IF NOT</li>
+              <li>EXISTS does not help when the extension</li>
+              <li>is not on the server at all</li>
+              <li>Python 3.14 · pip cache</li>
+              <li><b>REEP_REQUIRE_DB=1</b> — a skipped DB</li>
+              <li>test is a FAILURE, not a silent pass</li>
+              <li>alembic upgrade head → app.seed → pytest</li>
+            </ul>
+          </div>
+          <div>
+            <h5>worker-imports — dependency completeness</h5>
+            <ul>
+              <li>Python 3.12, clean environment</li>
+              <li>pip install -r requirements-voice.txt</li>
+              <li>exec voice_agent.py and print VOICE_TTS</li>
+              <li>catches the exact failure that shipped:</li>
+              <li>the manifest declared only livekit-agents</li>
+              <li>while the module imported groq, silero,</li>
+              <li>noise_cancellation and edge_tts</li>
+              <li>no LiveKit or Groq credentials needed</li>
+            </ul>
+          </div>
+          <div>
+            <h5>web — Angular</h5>
+            <ul>
+              <li>Node 22 · npm ci</li>
+              <li>tsc --noEmit -p tsconfig.app.json</li>
+              <li>ng test --watch=false (vitest)</li>
+              <li><b>ng build</b> — the real production build</li>
+              <li>enforces the bundle budget, which was</li>
+              <li>unenforceable while every route was eager</li>
+              <li>one `component:` slipped back into</li>
+              <li>app.routes.ts fails here, not in production</li>
+            </ul>
+          </div>
+        </div>
+
+<pre>docker compose up -d                                   <span class="cm"># Postgres 17 + pgvector on :5433</span>
+cd apps/api-py
+.venv/Scripts/pip install -r requirements-dev.txt
+.venv/Scripts/python -m alembic upgrade head
+.venv/Scripts/python -m app.seed                       <span class="cm"># refuses when ENV=prod</span>
+.venv/Scripts/python -m uvicorn app.main:app --port 3300
+.venv/Scripts/python -m pytest                         <span class="cm"># 28 modules</span>
+
+cd ../web &amp;&amp; npx ng serve                              <span class="cm"># :4200, proxies /api</span>
+cd ../web &amp;&amp; npx ng build                              <span class="cm"># budget gate</span></pre>
+
+        <div class="callout">
+          <h4>Windows note</h4>
+          <p>
+            <code>uvicorn --reload</code> has wedged a stale worker here. After editing backend files, kill port
+            3300 and restart rather than relying on <code>--reload</code>.
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ 11 ============ -->
+      <section id="prod">
+        <h2><span class="num">11</span> Production composition</h2>
+        <p class="deck">
+          <code>docker-compose.prod.yml</code>, deliberately not the default file. Secrets come from the
+          environment — never from a committed file, never baked into an image — and every value without a
+          default uses <code>${VAR:?set VAR}</code> so compose fails loudly rather than starting a
+          half-configured stack.
+        </p>
+
+        <figure>
+          <div class="figframe">
+            <svg class="dg" viewBox="0 0 960 540" role="img"
+                 aria-label="Production topology: a TLS terminator in front of the API; inside the compose network, a database with no published port, a one-shot migration unit that must complete before the API starts, the API container, and the voice worker reaching the API by service name. Two named volumes persist database data and uploads.">
+              <rect class="bx-guard" x="240" y="16" width="480" height="60" />
+              <text class="t-lab t-c" x="480" y="40" style="font-weight:700;fill:var(--guard)">TLS terminator / reverse proxy — REQUIRED</text>
+              <text class="t-mini t-c" x="480" y="60">ENV=prod marks the cookie Secure; without HTTPS the browser drops it and every login “succeeds” then behaves logged-out</text>
+
+              <path class="ed-guard" d="M480,76 V206" />
+
+              <rect class="bx-out" x="20" y="100" width="920" height="418" />
+              <text class="t-h" x="34" y="124">COMPOSE NETWORK — name: reep</text>
+
+              <rect class="bx-store" x="40" y="146" width="250" height="112" />
+              <text class="t-lab" x="54" y="170" style="font-weight:700;fill:var(--store)">db</text>
+              <text class="t-mini" x="54" y="189">pgvector/pgvector:pg17</text>
+              <text class="t-mini" x="54" y="206">NO PUBLISHED PORT — only the API</text>
+              <text class="t-mini" x="54" y="223">needs it, over this network</text>
+              <text class="t-mini" x="54" y="240">healthcheck pg_isready -d reep_py</text>
+              <text class="t-mini" x="54" y="254">limits 2 CPU / 2G</text>
+
+              <path class="ed" d="M290,180 H346" />
+              <text class="t-tiny" x="296" y="174">healthy</text>
+
+              <rect class="bx" x="348" y="146" width="250" height="112" />
+              <text class="t-lab" x="362" y="170" style="font-weight:700">migrate</text>
+              <text class="t-mini" x="362" y="189">python -m alembic upgrade head</text>
+              <text class="t-mini" x="362" y="206">restart: no — runs ONCE, its own unit</text>
+              <text class="t-mini" x="362" y="223">never from the API entrypoint: every</text>
+              <text class="t-mini" x="362" y="240">replica racing on the version table can</text>
+              <text class="t-mini" x="362" y="254">leave the schema half-applied</text>
+
+              <path class="ed-acc" d="M473,258 V300" />
+              <text class="t-tiny" x="483" y="282">service_completed_successfully</text>
+
+              <path class="ed" d="M165,258 V300 H346" />
+
+              <rect class="bx-accl" x="348" y="302" width="330" height="126" />
+              <text class="t-lab" x="362" y="326" style="font-weight:700;fill:var(--accent)">api</text>
+              <text class="t-mini" x="362" y="345">Dockerfile — python:3.14-slim, USER 10001</text>
+              <text class="t-mini" x="362" y="362">uvicorn --proxy-headers --forwarded-allow-ips *</text>
+              <text class="t-mini" x="362" y="379">--timeout-graceful-shutdown 110 · stop_grace 120 s</text>
+              <text class="t-mini" x="362" y="396">healthcheck = /health, LIVENESS only</text>
+              <text class="t-mini" x="362" y="413">limits 2 CPU / 1G, reserve 512M</text>
+
+              <rect class="bx-guard" x="694" y="302" width="246" height="126" />
+              <text class="t-mini" x="708" y="326" style="fill:var(--guard);font-weight:700">why never /ready here</text>
+              <text class="t-mini" x="708" y="346">pointing the container healthcheck at</text>
+              <text class="t-mini" x="708" y="363">/ready restarts every API container</text>
+              <text class="t-mini" x="708" y="380">during a brief Postgres wobble and</text>
+              <text class="t-mini" x="708" y="397">turns a recoverable blip into an outage.</text>
+              <text class="t-mini" x="708" y="414">Readiness withdraws a pod; it never kills it.</text>
+
+              <path class="ed-acc" d="M513,428 V462" />
+
+              <rect class="bx-out" x="40" y="446" width="590" height="60" />
+              <text class="t-lab" x="54" y="468" style="font-weight:700">voice-worker</text>
+              <text class="t-mini" x="54" y="486">Dockerfile.voice — python:3.12-slim · REEP_API_URL=http://api:3300 (service name, NOT localhost)</text>
+              <text class="t-mini" x="54" y="501">no healthcheck — no inbound HTTP surface · stop_grace 960 s = drain 900 + 2×20 + slack · limits 2 CPU / 3G</text>
+
+              <rect class="bx-store" x="40" y="278" width="250" height="42" />
+              <text class="t-mini" x="54" y="298">volume reep_pgdata</text>
+              <text class="t-mini" x="54" y="313">volume reep_uploads → /var/reep/uploads</text>
+            </svg>
+          </div>
+          <figcaption>
+            <b>Figure 8 — the two decisions that are easy to get wrong.</b> Migrations run once as their own
+            unit, and the container healthcheck is liveness only. Uploads must outlive the container: without
+            the named volume they land in the image layer and every redeploy destroys them.
+          </figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ 12 ============ -->
+      <section id="invariants">
+        <h2><span class="num">12</span> Invariants worth defending</h2>
+        <p class="deck">
+          The short list. Each one is enforced somewhere specific; each one has a failure mode that is silent
+          if it goes.
+        </p>
+
+        <div class="tw">
+          <table>
+            <thead><tr><th>#</th><th>Invariant</th><th>Enforced by</th></tr></thead>
+            <tbody>
+              <tr><td class="n">1</td><td class="k">student PII never reaches a remote model unbidden</td><td class="d"><code>student_data_egress_allowed()</code>; the resume path degrades to <code>used_ai=false</code> and says so</td></tr>
+              <tr><td class="n">2</td><td class="k">staff scope is role-decided; a MENTOR with no group sees nobody</td><td class="d"><code>require_mentor</code> / <code>require_admin</code> / <code>_assert_can_access_student</code></td></tr>
+              <tr class="hot"><td class="n">3</td><td class="k">exactly one <code>response.create</code> call site after the handshake</td><td class="d">the relay's call graph — a second site kills “one open question at a time” and <b>no test will notice</b></td></tr>
+              <tr><td class="n">4</td><td class="k">no student transcript is ever composed into model instructions</td><td class="d">persona + specialization block + phase directive, all fixed strings</td></tr>
+              <tr><td class="n">5</td><td class="k">a <code>running</code> interview row is always closed</td><td class="d">three layers, one <code>AND status='running'</code> predicate</td></tr>
+              <tr><td class="n">6</td><td class="k">conversations have exactly one writer</td><td class="d"><code>app/conversations.py</code>; <code>app/memory.py</code> is a tombstone — do not use it</td></tr>
+              <tr><td class="n">7</td><td class="k">uploads are typed by magic bytes, stored under random names</td><td class="d"><code>app/document_store.py</code> — a “.pdf” that is an executable is rejected</td></tr>
+              <tr><td class="n">8</td><td class="k">a mail with a given <code>dedupe_key</code> is sent at most once</td><td class="d">unique index; the losing racer catches <code>IntegrityError</code> and reports the existing row</td></tr>
+              <tr><td class="n">9</td><td class="k">routes stay lazy</td><td class="d"><code>loadComponent</code> everywhere; the <code>angular.json</code> budget fails CI otherwise</td></tr>
+              <tr><td class="n">10</td><td class="k">production refuses repo credentials at boot</td><td class="d"><code>production_boot_failures()</code> raised from the lifespan — uvicorn never binds</td></tr>
+              <tr><td class="n">11</td><td class="k">audio is off unless two independent switches are both on</td><td class="d"><code>INTERVIEW_RECORDING_ENABLED</code> <em>and</em> a live <code>scope_store_audio</code> grant</td></tr>
+              <tr><td class="n">12</td><td class="k">the interview record is additive, never a replacement for <code>messages</code></td><td class="d">the runbook query still answers “did it save anything” for every channel</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Migrated away — ignore any lingering reference</h3>
+        <div class="chips">
+          <span class="chip gd">Next.js</span><span class="chip gd">React</span><span class="chip gd">NestJS</span>
+          <span class="chip gd">Prisma</span><span class="chip gd">server-only</span><span class="chip gd">apps/api</span>
+        </div>
+        <p>
+          That stack was fully migrated and deleted. <code>apps/interview-realtime/</code>, the superseded
+          standalone prototype of the relay (<b>no authentication, no database</b>), was deleted in 2026-09
+          along with <code>ollama/</code> and <code>tools/cascade</code>. A rollback is re-pointing the client rather than
+          restoring code from git.
+        </p>
+      </section>
+
+      <footer>
+        <p>
+          REEP Stack Blueprint · compiled from <code>apps/api-py</code>, <code>apps/web</code>,
+          <code>docker-compose*.yml</code> and <code>.github/workflows/ci.yml</code>.<br>
+          Companion documents: <code>AGENTS.md</code> · <code>docs/architecture.md</code> ·
+          <code>docs/interview-engine-v3.md</code> · <code>docs/interview-assistant.md</code> ·
+          <code>docs/google-sign-in.md</code> · <code>docs/deployment-env.md</code>
+        </p>
+      </footer>
+
+    </main>
+  </div>
+</div>

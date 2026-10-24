@@ -1,0 +1,507 @@
+/* Skilling — the claim card and the badge board.
+ *
+ * Structure comes from the global reep-v2 classes (.panel, .dt-header, .card,
+ * .chip, .btn, .icon); nothing global is redefined. What lives here is the two
+ * things this screen alone has: the certificate dropzone with its picked state,
+ * and the badge board's category rows and pills.
+ *
+ * The claim form's controls are PILLS (999px) rather than the app's 12px
+ * fields. That is the handoff's choice on this screen and it earns itself: the
+ * card is a single vertical run of five controls, and the pill shape keeps them
+ * reading as one sequence instead of five stacked boxes. */
+:host {
+  display: block;
+}
+
+/* --- claim card ------------------------------------------------------- */
+
+.claim-card {
+  margin-bottom: 20px;
+}
+.claims-card {
+  margin-bottom: 20px;
+}
+.claim-title {
+  font-family: var(--font-display);
+  font-size: 17px;
+  font-weight: 800;
+  margin: 0 0 4px;
+  padding: 0;
+  border: 0;
+}
+.btn.submit {
+  padding: 13px 24px;
+  border-radius: 999px;
+}
+.claim-lede {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.claim-field {
+  display: block;
+  margin-bottom: 16px;
+}
+.claim-field select,
+.claim-field input {
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--hairline-45);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14px;
+}
+/* Disabled reads as "not yet", not as broken: the badge select is waiting on a
+   category, and its placeholder says so. */
+.claim-field select:disabled {
+  background: var(--tint-3);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.claim-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+/* One column below the point where two selects would truncate their options. */
+@media (max-width: 620px) {
+  .claim-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
+
+/* The dropzone, and the row it becomes once a file is chosen. */
+.cert-drop {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  border: 2px dashed rgba(122, 47, 158, 0.35);
+  border-radius: 18px;
+  padding: 36px 16px;
+  text-align: center;
+  background: transparent;
+  font-family: var(--font);
+  cursor: pointer;
+  margin-bottom: 18px;
+  transition:
+    border-color 0.14s ease,
+    background 0.14s ease;
+}
+.cert-drop:hover {
+  border-color: var(--purple-mid);
+  background: var(--tint-3);
+}
+.cert-drop .icon {
+  font-size: 30px;
+  color: var(--purple-mid);
+}
+.cert-drop-main {
+  font-size: 14.5px;
+  color: var(--ink);
+}
+.cert-drop-sub {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.cert-picked {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(19, 122, 74, 0.4);
+  background: var(--surface);
+  margin-bottom: 18px;
+}
+.cert-picked .icon {
+  font-size: 22px;
+  color: var(--good);
+}
+.cert-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+/* The "All my documents" link. `.link-btn` below is shaped for a <button>, so
+   the anchor needs the row layout and the underline reset it does not carry. */
+.skl-all-docs {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  text-decoration: none;
+
+  .icon {
+    font-size: 16px;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.link-btn {
+  border: none;
+  background: none;
+  color: var(--purple-mid);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  flex: none;
+}
+
+.claim-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.claim-hint {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* Submitted confirmation, in the success tone. */
+.claim-done {
+  background: var(--good-bg);
+  border-radius: 16px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+}
+.claim-done p {
+  margin: 0;
+  font-size: 14px;
+  color: var(--good);
+}
+.btn-outline-good {
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid var(--good);
+  background: var(--surface);
+  color: var(--good);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* --- badge board ------------------------------------------------------ */
+
+.board-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--hairline-26);
+}
+.legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  color: var(--muted);
+}
+.legend-item--lit {
+  font-weight: 700;
+  color: var(--ink);
+}
+.legend-hint {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+.dot {
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  display: inline-block;
+  flex: none;
+}
+.dot-open {
+  border: 1.5px solid rgba(160, 138, 178, 0.6);
+}
+
+.board-row {
+  display: flex;
+  gap: 24px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--hairline-26);
+  flex-wrap: wrap;
+}
+.board-cat {
+  flex: 0 0 180px;
+}
+.board-cat-name {
+  font-size: 14.5px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.board-cat-note {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+/* SIX TILES PER ROW, as the board specifies. `auto-fill` with a floor rather
+   than a hard `repeat(6, …)`: the sidebar is 220px and this card also has to
+   survive a narrow window, where six 150px columns would overflow. */
+.board-badges {
+  flex: 1;
+  min-width: 280px;
+  display: grid;
+  /* `min(Npx, 100%)` and not a bare `Npx`: a minmax() track whose minimum is a
+     fixed length does NOT collapse when the container is narrower than it — the
+     track keeps its minimum and the grid overflows. On a 320px handset the
+     content box inside a card is about 260px, so every one of these was wider
+     than the screen it was drawn on. `min()` caps the minimum at the container,
+     which changes nothing at any width where the track already fitted. */
+  grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
+  gap: 10px;
+  align-content: flex-start;
+}
+
+/* A pill is a state with a preview: tapping an unearned badge shows what it
+   will look like once verified (the handoff's "Tap badges to preview the earned
+   state"), and nothing about that tap is stored. An earned pill is already lit
+   and does not toggle. */
+/* --- the badge tile -----------------------------------------------------
+   A hexagonal emblem over the skill's name and its state, per the board. It
+   was a text pill, which made 48 badges read as a tag cloud: the one thing a
+   student comes here to see — which of these are lit — was carried by a 1.5px
+   border colour alone.
+
+   The hexagon is a clip-path rather than an inline SVG. The board draws it as
+   SVG, but this needs one shape repeated 48 times with a glyph centred in it,
+   and a clip-path keeps the icon a real `.icon` element that inherits the
+   font, the size clamp and the fonts-ready gate instead of being duplicated
+   into 48 inline <svg> blocks. */
+.badge-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  padding: 12px 8px 10px;
+  border-radius: 14px;
+  font-family: var(--font);
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  color: var(--ink);
+  cursor: pointer;
+  transition:
+    box-shadow 0.14s ease,
+    border-color 0.14s ease;
+}
+.badge-tile:hover {
+  border-color: var(--purple-mid);
+}
+.badge-tile:focus-visible {
+  outline: 2px solid var(--purple-mid);
+  outline-offset: 2px;
+}
+
+.badge-tile .emblem {
+  position: relative;
+  width: 56px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+/* The shape itself. A pointy-top hexagon, the board's proportions. */
+.badge-tile .hex {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  background: var(--tint-1);
+  border: 0;
+}
+.badge-tile .emblem > .icon {
+  position: relative;
+  font-size: 22px;
+  color: var(--brand-purple);
+  opacity: 0.75;
+}
+.badge-tile__name {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  /* Two lines' worth, so a one-word badge and a four-word badge put their
+     status line at the same height across a row of six. */
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  overflow-wrap: anywhere;
+}
+.badge-tile__status {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.badge-tile__status .icon {
+  font-size: 12px;
+}
+
+/* EARNED: the hexagon fills, the glyph inverts, and the BLUE VERIFIED TICK is
+   added — three signals, not one, because this is the state the whole screen
+   exists to show. The tick is the mentor's approval and no other state wears
+   it; a preview lights the hexagon and stops there. */
+.badge-tile--lit {
+  border-color: var(--purple-mid);
+  box-shadow: 0 6px 16px rgba(85, 44, 126, 0.16);
+}
+.badge-tile--lit .hex {
+  background: var(--brand-purple);
+}
+.badge-tile--lit .emblem > .icon {
+  color: #fff;
+  opacity: 1;
+}
+/* The one blue on this screen. Not a brand token on purpose: the design
+   system's palette is purple, and the verified mark is drawn in the blue every
+   student already reads as "verified" on the platforms they use, so it is
+   recognised rather than learned. Owned here, used nowhere else. */
+$verified-blue: #1a73e8;
+
+.badge-tile--verified .badge-tile__status {
+  color: $verified-blue;
+}
+.badge-tile .tick,
+.badge-tile .wait {
+  position: absolute;
+  right: -2px;
+  bottom: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-pill);
+  background: var(--surface);
+  display: grid;
+  place-items: center;
+}
+.badge-tile .tick .icon {
+  font-size: 20px;
+  color: $verified-blue;
+  opacity: 1;
+}
+.badge-tile .wait .icon {
+  font-size: 15px;
+  color: var(--warn);
+  opacity: 1;
+}
+.badge-tile--pending .badge-tile__status {
+  color: var(--warn);
+}
+.legend-tick {
+  font-size: 15px;
+  color: $verified-blue;
+}
+.legend-wait {
+  font-size: 14px;
+  color: var(--warn);
+}
+
+/* A previewed tile is dashed and keeps the muted status word, so it cannot be
+   mistaken for a badge the student has actually earned. */
+.badge-tile--preview {
+  border-style: dashed;
+}
+.badge-tile--preview .hex {
+  background: var(--purple-mid);
+}
+.badge-tile--preview .badge-tile__status {
+  color: var(--muted);
+}
+
+.board-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 16px;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+.board-foot-hint {
+  font-size: 12.5px;
+  color: var(--faint);
+}
+
+/* --- shared small pieces (kept from the previous screen) --------------- */
+
+.state-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.state-note .icon {
+  font-size: 16px;
+  color: var(--purple-mid);
+}
+
+.review-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0 9px;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+.review-note .icon {
+  font-size: 14px;
+  color: var(--faint);
+}
+
+/* --- claims in progress: a table ---------------------------------------- */
+.claims-table {
+  margin: 0;
+}
+.claims-status {
+  width: 190px;
+}
+.claims-note {
+  color: var(--muted);
+}
+
+/* Tap target at phone width (2026-09-22): /student/skilling's "All my documents" link, 266x17.
+   Block padding and not a min-height, because this is an inline link inside a
+   sentence — padding grows the hit area the thumb gets without moving the
+   words around it. Mobile only; the desktop link is unchanged. */
+@media (max-width: 760px) {
+  .skl-all-docs {
+    /* 15px and not 13: measured at 43px tall with 13, which is short of the
+       44px floor by a hair. */
+    padding-block: 15px;
+  }
+}

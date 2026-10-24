@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/@angular/service-worker/config/schema.json",
+  "index": "/index.html",
+  "assetGroups": [
+    {
+      "name": "app-shell",
+      "installMode": "prefetch",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/index.html", "/manifest.webmanifest", "/*.css", "/main-*.js", "/polyfills-*.js"]
+      }
+    },
+    {
+      "name": "lazy-routes",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/chunk-*.js", "!/*.js.map"]
+      }
+    },
+    {
+      "name": "assets",
+      "installMode": "lazy",
+      "updateMode": "prefetch",
+      "resources": {
+        "files": ["/favicon.ico", "/icon-*.png", "/apple-touch-icon.png", "/fonts/**", "/media/**"]
+      }
+    }
+  ],
+  "navigationUrls": ["/**", "!/api/**", "!/**/*.*", "!/**/*__*", "!/**/*__*/**"]
+}

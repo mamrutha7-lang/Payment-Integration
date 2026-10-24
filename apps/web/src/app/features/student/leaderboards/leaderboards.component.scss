@@ -1,0 +1,316 @@
+:host {
+  display: block;
+}
+
+/* --- the ranking, as a table -------------------------------------------
+   It was a stack of lavender pills with the viewer's own row painted in the
+   primary gradient. Two problems the board fixes: the gradient is this design's
+   badge for the ONE primary action of a view, and a ranking is four unlabelled
+   values in a row — rank, name, cohort, total — that nothing named. It is a
+   `.dt-table` now, with a header, and "this is you" is a left edge and a chip
+   rather than a colour the eye has to interpret. */
+.lb-table-card {
+  padding: 0;
+  overflow: hidden;
+}
+.lb-table {
+  margin: 0;
+}
+.lb-table tbody tr.me {
+  background: var(--tint-2);
+}
+.lb-table tbody tr.me td:first-child {
+  box-shadow: inset 3px 0 0 var(--brand-purple);
+}
+.lb-col-rank {
+  width: 64px;
+}
+.lb-col-of,
+.lb-col-val {
+  text-align: right;
+  white-space: nowrap;
+}
+.lb-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: var(--r-pill);
+  background: var(--tint-1);
+  color: var(--brand-purple);
+  font-weight: 800;
+  font-size: 12px;
+}
+.lb-table tbody tr.me .lb-rank {
+  background: var(--brand-purple);
+  color: #fff;
+}
+.lb-avatar {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--tint-1);
+  color: var(--brand-purple);
+  font-size: 10.5px;
+  font-weight: 800;
+  flex: none;
+}
+
+/* Pills, from the shared `.tabs` — nothing to add here but the spacing. */
+.lb-tabs {
+  margin-bottom: 12px;
+}
+
+/* --- the student cell: avatar, name, and the "You" chip ----------------- */
+.lb-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* `.chip.accent` carries the look; only the size is this screen's. */
+.lb-you {
+  font-size: 10.5px;
+  padding: 1px 7px;
+}
+
+/* --- OWN RANK: the prominent highlighted card at the top of each board --- */
+.lb-me-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+  border-radius: var(--r-card);
+  /* WHITE, with the gradient reserved for the medallion. The whole card used to
+     be the gradient, which made the one thing on the page that is not an action
+     look like the page's primary action. */
+  background: var(--card-gradient);
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--sh-card);
+}
+.lb-me-card--unranked {
+  background: var(--card-gradient);
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--sh-card);
+}
+.lb-me-card__rank {
+  flex: 0 0 auto;
+  min-width: 58px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--primary-gradient);
+  color: #fff;
+  box-shadow: var(--sh-navpill);
+}
+.lb-me-card--unranked .lb-me-card__rank {
+  background: var(--tint-1);
+  color: var(--brand-purple);
+}
+.lb-me-card__num {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.lb-me-card__of {
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.75;
+}
+.lb-me-card__rank .icon {
+  font-size: 30px;
+}
+.lb-me-card__body {
+  flex: 1;
+  min-width: 0;
+}
+.lb-me-card__headline {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.lb-me-card__hint {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.85;
+}
+/* A chip, per the board. The white-alpha fill was only legible on the gradient
+   the card no longer has, so it read as unstyled text once the card went
+   white — the same class of breakage as the dark login panel's nine colours. */
+.lb-me-card__val {
+  flex: 0 0 auto;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--r-pill);
+  background: var(--tint-1);
+  color: var(--brand-purple);
+  border: 1px solid var(--hairline-26);
+  white-space: nowrap;
+}
+
+/* --- info / feedback notes --- */
+.lb-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: var(--tint-3);
+  border: 1px solid var(--hairline);
+  color: var(--muted);
+  font-size: 13px;
+}
+.lb-note .icon {
+  font-size: 18px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.lb-note--feedback {
+  background: var(--good-bg);
+  border-color: rgba(19, 122, 74, 0.28);
+  color: var(--good);
+}
+.lb-note--feedback .icon {
+  color: var(--good);
+}
+
+/* --- HIDE-ME toggle in the header --- */
+.lb-hide input:disabled {
+  cursor: progress;
+}
+
+/* --- privacy explanation shown in the opted-out state --- */
+.lb-privacy-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+.lb-privacy-note .icon {
+  font-size: 17px;
+  flex-shrink: 0;
+}
+
+/* "Coming soon" / empty state, laid out inside the global .card. */
+.lb-empty {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.lb-empty .icon {
+  font-size: 30px;
+  color: var(--faint);
+  flex-shrink: 0;
+}
+.lb-empty__title {
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+/* The only remaining way back onto the boards, so it is a real button rather
+   than a link buried in the explanation. */
+.lb-rejoin {
+  margin-top: 12px;
+}
+
+/* --- the line under the title: who this ranks against --------------------- */
+.dt-header .dt-sub {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+.dt-header .dt-sub .icon {
+  font-size: 17px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--brand-purple);
+}
+/* Unseated is a state the office fixes, so it reads as a notice, not a caption. */
+.lb-scope--unseated {
+  color: var(--warn);
+}
+.lb-scope--unseated .icon {
+  color: var(--warn);
+}
+
+/* --- the rest of the batch: classmates not yet ranked here ------------------ */
+.lb-unranked {
+  margin-top: 14px;
+  padding: 14px 18px;
+}
+.lb-unranked__head {
+  margin-bottom: 10px;
+}
+.lb-unranked__title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+.lb-unranked__title .icon {
+  font-size: 18px;
+  color: var(--muted);
+}
+.lb-unranked__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+  gap: 6px 14px;
+}
+.lb-unranked__list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 10px;
+  color: var(--ink-soft);
+  font-size: 13.5px;
+}
+.lb-unranked__list li.me {
+  background: var(--tint-2);
+  color: var(--ink);
+  box-shadow: inset 3px 0 0 var(--brand-purple);
+}
+.lb-unranked__list li .lb-avatar {
+  background: var(--tint-3);
+  color: var(--muted);
+}
+.lb-unranked__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lb-unranked__more {
+  color: var(--muted);
+  font-weight: 600;
+}

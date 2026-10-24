@@ -1,0 +1,386 @@
+/* Catalogue — this screen's layout only.
+ *
+ * Everything that has a look rather than a position comes from
+ * styles/reep-v2.scss: .panel .dt-header .dt-title .dt-sub .crumb .tabs .card
+ * .field .ctrl .select .chip .btn .notice .empty .dt-frame .dt-gridbar
+ * .dt-quickfilter .dt-table .dt-statusbar .iconbtn. Nothing here redefines one
+ * of those; what is here is the two-column body, the drawer and the few pieces
+ * of type this screen needs. */
+
+:host {
+  display: block;
+}
+
+/* --- Head and filters --------------------------------------------------- */
+
+.cat-note {
+  margin-bottom: 12px;
+}
+
+.cat-tabs {
+  margin-bottom: 12px;
+}
+.cat-tab-count {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+  margin-left: 2px;
+}
+
+.cat-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.cat-select {
+  max-width: 220px;
+}
+/* `.cat-select.is-pending` is gone with B13: both scope pills answer now, and
+   a dimmed pill over a working control is worse than no dimming at all. */
+.cat-filters-note {
+  margin-left: auto;
+  font-size: 11.5px;
+  color: var(--faint);
+  max-width: 46ch;
+}
+
+/* --- The grid ----------------------------------------------------------- */
+
+.cat-gridbar-note {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+.cat-scroll {
+  overflow-x: auto;
+}
+.cat-table {
+  min-width: 760px;
+}
+.cat-table td {
+  color: var(--ink);
+}
+.cat-table td.num,
+.cat-table th.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.cat-meta {
+  color: var(--muted);
+  font-size: 11.5px;
+  margin-top: 2px;
+}
+.cat-chips {
+  display: inline-flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* The badge name is the control that opens the drawer, so it is a real button
+   rather than a click handler on the row: a row is not focusable and a student
+   developer reading this should not have to discover that it is clickable. */
+.cat-rowname {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border: 0;
+  background: none;
+  padding: 0;
+  text-align: left;
+  font-family: var(--font);
+  cursor: pointer;
+  color: var(--ink);
+}
+.cat-rowname-title {
+  font-weight: 700;
+}
+.cat-rowname:hover .cat-rowname-title {
+  color: var(--brand-purple);
+  text-decoration: underline;
+}
+.cat-rowcode {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  color: var(--faint);
+}
+
+.cat-foot {
+  margin: 12px 0 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+/* --- Body: grid beside the 380px drawer --------------------------------- */
+
+.cat-body {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.cat-main {
+  flex: 1 1 420px;
+  min-width: 0;
+}
+.cat-drawer {
+  width: 380px;
+  flex: none;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+@media (max-width: 1100px) {
+  .cat-drawer {
+    width: 100%;
+  }
+}
+.cat-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cat-drawer-row {
+  display: flex;
+  gap: 10px;
+}
+.cat-drawer-row > .field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.cat-drawer-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cat-drawer-foot {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: auto;
+}
+.cat-drawer-foot .icon {
+  font-size: 15px;
+}
+
+.cat-card-title {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--ink);
+  margin: 0;
+}
+
+.cat-cert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-control);
+  background: var(--surface);
+}
+.cat-cert.is-removed {
+  background: var(--tint-2);
+}
+.cat-cert-text {
+  min-width: 0;
+  flex: 1 1 0;
+}
+.cat-cert-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.cat-usedby {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.cat-usedby .cat-note {
+  margin-bottom: 0;
+}
+
+.cat-help {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.cat-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11.5px;
+}
+.cat-optional {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* --- The one form ------------------------------------------------------- */
+
+.cat-form {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.cat-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+.cat-form-foot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.cat-derived {
+  font-size: 11.5px;
+  color: var(--muted);
+  max-width: 52ch;
+}
+
+/* The one retry on this screen: the tracks read failed and the tab offers it
+   again rather than sitting on a spinner that says "Loading" for ever. */
+.cat-retry {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 12px;
+}
+
+/* --- B13: the subject import, the copy and the stage-rule form ----------
+ *
+ * Layout only, and every one of these names is prefixed `cat-` so it cannot
+ * collide with a global — the trap reep-v2-resume.scss set for `.entry`,
+ * `.step-group` and `.completeness`. `.field`, `.check`, `.footbar`, `.chip`,
+ * `.notice` and `.tabular` are all global and are used, never redefined. */
+
+.cat-import-pick {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* THE INPUT IS HIDDEN WITH GEOMETRY, NEVER `display: none`.
+ * `hidden`/`display:none` takes it out of the focus order, and a <label>
+ * wrapper is not tabbable either — which is how /mentor/signature ended up
+ * with a picker only a mouse could reach. The label carries the focus ring
+ * through :focus-within so the invisible input is never a trap. */
+.cat-fileinput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.cat-filelabel {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+}
+.cat-filelabel:hover {
+  border-color: var(--brand-purple);
+}
+.cat-filelabel:focus-within {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+}
+.cat-filename {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.cat-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid var(--hairline);
+}
+.cat-copy-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.cat-copy-parts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 0;
+}
+.cat-copy-parts legend {
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 4px;
+}
+.cat-copy-parts .check {
+  flex-wrap: wrap;
+}
+.cat-copy-parts .help {
+  flex-basis: 100%;
+  margin-left: 24px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.cat-stage-form {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+}
+.cat-stage-form .field {
+  min-width: 200px;
+}
+.cat-stage-form .field.narrow {
+  min-width: 110px;
+  max-width: 140px;
+}
+
+/* A button that reads as a link, for "the Stage rules tab". A real <button>,
+   because it changes a tab on this screen rather than navigating — an <a>
+   with no href is not reachable by keyboard. */
+.cat-linkish {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: var(--brand-purple);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cat-fee {
+  width: 92px;
+  text-align: right;
+  font: inherit;
+  padding: 4px 6px;
+}

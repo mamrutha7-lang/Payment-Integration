@@ -1,0 +1,318 @@
+<div class="panel" data-p="audit">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <span>Settings</span><span class="sep">/</span><span>What changed</span>
+      </div>
+      <h1 class="dt-title">What changed</h1>
+      <div class="dt-sub">Every change made in this console, newest first.</div>
+    </div>
+    <div class="dt-toolbar">
+      <!-- The ONE export on this screen. It is a plain <a href> so the browser
+           streams the file to disk, and it is disabled rather than live when
+           the endpoint would refuse: `/admin/audit/export.csv` answers 413 over
+           10 000 rows, and a refusal reached through `<a download>` lands on
+           the officer's disk named `.csv`. -->
+      @if (exportDisabled()) {
+        <button type="button" class="btn secondary" disabled [title]="exportReason()">
+          <span class="icon" aria-hidden="true">download</span> Export range
+        </button>
+      } @else {
+        <a
+          class="btn secondary"
+          [href]="exportUrl()"
+          download="audit-log.csv"
+          title="Downloads every event matching these filters, and records the download itself."
+        >
+          <span class="icon" aria-hidden="true">download</span> Export range
+        </a>
+      }
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="select">
+      <span class="lbl">Who</span>
+      <span class="val">{{ actorLabel() }}</span>
+      <select aria-label="Actor" (change)="setActor(selectValue($event))">
+        <option value="" [selected]="actorFilter() === ''">Anyone</option>
+        @for (actor of actorOptions(); track actor.key) {
+          <option [value]="actor.key" [selected]="actorFilter() === actor.key">
+            {{ actor.label }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">What</span>
+      <span class="val">{{ actionLabel() }}</span>
+      <select aria-label="Action" (change)="setAction(selectValue($event))">
+        <option value="" [selected]="actionFilter() === ''">All actions</option>
+        @for (action of actionOptions(); track action) {
+          <option [value]="action" [selected]="actionFilter() === action">{{ action }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">On what</span>
+      <span class="val">{{ targetTypeLabel() }}</span>
+      <select aria-label="Target type" (change)="setTargetType(selectValue($event))">
+        <option value="" [selected]="targetTypeFilter() === ''">All types</option>
+        @for (target of targetTypeOptions(); track target) {
+          <option [value]="target" [selected]="targetTypeFilter() === target">{{ target }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">When</span>
+      <span class="val">{{ rangeLabel() }}</span>
+      <select aria-label="Date range" (change)="setRange(selectValue($event))">
+        @for (choice of rangeChoices; track choice.key) {
+          <option [value]="choice.key" [selected]="rangeKey() === choice.key">
+            {{ choice.label }}
+          </option>
+        }
+      </select>
+    </div>
+
+    @if (hasFilters()) {
+      <button type="button" class="btn ghost sm" (click)="clearFilters()">Clear filters</button>
+    }
+
+    <span class="filter-hint">Reads are never recorded; not every write is.</span>
+  </div>
+
+  @if (error(); as message) {
+    <div class="notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      <span>{{ message }}</span>
+    </div>
+  }
+
+  <div class="board-columns">
+    <section class="card grid-card">
+      <div class="dt-gridbar">
+        <input
+          class="dt-quickfilter"
+          type="search"
+          placeholder="Filter the events on this page…"
+          aria-label="Filter the events on this page"
+          [value]="quickFilter()"
+          (input)="onQuickFilterInput($event)"
+        />
+        <span class="gridbar-actions">
+          <button
+            type="button"
+            class="btn secondary sm"
+            aria-label="Choose which columns are shown"
+            [attr.aria-expanded]="columnsPanelOpen()"
+            (click)="toggleColumnsPanel()"
+          >
+            <span class="icon" aria-hidden="true">table_rows</span>
+          </button>
+          <button
+            type="button"
+            class="btn secondary sm"
+            aria-label="Toggle compact rows"
+            [attr.aria-pressed]="isCompact()"
+            (click)="toggleDensity()"
+          >
+            <span class="icon" aria-hidden="true">tune</span>
+          </button>
+          <!-- NO EXPORT HERE, the same rule the Registrations queue writes down:
+               the board draws Export once, in the page header, and a second
+               control handing out the same file is how an extract escapes the
+               one place it is accounted for. It matters more here than there,
+               because every download of this file writes an EXPORTED row of its
+               own. One button, one export. -->
+        </span>
+
+        @if (columnsPanelOpen()) {
+          <div class="columns-panel">
+            <div class="columns-panel__title">Columns</div>
+            @for (column of toggleableColumns; track column.id) {
+              <label class="columns-panel__row">
+                <input
+                  type="checkbox"
+                  [checked]="isColumnVisible(column.id)"
+                  (change)="toggleColumn(column.id)"
+                />
+                <span>{{ column.label }}</span>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Mounted once and never torn down: an @if around the grid destroys the
+           GridApi the toolbar and the column panel hold, so the loading and the
+           empty cases are said in the status bar and the no-rows overlay. -->
+      <ag-grid-angular
+        class="audit-grid"
+        [theme]="gridTheme()"
+        [rowData]="rows()"
+        [columnDefs]="columns"
+        [defaultColDef]="defaultColumn"
+        [getRowId]="rowId"
+        [overlayNoRowsTemplate]="emptyOverlay()"
+        [quickFilterText]="quickFilter()"
+        [rowHeight]="rowHeight()"
+        [pagination]="false"
+        [suppressCellFocus]="true"
+        (gridReady)="onGridReady($event)"
+        (cellClicked)="onCellClicked($event)"
+      />
+
+      <div class="dt-statusbar">
+        @if (isLoading()) {
+          <span role="status">Reading the trail…</span>
+        } @else {
+          <span>{{ rowRangeLabel() }}</span>
+        }
+        <span class="pager">
+          <label class="pagesize">
+            <span>Page size</span>
+            <select aria-label="Events per page" (change)="setPageSize(numberValue($event))">
+              @for (size of pageSizes; track size) {
+                <option [value]="size" [selected]="size === pageSize()">{{ size }}</option>
+              }
+            </select>
+          </label>
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="isFirstPage() || isLoading()"
+            aria-label="Previous page"
+            (click)="goToPreviousPage()"
+          >
+            <span class="icon" aria-hidden="true">chevron_left</span>
+          </button>
+          <span>{{ pagerLabel() }}</span>
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="isLastPage() || isLoading()"
+            aria-label="Next page"
+            (click)="goToNextPage()"
+          >
+            <span class="icon" aria-hidden="true">chevron_right</span>
+          </button>
+        </span>
+      </div>
+    </section>
+
+    <aside class="card event-card" aria-labelledby="audit-event-heading">
+      <div class="card-head">
+        <div>
+          <h2 class="card-heading" id="audit-event-heading">Event</h2>
+          <p class="card-sub">who did it, through which route, and what changed</p>
+        </div>
+        @if (openEvent()) {
+          <button
+            type="button"
+            class="btn ghost sm"
+            aria-label="Close this event"
+            (click)="closeDetail()"
+          >
+            <span class="icon" aria-hidden="true">close</span>
+          </button>
+        }
+      </div>
+
+      @if (panelError(); as message) {
+        <div class="notice" role="alert">
+          <span class="icon" aria-hidden="true">error</span>
+          <span>{{ message }}</span>
+        </div>
+      }
+
+      @if (copyNote(); as message) {
+        <p class="copy-note" role="status">{{ message }}</p>
+      }
+
+      @if (isOpening()) {
+        <p class="panel-state" role="status">Opening the event…</p>
+      } @else if (openEvent(); as event) {
+        <dl class="event-facts">
+          <div class="event-fact">
+            <dt class="eyebrow">Who</dt>
+            <dd class="fact">{{ actorPanelLabel() }}</dd>
+          </div>
+          <div class="event-fact">
+            <dt class="eyebrow">Occurred</dt>
+            <dd class="fact">{{ occurredAtLabel() }}</dd>
+          </div>
+          <div class="event-fact">
+            <dt class="eyebrow">Via</dt>
+            <dd class="fact">{{ event.route || '—' }}</dd>
+          </div>
+          <div class="event-fact">
+            <dt class="eyebrow">What</dt>
+            <dd class="fact">{{ event.action }}</dd>
+          </div>
+          <div class="event-fact event-fact-wide">
+            <dt class="eyebrow">On what</dt>
+            <dd class="fact">{{ event.target_type }} · {{ event.target_id }}</dd>
+          </div>
+        </dl>
+
+        <div class="event-block">
+          <div class="eyebrow">Change</div>
+          <div class="diff">
+            <div class="diff-side">
+              <div class="eyebrow">Before</div>
+              <pre class="diff-body">{{ beforeText() }}</pre>
+            </div>
+            <div class="diff-side diff-after">
+              <div class="eyebrow">After</div>
+              <pre class="diff-body">{{ afterText() }}</pre>
+            </div>
+          </div>
+          <p class="diff-note">
+            A null side is not an empty object: a creation has no <code>before</code>, a deletion
+            has no <code>after</code>, and an event that changed no fields has neither.
+          </p>
+        </div>
+
+        <div class="event-block">
+          <div class="eyebrow">Metadata</div>
+          <pre class="diff-body">{{ metadataText() }}</pre>
+        </div>
+
+        <div class="event-block">
+          <div class="eyebrow">Identifiers</div>
+          <p class="fact">Event {{ event.id }}</p>
+          <p class="fact">Request {{ event.request_id || '—' }}</p>
+          <p class="fact">Correlation {{ event.correlation_id || '—' }}</p>
+        </div>
+
+        <div class="event-actions">
+          <button type="button" class="btn secondary" (click)="copyEventJson()">
+            <span class="icon" aria-hidden="true">content_copy</span> Copy event JSON
+          </button>
+          <button
+            type="button"
+            class="btn ghost"
+            [disabled]="owningScreen() === null"
+            [title]="
+              owningScreen() === null
+                ? 'No console screen administers this kind of record.'
+                : 'Opens the screen this record is administered from.'
+            "
+            (click)="openOwningScreen()"
+          >
+            <span class="icon" aria-hidden="true">open_in_new</span> {{ owningScreenLabel() }}
+          </button>
+        </div>
+      } @else {
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">info</span>
+          <span>Choose a row in the trail to read the event and its before → after pair.</span>
+        </div>
+      }
+    </aside>
+  </div>
+</div>

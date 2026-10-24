@@ -1,0 +1,14 @@
+{
+  "name": "reep-nfr-playwright",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Non-functional Playwright suite (performance, accessibility, responsive, resilience, security). The FUNCTIONAL e2e suite is the root tests/ directory.",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.2",
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.4"
+  }
+}

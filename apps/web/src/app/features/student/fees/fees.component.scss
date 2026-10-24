@@ -1,0 +1,62 @@
+/* Fees. Cards, buttons and the header are the global reep-v2 classes; this file
+ * lays out one fee per row. Paid and overdue carry a word as well as a colour. */
+:host {
+  display: block;
+}
+
+.fee-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.fee-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fee-meta {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.fee-overdue {
+  color: var(--risk, #b3261e);
+  font-weight: 600;
+}
+
+.fee-amount {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.fee-paid {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--good, #1b7a43);
+  font-weight: 600;
+}
+
+.fee-notice {
+  margin-bottom: 16px;
+}
+
+.fee-notice.risk {
+  border-color: var(--risk, #b3261e);
+}
+
+.card-line {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+@media (max-width: 600px) {
+  .fee-row {
+    flex-wrap: wrap;
+  }
+}

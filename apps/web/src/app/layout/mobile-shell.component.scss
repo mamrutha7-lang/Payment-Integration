@@ -1,0 +1,91 @@
+/* The phone app's frame. Colours come from the global REEP tokens
+ * (src/styles/reep-v2.scss) so the app and the website are one brand. */
+
+ion-toolbar {
+  --background: var(--surface);
+  --color: var(--ink);
+  --border-color: var(--hairline);
+}
+
+ion-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 17px;
+}
+
+ion-content {
+  --background: transparent;
+}
+
+/* The screens were built for the website's scrolling <main>; inside the app,
+ * ion-content does the scrolling, so <main> just flows, with phone padding.
+ * The bottom padding keeps the last row clear of the floating assistant. */
+.m-main.desktop-main {
+  overflow: visible;
+  padding: 12px 12px 96px;
+  min-height: 100%;
+}
+
+.m-who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+}
+.m-who__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.m-who__name {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.m-who__sub {
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.m-list {
+  padding: 4px 8px;
+  background: transparent;
+}
+.m-list ion-list-header {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  min-height: 28px;
+}
+.m-list ion-item {
+  --border-radius: 12px;
+  --min-height: 44px;
+  font-size: 15px;
+}
+.m-list ion-item .icon {
+  margin-inline-end: 14px;
+  font-size: 22px;
+}
+.m-list ion-item.m-active {
+  --background: rgba(85, 44, 126, 0.1);
+  --color: var(--brand-purple);
+  font-weight: 600;
+}
+
+ion-tab-bar {
+  --background: var(--surface);
+  --border: 1px solid var(--hairline);
+  --color-selected: var(--brand-purple);
+}
+ion-tab-button .icon {
+  font-size: 24px;
+}
+ion-tab-button ion-label {
+  font-size: 11px;
+  max-width: 76px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

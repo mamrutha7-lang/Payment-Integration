@@ -1,0 +1,219 @@
+# Release: after every green CI on `main`, decide whether what is waiting can
+# go to production, write the release notes, and — for the safe classes only,
+# and only when you have switched it on — ship it.
+#
+#   CI green on main
+#     -> diff against the LAST SUCCESSFUL production deploy
+#     -> tools/ci/release_gate.py decides (code, not a model, and tested)
+#     -> Claude writes the release notes into the "Release waiting" issue
+#     -> gate says auto_ok AND vars.AGENT_AUTODEPLOY == 'true'
+#          -> dispatch deploy.yml, watch it, triage it if it fails
+#        otherwise
+#          -> the issue names exactly what needs a human and which button
+#
+# AUTO-DEPLOY IS OFF UNTIL YOU TURN IT ON: Settings -> Secrets and variables ->
+# Actions -> Variables -> AGENT_AUTODEPLOY = true. Putting code in front of
+# every student without a human is a decision for the owner, not a default a
+# pull request can make. Off, this workflow still does everything else.
+#
+# What it will NEVER ship, whatever the switch says (release_gate.py):
+# migrations, models, infra/, auth / rule 1 / rule 2 / deletion code, the
+# service worker, dependency manifests, a change to the deploy pipeline or to
+# the gate itself, or more than 40 files. It always deploys with
+# run_migrations=false, which is safe precisely because a migration anywhere in
+# the change set refuses the auto path.
+#
+# workflow_run only fires for workflows on the default branch, so this starts
+# working once it is merged.
+
+name: Agent release
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+concurrency:
+  # A newer green main supersedes an older one: ship the latest, once.
+  group: agent-release
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  issues: write
+  actions: write     # dispatch and watch deploy.yml
+  id-token: write
+
+jobs:
+  gate:
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    outputs:
+      target: ${{ steps.gate.outputs.target }}
+      auto_ok: ${{ steps.gate.outputs.auto_ok }}
+      base: ${{ steps.base.outputs.base }}
+      head: ${{ steps.base.outputs.head }}
+      current: ${{ steps.base.outputs.current }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: What is live, and what is waiting
+        id: base
+        run: |
+          HEAD_SHA="${{ github.event.workflow_run.head_sha }}"
+          # The last SUCCESSFUL production deploy is what is live. A failed one
+          # rolled back (ECS circuit breaker), so it does not count.
+          BASE=$(gh run list --workflow deploy.yml --branch main --status success \
+                   --limit 1 --json headSha --jq '.[0].headSha // ""')
+          if [ -z "$BASE" ]; then
+            echo "::warning::No successful deploy found; nothing to compare against. A human must do the first deploy."
+            BASE="$HEAD_SHA"
+          fi
+          # A deployed commit that is no longer in main's history (a history
+          # rewrite, a force-push) cannot be diffed against. Nothing is known
+          # about what is waiting, so nothing ships automatically until a
+          # human deploys once and records a commit that exists.
+          if ! git merge-base --is-ancestor "$BASE" "$HEAD_SHA" 2>/dev/null; then
+            echo "::warning::Last deployed commit $BASE is not in main's history. A human must deploy once before automatic releases resume."
+            BASE="$HEAD_SHA"
+          fi
+          CURRENT=$(git ls-remote origin refs/heads/main | cut -f1)
+          echo "base=$BASE"       >> "$GITHUB_OUTPUT"
+          echo "head=$HEAD_SHA"   >> "$GITHUB_OUTPUT"
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "Live: $BASE  Waiting: $HEAD_SHA  main now: $CURRENT"
+          # The switch is a repository variable, which no agent tool can read;
+          # printing it here is how its value is checked without the settings page.
+          echo "AGENT_AUTODEPLOY=${{ vars.AGENT_AUTODEPLOY || '(not set)' }}"
+
+      - name: Release gate (deterministic)
+        id: gate
+        run: |
+          python3 tools/ci/release_gate.py --base "${{ steps.base.outputs.base }}" \
+                                           --head "${{ steps.base.outputs.head }}" | tee gate.json
+          {
+            echo "### Release gate"
+            echo '```json'; cat gate.json; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  notes:
+    needs: gate
+    if: needs.gate.outputs.target != 'none'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.gate.outputs.head }}
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            REPO: ${{ github.repository }}
+            LIVE: ${{ needs.gate.outputs.base }}
+            WAITING: ${{ needs.gate.outputs.head }}
+            TARGET: ${{ needs.gate.outputs.target }}
+            AUTO_OK: ${{ needs.gate.outputs.auto_ok }}
+            AUTODEPLOY_SWITCH: ${{ vars.AGENT_AUTODEPLOY || 'false' }}
+
+            Write release notes for what is waiting to go to production.
+            Run: python3 tools/ci/release_gate.py --base LIVE --head WAITING
+            and git log --oneline LIVE..WAITING.
+
+            Find the open issue labelled `release` (gh issue list --label release
+            --state open). Update its body, or create it titled
+            "Release waiting" with label `release`, containing:
+            1. What students, faculty and the office will notice, in plain words
+               (from the commit messages; one line per change).
+            2. The gate's verdict. If AUTO_OK is false, list each reason and the
+               exact step a human takes: Actions -> Deploy -> Run workflow,
+               target TARGET, run_migrations ticked when a migration is listed.
+               If infra/ changed, say cdk-deploy.yml is also needed and that its
+               option must be chosen by a human.
+            3. If AUTO_OK is true and AUTODEPLOY_SWITCH is true, say it is being
+               deployed automatically now. If the switch is off, say it would be
+               eligible for auto-deploy.
+            Never deploy anything yourself.
+          claude_args: |
+            --max-turns 30
+            --allowedTools "Read,Grep,Bash(git log:*),Bash(git diff:*),Bash(python3 tools/ci/release_gate.py:*),Bash(gh issue list:*),Bash(gh issue view:*),Bash(gh issue create:*),Bash(gh issue edit:*),Bash(gh label create:*)"
+
+  deploy:
+    needs: [gate, notes]
+    # Three independent conditions, all required: the gate said yes, the owner
+    # switched auto-deploy on, and main has not moved on since this CI run —
+    # deploy.yml builds whatever main is NOW, which must be what was gated.
+    # !cancelled(): release notes failing to write must not hold a safe deploy.
+    if: >-
+      !cancelled() && needs.gate.result == 'success' &&
+      needs.gate.outputs.auto_ok == 'true' &&
+      vars.AGENT_AUTODEPLOY == 'true' &&
+      needs.gate.outputs.current == needs.gate.outputs.head
+    runs-on: ubuntu-latest
+    outputs:
+      run_id: ${{ steps.dispatch.outputs.run_id }}
+      result: ${{ steps.watch.outputs.result }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Dispatch deploy.yml
+        id: dispatch
+        run: |
+          gh workflow run deploy.yml --repo "${{ github.repository }}" --ref main \
+            -f target="${{ needs.gate.outputs.target }}" \
+            -f run_migrations=false -f seed_kb=false -f confirm=deploy
+          # The dispatch returns no id; find the run it created.
+          for i in $(seq 1 30); do
+            sleep 5
+            ID=$(gh run list --repo "${{ github.repository }}" --workflow deploy.yml \
+                   --event workflow_dispatch --limit 1 \
+                   --json databaseId,headSha --jq '.[] | select(.headSha=="${{ needs.gate.outputs.head }}") | .databaseId')
+            if [ -n "$ID" ]; then echo "run_id=$ID" >> "$GITHUB_OUTPUT"; exit 0; fi
+          done
+          echo "::error::Dispatched deploy.yml but could not find its run."; exit 1
+
+      - name: Watch it
+        id: watch
+        run: |
+          if gh run watch "${{ steps.dispatch.outputs.run_id }}" --repo "${{ github.repository }}" \
+               --exit-status --interval 30; then
+            echo "result=success" >> "$GITHUB_OUTPUT"
+          else
+            echo "result=failure" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Close the release issue
+        if: steps.watch.outputs.result == 'success'
+        run: |
+          N=$(gh issue list --repo "${{ github.repository }}" --label release --state open \
+                --limit 1 --json number --jq '.[0].number // ""')
+          [ -n "$N" ] && gh issue close "$N" --repo "${{ github.repository }}" \
+            --comment "Deployed automatically: ${{ needs.gate.outputs.head }} (run ${{ steps.dispatch.outputs.run_id }})." || true
+
+  triage-failed-deploy:
+    needs: deploy
+    if: needs.deploy.outputs.result == 'failure'
+    # A called workflow can never hold more than its caller job grants, and
+    # this file's top level grants only contents: read.
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      actions: read
+      id-token: write
+    uses: ./.github/workflows/agent-triage.yml
+    with:
+      kind: deploy-failure
+      subject: ${{ needs.deploy.outputs.run_id }}
+    secrets: inherit

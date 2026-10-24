@@ -1,0 +1,45 @@
+{
+  "app": "python app.py",
+  "watch": {
+    "include": [
+      "**"
+    ],
+    "exclude": [
+      "README.md",
+      "cdk*.json",
+      "requirements*.txt",
+      "**/__pycache__",
+      "tests"
+    ]
+  },
+  "context": {
+    "project": "reep",
+    "recordingRetentionDays": 0,
+    "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
+    "@aws-cdk/core:checkSecretUsage": true,
+    "@aws-cdk/aws-iam:minimizePolicies": true,
+    "@aws-cdk/core:enablePartitionLiterals": true,
+    "@aws-cdk/aws-s3:createDefaultLoggingPolicy": true,
+    "@aws-cdk/aws-iam:standardizedServicePrincipals": true,
+    "phase": "harden",
+    "sesIdentityDomain": "sast-skills.com",
+    "sesFromAddress": "no-reply@sast-skills.com",
+    "sesConfigurationSet": "reep-transactional",
+    "sesManaged": false,
+    "leaveMailEnabled": true,
+    "backupRetentionDays": 35,
+    "archiveRetentionDays": 365,
+    "cloudfrontLogDays": 30,
+    "apiArm64": true,
+    "natInstance": true,
+    "natGateway": false,
+    "natAmiId": "ami-0cf36b0c962e50fd7",
+    "dbMultiAz": false,
+    "dbInstanceClassTarget": "db.t4g.small",
+    "vaultLockCompliance": false,
+    "blueGreen": false,
+    "liveColour": "blue",
+    "@aws-cdk/aws-ecs:removeDefaultDesiredCount": true,
+    "@aws-cdk/aws-ecs:removeDefaultDeploymentAlarm": true
+  }
+}

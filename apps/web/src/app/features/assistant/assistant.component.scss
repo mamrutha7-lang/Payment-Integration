@@ -1,0 +1,101 @@
+/* The mock-interview PAGE: heading, the Rule 1 note, the saved conversation.
+ * The room itself — stage, orb, consent, transcript, report — and every rule
+ * for it live in shared/interview-room/. */
+
+:host {
+  display: block;
+}
+
+.err {
+  color: var(--risk);
+  margin: 0 0 16px;
+}
+
+/* Scope + records guidance under the intro. */
+.assist-note {
+  margin: -24px 0 20px;
+  max-width: 72ch;
+  color: var(--muted);
+}
+.assist-note__link {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.assist-note__link:focus-visible {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* Inline text-button (Show/Hide). */
+.link-btn {
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 4px;
+}
+.link-btn:hover:not(:disabled) {
+  text-decoration: underline;
+}
+.link-btn:focus-visible {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 1px;
+}
+
+/* --- Saved conversation ------------------------------------------------- */
+.convo {
+  margin: 0 0 32px;
+}
+.convo__toggle {
+  font-size: 0.8125rem;
+}
+.convo__empty {
+  margin: 10px 0 0;
+  color: var(--muted);
+}
+.convo__log {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--hairline-42);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.cturn {
+  margin: 0 0 10px;
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 10px;
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+.cturn:last-child {
+  margin-bottom: 0;
+}
+.cturn__who {
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-purple);
+  padding-top: 2px;
+}
+.cturn--user .cturn__who {
+  color: var(--good);
+}
+.cturn__text {
+  color: var(--ink);
+  white-space: pre-wrap;
+}
+@media (max-width: 560px) {
+  .cturn {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}

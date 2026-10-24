@@ -1,0 +1,317 @@
+/* Interview question bank — this screen's LAYOUT only.
+ *
+ * `.panel` `.card` `.card-head` `.card-title` `.card-sub` `.chip` `.btn`
+ * `.field` `.ctrl` `.check` `.notice` `.tabs` `.crumb` `.dt-header` `.dt-title`
+ * `.dt-sub` `.dt-toolbar` `.dt-frame` `.dt-gridbar` `.dt-quickfilter`
+ * `.dt-table` `.dt-statusbar` `.footbar` `.icon` `.sr-only` are global
+ * (styles/reep-v2.scss) and are used as they are. What is here is the shape
+ * of this screen: the track tabs, then one card for the track and one for its
+ * questions, top to bottom.
+ *
+ * Every class below is prefixed `bank-` (or is scoped inside one that is), so
+ * nothing here can be mistaken for a global the next screen might expect.
+ */
+
+:host {
+  display: block;
+}
+
+/* --- banners -------------------------------------------------------------- */
+
+.bank-banner {
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.bank-banner__dismiss {
+  margin-left: auto;
+  flex: none;
+}
+
+/* --- which track: pill tabs ----------------------------------------------- */
+
+.bank-tracks {
+  margin-bottom: 12px;
+}
+
+.bank-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bank-tab-count {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+/* One categorical colour per track (01-design-system.md §1): FIN cat-1,
+   HR cat-2, MKT cat-3, BA cat-4 — fixed, so a track keeps its colour on every
+   screen that draws it. */
+.bank-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--seq-light);
+  flex: none;
+  display: inline-block;
+}
+
+.bank-dot--finance {
+  background: var(--cat-1);
+}
+
+.bank-dot--people {
+  background: var(--cat-2);
+}
+
+.bank-dot--marketing {
+  background: var(--cat-3);
+}
+
+.bank-dot--analytics {
+  background: var(--cat-4);
+}
+
+/* --- the cards, top to bottom --------------------------------------------- */
+
+.bank-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 1100px;
+}
+
+.bank-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.bank-row .field.grow {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.bank-row .field.narrow {
+  flex: 0 1 150px;
+}
+
+.bank-row + .bank-row,
+.bank-row + .field {
+  margin-top: 10px;
+}
+
+.required-mark {
+  color: var(--risk);
+}
+
+/* The card head carries a title, two state chips and two buttons; on a narrow
+   column it wraps, which is why neither group is absolutely placed. */
+.bank-track-chips,
+.bank-track-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.bank-track-warnings ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+.bank-enabled {
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.bank-enabled input:disabled {
+  cursor: default;
+}
+
+/* --- the add-one and add-many forms, inside the questions card ------------ */
+
+.bank-form {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--tint-1);
+  border: 1px solid var(--hairline);
+}
+
+.bank-form .footbar {
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
+.bank-bulk-text {
+  min-height: 150px;
+  font-variant-numeric: tabular-nums;
+}
+
+.bank-skipped {
+  margin-top: 10px;
+}
+
+.bank-skipped ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+}
+
+/* INVISIBLE BUT FOCUSABLE — `hidden` inside a label makes a picker
+   mouse-only, and the label is not tabbable in its place. */
+.bank-file {
+  position: relative;
+  margin-right: auto;
+}
+
+.bank-file__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.bank-file:focus-within {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 2px;
+}
+
+/* --- the question list ---------------------------------------------------- */
+
+.bank-scroll {
+  overflow-x: auto;
+  max-height: clamp(320px, calc(100vh - 420px), 640px);
+  overflow-y: auto;
+}
+
+.bank-table {
+  min-width: 720px;
+}
+
+.bank-tick {
+  width: 36px;
+}
+
+.bank-number {
+  width: 52px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.bank-phase {
+  width: 130px;
+}
+
+.bank-phase-select {
+  height: 28px;
+  padding: 0 6px;
+  font-size: 12px;
+}
+
+.bank-status {
+  width: 110px;
+}
+
+/* A chip that toggles: the button carries no dress of its own, so the chip
+   stays the chip the design system defines. */
+.bank-status-toggle {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.bank-status-toggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.bank-question-text {
+  width: 100%;
+  min-height: 34px;
+  resize: vertical;
+  font-family: inherit;
+  font-size: 12.5px;
+  line-height: 1.4;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-btn);
+  padding: 5px 7px;
+}
+
+.bank-question-text:hover {
+  border-color: var(--hairline-26);
+  background: var(--surface);
+}
+
+.bank-question-text:focus {
+  outline: none;
+  border-color: var(--purple-mid);
+  background: var(--surface);
+  box-shadow: var(--focus-ring);
+}
+
+.bank-actions {
+  width: 120px;
+  white-space: nowrap;
+  text-align: right;
+}
+
+.bank-icon-btn {
+  padding: 0 7px;
+}
+
+/* The reorder pair. `arrow_forward` is in the icon subset and turned a
+   quarter either way is an up and a down arrow; `expand_more`, which these
+   buttons used to carry, was taken off every screen in a7ff923 and left
+   them empty. */
+.bank-arrow-up,
+.bank-arrow-down {
+  display: inline-block;
+}
+
+.bank-arrow-up {
+  transform: rotate(-90deg);
+}
+
+.bank-arrow-down {
+  transform: rotate(90deg);
+}
+
+.bank-empty {
+  color: var(--muted);
+  padding: 18px 10px;
+  text-align: center;
+}
+
+.bank-state {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin: 0;
+  padding: 14px 12px;
+}
+
+.bank-pagesize {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bank-pagesize select {
+  height: 26px;
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-seg);
+  background: var(--surface);
+  font-family: inherit;
+  font-size: 12px;
+  color: var(--ink);
+}

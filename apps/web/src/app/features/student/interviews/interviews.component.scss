@@ -1,0 +1,206 @@
+/**
+ * Mock-interview history.
+ *
+ * Layout only. Every box, table, chip and stat here is a GLOBAL reep-v2 class
+ * (`.card`, `.dt-table`, `.dense-grid`, `.chip good/warn/risk/neutral`,
+ * `.dt-btn`) — this file adds the few things those do not cover and redefines
+ * none of them. A component that restyles `.chip` locally is how two screens
+ * start disagreeing about what "warn" looks like.
+ *
+ * Status is always TEXT AND COLOUR TOGETHER: every chip in the template carries
+ * a word, and nothing on this screen is distinguished by colour alone.
+ */
+
+:host {
+  display: block;
+}
+
+.iv-err {
+  color: var(--reep-error-main);
+  margin: 0 0 14px;
+  font-size: 13px;
+}
+
+.iv-note {
+  margin: 0 0 12px;
+  font-size: 12.6px;
+  line-height: 1.6;
+  color: var(--reep-text-secondary);
+}
+
+.iv-scope {
+  max-width: 78ch;
+  margin: -6px 0 18px;
+  font-size: 12.4px;
+  line-height: 1.6;
+  color: var(--reep-text-secondary);
+}
+
+.iv-muted {
+  color: var(--reep-text-secondary);
+}
+
+/* Visually hidden, still announced — the "Open" column header has no visible
+   label because the button says it, but a screen reader still needs one. */
+.iv-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.iv-stats {
+  /* The global .dense-grid is a fixed 4 columns; this screen has 3. */
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.iv-table td {
+  vertical-align: top;
+}
+.iv-date {
+  font-weight: 700;
+}
+.iv-time {
+  font-size: 11px;
+  color: var(--reep-text-secondary);
+}
+.iv-num {
+  font-variant-numeric: tabular-nums;
+}
+.iv-open {
+  text-align: right;
+  white-space: nowrap;
+}
+.iv-chip2 {
+  margin-left: 6px;
+}
+/* The open row, marked by weight and a rule as well as tint — a background
+   shade alone would be colour-only state. */
+.iv-row--open td {
+  background: var(--reep-action-hover);
+  box-shadow: inset 2px 0 0 var(--ink, #1c1810);
+}
+
+/* --- one interview, expanded ------------------------------------------- */
+.iv-detail {
+  margin-top: 4px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hairline, var(--reep-divider));
+}
+.iv-detail__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.iv-noreport {
+  margin-bottom: 16px;
+}
+.iv-noreport__title {
+  margin: 0 0 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--reep-text-primary);
+}
+
+.iv-empty {
+  text-align: center;
+  padding: 40px 24px;
+}
+.iv-empty__title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--reep-text-primary);
+}
+.iv-empty .iv-note {
+  max-width: 52ch;
+  margin: 0 auto 16px;
+}
+
+.iv-h3 {
+  margin: 22px 0 10px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--reep-text-primary);
+}
+
+.iv-log {
+  padding: 14px 16px;
+  border: 1px solid var(--hairline, var(--reep-divider));
+  border-radius: 10px;
+  background: var(--tint-3, var(--reep-surface));
+}
+
+/* A phase divider once per stage, instead of a chip on every line. */
+.iv-phase {
+  margin: 16px 0 8px;
+  font-size: 10.6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--reep-text-secondary);
+  border-bottom: 1px solid var(--hairline, var(--reep-divider));
+  padding-bottom: 4px;
+}
+.iv-phase:first-child {
+  margin-top: 0;
+}
+
+.iv-turn {
+  display: grid;
+  grid-template-columns: 6.5rem 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 12.8px;
+  line-height: 1.6;
+}
+.iv-turn__who {
+  font-weight: 700;
+  font-size: 10.6px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--reep-text-secondary);
+  padding-top: 3px;
+}
+.iv-turn[data-speaker='student'] .iv-turn__who {
+  color: var(--good, #5c7a3a);
+}
+.iv-turn[data-speaker='interviewer'] .iv-turn__who {
+  color: var(--reep-primary-main, #1a3c5e);
+}
+.iv-turn__body {
+  min-width: 0;
+}
+.iv-turn__text {
+  color: var(--reep-text-primary);
+  white-space: pre-wrap;
+}
+.iv-unheard {
+  color: var(--reep-text-secondary);
+}
+/* A word, not a colour: these say why a turn did not count, and the sentence is
+   the whole point. */
+.iv-flag {
+  display: block;
+  margin-top: 3px;
+  font-size: 11.4px;
+  color: var(--warn, #a8752f);
+}
+
+@media (max-width: 640px) {
+  .iv-stats {
+    grid-template-columns: 1fr;
+  }
+  .iv-turn {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .iv-detail__head {
+    flex-direction: column;
+  }
+}

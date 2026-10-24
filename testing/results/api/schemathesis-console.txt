@@ -1,0 +1,123 @@
+== schemathesis: public (^/(health|api/(auth/sso/status|register/hierarchy|interview/status))$)
+    
+    st replay qpg3yJ
+
+=================================== WARNINGS ===================================
+
+Authentication failed: 1 operation returned authentication errors
+
+401 Unauthorized (1 operation):
+  - GET /api/interview/status
+
+💡 Ensure valid authentication credentials are set via --auth or -H
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 4/370
+  Tested: 4
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ Undocumented HTTP status code: 1
+
+Warnings:
+  ⚠️ Missing authentication: 1 operation returned only 401/403 responses
+
+Test cases:
+  20 generated, 1 found 1 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis/public/junit-20260929T211259Z.xml
+  - NDJSON: results/api/schemathesis/public/ndjson-20260929T211259Z.ndjson
+
+Seed: 234383126568249791422040423199945050944
+
+======================== 1 failure, 1 warning in 0.30s =========================
+== schemathesis: student (^/api/student/)
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Resume not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/resume/0/pdf?appendix=false'
+    
+    st replay tobQSP
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 34/370
+  Tested: 34
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ Response violates schema: 2
+  ❌ Undocumented HTTP status code: 1
+
+Test cases:
+  308 generated, 3 found 3 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis/student/junit-20260929T211302Z.xml
+  - NDJSON: results/api/schemathesis/student/ndjson-20260929T211302Z.ndjson
+
+Seed: 94225391140300339650436948815064464451
+
+============================= 3 failures in 2.72s ==============================
+== schemathesis: admin (^/api/admin/)
+
+        "The Main Admin account cannot be removed or deleted - it is the only way int...
+
+[422] Unprocessable Content:
+
+    `{"detail":"The Main Admin account cannot be removed or deleted - it is the only way into the console. Hand the office over first (demote it to MENTOR with `python -m app.grant_access`)."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/1c7d10b26d71403e9d19c029a2099ba7/delete-plan
+    
+    st replay ZFEOhW
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 64/370
+  Tested: 64
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ Server error: 3
+  ❌ Response violates schema: 4
+  ❌ Undocumented HTTP status code: 25
+
+Test cases:
+  1761 generated, 29 found 32 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis/admin/junit-20260929T211306Z.xml
+  - NDJSON: results/api/schemathesis/admin/ndjson-20260929T211306Z.ndjson
+
+Seed: 188061488742790290575701464471448972744
+
+============================ 32 failures in 22.16s =============================

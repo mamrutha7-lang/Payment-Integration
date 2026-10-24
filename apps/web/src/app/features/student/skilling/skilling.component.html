@@ -1,0 +1,312 @@
+<div class="panel" data-p="skilling">
+  <p class="crumb">Skilling</p>
+  <div class="dt-header">
+    <div>
+      <h1 class="dt-title">Skilling</h1>
+      <div class="dt-sub">
+        Upload a certificate to claim a skill, then track your verified badges
+      </div>
+    </div>
+  </div>
+
+  <!-- Claim a skill with a certificate -->
+  <div class="card claim-card">
+    <h3 class="claim-title">Claim a skill with a certificate</h3>
+    <p class="claim-lede">
+      Upload the certificate and pick the badge it proves. A faculty reviewer verifies it before the
+      badge lights up.
+    </p>
+
+    @if (claimSubmitted()) {
+      <div class="claim-done">
+        <p>
+          <b>Claim submitted.</b> A faculty reviewer will check the certificate and verify the
+          badge.
+        </p>
+        <button type="button" class="btn-outline-good" (click)="claimAnother()">
+          Claim another skill
+        </button>
+      </div>
+    } @else if (boardError()) {
+      <div class="state-note"><span class="icon" aria-hidden="true">error</span>{{ boardError() }}</div>
+    } @else {
+      <div class="field-label">Certificate</div>
+      @if (claimFile()) {
+        <!-- The picked row is a drop target as well. The gesture is learned on
+             the dropzone this row replaces, and if it stopped working the
+             moment a file was attached then the SECOND drop — the one swapping
+             out a certificate for the right one — would be the drop that
+             navigates the window away and loses the claim. Same handlers, same
+             code path; the button says what the drop will do, so the state is
+             never colour alone. -->
+        <div
+          class="cert-picked"
+          [style.border-color]="certDragOver() ? 'var(--purple-mid)' : null"
+          [style.background]="certDragOver() ? 'var(--tint-3)' : null"
+          (dragenter)="onCertDragOver($event)"
+          (dragover)="onCertDragOver($event)"
+          (dragleave)="onCertDragLeave($event)"
+          (drop)="onCertDrop($event)"
+        >
+          <span class="icon" aria-hidden="true">check_circle</span>
+          <span class="cert-name">{{ claimFileName() }}</span>
+          <button type="button" class="link-btn" (click)="picker.click()">
+            {{ certDragOver() ? 'Drop to replace' : 'Replace' }}
+          </button>
+        </div>
+      } @else {
+        <!-- A real drop target, not just a line of copy claiming to be one.
+             preventDefault on dragenter/dragover is what makes an element
+             droppable at all; without it a dropped certificate kept the
+             browser's default and NAVIGATED the window to the file, unloading
+             the app and taking the half-filled claim beside it — category,
+             badge, issuer, note — with no error and nothing to go back to.
+             The state is drawn inline as the `.cert-drop:hover` treatment
+             (the box looks the way it does when a click would land) and is
+             also SAID on the main line, because a state carried by colour
+             alone is not one every student can see. The glyph does not change
+             with it: the icon font is subset to tools/fonts/icon-names.txt and
+             a name outside that list renders as nothing at all. (click) and
+             the tab order are untouched — the picker is still the way in from
+             the keyboard. -->
+        <button
+          type="button"
+          class="cert-drop"
+          [style.border-color]="certDragOver() ? 'var(--purple-mid)' : null"
+          [style.background]="certDragOver() ? 'var(--tint-3)' : null"
+          (click)="picker.click()"
+          (dragenter)="onCertDragOver($event)"
+          (dragover)="onCertDragOver($event)"
+          (dragleave)="onCertDragLeave($event)"
+          (drop)="onCertDrop($event)"
+        >
+          <span class="icon" aria-hidden="true">upload_file</span>
+          <span class="cert-drop-main" aria-live="polite">{{
+            readingFile()
+              ? 'Opening the file…'
+              : certDragOver()
+                ? 'Drop the certificate to attach it'
+                : 'Click to upload or drop a file'
+          }}</span>
+          <span class="cert-drop-sub">PDF or JPEG, up to 5 MB</span>
+        </button>
+      }
+      <!-- The ONE entry point to /student/uploads. The shell's sidebar leaves
+           Uploads out on the grounds that documents are "reached from the screen
+           that owns the work" — but no screen linked it, so a working document
+           shelf was reachable only by typing the URL. Skilling is where a
+           certificate is uploaded, so it is where "everything I have uploaded"
+           belongs. -->
+      <a class="link-btn skl-all-docs" routerLink="/student/uploads">
+        <span class="icon" aria-hidden="true">folder_open</span>
+        All my documents and their review status
+      </a>
+      <input
+        #picker
+        type="file"
+        accept="application/pdf,image/jpeg"
+        hidden
+        (change)="onFilePicked($event)"
+      />
+
+      <div class="claim-grid">
+        <label class="claim-field">
+          <span class="field-label">Skill category</span>
+          <select
+            [value]="claimCategory()"
+            [disabled]="dashboard() === null"
+            (change)="onCategoryChange($any($event.target).value)"
+          >
+            <option value="">
+              {{ dashboard() === null ? 'Loading categories…' : 'Select a category' }}
+            </option>
+            @for (c of categories(); track c.key) {
+              <option [value]="c.key">{{ c.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="claim-field">
+          <span class="field-label">Skill badge</span>
+          <select
+            [value]="claimBadge()"
+            [disabled]="!claimCategory()"
+            (change)="claimBadge.set($any($event.target).value)"
+          >
+            <option value="">
+              {{ claimCategory() ? 'Select a badge' : 'Pick a category first' }}
+            </option>
+            @for (b of badgeOptions(); track b.code) {
+              <option [value]="b.code">
+                {{ b.name }}{{ b.track_label ? ' · ' + b.track_label : '' }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <label class="claim-field">
+        <span class="field-label">Issued by</span>
+        <input
+          [value]="claimIssuer()"
+          (input)="claimIssuer.set($any($event.target).value)"
+          placeholder="e.g. NISM, Coursera, internal assessment"
+        />
+      </label>
+
+      <label class="claim-field">
+        <span class="field-label">Note for the reviewer</span>
+        <input
+          [value]="claimNote()"
+          (input)="claimNote.set($any($event.target).value)"
+          placeholder="Optional — what the certificate covers"
+        />
+      </label>
+
+      @if (claimError()) {
+        <div class="state-note" role="alert">
+          <span class="icon" aria-hidden="true">error</span>{{ claimError() }}
+        </div>
+      }
+
+      <div class="claim-actions">
+        <button
+          type="button"
+          class="btn primary submit"
+          [disabled]="!canSubmitClaim()"
+          (click)="submitClaim()"
+        >
+          {{ claiming() ? 'Submitting…' : 'Submit claim' }}
+        </button>
+        <span class="claim-hint">Typically verified within two working days</span>
+      </div>
+    }
+  </div>
+
+  <!--
+    Claims the student still has to act on. Renders only when there IS one, so
+    the screen matches the handoff whenever nothing is outstanding.
+  -->
+  @if (openClaims().length) {
+    <div class="card claims-card">
+      <h4>Claims in progress</h4>
+      <!--
+        A TABLE, per the board. It was a row per claim with the verifier's note
+        on a line of its own underneath, so on two claims the second claim's
+        badge name sat directly under the first claim's note and the two read as
+        one entry. Three named columns make the note belong to its row.
+      -->
+      <table class="dt-table claims-table">
+        <thead>
+          <tr>
+            <th>Badge</th>
+            <th class="claims-status">Status</th>
+            <th>Note from the reviewer</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of openClaims(); track c.id) {
+            <tr>
+              <td>{{ c.badgeName }}</td>
+              <td class="claims-status">
+                <span class="chip {{ c.chipClass }}">
+                  <span class="icon" aria-hidden="true">{{ c.chipIcon }}</span
+                  >{{ c.chipLabel }}
+                </span>
+              </td>
+              <!-- An em dash, not an empty cell: "no note" and "the note did
+                   not load" must not look the same. -->
+              <td class="claims-note">{{ c.reviewNote || '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- The badge board -->
+  <div class="card board">
+    <div class="board-legend">
+      <span class="legend-item"><span class="dot dot-open"></span>Not claimed</span>
+      <span class="legend-item">
+        <span class="icon legend-wait" aria-hidden="true">schedule</span>Claim waiting for review
+      </span>
+      <span class="legend-item legend-item--lit">
+        <span class="icon legend-tick" aria-hidden="true">verified</span>Verified by a reviewer
+      </span>
+      <span class="legend-hint">Tap badges to preview the earned state.</span>
+    </div>
+
+    @if (boardError()) {
+      <div class="state-note"><span class="icon" aria-hidden="true">error</span>{{ boardError() }}</div>
+    } @else if (board() === null) {
+      <div class="state-note">
+        <span class="icon" aria-hidden="true">hourglass_empty</span>Loading your badges…
+      </div>
+    } @else if (board()!.length === 0) {
+      <div class="state-note">
+        <span class="icon" aria-hidden="true">info</span>No badges in the catalogue yet.
+      </div>
+    } @else {
+      @for (cat of board()!; track cat.key) {
+        <div class="board-row">
+          <div class="board-cat">
+            <div class="board-cat-name">{{ cat.label }}</div>
+            <div class="board-cat-note">{{ cat.note }}</div>
+          </div>
+          <div class="board-badges">
+            @for (b of cat.badges; track b.code) {
+              <!-- THE BLUE TICK IS THE REVIEWER'S, AND ONLY THEIRS. It is drawn on
+                   a badge held EARNED and on nothing else: a badge nobody has
+                   claimed is unmarked, a claim in review wears a small clock,
+                   and a tapped preview lights the hexagon without the tick —
+                   a preview that wore it would be indistinguishable from a
+                   verified badge, which is the one thing this board must
+                   never blur. The state is said in words under the name as
+                   well, so it is never colour alone. -->
+              <button
+                type="button"
+                class="badge-tile"
+                [class.badge-tile--lit]="b.acquired || b.previewed"
+                [class.badge-tile--verified]="b.acquired"
+                [class.badge-tile--pending]="b.pending && !b.previewed"
+                [class.badge-tile--preview]="b.previewed"
+                [attr.title]="b.previewed ? 'Preview — tap again to clear' : b.hint"
+                [attr.aria-pressed]="b.acquired ? null : b.previewed"
+                (click)="togglePreview(b)"
+              >
+                <span class="emblem" aria-hidden="true">
+                  <span class="hex"></span>
+                  <span class="icon">{{ categoryIcon(cat.key) }}</span>
+                  @if (b.acquired) {
+                    <span class="tick"><span class="icon">verified</span></span>
+                  } @else if (b.pending && !b.previewed) {
+                    <span class="wait"><span class="icon">schedule</span></span>
+                  }
+                </span>
+                <span class="badge-tile__name">{{ b.name }}</span>
+                <span class="badge-tile__status">
+                  @if (b.acquired) {
+                    <span class="icon" aria-hidden="true">verified</span>Verified
+                  } @else if (b.previewed) {
+                    Preview
+                  } @else if (b.pending) {
+                    <span class="icon" aria-hidden="true">schedule</span>Waiting for review
+                  } @else {
+                    Not claimed
+                  }
+                </span>
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="board-foot">
+        <div>
+          <b>{{ litCount() }}</b> skills currently illuminated
+        </div>
+        <div class="board-foot-hint">Unmarked → claimed &amp; waiting for review → blue tick</div>
+      </div>
+    }
+  </div>
+</div>

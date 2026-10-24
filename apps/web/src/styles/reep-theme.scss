@@ -1,0 +1,296 @@
+/**
+ * The REEP design system, ported from the Next.js app's `src/theme.ts` to
+ * framework-agnostic CSS custom properties.
+ *
+ * This is the foundation of the pixel-perfect migration. The React app drives
+ * MUI through `cssVariables: { colorSchemeSelector: 'data-theme' }`, which means
+ * every colour, radius and shadow on screen is already a CSS variable switched
+ * by a `data-theme` attribute on the root. Porting is therefore not a
+ * reinterpretation — it is transcribing those exact values so an Angular
+ * component reads the identical token an MUI component did. Every hex, every
+ * rgba, every measured contrast decision in `theme.ts` is reproduced here
+ * unchanged; the comments explaining *why* each value is what it is live in
+ * `theme.ts` and are not repeated.
+ *
+ * WHAT CHANGED IN 2026-08: the values are now the REEP v2 lilac palette, and the
+ * dark block is gone. See the note above the :root below — this file is the one
+ * definition of every `--reep-*` token, and the design is a single committed
+ * theme rather than a light/dark pair.
+ */
+
+/* --- fonts ---------------------------------------------------------------- */
+/* Inter, loaded the way next/font loaded it — a --font-inter variable the app
+   already references. Wired to the actual @font-face in the Angular app's
+   global styles so the stack below resolves identically. */
+
+/* --- palette ---------------------------------------------------------------
+ *
+ * These are the REEP v2 values (the lilac / purple-magenta design handoff), not
+ * the warm-paper MUI ones this file was originally transcribed from. They live
+ * HERE, as the single definition, rather than being overridden from
+ * reep-v2.scss: one token, one place. The override block that used to sit in
+ * reep-v2.scss was a shim while the two designs coexisted, and a value defined
+ * twice is a value that will eventually disagree with itself.
+ *
+ * ~190 references across the login and register screens, the resume builder and
+ * a long tail of components read these names. The names are MUI-shaped
+ * (primary/secondary/text/bg) rather than brand-shaped, which is why they are
+ * kept: renaming 190 call sites to say the same thing buys nothing and risks
+ * leaving one screen unstyled. New code should use the honest names in
+ * reep-v2.scss (--brand-purple, --ink, --surface, …).
+ *
+ * SINGLE THEME. The `:root[data-theme='dark']` block that used to follow was
+ * deleted in 2026-08: the v2 design is one committed visual world, nothing in
+ * the UI called ThemeService.toggle(), and a dark palette nobody can reach is a
+ * second set of colours to keep correct for no one.
+ *
+ * PHASE 5 DELETED THE SERVICE TOO (core/theme.service.ts). It was the last
+ * writer of `data-theme`, and with the dark block gone it toggled an attribute
+ * no selector in this repository reads — a switch wired to nothing, which the
+ * next person to find it reads as a theme feature that broke. `data-theme` is
+ * now a STATIC `light` written once on <html> in index.html. Nothing branches on
+ * it; it is there so a token that ever needs a scheme selector again has one.
+ */
+
+:root {
+  --font-inter: 'Inter';
+
+  --reep-primary-main: #552c7e;
+  --reep-primary-light: #7a2f9e;
+  --reep-primary-dark: #401f60;
+  --reep-primary-contrast: #ffffff;
+
+  --reep-secondary-main: #7a2f9e;
+  --reep-secondary-light: #a0248f;
+  --reep-secondary-dark: #8d1866;
+  --reep-secondary-contrast: #ffffff;
+
+  --reep-success-main: #137a4a;
+  --reep-warning-main: #8f6100;
+  --reep-error-main: #ad2452;
+  --reep-info-main: #7a2f9e;
+
+  --reep-bg-default: #ece4f5;
+  --reep-bg-paper: #ffffff;
+
+  --reep-text-primary: #3a1f52;
+  --reep-text-secondary: #7a6392;
+  --reep-text-disabled: #a08cb2;
+
+  --reep-divider: rgba(160, 138, 178, 0.38);
+  --reep-action-hover: rgba(122, 47, 158, 0.06);
+  --reep-action-selected: rgba(85, 44, 126, 0.1);
+
+  --reep-radius: 12px;
+  --reep-radius-control: 12px;
+  --reep-radius-chip: 999px;
+
+  --reep-glass-bg: rgba(255, 255, 255, 0.72);
+  --reep-glass-solid: #faf6fd;
+  --reep-glass-border: rgba(160, 138, 178, 0.38);
+  --reep-glass-shadow: 0 10px 26px rgba(58, 31, 82, 0.1), inset 0 1px 0 #fff;
+  --reep-glass-highlight: inset 0 1px 0 #fff;
+
+  --reep-neu-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(245, 237, 250, 0.7));
+  --reep-neu-flat: #f5edfa;
+  --reep-neu-shadow: 0 10px 26px rgba(58, 31, 82, 0.1), inset 0 1px 0 #fff;
+  --reep-neu-shadow-lift:
+    0 10px 22px rgba(85, 44, 126, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --reep-neu-inset: inset 0 1px 2px rgba(58, 31, 82, 0.12);
+
+  --reep-bloom-a: rgba(122, 47, 158, 0.18);
+  --reep-bloom-b: rgba(85, 44, 126, 0.16);
+  --reep-bloom-c: rgba(160, 36, 143, 0.12);
+
+  --reep-chip-good: #137a4a;
+  --reep-chip-accent: #552c7e;
+
+  --reep-cell-well: #f5edfa;
+  --reep-cell-well-hover: #efe4f6;
+  --reep-cell-well-inset: inset 0 1px 2px rgba(58, 31, 82, 0.12);
+}
+
+/* --- typography scale (from theme.ts `typography`) ------------------------ */
+/* Kept as classes rather than element selectors: MUI's Typography maps variant
+   to element by config, not by tag, so `h1` here is the visual scale, applied
+   wherever the React app wrote `variant="h1"`. */
+
+:root {
+  --reep-font-stack: var(--font-inter), system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+.reep-h1 {
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: -0.021em;
+  line-height: 1.25;
+}
+.reep-h2 {
+  font-size: 1.3125rem;
+  font-weight: 600;
+  letter-spacing: -0.017em;
+  line-height: 1.3;
+}
+.reep-h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.011em;
+  line-height: 1.4;
+}
+.reep-h4 {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.006em;
+}
+.reep-subtitle1 {
+  font-size: 0.9375rem;
+  font-weight: 500;
+}
+.reep-subtitle2 {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.reep-body1 {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+.reep-body2 {
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.reep-caption {
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* --- baseline (from MuiCssBaseline styleOverrides) ----------------------- */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--reep-font-stack);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--reep-text-primary);
+  background-color: var(--reep-bg-default);
+  -webkit-font-smoothing: antialiased;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* One focus ring, everywhere — the accent at 2px with a 2px offset, exactly as
+   the React app's `*:focus-visible` rule draws it. */
+*:focus-visible {
+  outline: 2px solid var(--reep-secondary-main);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 1400;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  background-color: var(--reep-bg-paper);
+  color: var(--reep-text-primary);
+  border: 1px solid var(--reep-divider);
+}
+.skip-link:focus {
+  left: 8px;
+  top: 8px;
+}
+
+/* --- buttons (ported from the MuiButton theme) --------------------------- */
+/* Used on every screen, so global. radius 7, minHeight 38 (32 small), the
+   secondary contained fill for the primary action, outlined at the divider. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  font-family: var(--reep-font-stack);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--reep-text-primary);
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
+}
+.btn:hover {
+  background: var(--reep-action-hover);
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.btn--primary {
+  background: var(--reep-secondary-main);
+  color: var(--reep-secondary-contrast);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--reep-secondary-dark);
+}
+.btn--outlined {
+  border-color: var(--reep-divider);
+}
+.btn--small {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 0.8125rem;
+}
+
+/* Translucency is a preference, not a requirement — the same fallbacks the
+   React app declares, so a browser that cannot blur, or a reader who asked it
+   not to, gets an opaque surface rather than unreadable text. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .reep-glass {
+    background: var(--reep-glass-solid) !important;
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .reep-glass {
+    background: var(--reep-glass-solid) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+  .reep-ambient {
+    display: none;
+  }
+}
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .reep-ambient {
+    display: none !important;
+  }
+  .reep-glass,
+  .reep-neu {
+    background: #fff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: 1px solid #e3e3e0 !important;
+  }
+}

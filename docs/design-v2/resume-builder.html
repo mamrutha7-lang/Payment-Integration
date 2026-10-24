@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>REEP — Resume Builder (full redesign)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..600,0..1,-50..200&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink-900:#1c1810; --ink-800:#2a231a; --ink-700:#443c2d; --ink-500:#5a5142; --ink-400:#847a67;
+  --paper-0:#efe9dd; --paper-1:#f8f4ec; --paper-2:#fffdf8;
+  --amber-700:#6b4413; --amber-600:#8a5a1e; --amber-500:#a8752f; --amber-400:#c99a4e; --amber-300:#e8c48c;
+  --line: rgba(28,24,16,.12);
+  --good:#5c7a3a; --warn:#a8752f; --risk:#8b3a2e;
+  --radius-md:14px; --radius-sm:10px;
+  --shadow-lift: 0 4px 10px rgba(28,24,16,.08), 0 16px 40px rgba(28,24,16,.10);
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+*{box-sizing:border-box;}
+body{margin:0; font-family:var(--font); background:#d8d0bd; color:var(--ink-900); -webkit-font-smoothing:antialiased;}
+.icon{font-family:'Material Symbols Rounded'; font-variation-settings:'opsz' 24,'wght' 400,'FILL' 0,'GRAD' 0; font-size:20px; line-height:1; vertical-align:middle;}
+h1,h2,h3,h4,p{margin:0;}
+button{font-family:var(--font); cursor:pointer; border:none; background:none;}
+input,select,textarea{font-family:var(--font);}
+.meta-bar{position:sticky; top:0; z-index:60; background:var(--ink-900); color:var(--paper-1); padding:10px 20px; display:flex; align-items:center; gap:16px; font-size:13px;}
+.meta-tabs{display:flex; gap:6px; background:rgba(255,255,255,.08); padding:4px; border-radius:999px;}
+.meta-tabs button{padding:7px 14px; border-radius:999px; color:var(--paper-1); font-size:12.5px; font-weight:600; opacity:.65;}
+.meta-tabs button.active{background:var(--paper-1); color:var(--ink-900); opacity:1;}
+.meta-note{opacity:.6; font-size:12px; margin-left:auto;}
+.wrap{display:flex; justify-content:center; padding:28px 20px 70px;}
+.view{display:none;} .view.active{display:flex; justify-content:center; width:100%;}
+
+.frame{width:1340px; max-width:100%; border-radius:12px; overflow:hidden; box-shadow:var(--shadow-lift); background:var(--paper-0); border:1px solid #00000018;}
+.titlebar{background:var(--ink-900); color:var(--paper-1); padding:8px 16px; font-size:12px; display:flex; align-items:center; gap:8px;}
+.shell{display:flex; min-height:820px;}
+
+/* thin app rail */
+.rail{width:56px; background:var(--ink-900); display:flex; flex-direction:column; align-items:center; padding:16px 0; gap:4px; flex:0 0 auto;}
+.rail .brand{color:var(--paper-1); font-weight:800; font-size:14px; margin-bottom:16px;}
+.rail a{width:38px; height:38px; border-radius:11px; display:flex; align-items:center; justify-content:center; color:rgba(248,244,236,.5);}
+.rail a.active{background:rgba(248,244,236,.14); color:var(--paper-1);}
+
+/* section stepper */
+.stepper{width:250px; background:var(--paper-1); border-right:1px solid var(--line); padding:18px 12px; flex:0 0 auto; overflow:auto;}
+.completeness{background:var(--paper-2); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:16px;}
+.completeness .top{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;}
+.completeness .pct{font-size:22px; font-weight:800;}
+.completeness .lbl{font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-500); font-weight:700;}
+.meter{height:7px; border-radius:4px; background:var(--line); overflow:hidden;}
+.meter i{display:block; height:100%; background:linear-gradient(90deg,var(--amber-500),var(--amber-700)); border-radius:4px;}
+.completeness small{display:block; font-size:11.5px; color:var(--ink-500); margin-top:8px; line-height:1.45;}
+.step-item{display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:9px; font-size:12.8px; font-weight:600; color:var(--ink-500); cursor:pointer; margin-bottom:1px;}
+.step-item:hover{background:var(--paper-2);}
+.step-item.active{background:var(--ink-900); color:var(--paper-1);}
+.step-dot{width:8px; height:8px; border-radius:50%; background:var(--line); flex:0 0 auto;}
+.step-dot.done{background:var(--good);}
+.step-dot.partial{background:var(--amber-500);}
+.step-item.active .step-dot{outline:2px solid rgba(248,244,236,.25);}
+.step-group{font-size:10.5px; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-400); padding:14px 10px 6px; font-weight:700;}
+
+/* main */
+.main{flex:1; display:flex; flex-direction:column; min-width:0;}
+.main-head{padding:20px 28px 16px; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:flex-start; background:var(--paper-1);}
+.main-head h2{font-size:20px; font-weight:800; letter-spacing:-.01em;}
+.main-head .sub{color:var(--ink-500); font-size:12.8px; margin-top:4px;}
+.head-actions{display:flex; gap:8px; flex:0 0 auto;}
+.btn{padding:9px 15px; border-radius:9px; border:1px solid var(--line); background:var(--paper-2); font-size:12.8px; font-weight:600; display:inline-flex; align-items:center; gap:6px; color:var(--ink-900);}
+.btn .icon{font-size:16px;}
+.btn.primary{background:var(--ink-900); color:var(--paper-1); border-color:var(--ink-900);}
+.btn.accent{background:var(--amber-600); color:#fff; border-color:var(--amber-600);}
+.btn.ghost{background:transparent; border-color:transparent; color:var(--amber-600);}
+.btn:disabled{opacity:.45; cursor:not-allowed;}
+.body{flex:1; padding:24px 28px 20px; overflow:auto;}
+.panel{display:none;} .panel.active{display:block;}
+.footbar{border-top:1px solid var(--line); background:var(--paper-1); padding:12px 28px; display:flex; justify-content:space-between; align-items:center;}
+.footbar .hint{font-size:12px; color:var(--ink-500); display:flex; align-items:center; gap:7px;}
+
+/* form primitives */
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+.grid4{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px;}
+.field{margin-bottom:16px;}
+.field label{font-size:11.5px; font-weight:700; color:var(--ink-500); display:block; margin-bottom:6px; letter-spacing:.02em;}
+.field label .req{color:var(--risk);}
+.field .lock{font-size:10px; background:var(--paper-0); color:var(--ink-500); padding:2px 6px; border-radius:5px; margin-left:6px; font-weight:700; letter-spacing:0;}
+.ctrl{width:100%; padding:10px 12px; border-radius:9px; border:1px solid var(--line); background:var(--paper-2); font-size:13.3px; color:var(--ink-900);}
+.ctrl:disabled{background:var(--paper-0); color:var(--ink-500); cursor:not-allowed;}
+textarea.ctrl{min-height:88px; resize:vertical;}
+.inline{display:flex; gap:8px;}
+.inline .code{width:110px; flex:0 0 auto;}
+.card{background:var(--paper-1); border:1px solid var(--line); border-radius:var(--radius-md); padding:20px; margin-bottom:18px;}
+.card > h3{font-size:14px; font-weight:800; margin-bottom:4px; display:flex; align-items:center; justify-content:space-between; gap:10px;}
+.card > .desc{font-size:12.3px; color:var(--ink-500); margin-bottom:16px; line-height:1.5;}
+.addlink{color:var(--amber-600); font-size:12.3px; font-weight:700; display:inline-flex; align-items:center; gap:4px;}
+.rowline{display:flex; gap:8px; align-items:flex-start; margin-bottom:8px;}
+.rowline .ctrl{flex:1;}
+.iconbtn{width:38px; height:38px; border-radius:9px; border:1px solid var(--line); background:var(--paper-2); display:flex; align-items:center; justify-content:center; color:var(--ink-500); flex:0 0 auto;}
+.iconbtn:hover{color:var(--risk); border-color:rgba(139,58,46,.3);}
+.right{margin-left:auto;}
+
+/* entry cards (repeatable records) */
+.entry{background:var(--paper-2); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:10px; position:relative;}
+.entry .tools{position:absolute; top:14px; right:14px; display:flex; gap:6px;}
+.entry .tools button{width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:var(--ink-400);}
+.entry .tools button:hover{background:var(--paper-0); color:var(--ink-900);}
+.entry h4{font-size:14px; font-weight:800; margin-bottom:2px;}
+.entry .org{font-size:13px; color:var(--ink-700); font-weight:600;}
+.entry .meta{font-size:12px; color:var(--ink-500); margin-top:2px;}
+.entry .desc{font-size:12.5px; color:var(--ink-700); line-height:1.55; margin-top:8px;}
+.tag{display:inline-flex; align-items:center; gap:4px; background:var(--paper-0); color:var(--ink-500); font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:6px; margin-left:8px; vertical-align:middle;}
+.tag.evi{background:rgba(92,122,58,.13); color:var(--good);}
+.tag.lock{background:rgba(28,24,16,.07);}
+.empty{text-align:center; padding:44px 20px; color:var(--ink-500);}
+.empty .icon{font-size:34px; color:var(--amber-400); display:block; margin-bottom:10px;}
+.empty p{font-size:13px;}
+.dropzone{border:2px dashed var(--line); border-radius:12px; padding:22px; text-align:center; color:var(--ink-500); background:var(--paper-2); font-size:12.5px;}
+.dropzone .icon{font-size:26px; color:var(--amber-600); display:block; margin-bottom:6px;}
+.dropzone small{display:block; font-size:11px; margin-top:4px;}
+
+/* tag input */
+.taginput{border:1px solid var(--line); background:var(--paper-2); border-radius:9px; padding:8px; display:flex; flex-wrap:wrap; gap:6px; align-items:center;}
+.taginput .chipx{background:var(--ink-900); color:var(--paper-1); font-size:12px; font-weight:600; padding:5px 9px; border-radius:7px; display:inline-flex; align-items:center; gap:6px;}
+.taginput .chipx .icon{font-size:14px; cursor:pointer; opacity:.7;}
+.taginput input{border:none; outline:none; background:transparent; flex:1; min-width:130px; font-size:13px; padding:5px;}
+
+/* tables */
+.tbl{width:100%; border-collapse:collapse; font-size:12.6px; background:var(--paper-2); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+.tbl th{text-align:left; padding:10px 12px; background:var(--paper-0); color:var(--ink-500); font-weight:700; font-size:10.6px; text-transform:uppercase; letter-spacing:.05em;}
+.tbl td{padding:8px 12px; border-top:1px solid var(--line); vertical-align:middle;}
+.tbl td .ctrl{padding:7px 10px; font-size:12.5px;}
+.tbl .num{width:110px;}
+
+/* chips + status */
+.chip{display:inline-flex; align-items:center; gap:5px; padding:5px 10px; border-radius:8px; font-size:11.5px; font-weight:700;}
+.chip.good{background:rgba(92,122,58,.12); color:var(--good);}
+.chip.warn{background:rgba(168,117,47,.14); color:var(--warn);}
+.chip.risk{background:rgba(139,58,46,.12); color:var(--risk);}
+.chip.neutral{background:var(--paper-0); color:var(--ink-500);}
+.chip .icon{font-size:14px;}
+.notice{border-radius:10px; padding:12px 14px; font-size:12.3px; line-height:1.5; display:flex; gap:9px; align-items:flex-start; margin-bottom:16px;}
+.notice .icon{font-size:18px; flex:0 0 auto;}
+.notice.info{background:rgba(138,90,30,.09); color:var(--amber-700);}
+.notice.evi{background:rgba(92,122,58,.1); color:var(--good);}
+.radio-row{display:flex; gap:20px; align-items:center;}
+.radio-row label{display:flex; align-items:center; gap:8px; font-size:13.3px; font-weight:600;}
+.check{display:flex; align-items:center; gap:8px; font-size:12.8px; font-weight:600; color:var(--ink-700);}
+
+/* resume list + preview */
+.res-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+.res-card{background:var(--paper-1); border:1px solid var(--line); border-radius:12px; padding:18px;}
+.res-card.default{border-color:var(--amber-600); box-shadow:0 0 0 1px var(--amber-600) inset;}
+.res-card h4{font-size:14px; font-weight:800; margin-bottom:3px;}
+.res-card .meta{font-size:11.8px; color:var(--ink-500);}
+.res-actions{display:flex; gap:6px; margin-top:14px; flex-wrap:wrap;}
+.preview{background:var(--paper-2); border:1px solid var(--line); border-radius:12px; padding:28px; font-size:12.4px; line-height:1.6;}
+.preview h2{font-size:19px; margin-bottom:2px;}
+.preview .psub{color:var(--ink-500); font-size:11.8px; margin-bottom:16px;}
+.preview .psec{font-size:10.6px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:var(--amber-600); border-bottom:1px solid var(--line); padding-bottom:4px; margin:16px 0 8px;}
+.evi-tag{font-size:9.6px; background:rgba(92,122,58,.13); color:var(--good); padding:2px 6px; border-radius:5px; margin-left:6px; font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="meta-bar">
+  <b>REEP — Resume Builder</b>
+  <div class="meta-tabs" id="views">
+    <button data-view="builder" class="active">Profile &amp; Builder</button>
+    <button data-view="resumes">All Resumes</button>
+    <button data-view="preview">Generated Resume</button>
+  </div>
+  <span class="meta-note">15-section profile · repeatable records · approval workflow · evidence-grounded generation</span>
+</div>
+
+<div class="wrap">
+
+<!-- ================= BUILDER ================= -->
+<div class="view active" data-view-panel id="view-builder">
+<div class="frame">
+  <div class="titlebar"><span class="icon" style="font-size:14px">school</span> REEP — Student</div>
+  <div class="shell">
+
+    <div class="rail">
+      <div class="brand">R</div>
+      <a><span class="icon">home</span></a>
+      <a><span class="icon">work</span></a>
+      <a><span class="icon">verified</span></a>
+      <a><span class="icon">schedule</span></a>
+      <a class="active"><span class="icon">description</span></a>
+      <a><span class="icon">smart_toy</span></a>
+    </div>
+
+    <div class="stepper" id="stepper">
+      <div class="completeness">
+        <div class="top"><span class="lbl">Profile complete</span><span class="pct" id="pctLabel">46%</span></div>
+        <div class="meter"><i style="width:46%"></i></div>
+        <small>A resume can be generated at any time, but <b>70%+</b> produces a materially stronger document.</small>
+      </div>
+
+      <div class="step-group">Identity</div>
+      <div class="step-item active" data-step="basic"><span class="step-dot done"></span> Basic Details</div>
+      <div class="step-item" data-step="contact"><span class="step-dot done"></span> Contact Details</div>
+      <div class="step-item" data-step="family"><span class="step-dot"></span> Family Details</div>
+
+      <div class="step-group">Academics</div>
+      <div class="step-item" data-step="education"><span class="step-dot partial"></span> Education</div>
+      <div class="step-item" data-step="attachments"><span class="step-dot"></span> Attachments</div>
+
+      <div class="step-group">Experience</div>
+      <div class="step-item" data-step="experience"><span class="step-dot done"></span> Professional Experience</div>
+      <div class="step-item" data-step="internship"><span class="step-dot"></span> Internship</div>
+      <div class="step-item" data-step="projects"><span class="step-dot"></span> Projects</div>
+
+      <div class="step-group">Achievement</div>
+      <div class="step-item" data-step="publications"><span class="step-dot"></span> Publications / Research</div>
+      <div class="step-item" data-step="seminars"><span class="step-dot"></span> Seminars / Trainings</div>
+      <div class="step-item" data-step="certifications"><span class="step-dot partial"></span> Certification / Assessments</div>
+      <div class="step-item" data-step="por"><span class="step-dot"></span> Positions of Responsibility</div>
+
+      <div class="step-group">Final</div>
+      <div class="step-item" data-step="other"><span class="step-dot partial"></span> Other Details</div>
+      <div class="step-item" data-step="references"><span class="step-dot"></span> References</div>
+      <div class="step-item" data-step="policy"><span class="step-dot done"></span> Placement Policy</div>
+    </div>
+
+    <div class="main">
+      <div class="main-head">
+        <div>
+          <h2 id="secTitle">Basic Details</h2>
+          <div class="sub" id="secSub">Identity and demographics. Fields synced from the university record are locked.</div>
+        </div>
+        <div class="head-actions">
+          <button class="btn" data-view-jump="resumes"><span class="icon">folder_open</span> All Resumes</button>
+          <button class="btn accent" data-view-jump="preview"><span class="icon">auto_awesome</span> Generate Resume</button>
+        </div>
+      </div>
+
+      <div class="body">
+
+        <!-- 1 BASIC -->
+        <div class="panel active" data-p="basic">
+          <div class="notice info"><span class="icon">lock</span><div><b>Locked fields come from the university student record.</b> USN, name, course and specialization cannot be edited here — raise a correction request with the registrar if any are wrong.</div></div>
+          <div class="card">
+            <h3>Identity</h3>
+            <div style="display:flex; gap:22px;">
+              <div style="width:190px; flex:0 0 auto;">
+                <div class="field"><label>Photo</label>
+                  <div class="dropzone"><span class="icon">add_a_photo</span>Drop a picture or click to upload<small>Must be below 3MB</small></div>
+                </div>
+              </div>
+              <div style="flex:1;">
+                <div class="field"><label>USN <span class="req">*</span><span class="lock">SYNCED</span></label><input class="ctrl" value="1BG24MBA014" disabled></div>
+                <div class="grid3">
+                  <div class="field"><label>First name<span class="lock">SYNCED</span></label><input class="ctrl" value="Aditi" disabled></div>
+                  <div class="field"><label>Middle name</label><input class="ctrl" placeholder="Middle name"></div>
+                  <div class="field"><label>Last name<span class="lock">SYNCED</span></label><input class="ctrl" value="Kulkarni" disabled></div>
+                </div>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Course<span class="lock">SYNCED</span></label><input class="ctrl" value="MBA" disabled></div>
+              <div class="field"><label>Primary specialization<span class="lock">SYNCED</span></label><input class="ctrl" value="Finance" disabled></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Personal</h3>
+            <div class="grid2">
+              <div class="field"><label>Gender <span class="req">*</span></label><select class="ctrl"><option>Female</option><option>Male</option><option>Prefer not to say</option></select></div>
+              <div class="field"><label>Date of birth <span class="req">*</span></label><input class="ctrl" type="date" value="2002-03-14"></div>
+              <div class="field"><label>Blood group</label><select class="ctrl"><option>Select</option><option>A+</option><option>B+</option><option>O+</option><option>AB+</option></select></div>
+              <div class="field"><label>Marital status</label><select class="ctrl"><option>Select</option><option>Single</option><option>Married</option></select></div>
+            </div>
+            <div class="field"><label>Known languages</label>
+              <div class="taginput"><span class="chipx">English <span class="icon">close</span></span><span class="chipx">Kannada <span class="icon">close</span></span><span class="chipx">Hindi <span class="icon">close</span></span><input placeholder="Type a language and press Enter"></div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Dream company</label><input class="ctrl" placeholder="e.g. Deloitte"></div>
+              <div class="field"><label>Medical history</label><input class="ctrl" placeholder="Anything the placement office should know"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 CONTACT -->
+        <div class="panel" data-p="contact">
+          <div class="card">
+            <h3>Phone &amp; email</h3>
+            <div class="grid2">
+              <div class="field"><label>Primary phone <span class="req">*</span><span class="lock">SYNCED</span></label>
+                <div class="inline"><select class="ctrl code" disabled><option>+91</option></select><input class="ctrl" value="98450 00000" disabled></div>
+              </div>
+              <div class="field"><label>College / official email <span class="req">*</span><span class="lock">SYNCED</span></label><input class="ctrl" value="aditi.k@bgscet.ac.in" disabled></div>
+            </div>
+            <div class="grid2">
+              <div class="field"><label>Other phone number(s)</label>
+                <div class="rowline"><select class="ctrl code"><option>+91</option></select><input class="ctrl" placeholder="Alternate number"><button class="iconbtn"><span class="icon">delete</span></button></div>
+                <button class="addlink"><span class="icon" style="font-size:15px">add</span> Add another number</button>
+              </div>
+              <div class="field"><label>Personal email</label>
+                <div class="rowline"><input class="ctrl" placeholder="you@example.com"><button class="iconbtn"><span class="icon">delete</span></button></div>
+                <button class="addlink"><span class="icon" style="font-size:15px">add</span> Add another email</button>
+              </div>
+            </div>
+            <div class="field"><label>Web links / professional profiles</label>
+              <div class="rowline"><select class="ctrl code" style="width:150px;"><option>LinkedIn</option><option>GitHub</option><option>Portfolio</option><option>Other</option></select><input class="ctrl" placeholder="https://…"><button class="iconbtn"><span class="icon">delete</span></button></div>
+              <button class="addlink"><span class="icon" style="font-size:15px">add</span> Add link</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Current address</h3>
+            <div class="field"><label>Address line 1 <span class="req">*</span></label><input class="ctrl" placeholder="House / street"></div>
+            <div class="field"><label>Address line 2</label><input class="ctrl" placeholder="Area / landmark"></div>
+            <div class="grid4">
+              <div class="field"><label>Country <span class="req">*</span></label><select class="ctrl"><option>India</option></select></div>
+              <div class="field"><label>State <span class="req">*</span></label><input class="ctrl" value="Karnataka"></div>
+              <div class="field"><label>City <span class="req">*</span></label><input class="ctrl" value="Bengaluru"></div>
+              <div class="field"><label>Postal code</label><input class="ctrl" placeholder="560000"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Permanent address <label class="check" style="font-weight:600;"><input type="checkbox" checked> Same as current address</label></h3>
+            <div class="desc">Unchecking reveals the full address form again.</div>
+          </div>
+        </div>
+
+        <!-- 3 FAMILY -->
+        <div class="panel" data-p="family">
+          <div class="card">
+            <h3>Father's details</h3>
+            <div class="grid2">
+              <div class="field"><label>Name</label><input class="ctrl" placeholder="Father's name"></div>
+              <div class="field"><label>Occupation</label><input class="ctrl" placeholder="Occupation"></div>
+              <div class="field"><label>Organisation</label><select class="ctrl"><option>Select organisation</option></select></div>
+              <div class="field"><label>Designation</label><select class="ctrl"><option>Select designation</option></select></div>
+              <div class="field"><label>Email</label><input class="ctrl" placeholder="Enter email"></div>
+              <div class="field"><label>Phone number</label><div class="inline"><select class="ctrl code"><option>+91</option></select><input class="ctrl" placeholder="Enter phone"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Mother's details</h3>
+            <div class="grid2">
+              <div class="field"><label>Name</label><input class="ctrl" placeholder="Mother's name"></div>
+              <div class="field"><label>Occupation</label><input class="ctrl" placeholder="Occupation"></div>
+              <div class="field"><label>Organisation</label><select class="ctrl"><option>Select organisation</option></select></div>
+              <div class="field"><label>Designation</label><select class="ctrl"><option>Select designation</option></select></div>
+              <div class="field"><label>Email</label><input class="ctrl" placeholder="Enter email"></div>
+              <div class="field"><label>Phone number</label><div class="inline"><select class="ctrl code"><option>+91</option></select><input class="ctrl" placeholder="Enter phone"></div></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>Guardian / siblings <button class="addlink right"><span class="icon" style="font-size:15px">add</span> Add</button></h3>
+            <div class="desc">Optional. Only used where the placement office requires next-of-kin details.</div>
+          </div>
+        </div>
+
+        <!-- 4 EDUCATION -->
+        <div class="panel" data-p="education">
+          <div class="notice info"><span class="icon">verified_user</span><div><b>Academic records require approval.</b> Edits here are submitted to your mentor rather than saved silently, because CGPA and backlog figures feed placement eligibility.</div></div>
+          <div class="card">
+            <h3>MBA 2025–2027 — semester record</h3>
+            <div class="desc">Marksheet upload sits on the row it belongs to, so the proof and the number stay together.</div>
+            <table class="tbl">
+              <tr><th>Year</th><th>Semester</th><th class="num">Aggregate CGPA</th><th class="num">Closed backlogs</th><th class="num">Live backlogs</th><th>Marksheet</th></tr>
+              <tr><td>1</td><td>I</td><td><input class="ctrl" value="8.6"></td><td><input class="ctrl" value="0"></td><td><input class="ctrl" value="0"></td><td><button class="iconbtn"><span class="icon">upload</span></button></td></tr>
+              <tr><td>1</td><td>II</td><td><input class="ctrl" value="8.4"></td><td><input class="ctrl" value="0"></td><td><input class="ctrl" value="0"></td><td><button class="iconbtn"><span class="icon">upload</span></button></td></tr>
+              <tr><td>2</td><td>III</td><td><input class="ctrl" placeholder="—"></td><td><input class="ctrl" placeholder="—"></td><td><input class="ctrl" placeholder="—"></td><td><button class="iconbtn"><span class="icon">upload</span></button></td></tr>
+              <tr><td>2</td><td>IV</td><td><input class="ctrl" placeholder="—"></td><td><input class="ctrl" placeholder="—"></td><td><input class="ctrl" placeholder="—"></td><td><button class="iconbtn"><span class="icon">upload</span></button></td></tr>
+              <tr><td colspan="2"><b>Aggregate <span class="req" style="color:var(--risk)">*</span></b></td><td><input class="ctrl" value="8.5"></td><td><input class="ctrl" value="0"></td><td><input class="ctrl" value="0"></td><td></td></tr>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Other degrees <button class="addlink right"><span class="icon" style="font-size:15px">add</span> Add degree</button></h3>
+            <div class="entry">
+              <div class="tools"><button><span class="icon" style="font-size:17px">edit</span></button><button><span class="icon" style="font-size:17px">attach_file</span></button><button><span class="icon" style="font-size:17px">delete</span></button></div>
+              <h4>B.Com, Finance <span class="tag">Full time</span></h4>
+              <div class="org">Bangalore University</div>
+              <div class="meta">2020 — 2023 · 72 / 100</div>
+            </div>
+          </div>
+          <div class="grid2">
+            <div class="card" style="margin-bottom:0;">
+              <h3>12th standard <button class="addlink right"><span class="icon" style="font-size:15px">add</span> Add</button></h3>
+              <div class="entry">
+                <div class="tools"><button><span class="icon" style="font-size:17px">edit</span></button><button><span class="icon" style="font-size:17px">delete</span></button></div>
+                <h4>Vidya Mandir PU College</h4>
+                <div class="meta">PUE Karnataka — 2020 · 88 / 100</div>
+                <div class="meta">Subjects: Commerce · Medium: English</div>
+              </div>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+              <h3>10th standard <button class="addlink right"><span class="icon" style="font-size:15px">add</span> Add</button></h3>
+              <div class="entry">
+                <div class="tools"><button><span class="icon" style="font-size:17px">edit</span></button><button><span class="icon" style="font-size:17px">delete</span></button></div>
+                <h4>St. Joseph's High School</h4>
+                <div class="meta">CBSE — 2018 · 91 / 100</div>
+                <div class="meta">Medium: English</div>
+              </div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:18px;">
+            <h3>Diploma (equivalent to 12th) <button class="addlink right"><span class="icon" style="font-size:15px">add</span> Add</button></h3>
+            <div class="empty" style="padding:26px;"><span class="icon">school</span><p>No diploma record added.</p></div>
+          </div>
+          <div class="card">
+            <h3>Academic gaps</h3>
+            <div class="desc">Recruiters ask about these directly. Declaring them here means the resume can explain rather than leave a hole.</div>
+            <div class="grid4">
+              <div class="field"><label>12th → graduation (months)</label><input class="ctrl" placeholder="0"></div>
+              <div class="field"><label>Diploma → graduation (months)</label><input class="ctrl" placeholder="0"></div>
+              <div class="field"><label>Graduation → PG (months)</label><input class="ctrl" placeholder="0"></div>
+              <div class="field"><label>Other gap (months)</label><input class="ctrl" placeholder="0"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 ATTACHMENTS -->
+        <div class="panel" data-p="attachments">
+          <div class="notice info"><span class="icon">info</span><div>This screen is a <b>read-only ledger</b>. Each file is uploaded from the section it belongs to, so a document can never be attached to the wrong record.</div></div>
+          <div class="card">
+            <h3>Academic records <span class="chip neutral"><span class="icon">link</span>managed in Education</span></h3>
+            <table class="tbl">
+              <tr><th>Document</th><th>Status</th><th>Uploaded</th><th></th></tr>
+              <tr><td>Semester I marksheet</td><td><span class="chip good"><span class="icon">check_circle</span>Verified</span></td><td>12 Mar 2026</td><td><button class="btn" style="padding:4px 10px; font-size:11.5px;">View</button></td></tr>
+              <tr><td>Semester II marksheet</td><td><span class="chip warn"><span class="icon">hourglass_top</span>Pending mentor check</span></td><td>02 Aug 2026</td><td><button class="btn" style="padding:4px 10px; font-size:11.5px;">View</button></td></tr>
+              <tr><td>12th marksheet</td><td><span class="chip risk"><span class="icon">error</span>Missing</span></td><td>—</td><td><button class="btn" style="padding:4px 10px; font-size:11.5px;">Go to Education</button></td></tr>
+              <tr><td>10th marksheet</td><td><span class="chip good"><span class="icon">check_circle</span>Verified</span></td><td>12 Mar 2026</td><td><button class="btn" style="padding:4px 10px; font-size:11.5px;">View</button></td></tr>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Certificates <span class="chip neutral"><span class="icon">link</span>managed in their own sections</span></h3>
+            <table class="tbl">
+              <tr><th>Document</th><th>Source section</th><th>Status</th><th></th></tr>
+              <tr><td>Excel for Business — Coursera</td><td>Certification / Assessments</td><td><span class="chip good"><span class="icon">bolt</span>Auto-synced from REEP</span></td><td><button class="btn" style="padding:4px 10px; font-size:11.5px;">View</button></td></tr>
+              <tr><td>Data Analysis with Python</td><td>Certification / Assessments</td><td><span class="chip warn"><span class="icon">hourglass_top</span>Awaiting verification</span></td><td><button class="btn" style="padding:4px 10px; font-size:11.5px;">View</button></td></tr>
+              <tr><td>Internship certificate</td><td>Internship</td><td><span class="chip risk"><span class="icon">error</span>Missing</span></td><td><button class="btn" style="padding:4px 10px; font-size:11.5px;">Go to Internship</button></td></tr>
+            </table>
+          </div>
+          <div class="card">
+            <h3>Other documents <button class="addlink right"><span class="icon" style="font-size:15px">upload</span> Upload</button></h3>
+            <div class="desc">Anything that has no home elsewhere — organizational study report, ID proof, consent forms.</div>
+            <div class="dropzone"><span class="icon">cloud_upload</span>Drop a file or click to upload<small>PDF, JPG, PNG · up to 10MB</small></div>
+          </div>
+        </div>
+
+        <!-- 6 EXPERIENCE -->
+        <div class="panel" data-p="experience">
+          <div class="card">
+            <h3>Professional experience <button class="btn primary right" style="padding:7px 13px;"><span class="icon">add</span> Add experience</button></h3>
+            <div class="desc">Full-time roles held before or during the programme.</div>
+            <div class="entry">
+              <div class="tools"><button><span class="icon" style="font-size:17px">edit</span></button><button><span class="icon" style="font-size:17px">attach_file</span></button><button><span class="icon" style="font-size:17px">delete</span></button></div>
+              <h4>Marketing Intern</h4>
+              <div class="org">Sri Balaji Distributors · FMCG</div>
+              <div class="meta">Jun 2023 — Dec 2023 · Bengaluru, Karnataka, India</div>
+              <div class="desc">Supported regional sales reporting and dealer reconciliation; built the weekly stock-movement tracker used by three territory managers.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7 INTERNSHIP -->
+        <div class="panel" data-p="internship">
+          <div class="card">
+            <h3>Internships <button class="btn primary right" style="padding:7px 13px;"><span class="icon">add</span> Add internship</button></h3>
+            <div class="desc">Kept separate from professional experience because recruiters weigh them differently.</div>
+            <div class="empty"><span class="icon">work_history</span><p>No internships added yet.</p><button class="btn primary" style="margin-top:12px;"><span class="icon">add</span> Add your first internship</button></div>
+          </div>
+        </div>
+
+        <!-- 8 PROJECTS -->
+        <div class="panel" data-p="projects">
+          <div class="card">
+            <h3>Projects <button class="btn primary right" style="padding:7px 13px;"><span class="icon">add</span> Add project</button></h3>
+            <div class="desc">Academic, capstone or personal projects. Each accepts a description, tech/skills used, and a link or attachment.</div>
+            <div class="empty"><span class="icon">lightbulb</span><p>No projects added yet.</p><button class="btn primary" style="margin-top:12px;"><span class="icon">add</span> Add your first project</button></div>
+          </div>
+        </div>
+
+        <!-- 9 PUBLICATIONS -->
+        <div class="panel" data-p="publications">
+          <div class="card">
+            <h3>Publications / research / white papers <button class="btn primary right" style="padding:7px 13px;"><span class="icon">add</span> Add publication</button></h3>
+            <div class="desc">Title, publisher or journal, date, co-authors, DOI or link.</div>
+            <div class="empty"><span class="icon">menu_book</span><p>No research papers added.</p></div>
+          </div>
+        </div>
+
+        <!-- 10 SEMINARS -->
+        <div class="panel" data-p="seminars">
+          <div class="card">
+            <h3>Seminars / trainings / workshops <button class="btn primary right" style="padding:7px 13px;"><span class="icon">add</span> Add training</button></h3>
+            <div class="desc">Short-form learning that is not a full certification.</div>
+            <div class="empty"><span class="icon">groups</span><p>No trainings added.</p></div>
+          </div>
+        </div>
+
+        <!-- 11 CERTIFICATIONS -->
+        <div class="panel" data-p="certifications">
+          <div class="notice evi"><span class="icon">bolt</span><div><b>REEP programme certifications appear here automatically.</b> They are provider-verified, so they carry an evidence tag and cannot be edited — only certifications earned outside the programme are added manually.</div></div>
+          <div class="card">
+            <h3>Certifications &amp; assessments <button class="btn primary right" style="padding:7px 13px;"><span class="icon">add</span> Add certification</button></h3>
+            <div class="entry">
+              <div class="tools"><button><span class="icon" style="font-size:17px">visibility</span></button></div>
+              <h4>Excel for Business <span class="tag evi"><span class="icon" style="font-size:12px">bolt</span>From REEP record</span> <span class="tag lock">Locked</span></h4>
+              <div class="org">Coursera · Reboot stage</div>
+              <div class="meta">Completed 14 Jun 2026 · 22 hours · provider-verified</div>
+            </div>
+            <div class="entry">
+              <div class="tools"><button><span class="icon" style="font-size:17px">visibility</span></button></div>
+              <h4>Business Communication <span class="tag evi"><span class="icon" style="font-size:12px">bolt</span>From REEP record</span> <span class="tag lock">Locked</span></h4>
+              <div class="org">Coursera · Reboot stage</div>
+              <div class="meta">Completed 30 May 2026 · 18 hours · provider-verified</div>
+            </div>
+            <div class="entry">
+              <div class="tools"><button><span class="icon" style="font-size:17px">edit</span></button><button><span class="icon" style="font-size:17px">attach_file</span></button><button><span class="icon" style="font-size:17px">delete</span></button></div>
+              <h4>Data Analysis with Python <span class="chip warn" style="margin-left:8px;"><span class="icon">hourglass_top</span>Self-reported · awaiting verification</span></h4>
+              <div class="org">Coursera · Excel stage</div>
+              <div class="meta">In progress — 40% · certificate proof uploaded 02 Aug 2026</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12 POR -->
+        <div class="panel" data-p="por">
+          <div class="card">
+            <h3>Positions of responsibility <button class="btn primary right" style="padding:7px 13px;"><span class="icon">add</span> Add position</button></h3>
+            <div class="desc">Club roles, committee positions, class representative, event leadership. Title, organisation, duration and what you were accountable for.</div>
+            <div class="empty"><span class="icon">workspace_premium</span><p>No positions added yet.</p></div>
+          </div>
+        </div>
+
+        <!-- 13 OTHER -->
+        <div class="panel" data-p="other">
+          <div class="card">
+            <h3>Career objective</h3>
+            <div class="desc">What you want from the role and what you bring. This is the paragraph the generated resume opens with.</div>
+            <textarea class="ctrl" placeholder="Describe your expectations, both for yourself and the organization…"></textarea>
+            <div style="text-align:right; font-size:11.5px; color:var(--ink-500); margin-top:5px;">0 / 6000</div>
+          </div>
+          <div class="card">
+            <h3>Key expertise</h3>
+            <div class="desc">Press Enter after each skill. A comma- or space-separated string is stored as one skill, which is almost never what you want.</div>
+            <div class="taginput"><span class="chipx">Financial modeling <span class="icon">close</span></span><span class="chipx">Advanced Excel <span class="icon">close</span></span><span class="chipx">Stakeholder communication <span class="icon">close</span></span><input placeholder="Add a skill and press Enter"></div>
+            <div class="notice evi" style="margin:14px 0 0;"><span class="icon">insights</span><div>Skills matched to your REEP badges are weighted higher when a job's <b>match percentage</b> is calculated.</div></div>
+          </div>
+          <div class="grid2">
+            <div class="card" style="margin-bottom:0;">
+              <h3>Achievements</h3>
+              <div class="rowline"><input class="ctrl" placeholder="Enter an achievement"><button class="iconbtn"><span class="icon">delete</span></button></div>
+              <button class="addlink"><span class="icon" style="font-size:15px">add</span> Add achievement</button>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+              <h3>Awards &amp; scholarships</h3>
+              <div class="rowline"><input class="ctrl" placeholder="Enter an award or scholarship"><button class="iconbtn"><span class="icon">delete</span></button></div>
+              <button class="addlink"><span class="icon" style="font-size:15px">add</span> Add award</button>
+            </div>
+          </div>
+          <div class="grid2" style="margin-top:18px;">
+            <div class="card" style="margin-bottom:0;">
+              <h3>Co-curricular activities</h3>
+              <div class="rowline"><input class="ctrl" placeholder="Enter an activity"><button class="iconbtn"><span class="icon">delete</span></button></div>
+              <button class="addlink"><span class="icon" style="font-size:15px">add</span> Add activity</button>
+            </div>
+            <div class="card" style="margin-bottom:0;">
+              <h3>Extra-curricular activities</h3>
+              <div class="rowline"><input class="ctrl" placeholder="Enter an activity"><button class="iconbtn"><span class="icon">delete</span></button></div>
+              <button class="addlink"><span class="icon" style="font-size:15px">add</span> Add activity</button>
+            </div>
+          </div>
+          <div class="card" style="margin-top:18px;">
+            <h3>Web links</h3>
+            <div class="rowline"><select class="ctrl code" style="width:150px;"><option>LinkedIn</option><option>GitHub</option><option>Portfolio</option></select><input class="ctrl" placeholder="https://…"><button class="iconbtn"><span class="icon">delete</span></button></div>
+            <button class="addlink"><span class="icon" style="font-size:15px">add</span> Add link</button>
+          </div>
+        </div>
+
+        <!-- 14 REFERENCES -->
+        <div class="panel" data-p="references">
+          <div class="card">
+            <h3>References <button class="btn primary right" style="padding:7px 13px;"><span class="icon">add</span> Add reference</button></h3>
+            <div class="desc">Name, designation, organisation, relationship, email and phone. Your faculty mentor can be added with one click.</div>
+            <div class="entry" style="border-style:dashed;">
+              <h4>Rakesh Iyer <span class="tag evi"><span class="icon" style="font-size:12px">bolt</span>Your mentor</span></h4>
+              <div class="org">Faculty Mentor · BGSCET · MBA-2026-B</div>
+              <div class="meta">Suggested — add with one click</div>
+              <button class="btn primary" style="margin-top:10px; padding:6px 12px; font-size:12px;"><span class="icon">add</span> Add as reference</button>
+            </div>
+            <div class="empty" style="padding:26px;"><span class="icon">handshake</span><p>No references added yet.</p></div>
+          </div>
+        </div>
+
+        <!-- 15 POLICY -->
+        <div class="panel" data-p="policy">
+          <div class="card">
+            <h3>Placement policy</h3>
+            <div class="desc">This governs which opportunities you appear against on the Jobs page.</div>
+            <div class="field"><label>Eligible for placements</label>
+              <div class="radio-row"><label><input type="radio" name="elig" checked> Yes</label><label><input type="radio" name="elig"> No</label></div>
+            </div>
+            <div class="grid2" style="margin-top:6px;">
+              <div class="field"><label>Interested in jobs <span class="req">*</span></label><select class="ctrl"><option>Select</option><option>Yes — full-time roles</option><option>No</option></select></div>
+              <div class="field"><label>Interested in internships <span class="req">*</span></label><select class="ctrl"><option>Select</option><option>Yes — internships</option><option>No</option></select></div>
+            </div>
+            <div class="notice info" style="margin:6px 0 0;"><span class="icon">visibility</span><div>Setting <b>Eligible for placements: No</b> removes you from all recruiter shortlists immediately. Your mentor is notified so it can be discussed rather than discovered later.</div></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="footbar">
+        <div class="hint"><span class="icon" style="font-size:16px">history</span> Last saved 15 Aug 2026, 09:12 · changes are versioned</div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn"><span class="icon">visibility</span> View saved values</button>
+          <button class="btn"><span class="icon">delete</span> Discard</button>
+          <button class="btn primary" id="saveBtn"><span class="icon">save</span> Save section</button>
+          <button class="btn accent" id="approvalBtn" style="display:none;"><span class="icon">send</span> Update &amp; request approval</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ================= ALL RESUMES ================= -->
+<div class="view" data-view-panel id="view-resumes">
+<div class="frame">
+  <div class="titlebar"><span class="icon" style="font-size:14px">school</span> REEP — Student</div>
+  <div class="shell">
+    <div class="rail">
+      <div class="brand">R</div>
+      <a><span class="icon">home</span></a><a><span class="icon">work</span></a><a><span class="icon">verified</span></a><a><span class="icon">schedule</span></a>
+      <a class="active"><span class="icon">description</span></a><a><span class="icon">smart_toy</span></a>
+    </div>
+    <div class="main">
+      <div class="main-head">
+        <div><h2>All Resumes</h2><div class="sub">One resume can be marked default — that is the copy the placement office downloads.</div></div>
+        <div class="head-actions">
+          <button class="btn" data-view-jump="builder"><span class="icon">edit</span> Edit profile</button>
+          <button class="btn accent" data-view-jump="preview"><span class="icon">auto_awesome</span> Generate new</button>
+        </div>
+      </div>
+      <div class="body">
+        <div class="notice info"><span class="icon">workspace_premium</span><div><b>Default resume.</b> You are the author of your default resume, and the department can download it for any placement event. You can still submit a different resume when applying to a specific job.</div></div>
+        <div class="res-grid">
+          <div class="res-card default">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div><h4>General — Finance roles</h4><div class="meta">Generated 14 Aug 2026 · v3</div></div>
+              <span class="chip warn"><span class="icon">star</span>Default</span>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+              <span class="chip good"><span class="icon">check_circle</span>Mentor approved</span>
+              <span class="chip neutral"><span class="icon">bolt</span>Local model</span>
+            </div>
+            <div class="res-actions">
+              <button class="btn" data-view-jump="preview"><span class="icon">visibility</span> View</button>
+              <button class="btn"><span class="icon">download</span> Download</button>
+              <button class="btn"><span class="icon">content_copy</span> Duplicate</button>
+              <button class="btn"><span class="icon">delete</span></button>
+            </div>
+          </div>
+          <div class="res-card">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+              <div><h4>Business Analyst — Nova Fintech</h4><div class="meta">Generated 10 Aug 2026 · tailored to job</div></div>
+              <span class="chip neutral">Job-specific</span>
+            </div>
+            <div style="margin-top:10px; display:flex; gap:6px; flex-wrap:wrap;">
+              <span class="chip warn"><span class="icon">hourglass_top</span>Awaiting mentor review</span>
+              <span class="chip good"><span class="icon">percent</span>82% match</span>
+            </div>
+            <div class="res-actions">
+              <button class="btn" data-view-jump="preview"><span class="icon">visibility</span> View</button>
+              <button class="btn"><span class="icon">download</span> Download</button>
+              <button class="btn"><span class="icon">star</span> Make default</button>
+              <button class="btn"><span class="icon">delete</span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footbar"><div class="hint"><span class="icon" style="font-size:16px">info</span> Only one resume can be default at a time.</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ================= PREVIEW ================= -->
+<div class="view" data-view-panel id="view-preview">
+<div class="frame">
+  <div class="titlebar"><span class="icon" style="font-size:14px">school</span> REEP — Student</div>
+  <div class="shell">
+    <div class="rail">
+      <div class="brand">R</div>
+      <a><span class="icon">home</span></a><a><span class="icon">work</span></a><a><span class="icon">verified</span></a><a><span class="icon">schedule</span></a>
+      <a class="active"><span class="icon">description</span></a><a><span class="icon">smart_toy</span></a>
+    </div>
+    <div class="main">
+      <div class="main-head">
+        <div><h2>Generated Resume</h2><div class="sub">Every claim is tied to the record that supports it, so your mentor can audit it.</div></div>
+        <div class="head-actions">
+          <button class="btn" data-view-jump="builder"><span class="icon">edit</span> Edit profile</button>
+          <button class="btn"><span class="icon">download</span> Download PDF</button>
+          <button class="btn accent"><span class="icon">send</span> Submit for approval</button>
+        </div>
+      </div>
+      <div class="body">
+        <div style="display:grid; grid-template-columns:1.55fr 1fr; gap:18px;">
+          <div class="preview">
+            <h2>Aditi Kulkarni</h2>
+            <div class="psub">MBA Candidate (Finance) · REEP Programme, BGSCET · Bengaluru · aditi.k@bgscet.ac.in</div>
+
+            <div class="psec">Objective</div>
+            Finance-track MBA candidate with prior FMCG sales-reporting experience, seeking an analyst role where modelling and stakeholder communication are used daily.
+
+            <div class="psec">Education</div>
+            <b>MBA (Finance)</b>, BGSCET — 2025–2027 · Aggregate CGPA 8.5, no live backlogs<span class="evi-tag">semester record</span><br>
+            <b>B.Com (Finance)</b>, Bangalore University — 2020–2023 · 72/100
+
+            <div class="psec">Certifications</div>
+            Excel for Business — Coursera, 22 hrs<span class="evi-tag">provider-verified</span><br>
+            Business Communication — Coursera, 18 hrs<span class="evi-tag">provider-verified</span>
+
+            <div class="psec">Programme progress</div>
+            Reboot stage — 62% complete · 11.5 hrs/week average study time · focus score 67/100<span class="evi-tag">progress.ts</span><br>
+            Attendance 80% across the current term<span class="evi-tag">lecture register</span>
+
+            <div class="psec">Experience</div>
+            <b>Marketing Intern</b>, Sri Balaji Distributors — Jun–Dec 2023<br>
+            Supported regional sales reporting and dealer reconciliation; built the weekly stock-movement tracker used by three territory managers.
+
+            <div class="psec">Skills</div>
+            Financial modeling · Advanced Excel · Stakeholder communication<span class="evi-tag">2 matched to REEP badges</span>
+          </div>
+
+          <div>
+            <div class="card">
+              <h3>Generation trace</h3>
+              <div style="font-size:12.4px; line-height:1.8; color:var(--ink-700);">
+                <div><span class="chip neutral"><span class="icon">bolt</span>Local model</span> on programme hardware</div>
+                <div style="margin-top:10px;">Student data never left the building. 7 records were read; 7 claims were written; <b>0 unsupported claims</b> were dropped.</div>
+              </div>
+            </div>
+            <div class="card">
+              <h3>Evidence pack</h3>
+              <div style="font-size:12.4px; line-height:1.9;">
+                <div><span class="chip good"><span class="icon">check</span></span> 2 certifications — provider-verified</div>
+                <div><span class="chip good"><span class="icon">check</span></span> Semester CGPA record</div>
+                <div><span class="chip good"><span class="icon">check</span></span> Stage progress + focus score</div>
+                <div><span class="chip good"><span class="icon">check</span></span> Attendance register</div>
+                <div><span class="chip warn"><span class="icon">remove</span></span> 1 self-reported cert excluded — not yet verified</div>
+              </div>
+            </div>
+            <div class="card">
+              <h3>What would strengthen this</h3>
+              <div style="font-size:12.4px; line-height:1.75; color:var(--ink-700);">
+                Adding <b>Projects</b> and <b>Positions of Responsibility</b> would lift profile completeness from 46% to roughly 68% and give the resume two more substantive sections.
+                <button class="btn primary" style="margin-top:12px; padding:7px 12px; font-size:12px;" data-view-jump="builder"><span class="icon">arrow_forward</span> Complete those sections</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footbar"><div class="hint"><span class="icon" style="font-size:16px">lock</span> Generated on-device · evidence stored for mentor audit</div></div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+
+<script>
+// view switching
+function showView(v){
+  document.querySelectorAll('#views button').forEach(b=>b.classList.toggle('active', b.dataset.view===v));
+  document.querySelectorAll('[data-view-panel]').forEach(p=>p.classList.toggle('active', p.id==='view-'+v));
+  window.scrollTo({top:0});
+}
+document.querySelectorAll('#views button').forEach(b=>b.addEventListener('click', ()=>showView(b.dataset.view)));
+document.querySelectorAll('[data-view-jump]').forEach(b=>b.addEventListener('click', ()=>showView(b.dataset.viewJump)));
+
+// section stepper
+const meta = {
+  basic:["Basic Details","Identity and demographics. Fields synced from the university record are locked."],
+  contact:["Contact Details","Phone, email, links and addresses. Repeatable rows for anything you have more than one of."],
+  family:["Family Details","Next-of-kin information required by the placement office."],
+  education:["Education","Semester record, prior qualifications and declared academic gaps. Edits here need approval."],
+  attachments:["Attachments","A ledger of every document, routed from the section that owns it."],
+  experience:["Professional Experience","Full-time roles, with description bullets that feed the resume directly."],
+  internship:["Internship","Internships, tracked separately from full-time experience."],
+  projects:["Projects","Academic, capstone and personal projects."],
+  publications:["Publications / Research / White Papers","Published or in-review research output."],
+  seminars:["Seminars / Trainings / Workshops","Short-form learning that is not a full certification."],
+  certifications:["Certification / Assessments","REEP certifications sync automatically; outside ones are added manually."],
+  por:["Positions of Responsibility","Leadership and committee roles."],
+  other:["Other Details","Objective, key expertise, achievements, awards and activities."],
+  references:["References","Referees a recruiter may contact."],
+  policy:["Placement Policy","Controls which opportunities you appear against."]
+};
+document.querySelectorAll('.step-item').forEach(s => s.addEventListener('click', () => {
+  const k = s.dataset.step;
+  document.querySelectorAll('.step-item').forEach(x=>x.classList.remove('active'));
+  s.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p => p.classList.toggle('active', p.dataset.p === k));
+  document.getElementById('secTitle').textContent = meta[k][0];
+  document.getElementById('secSub').textContent = meta[k][1];
+  const isApproval = (k === 'education');
+  document.getElementById('saveBtn').style.display = isApproval ? 'none' : 'inline-flex';
+  document.getElementById('approvalBtn').style.display = isApproval ? 'inline-flex' : 'none';
+  document.querySelector('.body').scrollTop = 0;
+}));
+
+// tag input behaviour
+document.querySelectorAll('.taginput').forEach(box => {
+  const input = box.querySelector('input');
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && input.value.trim()) {
+      e.preventDefault();
+      const chip = document.createElement('span');
+      chip.className = 'chipx';
+      chip.innerHTML = input.value.trim() + ' <span class="icon">close</span>';
+      chip.querySelector('.icon').addEventListener('click', () => chip.remove());
+      box.insertBefore(chip, input);
+      input.value = '';
+    }
+  });
+  box.querySelectorAll('.chipx .icon').forEach(x => x.addEventListener('click', () => x.parentElement.remove()));
+});
+</script>
+</body>
+</html>

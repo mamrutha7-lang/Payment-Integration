@@ -1,0 +1,268 @@
+/* The builder is painted almost entirely by the global reep-v2 + reep-v2-resume
+ * classes. Only the host frame, the top view-tab row, and the two-column shell
+ * (which the mockup's demo chrome owned) are local. */
+:host {
+  display: block;
+}
+
+/* top-level view tabs — a pill row echoing the mockup's .meta-tabs, kept local
+   so the global stylesheet stays free of demo-harness chrome. */
+/* The numbered flow. Wraps rather than scrolls: four steps at 13px do not fit a
+   narrow column, and a step the student cannot see is a step they will not
+   take. */
+/* The stepper is the shared `.wizard-steps`; this only makes its steps
+   buttons and places them in the head.
+
+   They were filled pills, the active one in --primary-gradient. Four pills of
+   which one is the loudest object on the page competed with Generate Resume,
+   which IS this screen's primary action — and the steps are navigation, not an
+   action. The board numbers them in circles: filled for where you are, hollow
+   for where you are not. */
+.rb-header {
+  align-items: flex-start;
+  gap: 16px;
+}
+.rb-steps button {
+  appearance: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.rb-steps button:focus-visible {
+  outline: 2px solid var(--brand-purple);
+  outline-offset: 3px;
+  border-radius: var(--r-pill);
+}
+
+/* --- goal strip --- */
+.rb-goal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: flex-end;
+  background: var(--tint-2);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}
+.rb-goal label {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+/* The posting is the longest value and the one worth reading in full. */
+.rb-goal .goal-opp {
+  flex: 1;
+  min-width: 220px;
+}
+/* Sentence case, like every other field label — see the note on `.field label`
+   in reep-v2.scss. These three sit above three selects and were the only
+   uppercase labels left on the screen once that changed. */
+.goal-lbl {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  letter-spacing: 0.02em;
+}
+.rb-goal select {
+  padding: 6px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--hairline-45);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 13px;
+  max-width: 100%;
+}
+.goal-match {
+  flex: 0 0 auto;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 7px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+/* Tone carries meaning here, so each one also carries its own words — the label
+   says "eligible" or "not yet eligible", never colour alone. */
+.goal-match--neutral {
+  background: rgba(58, 31, 82, 0.08);
+  color: var(--muted);
+}
+.goal-match--good {
+  background: var(--good-bg);
+  color: var(--good);
+}
+.goal-match--warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+
+/* --- import verified record --- */
+.import-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--purple-mid);
+  background: var(--tint-1);
+  color: var(--brand-purple);
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-bottom: 14px;
+}
+.import-btn:hover {
+  background: var(--surface);
+}
+.import-btn .icon {
+  font-size: 16px;
+}
+.import-done {
+  font-size: 11.5px;
+  color: var(--good);
+  text-align: center;
+  margin: -8px 0 14px;
+}
+
+/* the builder's stepper + main sit side by side inside a framed shell (the
+   mockup's .shell), since the app-shell no longer supplies that frame here. */
+.rb-shell {
+  display: flex;
+  min-height: 680px;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--ground);
+}
+
+.foot-actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* --- sticky save bar --- */
+/* The footbar is pinned to the bottom of the main column (only .body scrolls),
+   so the save state is always visible. Emphasise it and stack the status chip
+   above the versioning note. */
+.save-state {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.save-chip {
+  align-self: flex-start;
+}
+.save-chip .icon {
+  font-size: 14px;
+}
+.foot-note {
+  font-size: 11px;
+  color: var(--muted);
+}
+.save-chip .icon.spin {
+  animation: rb-spin 0.9s linear infinite;
+}
+@keyframes rb-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .save-chip .icon.spin {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+ * THE BUILDER AT PHONE WIDTH (2026-09-22)
+ *
+ * `.rb-shell` is a flex ROW — a 250px `.stepper` rail beside `section.main` —
+ * with `overflow: hidden`, and it never collapsed. Measured in Chromium at
+ * 390px: the shell's box was 356px against 575px of content, so 219px was
+ * CLIPPED rather than scrolled; `section.main` was squeezed to 106px, which
+ * wrapped "Identity and demographic" to one word per line; and `.head-actions`
+ * sat 202px past the right edge with its buttons entirely off-screen. Nothing
+ * could be scrolled to, because the shell hides its overflow — the same
+ * clip-not-overflow trap the data tables had, in the one screen where a
+ * student writes their CV.
+ *
+ * 640px IS MEASURED, NOT CHOSEN. The content has a hard 575px minimum, so the
+ * shell is correct down to 640 and starts clipping at 560. The rule sits well
+ * below any desktop width and this file is Angular-scoped, so it reaches the
+ * builder's own markup and nothing else — which matters here more than usual,
+ * because `.main-head`, `.head-actions` and `.footbar` are names BOTH global
+ * stylesheets already claim (tools/ci/check_style_duplicates.py's
+ * KNOWN_DUPLICATES). A global rule for them would have reached six other
+ * screens.
+ * ======================================================================= */
+
+@media (max-width: 640px) {
+  .rb-shell {
+    flex-direction: column;
+    /* The 680px floor is there to hold a two-column frame open; stacked, it
+       only adds empty space under a short step. */
+    min-height: 0;
+  }
+
+  .rb-shell .stepper {
+    width: auto;
+    border-right: 0;
+    border-bottom: 1px solid var(--hairline);
+    /* `auto` gave the rail its own scrollbar beside the page's; stacked, it
+       is just another block and the page scrolls it. */
+    overflow: visible;
+    padding: 14px 12px;
+  }
+
+  .rb-shell .main-head {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 16px;
+  }
+
+  .rb-shell .head-actions {
+    flex-wrap: wrap;
+  }
+
+  .rb-shell .body {
+    padding: 16px;
+  }
+
+  .rb-shell .footbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px 16px;
+  }
+
+  /* The four flow steps were 22px tall — the smallest targets in the product.
+     They wrap already, so height is the only thing missing. */
+  .rb-steps button {
+    min-height: 44px;
+  }
+
+  /* The only text in the app under 11px, and it includes the label that says
+     which fields are locked. `.rb-shell .lock` rather than `.lock`, because
+     `.field .lock` in the global resume sheet sets the 10px at (0,2,0). */
+  .step-group,
+  .rb-shell .lock,
+  .rb-shell .reqp {
+    font-size: 11px;
+  }
+
+  /* Not a `.btn`, so the global mobile rule does not reach it. */
+  .import-btn {
+    min-height: 44px;
+  }
+}

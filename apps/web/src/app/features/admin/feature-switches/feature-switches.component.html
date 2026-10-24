@@ -1,0 +1,530 @@
+<div class="panel" data-p="feature-switches">
+  <div class="dt-header">
+    <div>
+      <div class="crumb">
+        <a routerLink="/admin/governance">Who can do what</a>
+        <span class="sep">/</span>
+        <span>Student feature switches</span>
+      </div>
+      <h1 class="dt-title">Student feature switches</h1>
+      <div class="dt-sub">Turn a student feature on or off.</div>
+    </div>
+    <div class="dt-toolbar">
+      <button
+        type="button"
+        class="btn secondary"
+        [disabled]="state() !== 'ready'"
+        (click)="startNewOverride()"
+      >
+        <span class="icon" aria-hidden="true">add</span> Add a rule
+      </button>
+    </div>
+  </div>
+
+  <div role="status">
+    @if (state() === 'loading') {
+      <div class="notice info fs-note">
+        <span class="icon" aria-hidden="true">hourglass_empty</span>
+        <div>Loading…</div>
+      </div>
+    }
+    @if (flash()) {
+      <div class="notice good fs-note">
+        <span class="icon" aria-hidden="true">check</span>
+        <div>{{ flash() }}</div>
+      </div>
+    }
+  </div>
+  <div role="alert">
+    @if (error()) {
+      <div class="notice fs-note">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>{{ error() }}</div>
+      </div>
+    }
+  </div>
+
+  @if (state() === 'ready') {
+    <!-- The governance section's own tabs. Give access, Who has access and
+         Groups are panes of ONE screen, so each link lands on it with `?tab=`
+         naming the pane, and each says so in its accessible name. -->
+    <div class="tabs fs-tabs">
+      <a
+        class="tab fs-tablink"
+        routerLink="/admin/governance"
+        [queryParams]="{ tab: 'give' }"
+        aria-label="Give access, on Who can do what"
+      >
+        Give access
+      </a>
+      <a
+        class="tab fs-tablink"
+        routerLink="/admin/governance"
+        [queryParams]="{ tab: 'holders' }"
+        aria-label="Who has access, on Who can do what"
+      >
+        Who has access
+      </a>
+      <a
+        class="tab fs-tablink"
+        routerLink="/admin/governance"
+        [queryParams]="{ tab: 'groups' }"
+        aria-label="Groups, on Who can do what"
+      >
+        Groups
+      </a>
+      <span class="tab active" aria-current="page">Student feature switches</span>
+      <a class="tab fs-tablink" routerLink="/admin/audit">
+        What changed<span class="icon" aria-hidden="true">open_in_new</span>
+      </a>
+    </div>
+
+    <div class="fs-filters">
+
+      <div class="select fs-scope-filter">
+        <span class="lbl">Applies to</span>
+        <span class="val">{{ scopeFilterLabel() }}</span>
+        <select aria-label="Applies to" (change)="setScopeFilter($any($event.target).value)">
+          <option value="" [selected]="scopeFilter() === ''">All</option>
+          @for (scope of hierarchyScopes; track scope) {
+            <option [value]="scope" [selected]="scopeFilter() === scope">
+              {{ scopeLabelFor(scope) }}
+            </option>
+          }
+          <option value="STUDENT" [selected]="scopeFilter() === 'STUDENT'">Student</option>
+        </select>
+      </div>
+
+      <div class="select fs-enforcement-filter">
+        <span class="lbl">Enforcement</span>
+        <span class="val">{{ enforcementFilterLabel() }}</span>
+        <select aria-label="Enforcement" (change)="setEnforcementFilter($any($event.target).value)">
+          <option value="all" [selected]="enforcementFilter() === 'all'">All</option>
+          <option value="enforced" [selected]="enforcementFilter() === 'enforced'">
+            Server-enforced
+          </option>
+          <option value="unwired" [selected]="enforcementFilter() === 'unwired'">
+            Not wired yet
+          </option>
+        </select>
+      </div>
+
+      <p class="fs-filters-note">
+        Resolution order: student → batch → specialization → course → department → college, then on
+        by default. The most specific rule wins, and a student with no batch is reached only by a
+        student-level rule.
+      </p>
+    </div>
+
+    <!-- The honest headline. Enforcement is the catalogue's own `enforced`
+         flag, per feature — never a list kept in this component. -->
+    <div class="notice accent fs-note">
+      <span class="icon" aria-hidden="true">info</span>
+      <div>
+        <b>{{ enforcementSummary() }}</b>
+      </div>
+    </div>
+
+    <div class="fs-board">
+      <div class="dt-frame fs-grid-frame">
+        <div class="fs-grid-scroll">
+          <table class="dt-table fs-table" aria-label="Student feature switches">
+            <thead>
+              <tr>
+                <th class="pinned fs-feature-col">Feature</th>
+                <th>Default</th>
+                <th class="fs-scope-col">Applies to</th>
+                <th>Value</th>
+                <th class="fs-enforcement-col">Enforcement</th>
+                <th>Changed</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of pagedRows(); track row.key) {
+                <tr [class.selected]="isRowSelected(row.key)">
+                  <td class="pinned fs-feature-col">
+                    <button
+                      type="button"
+                      class="fs-rowpick"
+                      [attr.aria-pressed]="isRowSelected(row.key)"
+                      (click)="selectFeature(row.key)"
+                    >
+                      <span class="fs-feature-name">{{ row.label }}</span>
+                      <span class="fs-key">{{ row.key }}</span>
+                    </button>
+                  </td>
+                  <td><span class="chip dot good">{{ defaultValueLabel }}</span></td>
+                  <td class="fs-scope-col">{{ row.scopeSummary }}</td>
+                  <td>
+                    @if (row.valueVaries) {
+                      <span class="chip dot warn">{{ row.valueLabel }}</span>
+                    } @else if (row.valueIsSwitchedOff) {
+                      <span class="chip dot neutral">Off</span>
+                    } @else {
+                      <span class="chip dot good">{{ row.valueLabel }}</span>
+                    }
+                  </td>
+                  <td class="fs-enforcement-col">
+                    <span class="chip dot" [class.good]="row.isServerEnforced" [class.warn]="!row.isServerEnforced">
+                      {{ row.enforcementLabel }}
+                    </span>
+                  </td>
+                  <td class="fs-nums">{{ row.changedLabel }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="fs-empty">
+                    @if (featureRows().length === 0) {
+                      The catalogue serves no student switches.
+                    } @else {
+                      No switch matches these filters.
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="dt-statusbar">
+          <span>Rows: <b>{{ filteredRows().length }}</b></span>
+          <span>Selected: <b>{{ selectedRow() === null ? 0 : 1 }}</b></span>
+          <span>Rules in force: <b>{{ rulesInForce() }}</b></span>
+          <span class="pager">
+            <label class="fs-pagesize">
+              <span>Page size</span>
+              <select aria-label="Rows per page" (change)="setRowsPerPage($any($event.target).value)">
+                @for (size of rowsPerPageChoices; track size) {
+                  <option [value]="size" [selected]="size === rowsPerPage()">{{ size }}</option>
+                }
+              </select>
+            </label>
+            <span>{{ firstRowOnPage() }} to {{ lastRowOnPage() }} of {{ filteredRows().length }}</span>
+            <button
+              type="button"
+              class="btn ghost sm"
+              aria-label="Previous page"
+              [disabled]="pageIndex() === 0"
+              (click)="goToPage(pageIndex() - 1)"
+            >
+              <span class="icon" aria-hidden="true">chevron_left</span>
+            </button>
+            <span>Page {{ pageIndex() + 1 }} of {{ pageCount() }}</span>
+            <button
+              type="button"
+              class="btn ghost sm"
+              aria-label="Next page"
+              [disabled]="pageIndex() + 1 >= pageCount()"
+              (click)="goToPage(pageIndex() + 1)"
+            >
+              <span class="icon" aria-hidden="true">chevron_right</span>
+            </button>
+          </span>
+        </div>
+      </div>
+
+      <!-- ============================================= the 380px panel === -->
+      <section class="card fs-panel" aria-label="Override">
+        @if (selectedRow(); as row) {
+          <h2 class="fs-card-title">Override · {{ row.label }}</h2>
+
+          <div class="field synced">
+            <label>Feature</label>
+            <div class="ctrl">{{ row.key }} · {{ row.label }}</div>
+            <span class="help">Pick another feature in the table to switch to it.</span>
+          </div>
+
+          @if (row.isServerEnforced) {
+            <div class="notice good">
+              <span class="icon" aria-hidden="true">verified_user</span>
+              <div>The API checks this switch before it serves the feature.</div>
+            </div>
+          } @else {
+            <div class="notice warn">
+              <span class="icon" aria-hidden="true">warning</span>
+              <div>
+                This switch is not wired yet, so it cannot be set. Existing rules can still be removed.
+              </div>
+            </div>
+          }
+
+          @if (row.rules.length > 0) {
+            <h3 class="fs-subhead">{{ row.rules.length | plural: 'rule' }} in force</h3>
+            <ul class="fs-rules">
+              @for (rule of row.rules; track rule.id) {
+                <li
+                  class="fs-rule"
+                  [class.editing]="editingRuleId() === rule.id"
+                  [class.lapsed]="rule.hasLapsed"
+                >
+                  <div class="fs-rule-head">
+                    <span class="fs-rule-target">{{ rule.scopeLabel }} · {{ rule.targetLabel }}</span>
+                    @if (rule.hasLapsed) {
+                      <span class="chip dot neutral">Lapsed</span>
+                    } @else if (rule.isSwitchedOff) {
+                      <span class="chip dot neutral">Off</span>
+                    } @else {
+                      <span class="chip dot good">On</span>
+                    }
+                  </div>
+                  <div class="fs-rule-meta">
+                    @if (rule.hasLapsed) {
+                      {{ rule.studentsLabel }} · expired {{ rule.untilLabel }} — it decides nothing
+                      now · set {{ rule.changedLabel }}
+                    } @else {
+                      {{ rule.studentsLabel }} · {{ rule.untilLabel }} · set {{ rule.changedLabel }}
+                    }
+                  </div>
+                  <p class="fs-rule-reason">{{ rule.reason }}</p>
+                  <!-- The office's note and the student's sentence are two
+                       different things and are never run together: `reason` is
+                       auditable and sometimes unkind, `student_message` is what
+                       the person is shown. `null` is a real answer and gets its
+                       own words, never an empty quotation. -->
+                  @if (rule.studentMessage) {
+                    <p class="fs-rule-message">
+                      <span class="icon" aria-hidden="true">chat_bubble</span>
+                      Students are shown: “{{ rule.studentMessage }}”
+                    </p>
+                  } @else if (rule.isSwitchedOff) {
+                    <p class="fs-rule-message quiet">
+                      <span class="icon" aria-hidden="true">chat_bubble</span>
+                      Students are told nothing — the feature is simply absent.
+                    </p>
+                  }
+                  @if (removingRuleId() === rule.id) {
+                    <div class="fs-rule-confirm" role="status">
+                      <span>
+                        Remove this rule? The next rung up decides again for
+                        {{ rule.studentsLabel }}.
+                      </span>
+                      <span class="fs-rule-actions">
+                        <button type="button" class="btn ghost sm" (click)="removingRuleId.set(null)">
+                          Keep it
+                        </button>
+                        <button
+                          type="button"
+                          class="btn danger sm"
+                          [disabled]="saving()"
+                          (click)="removeRule(rule)"
+                        >
+                          <span class="icon" aria-hidden="true">delete</span> Remove override
+                        </button>
+                      </span>
+                    </div>
+                  } @else {
+                    <div class="fs-rule-actions">
+                      <button type="button" class="btn ghost sm" (click)="editRule(rule)">
+                        <span class="icon" aria-hidden="true">edit</span> Edit
+                      </button>
+                      <button
+                        type="button"
+                        class="btn ghost sm"
+                        (click)="removingRuleId.set(rule.id)"
+                      >
+                        <span class="icon" aria-hidden="true">delete</span> Remove override
+                      </button>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          } @else {
+            <div class="notice accent">
+              <span class="icon" aria-hidden="true">info</span>
+              <div>No rule on this feature — it is on for every student.</div>
+            </div>
+          }
+
+          <h3 class="fs-subhead">{{ formHeading() }}</h3>
+          @if (editRetargetedNote()) {
+            <p class="fs-reach" role="status">{{ editRetargetedNote() }}</p>
+          }
+
+          <div class="field">
+            <label for="fs-scope">Scope</label>
+            <select
+              id="fs-scope"
+              class="ctrl"
+              #scopeSelect
+              [disabled]="selectedFeatureIsUnwired()"
+              (change)="setFormScope($any($event.target).value)"
+            >
+              @for (scope of hierarchyScopes; track scope) {
+                <option [value]="scope" [selected]="formScope() === scope">
+                  {{ scopeLabelFor(scope) }}
+                </option>
+              }
+              <option value="STUDENT" [selected]="formScope() === 'STUDENT'">Student</option>
+            </select>
+          </div>
+
+          @if (scopeIsStudent()) {
+            <div class="field">
+              <label for="fs-student">Student</label>
+              <div class="fs-search">
+                <input
+                  id="fs-student"
+                  class="ctrl"
+                  type="search"
+                  placeholder="Name, email or USN"
+                  [disabled]="selectedFeatureIsUnwired()"
+                  [value]="studentQuery()"
+                  (input)="studentQuery.set($any($event.target).value)"
+                  (keydown.enter)="searchStudents()"
+                />
+                <button
+                  type="button"
+                  class="btn secondary"
+                  [disabled]="searchingStudents() || selectedFeatureIsUnwired()"
+                  (click)="searchStudents()"
+                >
+                  <span class="icon" aria-hidden="true">search</span> Find
+                </button>
+              </div>
+              @if (studentResults().length > 0) {
+                <ul class="fs-results">
+                  @for (student of studentResults(); track student.student_id) {
+                    <li>
+                      <button
+                        type="button"
+                        class="tree-row"
+                        [class.selected]="formTargetId() === student.student_id"
+                        (click)="pickStudent(student)"
+                      >
+                        <span class="label">{{ studentLabelOf(student) }}</span>
+                        <span class="count">{{ student.batch ?? 'No batch' }}</span>
+                      </button>
+                    </li>
+                  }
+                </ul>
+              }
+              <div role="alert">
+                @if (studentSearchError()) {
+                  <span class="err">
+                    <span class="icon" aria-hidden="true">error</span>{{ studentSearchError() }}
+                  </span>
+                }
+              </div>
+            </div>
+          } @else {
+            <div class="field">
+              <label for="fs-target">Applies to</label>
+              <select
+                id="fs-target"
+                class="ctrl"
+                [disabled]="selectedFeatureIsUnwired()"
+                (change)="formTargetId.set($any($event.target).value)"
+              >
+                <option value="" [selected]="formTargetId() === ''">Choose one…</option>
+                @for (node of targetOptions(); track node.id) {
+                  <option [value]="node.id" [selected]="formTargetId() === node.id">
+                    {{ node.label }} — {{ node.students | plural: 'student' }}
+                  </option>
+                }
+              </select>
+              @if (targetOptions().length === 0) {
+                <span class="help">Nothing exists at that level yet.</span>
+              }
+            </div>
+          }
+
+          <p class="fs-reach">{{ reachLabel() }}</p>
+
+          <div class="fs-pair">
+            <div class="field">
+              <label for="fs-value">Value</label>
+              <select
+                id="fs-value"
+                class="ctrl"
+                [disabled]="selectedFeatureIsUnwired()"
+                (change)="setFormValue($any($event.target).value)"
+              >
+                <option value="off" [selected]="!formSwitchedOn()">Off</option>
+                <option value="on" [selected]="formSwitchedOn()">On</option>
+              </select>
+              <span class="help">"On" is a real rule: it switches a broader "off" back on.</span>
+            </div>
+            <div class="field">
+              <label for="fs-until">Until</label>
+              <input
+                id="fs-until"
+                class="ctrl"
+                type="date"
+                [disabled]="selectedFeatureIsUnwired()"
+                [value]="formExpiryDate()"
+                (input)="formExpiryDate.set($any($event.target).value)"
+              />
+              <span class="help">Blank = until it is removed.</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="fs-reason">Reason <span class="fs-required">*</span></label>
+            <textarea
+              id="fs-reason"
+              class="ctrl multi"
+              rows="3"
+              maxlength="400"
+              placeholder="Why this is switched off, in a sentence someone can audit in a year."
+              [disabled]="selectedFeatureIsUnwired()"
+              [value]="formReason()"
+              (input)="formReason.set($any($event.target).value)"
+            ></textarea>
+            <span class="help">At least {{ minReason() | plural: 'character' }}.</span>
+          </div>
+
+          <!-- B2.2 made this real: `student_message` is a column, it travels on
+               OverrideIn/OverrideOut, and `record_change` writes it onto the
+               audit trail beside the rule — "what were they told" is asked
+               afterwards. 500 is the API's own cap (Field(max_length=500)). -->
+          <div class="field">
+            <label for="fs-message">Student-facing message</label>
+            <textarea
+              id="fs-message"
+              class="ctrl multi"
+              rows="2"
+              maxlength="500"
+              placeholder="Mock interviews open in November"
+              [disabled]="selectedFeatureIsUnwired()"
+              [value]="formStudentMessage()"
+              (input)="formStudentMessage.set($any($event.target).value)"
+            ></textarea>
+            <span class="help">What the student reads when this rule refuses them. Blank hides the feature silently.</span>
+            <div role="status">
+              @if (studentMessageWillNotBeShown()) {
+                <span class="help">This rule switches the feature <b>on</b>, so this message is never shown.</span>
+              }
+            </div>
+          </div>
+
+          <div class="fs-actions">
+            @if (editingRuleId() !== null) {
+              <button type="button" class="btn ghost" (click)="startNewOverride()">Cancel</button>
+            }
+            <button
+              type="button"
+              class="btn primary"
+              [disabled]="!canSave()"
+              (click)="saveOverride()"
+            >
+              <span class="icon" aria-hidden="true">check</span>
+              {{ saving() ? 'Saving…' : 'Save' }}
+            </button>
+          </div>
+          @if (saveBlockedReason()) {
+            <p class="fs-blocked">{{ saveBlockedReason() }}</p>
+          }
+        } @else {
+          <h2 class="fs-card-title">Override</h2>
+          <div class="notice accent">
+            <span class="icon" aria-hidden="true">info</span>
+            <div>
+              Pick a feature in the table.
+            </div>
+          </div>
+        }
+      </section>
+    </div>
+  }
+</div>

@@ -1,0 +1,1616 @@
+<title>Student 360 Redesign</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400,0..1,0&icon_names=alternate_email,call,check,check_circle,checklist,chevron_right,close,content_copy,description,download,edit,event,event_available,expand_more,forum,group_add,history,hourglass_top,how_to_reg,info,leaderboard,link,location_on,lock,logout,mail,manage_accounts,mic,more_horiz,open_in_new,pending_actions,person,person_add,person_remove,picture_as_pdf,reply,restart_alt,schedule,school,speed,timelapse,verified,visibility,visibility_off,workspace_premium&display=block">
+
+<style>
+/* Layout: a candidate rail (who they are, how to reach them, their resume,
+   who may open this record) beside a workspace that reads top to bottom:
+   six numbers, what needs attention, then one tab per subject.
+   REEP v2 tokens, copied from apps/web/src/styles/reep-v2.scss. REEP is one
+   committed light theme, so this page is too: every colour is set here. */
+:root {
+  color-scheme: light;
+  --page: #f2e7f8;
+  --wash: linear-gradient(180deg, #ece4f5 0%, #f2e7f8 45%, #fbe6f2 100%);
+  --brand: #552c7e;
+  --brand-mid: #7a2f9e;
+  --magenta: #ba2185;
+  --ink: #1e1b29;
+  --ink-soft: #4a2668;
+  --ink-nav: #5b3080;
+  --muted: #585566;
+  --faint: #67637c;
+  --surface: #ffffff;
+  --tint-1: #efe4f6;
+  --tint-2: #f5edfa;
+  --tint-3: #faf6fd;
+  --hairline: rgba(160, 138, 178, 0.38);
+  --rule: rgba(160, 138, 178, 0.26);
+  --good: #107045;
+  --good-bg: rgba(19, 122, 74, 0.12);
+  --warn: #8f6100;
+  --warn-dot: #d99a00;
+  --warn-bg: rgba(217, 154, 0, 0.12);
+  --risk: #ad2452;
+  --risk-bg: rgba(173, 36, 82, 0.1);
+  --seq-light: #c9b8d8;
+  --axis: #7c7891;
+  --primary: linear-gradient(120deg, #552c7e, #7a2f9e 38%, #a0248f 68%, #ba2185);
+  --card: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(245, 237, 250, 0.74));
+  --sh-card: 0 10px 26px rgba(58, 31, 82, 0.1), inset 0 1px 0 #fff;
+  --sh-ctrl: 0 2px 6px rgba(58, 31, 82, 0.06), inset 0 1px 0 #fff;
+  --sh-primary: 0 8px 18px rgba(85, 44, 126, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --sh-pop: 0 18px 44px rgba(40, 18, 60, 0.22);
+  --paper-ink: #1b1824;
+  --on-primary: #ffffff;
+  --font-display: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --font: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", Menlo, monospace;
+  --r-card: 16px;
+  --r-btn: 12px;
+  --r-tile: 10px;
+  --r-pill: 999px;
+}
+
+* { box-sizing: border-box; }
+body {
+  background-color: var(--page);
+  background-image: var(--wash);
+  color: var(--ink);
+  font: 14px/1.5 var(--font);
+  -webkit-font-smoothing: antialiased;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 56px;
+  min-height: 100%;
+}
+.shell { max-width: 1340px; margin: 0 auto; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+p { margin: 0; }
+a { color: var(--brand); }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 6px; }
+.num { font-variant-numeric: tabular-nums; }
+.soft { color: var(--muted); }
+.faint { color: var(--faint); }
+
+/* Icons: Material Symbols by ligature, hidden until the face has loaded so a
+   stray word never shows (the same gate main.ts applies in the app). */
+.icon {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal; font-style: normal; font-size: 18px; line-height: 1;
+  width: 1em; height: 1em; overflow: hidden; display: inline-block; flex: none;
+  letter-spacing: normal; text-transform: none; white-space: nowrap; direction: ltr;
+  font-feature-settings: "liga"; -webkit-font-smoothing: antialiased;
+  visibility: hidden; vertical-align: -0.2em;
+}
+.fonts-ready .icon { visibility: visible; }
+.icon.fill { font-variation-settings: "FILL" 1; }
+
+/* ---------------------------------------------------------- prototype bar */
+.proto {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px;
+  padding-block: 10px; font-size: 12.5px; color: var(--muted);
+  border-bottom: 1px dashed var(--hairline);
+}
+.proto-tag {
+  font-family: var(--font-display); font-weight: 800; font-size: 10.5px;
+  letter-spacing: 0.09em; text-transform: uppercase; color: var(--brand);
+  background: var(--tint-1); border-radius: var(--r-pill); padding: 3px 9px;
+}
+.proto .grow { flex: 1 1 260px; min-width: 0; }
+.seg { display: inline-flex; align-items: center; gap: 4px; background: var(--surface);
+  border: 1px solid var(--hairline); border-radius: var(--r-pill); padding: 3px; box-shadow: var(--sh-ctrl); }
+.seg-label { font-size: 11.5px; color: var(--faint); padding: 0 6px 0 8px; }
+.seg button { border: 0; background: transparent; border-radius: var(--r-pill); padding: 5px 12px;
+  font-size: 12.5px; font-weight: 600; color: var(--ink-nav); cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--tint-1); color: var(--brand); }
+
+.changes { margin-top: 12px; background: var(--surface); border: 1px solid var(--hairline);
+  border-radius: var(--r-card); box-shadow: var(--sh-ctrl); }
+.changes summary { cursor: pointer; padding: 12px 16px; font-family: var(--font-display);
+  font-weight: 700; color: var(--ink-soft); display: flex; align-items: center; gap: 8px; list-style: none; }
+.changes summary::-webkit-details-marker { display: none; }
+.changes summary .icon { transition: transform 0.15s; }
+.changes[open] summary .icon.chev { transform: rotate(180deg); }
+.changes ol { margin: 0; padding: 0 16px 16px 16px; list-style: none; display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+.changes li { background: var(--tint-3); border: 1px solid var(--rule); border-radius: var(--r-tile);
+  padding: 10px 12px; font-size: 13px; }
+.changes li b { display: block; font-family: var(--font-display); color: var(--brand); margin-bottom: 2px; }
+.changes li .was { display: block; margin-top: 6px; font-size: 12px; color: var(--faint); }
+
+/* ---------------------------------------------------------- app bar */
+.appbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 14px 6px; }
+.brand { display: flex; align-items: center; gap: 9px; font-size: 14px; color: var(--muted); }
+.brand b { font-family: var(--font-display); font-weight: 800; color: var(--ink); letter-spacing: 0.02em; }
+.mark { width: 28px; height: 28px; border-radius: 8px; background: var(--primary); color: var(--on-primary);
+  display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; box-shadow: var(--sh-primary); }
+.who { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.who small { display: block; font-weight: 500; color: var(--faint); font-size: 11.5px; }
+
+/* ---------------------------------------------------------- page head */
+.page-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 10px 16px; padding-block: 8px 16px; }
+.crumb { font-size: 13px; color: var(--faint); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.crumb a { color: var(--ink-nav); text-decoration: none; font-weight: 600; }
+.crumb a:hover { text-decoration: underline; }
+.crumb .cur { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+.head-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.ribbon { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: var(--r-btn);
+  background: var(--tint-1); color: var(--ink-soft); font-size: 13px; font-weight: 600; }
+
+/* ---------------------------------------------------------- buttons, chips */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid transparent;
+  border-radius: var(--r-btn); padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer;
+  white-space: nowrap; text-decoration: none; line-height: 1.2; }
+.btn.primary { background: var(--primary); color: var(--on-primary); box-shadow: var(--sh-primary); }
+.btn.primary:hover { filter: brightness(1.06); }
+.btn.secondary { background: var(--surface); border-color: rgba(160, 138, 178, 0.42); color: var(--ink); box-shadow: var(--sh-ctrl); }
+.btn.secondary:hover { background: var(--tint-3); }
+.btn.danger { background: var(--surface); border-color: var(--risk); color: var(--risk); }
+.btn.ghost { background: transparent; color: var(--brand); padding-inline: 8px; }
+.btn.ghost:hover { background: var(--tint-2); }
+.btn.small { padding: 6px 10px; font-size: 12.5px; }
+.btn.block { width: 100%; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; filter: none; }
+.icon-btn { border: 1px solid transparent; background: transparent; border-radius: 8px; width: 30px; height: 30px;
+  display: inline-grid; place-items: center; cursor: pointer; color: var(--ink-nav); flex: none; }
+.icon-btn:hover { background: var(--tint-2); border-color: var(--rule); }
+
+.chip { display: inline-flex; align-items: center; gap: 5px; border-radius: var(--r-pill); padding: 2px 9px;
+  font-size: 11.5px; font-weight: 700; background: var(--tint-2); color: var(--ink-nav); white-space: nowrap; line-height: 1.6; }
+.chip.good { background: var(--good-bg); color: var(--good); }
+.chip.warn { background: var(--warn-bg); color: var(--warn); }
+.chip.risk { background: var(--risk-bg); color: var(--risk); }
+.chip.brand { background: var(--tint-1); color: var(--brand); }
+.chip.new { background: var(--surface); color: var(--magenta); border: 1px solid currentColor; }
+.chip.dot::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+/* ---------------------------------------------------------- cards */
+.card { background: var(--card); border: 1px solid var(--hairline); border-radius: var(--r-card);
+  box-shadow: var(--sh-card); padding: 16px 18px; min-width: 0; }
+.card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.card-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+.card-sub { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.eyebrow { font-family: var(--font-display); font-size: 10.5px; font-weight: 800; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--faint); }
+
+/* ---------------------------------------------------------- layout */
+.layout { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 18px; align-items: start; }
+.rail { display: grid; gap: 14px; }
+.work { display: grid; gap: 16px; min-width: 0; }
+@media (max-width: 1060px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .rail { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+}
+
+/* ---------------------------------------------------------- candidate rail */
+.av { width: 34px; height: 34px; border-radius: 50%; display: inline-grid; place-items: center; flex: none;
+  font-family: var(--font-display); font-weight: 800; font-size: 12px; color: var(--brand);
+  background: var(--tint-1); border: 1px solid var(--hairline); }
+.av.lg { width: 60px; height: 60px; font-size: 20px; border: 2px solid var(--surface);
+  box-shadow: 0 0 0 2px var(--seq-light), var(--sh-ctrl); }
+.av.sm { width: 28px; height: 28px; font-size: 11px; }
+.cand-top { display: flex; gap: 14px; align-items: center; }
+.cand-top h1 { font-size: 21px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.2; }
+.usn { font-family: var(--mono); font-size: 12.5px; color: var(--ink-nav); margin-top: 3px; display: flex; align-items: center; gap: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 4px; }
+.facts { display: grid; gap: 0; margin: 10px 0 0; }
+.facts > div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 10px; padding: 7px 0; border-top: 1px solid var(--rule); font-size: 13px; }
+.facts dt { color: var(--faint); }
+.facts dd { margin: 0; font-weight: 600; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.facts dd .soft { font-weight: 500; }
+
+.contact { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.contact li { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 0; }
+.contact li > .icon { color: var(--faint); }
+.contact .lbl { display: block; font-size: 11.5px; color: var(--faint); }
+.contact .val { display: block; font-size: 13px; font-weight: 600; overflow-wrap: anywhere; }
+.contact .val.link { color: var(--brand); }
+.contact .missing { color: var(--faint); font-weight: 500; font-style: italic; }
+
+.resume-mini { display: flex; gap: 12px; align-items: center; padding: 10px; border-radius: var(--r-tile);
+  background: var(--surface); border: 1px solid var(--rule); margin-bottom: 12px; }
+.doc-ico { width: 38px; height: 46px; border-radius: 6px; background: var(--tint-2); border: 1px solid var(--hairline);
+  display: grid; place-items: center; color: var(--brand); flex: none; }
+.resume-mini b { display: block; font-family: var(--font-display); }
+.resume-mini span { font-size: 12px; }
+.stack-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.avstack { display: flex; flex-wrap: wrap; gap: 4px; }
+.rail p { font-size: 12.5px; }
+.rail .card > .btn + .btn { margin-top: 8px; }
+
+/* ---------------------------------------------------------- KPI strip */
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (min-width: 1420px) { .kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.kpi { text-align: left; cursor: pointer; display: flex; flex-direction: column; gap: 6px; padding: 14px 14px 12px;
+  background: var(--card); border: 1px solid var(--hairline); border-radius: var(--r-card); box-shadow: var(--sh-card);
+  min-width: 0; transition: transform 0.12s, border-color 0.12s; }
+.kpi:hover { border-color: var(--brand-mid); transform: translateY(-1px); }
+.kpi-label { font-family: var(--font-display); font-size: 10.5px; font-weight: 800; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--faint); display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.kpi-label > span:first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.kpi-label .icon { font-size: 16px; color: var(--seq-light); }
+.kpi-value { font-family: var(--font-display); font-size: 30px; font-weight: 800; letter-spacing: -0.02em;
+  line-height: 1; color: var(--ink); font-variant-numeric: tabular-nums; }
+.kpi-value small { font-size: 13px; font-weight: 700; color: var(--faint); margin-left: 3px; letter-spacing: 0; }
+.kpi-chart { height: 28px; }
+.kpi-chart svg { display: block; width: 100%; height: 28px; overflow: visible; }
+.kpi-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 12px; color: var(--muted); }
+.meter { height: 8px; border-radius: var(--r-pill); background: var(--tint-1); overflow: hidden; }
+.meter > span { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
+.meter.good > span { background: var(--good); }
+.meter.warn > span { background: var(--warn-dot); }
+.kpi .meter { margin-block: 10px 10px; }
+.delta-up { color: var(--good); font-weight: 700; }
+
+/* ---------------------------------------------------------- attention */
+.attention { padding: 14px 18px; }
+.att-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.att { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 12px; align-items: center;
+  padding: 9px 10px; border-radius: var(--r-tile); background: var(--surface); border: 1px solid var(--rule); }
+.att > .icon { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; font-size: 18px; }
+.att.staff > .icon { background: var(--warn-bg); color: var(--warn); }
+.att.student > .icon { background: var(--tint-1); color: var(--brand); }
+.att b { display: block; font-size: 13.5px; }
+.att span.why { display: block; font-size: 12.5px; color: var(--muted); }
+.att .who-waits { font-size: 11px; font-weight: 700; color: var(--faint); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* ---------------------------------------------------------- tabs */
+.tabs-wrap { overflow-x: auto; margin-inline: -2px; padding: 2px; scrollbar-width: thin; }
+.tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 5px; border-radius: 22px;
+  background: rgba(255, 255, 255, 0.6); border: 1px solid var(--hairline); }
+.tab { appearance: none; border: 0; background: transparent; border-radius: var(--r-pill); padding: 7px 13px;
+  font-size: 13px; font-weight: 700; color: var(--ink-nav); cursor: pointer; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.tab:hover { background: var(--tint-2); color: var(--brand); }
+.tab[aria-selected="true"] { background: var(--primary); color: var(--on-primary); box-shadow: 0 5px 14px rgba(85, 44, 126, 0.36); }
+.tab .count { font-size: 11px; font-weight: 800; border-radius: var(--r-pill); padding: 0 7px; background: var(--tint-1); color: var(--brand); line-height: 1.7; }
+.tab[aria-selected="true"] .count { background: rgba(255, 255, 255, 0.24); color: var(--on-primary); }
+@media (max-width: 700px) { .tabs { flex-wrap: nowrap; width: max-content; min-width: 100%; border-radius: var(--r-pill); } }
+.panel { display: grid; gap: 16px; min-width: 0; }
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.grid-2.even { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.col { display: grid; gap: 16px; min-width: 0; }
+@media (max-width: 1180px) { .grid-2, .grid-2.even { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------------------------------------------------------- tables */
+.table-scroll { overflow-x: auto; margin-inline: -4px; padding-inline: 4px; }
+table.dt { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dt th { text-align: left; font-family: var(--font-display); font-size: 10.5px; font-weight: 800; letter-spacing: 0.07em;
+  text-transform: uppercase; color: var(--faint); padding: 8px 10px; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+.dt td { padding: 9px 10px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.dt tr:last-child td { border-bottom: 0; }
+.dt td.n, .dt th.n { text-align: right; font-variant-numeric: tabular-nums; }
+.dt tr.me td { background: var(--tint-1); }
+.dt tr.me td:first-child { border-radius: 10px 0 0 10px; }
+.dt tr.me td:last-child { border-radius: 0 10px 10px 0; }
+.dt tr.gap td { text-align: center; color: var(--faint); padding: 2px; letter-spacing: 0.3em; }
+.dt .row-actions { display: flex; gap: 4px; justify-content: flex-end; }
+.dash { color: var(--faint); }
+.cellnote { display: block; font-size: 12px; color: var(--muted); }
+
+/* ---------------------------------------------------------- readiness */
+.ready-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 10px 14px; margin-bottom: 4px; }
+.big { font-family: var(--font-display); font-size: 44px; font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.big small { font-size: 16px; color: var(--faint); font-weight: 700; letter-spacing: 0; }
+.factor-bar { width: 120px; }
+.status { display: inline-flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+.status.good { color: var(--good); }
+.status.warn { color: var(--warn); }
+.status.risk { color: var(--risk); }
+
+/* ---------------------------------------------------------- timeline */
+.timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.timeline li { display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 12px; position: relative; padding-bottom: 14px; }
+.timeline li:not(:last-child)::before { content: ""; position: absolute; left: 14px; top: 30px; bottom: 0; width: 2px; background: var(--rule); }
+.step { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display);
+  font-weight: 800; font-size: 12px; border: 1px solid var(--hairline); background: var(--surface); color: var(--faint); }
+.step.done { background: var(--good-bg); color: var(--good); border-color: transparent; }
+.step.now { background: var(--primary); color: var(--on-primary); border-color: transparent; box-shadow: var(--sh-primary); }
+.timeline b { font-family: var(--font-display); }
+.timeline .when { font-size: 12px; color: var(--faint); margin-left: 6px; font-family: var(--font); font-weight: 500; }
+.timeline .what { font-size: 12.5px; color: var(--muted); }
+
+.feed { list-style: none; margin: 0; padding: 0; }
+.feed li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--rule); font-size: 13px; }
+.feed li:first-child { border-top: 0; }
+.feed .icon { color: var(--brand-mid); }
+.feed time { font-size: 12px; color: var(--faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* ---------------------------------------------------------- resume */
+.resume-grid { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 1180px) { .resume-grid { grid-template-columns: minmax(0, 1fr); } }
+.file-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; }
+.file-row .doc-ico { width: 30px; height: 36px; }
+.file-row b { display: block; font-size: 13px; overflow-wrap: anywhere; }
+.file-row span { font-size: 12px; color: var(--muted); }
+.preview-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.preview-bar .left { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.paper-note { font-size: 12px; color: var(--muted); margin-top: 12px; display: flex; gap: 6px; align-items: flex-start; }
+.cv-file { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 12px; align-items: start; padding: 12px;
+  border-radius: var(--r-tile); background: var(--surface); border: 1px solid var(--rule); margin-bottom: 12px; }
+.cv-file b { display: block; font-family: var(--font-display); font-size: 13.5px; overflow-wrap: anywhere; }
+.cv-file span:not(.icon):not(.chip) { display: block; font-size: 12px; color: var(--muted); }
+.cv-file .chip { margin-top: 8px; }
+.viewer { border-radius: 12px; overflow: hidden; border: 1px solid var(--hairline); }
+.viewer-bar { display: flex; justify-content: space-between; gap: 10px; padding: 7px 12px; font-size: 12px; font-weight: 600;
+  background: var(--ink); color: var(--tint-1); }
+.viewer-body { background: #e9e5ee; padding: clamp(10px, 3vw, 24px); max-height: 760px; overflow: auto; display: grid; gap: 16px; }
+.cv-page { background: var(--surface); color: var(--paper-ink); width: 100%; max-width: 640px; margin: 0 auto;
+  padding: clamp(18px, 4vw, 40px) clamp(16px, 4.5vw, 44px); box-shadow: 0 4px 16px rgba(30, 20, 46, 0.18);
+  font-family: Georgia, "Times New Roman", serif; font-size: 12.5px; line-height: 1.5; }
+.cv-head { border-bottom: 2px solid var(--paper-ink); padding-bottom: 8px; margin-bottom: 4px; }
+.cv-head h2 { font-family: Georgia, "Times New Roman", serif; font-size: 24px; font-weight: 700; color: var(--paper-ink); }
+.cv-head p { font-size: 11.5px; color: #4b4757; overflow-wrap: anywhere; }
+.cv-page h3 { font-family: Georgia, "Times New Roman", serif; font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--paper-ink); margin: 14px 0 4px; }
+.cv-page p, .cv-page li { color: #2d2a38; }
+.cv-page ul { margin: 2px 0 0; padding-left: 18px; }
+.cv-row { display: flex; justify-content: space-between; gap: 12px; margin-top: 4px; }
+.cv-row span { white-space: nowrap; color: #4b4757; }
+.cv-sub { font-style: italic; font-size: 12px; }
+.cv-sign { margin-top: 18px; }
+
+/* ---------------------------------------------------------- skills */
+.stage-strip { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.stage { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--r-pill); font-size: 12.5px;
+  font-weight: 700; background: var(--surface); border: 1px solid var(--rule); color: var(--faint); }
+.stage.done { color: var(--good); background: var(--good-bg); border-color: transparent; }
+.stage.now { background: var(--primary); color: var(--on-primary); border-color: transparent; }
+.stage-sep { color: var(--seq-light); }
+.stat-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+@media (max-width: 640px) { .stat-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { background: var(--surface); border: 1px solid var(--rule); border-radius: var(--r-tile); padding: 10px 12px; }
+.stat b { display: block; font-family: var(--font-display); font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--muted); }
+.cat-rows { display: grid; gap: 10px; }
+.cat-row { display: grid; grid-template-columns: 170px minmax(0, 1fr) 52px; gap: 12px; align-items: center; font-size: 13px; }
+@media (max-width: 520px) { .cat-row { grid-template-columns: 110px minmax(0, 1fr) 44px; } }
+.cat-row .n { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+.badge-tile { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 10px; padding: 10px 12px; border-radius: var(--r-tile);
+  background: var(--surface); border: 1px solid var(--rule); align-items: start; }
+.hex { width: 40px; height: 44px; display: grid; place-items: center; color: var(--on-primary); background: var(--primary);
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); font-size: 20px; }
+.hex.pending { background: var(--warn-bg); color: var(--warn); }
+.hex.back { background: var(--tint-1); color: var(--brand); }
+.badge-tile b { display: block; font-family: var(--font-display); font-size: 13px; line-height: 1.3; }
+.badge-tile .meta { font-size: 11.5px; color: var(--muted); }
+.badge-tile .by { font-size: 11.5px; color: var(--good); display: flex; align-items: center; gap: 4px; margin-top: 3px; }
+.badge-tile .by .icon { font-size: 15px; }
+.claims { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.claim { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px;
+  border-radius: var(--r-tile); background: var(--surface); border: 1px solid var(--rule); }
+.claim b { display: block; font-family: var(--font-display); font-size: 13px; }
+.claim span { display: block; font-size: 12px; color: var(--muted); }
+.self-skills { display: flex; flex-wrap: wrap; gap: 6px; }
+.self-skills .chip { background: var(--surface); border: 1px dashed var(--hairline); color: var(--ink); font-weight: 600; }
+.growth-up { color: var(--good); font-weight: 800; }
+
+/* ---------------------------------------------------------- leaderboard */
+.boards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 1180px) { .boards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .boards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.board { text-align: left; cursor: pointer; padding: 12px; border-radius: var(--r-card); background: var(--surface);
+  border: 1px solid var(--rule); display: grid; gap: 4px; min-width: 0; }
+.board:hover { border-color: var(--hairline); background: var(--tint-3); }
+.board[aria-pressed="true"] { border-color: var(--brand-mid); background: var(--tint-2); box-shadow: inset 0 -3px 0 var(--brand); }
+.board .name { font-size: 12px; font-weight: 700; color: var(--ink-nav); }
+.board .rank { font-family: var(--font-display); font-size: 26px; font-weight: 800; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.board .rank small { font-size: 12px; color: var(--faint); font-weight: 700; }
+.board .val { font-size: 12px; color: var(--muted); }
+.board .meter { height: 6px; margin-top: 4px; }
+.lb-name { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.lb-name .av { width: 28px; height: 28px; font-size: 10.5px; }
+.rank-cell { font-family: var(--font-display); font-weight: 800; width: 52px; }
+
+/* ---------------------------------------------------------- charts */
+.chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.chart .grid line { stroke: var(--rule); stroke-width: 1; }
+.chart .tick { fill: var(--faint); font: 11px var(--font); }
+.chart .xl { fill: var(--muted); font: 11px var(--font); }
+.chart .val-label { fill: var(--ink); font: 700 11px var(--font); }
+.chart .bar { fill: var(--brand-mid); }
+.chart .bar.low { fill: var(--risk); }
+.chart .threshold { stroke: var(--warn-dot); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.chart .threshold-label { fill: var(--warn); font: 700 11px var(--font); }
+.chart .line { fill: none; stroke: var(--brand); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.chart .area { fill: var(--tint-1); }
+.chart .pt { fill: var(--surface); stroke: var(--brand); stroke-width: 2; }
+.chart .pt.end { fill: var(--brand); }
+.spark .line { stroke-width: 2; }
+.spark .bar { fill: var(--seq-light); }
+.spark .bar.last { fill: var(--brand); }
+.chart-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.chart-legend i { display: inline-block; width: 14px; height: 0; border-top: 2px dashed var(--warn-dot); vertical-align: middle; margin-right: 5px; }
+
+/* ---------------------------------------------------------- time sheet */
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 640px) { .days { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.day { border-radius: var(--r-tile); padding: 8px 9px; border: 1px solid var(--rule); background: var(--surface); display: grid; gap: 2px; min-width: 0; }
+.day .d { font-size: 11px; color: var(--faint); font-weight: 600; }
+.day .s { font-size: 12px; font-weight: 700; }
+.day .h { font-size: 11.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.day.sub { background: var(--good-bg); border-color: transparent; }
+.day.sub .s { color: var(--good); }
+.day.draft { background: var(--warn-bg); border-color: transparent; }
+.day.draft .s { color: var(--warn); }
+.day.none .s { color: var(--risk); }
+.day.today { border-color: var(--brand-mid); border-style: dashed; }
+.day.today .s { color: var(--brand); }
+
+/* ---------------------------------------------------------- access */
+.access-row { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 12px; align-items: start; padding: 12px 0; border-top: 1px solid var(--rule); }
+.access-row:first-of-type { border-top: 0; }
+.access-row b { display: block; font-size: 13.5px; }
+.access-row .what { font-size: 12.5px; color: var(--muted); }
+.access-row .reach { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.notice { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: var(--r-tile); font-size: 12.5px; background: var(--tint-2); color: var(--ink-soft); }
+.notice .icon { margin-top: 1px; }
+
+/* ---------------------------------------------------------- menu, dialog, toast */
+.menu-wrap { position: relative; }
+.menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 20; min-width: 250px; background: var(--surface);
+  border: 1px solid var(--hairline); border-radius: var(--r-btn); box-shadow: var(--sh-pop); padding: 6px; display: grid; }
+.menu button { border: 0; background: transparent; text-align: left; padding: 9px 10px; border-radius: 8px; cursor: pointer;
+  display: flex; gap: 10px; align-items: center; font-size: 13px; font-weight: 600; color: var(--ink); }
+.menu button:hover, .menu button:focus-visible { background: var(--tint-2); }
+.menu button.danger { color: var(--risk); }
+.menu hr { border: 0; border-top: 1px solid var(--rule); margin: 4px 2px; }
+
+dialog { border: 1px solid var(--hairline); border-radius: 20px; padding: 0; width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 40px); box-shadow: var(--sh-pop); background: var(--surface); color: var(--ink); }
+dialog::backdrop { background: rgba(30, 20, 46, 0.42); }
+.dlg { display: grid; gap: 14px; padding: 20px 22px; }
+.dlg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.dlg-head h2 { font-size: 18px; }
+.field { display: grid; gap: 6px; }
+.field > label, .field > .flabel { font-size: 12.5px; font-weight: 700; color: var(--ink-soft); }
+.field select, .field input[type="date"], .field textarea { font: inherit; font-size: 13.5px; color: var(--ink); background: var(--surface);
+  border: 1px solid rgba(160, 138, 178, 0.55); border-radius: 10px; padding: 9px 11px; width: 100%; }
+.field textarea { min-height: 70px; resize: vertical; }
+.field .hint { font-size: 12px; color: var(--faint); }
+.reach-opts { display: grid; gap: 6px; }
+.reach-opt { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; align-items: start; padding: 9px 11px;
+  border-radius: 10px; border: 1px solid var(--rule); cursor: pointer; font-size: 13px; }
+.reach-opt:has(input:checked) { border-color: var(--brand-mid); background: var(--tint-2); }
+.reach-opt input { accent-color: var(--brand); margin: 2px 0 0; }
+.reach-opt b { display: block; }
+.reach-opt span { font-size: 12px; color: var(--muted); }
+.can-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.can-list li { display: flex; gap: 8px; align-items: flex-start; }
+.can-list .yes { color: var(--good); }
+.can-list .no { color: var(--risk); }
+.dlg-foot { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 22px; border-top: 1px solid var(--rule); background: var(--tint-3); border-radius: 0 0 20px 20px; }
+
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  z-index: 50; background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 12px; font-size: 13px;
+  box-shadow: var(--sh-pop); max-width: min(560px, calc(100vw - 32px)); display: flex; gap: 8px; align-items: center; }
+
+/* Who is looking: the Main Admin, or a faculty member the office let in. */
+.faculty-only { display: none !important; }
+body.as-faculty .faculty-only { display: flex !important; }
+body.as-faculty .admin-only { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; scroll-behavior: auto !important; }
+}
+</style>
+
+<div class="shell">
+
+  <!-- ===================================================== prototype bar -->
+  <div class="proto">
+    <span class="proto-tag">Prototype</span>
+    <span class="grow">Sample data for a made-up student. Click the numbers, tabs and buttons; nothing is saved.</span>
+    <div class="seg" role="group" aria-label="Preview the page as">
+      <span class="seg-label">Preview as</span>
+      <button type="button" id="asAdmin" aria-pressed="true">Main Admin</button>
+      <button type="button" id="asFaculty" aria-pressed="false">Faculty given access</button>
+    </div>
+  </div>
+
+  <details class="changes" id="changes" open>
+    <summary><span class="icon">checklist</span> What this redesign fixes <span class="icon chev">expand_more</span></summary>
+    <ol>
+      <li><b>Resume</b>The CV the student uploaded when they registered, shown on the page and downloadable as a PDF.<span class="was">Before: it was only a row in the Documents list, labelled "CV from application".</span></li>
+      <li><b>Skills</b>Every verified skill with who verified it and when, claims waiting for a decision, skills the student only listed, and growth across checkpoints.<span class="was">Before: one small "11/48" bar.</span></li>
+      <li><b>Leaderboard</b>The student's rank on all five boards inside their batch, with the classmates around them.<span class="was">Before: not on the page.</span></li>
+      <li><b>KPIs</b>Six numbers at the top: readiness, CGPA, attendance, batch rank, verified skills and mock interviews. Each one opens its tab.<span class="was">Before: none.</span></li>
+      <li><b>Access</b>You choose who else may open student records, which students it covers and until when. They get a read-only page, and their downloads are recorded.<span class="was">Before: only in Governance, and this page never said who could see it.</span></li>
+    </ol>
+  </details>
+
+  <!-- ===================================================== app bar -->
+  <header class="appbar">
+    <div class="brand"><span class="mark" aria-hidden="true">R</span><b>REEP</b> Admin console</div>
+    <div class="who">
+      <span class="av sm" id="whoAv">PO</span>
+      <div><span id="whoName">Placement office</span><small id="whoRole">Main Admin</small></div>
+    </div>
+  </header>
+
+  <div class="page-head">
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="#overview">People</a><span aria-hidden="true">/</span>
+      <a href="#overview">Students</a><span aria-hidden="true">/</span>
+      <span class="cur">1MP25MBA014</span>
+    </nav>
+    <div class="head-actions admin-only">
+      <button type="button" class="btn secondary" data-say="Opens the edit form: name, college email, USN, batch, stage and semester."><span class="icon">edit</span> Edit profile</button>
+      <button type="button" class="btn secondary" data-say="Opens the batch picker for Priya."><span class="icon">school</span> Move batch</button>
+      <div class="menu-wrap">
+        <button type="button" class="btn secondary" id="moreBtn" aria-haspopup="menu" aria-expanded="false" aria-controls="moreMenu"><span class="icon">more_horiz</span> More</button>
+        <div class="menu" id="moreMenu" role="menu" hidden>
+          <button type="button" role="menuitem" data-say="Asks first, then signs Priya out on every device."><span class="icon">logout</span> Sign out everywhere</button>
+          <button type="button" role="menuitem" data-say="Asks for a reason, then gives Priya today's mock interviews back."><span class="icon">restart_alt</span> Reset today's interview limit</button>
+          <button type="button" role="menuitem" data-goto="access"><span class="icon">history</span> See what changed</button>
+          <hr>
+          <button type="button" role="menuitem" class="danger" data-say="Opens the remove or delete dialog, which asks for the emailed code."><span class="icon">person_remove</span> Remove from roster…</button>
+        </div>
+      </div>
+    </div>
+    <div class="ribbon faculty-only"><span class="icon">lock</span> Read only. The placement office gave you access to Management Studies records until 31 Dec 2026.</div>
+  </div>
+
+  <div class="layout">
+
+    <!-- ===================================================== candidate rail -->
+    <aside class="rail" aria-label="Student summary">
+      <section class="card">
+        <div class="cand-top">
+          <div class="av lg" aria-hidden="true">PS</div>
+          <div>
+            <h1>Priya Shetty</h1>
+            <div class="usn">1MP25MBA014
+              <button type="button" class="icon-btn copy" data-copy="1MP25MBA014" aria-label="Copy USN" title="Copy USN"><span class="icon">content_copy</span></button>
+            </div>
+          </div>
+        </div>
+        <div class="chips">
+          <span class="chip good dot">Active</span>
+          <span class="chip brand">Excel stage</span>
+          <span class="chip">Wants placement</span>
+        </div>
+        <dl class="facts">
+          <div><dt>Batch</dt><dd>MBA - Finance · 2025-27</dd></div>
+          <div><dt>Department</dt><dd>Management Studies</dd></div>
+          <div><dt>College</dt><dd>BGS College of Engineering &amp; Technology</dd></div>
+          <div><dt>Semester</dt><dd>3 of 4</dd></div>
+          <div><dt>Faculty mentor</dt><dd>Dr. Meera Rao <span class="soft">since Sep 2025</span></dd></div>
+          <div><dt>Last signed in</dt><dd>Today, 08:12</dd></div>
+        </dl>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2 class="card-title">Contact</h2></div>
+        <ul class="contact">
+          <li><span class="icon">call</span><div><span class="lbl">Phone</span><span class="val num">+91 98450 12345</span></div>
+            <button type="button" class="icon-btn copy" data-copy="+91 98450 12345" aria-label="Copy phone number" title="Copy"><span class="icon">content_copy</span></button></li>
+          <li><span class="icon">mail</span><div><span class="lbl">College email</span><span class="val">1mp25mba014@bgscet.ac.in</span></div>
+            <button type="button" class="icon-btn copy" data-copy="1mp25mba014@bgscet.ac.in" aria-label="Copy college email" title="Copy"><span class="icon">content_copy</span></button></li>
+          <li><span class="icon">alternate_email</span><div><span class="lbl">Personal email</span><span class="val">priya.shetty@example.com</span></div>
+            <button type="button" class="icon-btn copy" data-copy="priya.shetty@example.com" aria-label="Copy personal email" title="Copy"><span class="icon">content_copy</span></button></li>
+          <li><span class="icon">link</span><div><span class="lbl">LinkedIn</span><span class="val link">linkedin.com/in/priya-shetty-example</span></div>
+            <button type="button" class="icon-btn" data-say="Opens Priya's LinkedIn profile in a new tab." aria-label="Open LinkedIn profile" title="Open"><span class="icon">open_in_new</span></button></li>
+          <li><span class="icon">location_on</span><div><span class="lbl">City</span><span class="val">Bengaluru</span></div><span></span></li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2 class="card-title">Resume</h2><span class="chip good">Verified</span></div>
+        <div class="resume-mini">
+          <div class="doc-ico"><span class="icon">picture_as_pdf</span></div>
+          <div><b>Priya_Shetty_CV.pdf</b><span class="soft">Uploaded when she registered · 03 Aug 2025</span></div>
+        </div>
+        <button type="button" class="btn primary block" data-download="Priya_Shetty_CV.pdf"><span class="icon">download</span> Download CV</button>
+        <button type="button" class="btn ghost block" data-goto="resume">View her CV</button>
+      </section>
+
+      <section class="card">
+        <div class="card-head"><h2 class="card-title">Who can open this record</h2></div>
+        <div class="stack-row">
+          <div class="avstack" id="railAvatars"><span class="av sm" title="Placement office">PO</span><span class="av sm" title="Dr. Meera Rao">MR</span><span class="av sm" title="Prof. Kiran Hegde">KH</span></div>
+          <span class="chip" id="railAccessCount">3 people</span>
+        </div>
+        <p class="soft" id="railAccessLine">The placement office, her faculty mentor, and 1 person you gave access.</p>
+        <button type="button" class="btn secondary block" data-goto="access" style="margin-top:12px"><span class="icon">manage_accounts</span> <span class="admin-only" style="display:inline">Manage access</span><span class="faculty-only" style="display:none">See who has access</span></button>
+      </section>
+    </aside>
+
+    <!-- ===================================================== workspace -->
+    <main class="work">
+
+      <section class="kpis" aria-label="Key numbers">
+        <button type="button" class="kpi" data-goto="overview">
+          <span class="kpi-label"><span>Readiness</span> <span class="icon">speed</span></span>
+          <span class="kpi-value">78<small>/100</small></span>
+          <span class="meter"><span style="width:78%"></span></span>
+          <span class="kpi-foot"><span class="chip good">Ready</span><span class="delta-up">+6 since sem 2</span></span>
+        </button>
+        <button type="button" class="kpi" data-goto="academics">
+          <span class="kpi-label"><span>CGPA</span> <span class="icon">school</span></span>
+          <span class="kpi-value">7.92<small>/10</small></span>
+          <span class="meter"><span style="width:79.2%"></span></span>
+          <span class="kpi-foot"><span class="chip good">No backlogs</span>after sem 2</span>
+        </button>
+        <button type="button" class="kpi" data-goto="academics">
+          <span class="kpi-label"><span>Attendance</span> <span class="icon">event_available</span></span>
+          <span class="kpi-value">84<small>%</small></span>
+          <span class="kpi-chart" id="sparkAttendance" aria-hidden="true"></span>
+          <span class="kpi-foot"><span class="chip good">Met</span>75% needed · 6 weeks</span>
+        </button>
+        <button type="button" class="kpi" data-goto="leaderboard">
+          <span class="kpi-label"><span>Batch rank</span> <span class="icon">leaderboard</span></span>
+          <span class="kpi-value">#4<small>of 52</small></span>
+          <span class="meter"><span style="width:92%"></span></span>
+          <span class="kpi-foot"><span class="chip brand">Top 8%</span>Overall board</span>
+        </button>
+        <button type="button" class="kpi" data-goto="skills">
+          <span class="kpi-label"><span>Verified skills</span> <span class="icon">workspace_premium</span></span>
+          <span class="kpi-value">11<small>of 48</small></span>
+          <span class="meter"><span style="width:23%"></span></span>
+          <span class="kpi-foot"><span class="chip warn">2 waiting</span>130 points</span>
+        </button>
+        <button type="button" class="kpi" data-goto="interviews">
+          <span class="kpi-label"><span>Interviews</span> <span class="icon">mic</span></span>
+          <span class="kpi-value">6<small>mocks</small></span>
+          <span class="kpi-chart" id="sparkInterviews" aria-hidden="true"></span>
+          <span class="kpi-foot"><span class="chip good">Best 78</span>last 11 Oct</span>
+        </button>
+      </section>
+
+      <section class="card attention" aria-labelledby="attTitle">
+        <div class="card-head"><h2 class="card-title" id="attTitle">Needs attention</h2><span class="chip warn">3</span></div>
+        <ul class="att-list">
+          <li class="att staff"><span class="icon">pending_actions</span>
+            <div><span class="who-waits">Waiting on staff</span><b>2 skill claims waiting for a decision</b><span class="why">Financial Modelling &amp; Valuation · Power BI</span></div>
+            <button type="button" class="btn small secondary" data-goto="skills">Review</button></li>
+          <li class="att student"><span class="icon">reply</span>
+            <div><span class="who-waits">Waiting on Priya</span><b>1 claim and 1 document sent back for changes</b><span class="why">SQL claim · NISM certificate scan is cut off</span></div>
+            <button type="button" class="btn small secondary" data-goto="documents">See them</button></li>
+          <li class="att student"><span class="icon">person</span>
+            <div><span class="who-waits">Waiting on Priya</span><b>Profile has no career summary</b><span class="why">7 of 8 placement fields filled</span></div>
+            <button type="button" class="btn small secondary" data-goto="overview">See profile</button></li>
+        </ul>
+      </section>
+
+      <div class="tabs-wrap">
+        <div class="tabs" role="tablist" aria-label="Parts of the record" id="tablist">
+          <button type="button" role="tab" class="tab" id="tab-overview" aria-controls="p-overview" aria-selected="true">Overview</button>
+          <button type="button" role="tab" class="tab" id="tab-resume" aria-controls="p-resume" aria-selected="false" tabindex="-1">Resume</button>
+          <button type="button" role="tab" class="tab" id="tab-skills" aria-controls="p-skills" aria-selected="false" tabindex="-1">Skills <span class="count">11</span></button>
+          <button type="button" role="tab" class="tab" id="tab-leaderboard" aria-controls="p-leaderboard" aria-selected="false" tabindex="-1">Leaderboard <span class="count">#4</span></button>
+          <button type="button" role="tab" class="tab" id="tab-academics" aria-controls="p-academics" aria-selected="false" tabindex="-1">Academics</button>
+          <button type="button" role="tab" class="tab" id="tab-interviews" aria-controls="p-interviews" aria-selected="false" tabindex="-1">Interviews <span class="count">6</span></button>
+          <button type="button" role="tab" class="tab" id="tab-timesheet" aria-controls="p-timesheet" aria-selected="false" tabindex="-1">Time sheet</button>
+          <button type="button" role="tab" class="tab" id="tab-documents" aria-controls="p-documents" aria-selected="false" tabindex="-1">Documents <span class="count">6</span></button>
+          <button type="button" role="tab" class="tab" id="tab-access" aria-controls="p-access" aria-selected="false" tabindex="-1">Access</button>
+        </div>
+      </div>
+
+      <!-- ================================================= OVERVIEW -->
+      <section class="panel" role="tabpanel" id="p-overview" aria-labelledby="tab-overview">
+        <div class="grid-2">
+          <div class="col">
+            <div class="card">
+              <div class="card-head">
+                <div><h2 class="card-title">Placement readiness</h2><div class="card-sub">Measured against the placement criteria for MBA</div></div>
+              </div>
+              <div class="ready-head">
+                <span class="big">78<small> /100</small></span>
+                <span class="chip good">Ready</span>
+                <span class="delta-up" style="font-size:13px">+6 since semester 2</span>
+              </div>
+              <p class="soft" style="margin:4px 0 12px;font-size:13px">Ready for most campus drives. The certification count and the missing career summary keep the score below 85.</p>
+              <div class="table-scroll">
+                <table class="dt">
+                  <thead><tr><th>Check</th><th>Where she is</th><th></th><th>Status</th></tr></thead>
+                  <tbody>
+                    <tr><td>CGPA</td><td class="num">7.92 <span class="cellnote">needs 6.50</span></td><td><div class="meter good factor-bar"><span style="width:79%"></span></div></td><td><span class="status good"><span class="icon">check_circle</span>Met</span></td></tr>
+                    <tr><td>Live backlogs</td><td class="num">0</td><td><div class="meter good factor-bar"><span style="width:100%"></span></div></td><td><span class="status good"><span class="icon">check_circle</span>Met</span></td></tr>
+                    <tr><td>Attendance</td><td class="num">84% <span class="cellnote">needs 75%</span></td><td><div class="meter good factor-bar"><span style="width:84%"></span></div></td><td><span class="status good"><span class="icon">check_circle</span>Met</span></td></tr>
+                    <tr><td>Certifications</td><td class="num">2 of 3</td><td><div class="meter warn factor-bar"><span style="width:67%"></span></div></td><td><span class="status warn"><span class="icon">timelapse</span>Partly</span></td></tr>
+                    <tr><td>Placement profile</td><td class="num">7 of 8 fields <span class="cellnote">no career summary</span></td><td><div class="meter warn factor-bar"><span style="width:88%"></span></div></td><td><span class="status warn"><span class="icon">timelapse</span>Partly</span></td></tr>
+                    <tr><td>Resume profile</td><td>Complete</td><td><div class="meter good factor-bar"><span style="width:100%"></span></div></td><td><span class="status good"><span class="icon">check_circle</span>Met</span></td></tr>
+                    <tr><td>Mock interview</td><td class="num">Best 78 <span class="cellnote">needs 60</span></td><td><div class="meter good factor-bar"><span style="width:78%"></span></div></td><td><span class="status good"><span class="icon">check_circle</span>Met</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><div><h2 class="card-title">Profile as she filled it in</h2><div class="card-sub">Updated 06 Oct 2026</div></div></div>
+              <dl class="facts" style="margin-top:0">
+                <div><dt>Career summary</dt><dd><span class="dash">Not written yet</span></dd></div>
+                <div><dt>Looking for</dt><dd>Jobs and internships</dd></div>
+                <div><dt>Education</dt><dd>3 entries</dd></div>
+                <div><dt>Experience</dt><dd>1 internship</dd></div>
+                <div><dt>Projects</dt><dd>2 entries</dd></div>
+                <div><dt>English baseline</dt><dd>B2 <span class="soft">· provisional, speaking not scored yet</span></dd></div>
+              </dl>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="card">
+              <div class="card-head"><h2 class="card-title">Semester by semester</h2><span class="chip">3 of 4</span></div>
+              <ol class="timeline">
+                <li><span class="step done"><span class="icon">check</span></span>
+                  <div><b>Semester 1</b><span class="when">Aug 2025 – Jan 2026</span><div class="what">SGPA 7.80 · 3 badges · no interviews</div></div></li>
+                <li><span class="step done"><span class="icon">check</span></span>
+                  <div><b>Semester 2</b><span class="when">Jan – Jul 2026</span><div class="what">SGPA 8.04 · CGPA 7.92 · 5 badges · 2 interviews, best 62</div></div></li>
+                <li><span class="step now">3</span>
+                  <div><b>Semester 3</b><span class="when">since 21 Jul 2026</span><div class="what">Marks not imported yet · 3 badges · 4 interviews, best 78</div></div></li>
+                <li><span class="step">4</span>
+                  <div><b>Semester 4</b><span class="when">next</span><div class="what">Starts when the office promotes the batch</div></div></li>
+              </ol>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h2 class="card-title">Faculty mentor</h2>
+                <button type="button" class="btn small secondary admin-only" data-say="Opens Assign faculty with Priya selected.">Reassign</button></div>
+              <div style="display:flex;gap:12px;align-items:center">
+                <span class="av" aria-hidden="true">MR</span>
+                <div><b>Dr. Meera Rao</b><div class="soft" style="font-size:12.5px">Since 04 Sep 2025 · assigned by the placement office</div></div>
+              </div>
+              <div class="notice" style="margin-top:12px"><span class="icon">event</span><span>Last meeting 06 Oct 2026: preparing for the Deloitte round.</span></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><h2 class="card-title">Recent activity</h2></div>
+              <ul class="feed">
+                <li><span class="icon">workspace_premium</span><span>Claimed Financial Modelling &amp; Valuation</span><time>12 Oct, 16:40</time></li>
+                <li><span class="icon">mic</span><span>Mock interview, Financial Analytics, scored 78</span><time>11 Oct, 14:02</time></li>
+                <li><span class="icon">schedule</span><span>Time sheet submitted, 24 h</span><time>10 Oct, 23:58</time></li>
+                <li><span class="icon">person</span><span>Updated her placement profile</span><time>09 Oct, 11:15</time></li>
+                <li><span class="icon">forum</span><span>Met Dr. Meera Rao</span><time>06 Oct, 10:30</time></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================= RESUME -->
+      <section class="panel" role="tabpanel" id="p-resume" aria-labelledby="tab-resume" hidden>
+        <div class="resume-grid">
+          <div class="col">
+            <div class="card">
+              <div class="card-head"><div><h2 class="card-title">Her CV</h2><div class="card-sub">The file she uploaded when she registered</div></div></div>
+              <div class="cv-file">
+                <div class="doc-ico"><span class="icon">picture_as_pdf</span></div>
+                <div>
+                  <b>Priya_Shetty_CV.pdf</b>
+                  <span>PDF · 2 pages · 214 KB</span>
+                  <span>Uploaded with her application, 03 Aug 2025</span>
+                  <span class="chip good">Verified</span>
+                </div>
+              </div>
+              <button type="button" class="btn primary block" data-download="Priya_Shetty_CV.pdf"><span class="icon">download</span> Download CV</button>
+              <button type="button" class="btn secondary block" data-say="Opens Priya_Shetty_CV.pdf full size in a new tab." style="margin-top:8px"><span class="icon">open_in_new</span> Open in a new tab</button>
+            </div>
+            <div class="notice"><span class="icon">info</span><span>If she uploads a newer CV later, it is listed here above this one. The CV from her application is always kept.</span></div>
+            <div class="card">
+              <div class="card-head"><div><h2 class="card-title">Also built in REEP</h2><div class="card-sub">Versions she made in the resume builder</div></div></div>
+              <div id="builderRows"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="preview-bar">
+              <div class="left">
+                <h2 class="card-title">Priya_Shetty_CV.pdf</h2>
+                <span class="chip good">Verified</span>
+              </div>
+              <div class="left">
+                <button type="button" class="btn secondary small" data-say="Opens Priya_Shetty_CV.pdf full size in a new tab."><span class="icon">open_in_new</span> Open</button>
+                <button type="button" class="btn primary small" data-download="Priya_Shetty_CV.pdf"><span class="icon">download</span> Download</button>
+              </div>
+            </div>
+            <div class="viewer">
+              <div class="viewer-bar" aria-hidden="true"><span>Priya_Shetty_CV.pdf</span><span>2 pages</span></div>
+              <div class="viewer-body" tabindex="0" aria-label="Preview of the CV she uploaded">
+                <article class="cv-page">
+                  <header class="cv-head">
+                    <h2>Priya Shetty</h2>
+                    <p>Bengaluru, Karnataka &nbsp;|&nbsp; +91 98450 12345 &nbsp;|&nbsp; priya.shetty@example.com</p>
+                  </header>
+                  <h3>Profile</h3>
+                  <p>Commerce graduate joining the MBA in Finance at BGS College of Engineering &amp; Technology. Interested in banking, credit analysis and financial planning.</p>
+                  <h3>Education</h3>
+                  <div class="cv-row"><b>MBA, Finance</b><span>2025 – 2027</span></div>
+                  <p class="cv-sub">BGS College of Engineering &amp; Technology, Bengaluru · pursuing</p>
+                  <div class="cv-row"><b>B.Com</b><span>2022 – 2025</span></div>
+                  <p class="cv-sub">Mount Carmel College, Bengaluru · CGPA 8.40</p>
+                  <div class="cv-row"><b>Class XII, Commerce</b><span>2022</span></div>
+                  <p class="cv-sub">Vidya Vardhaka PU College · 91%</p>
+                  <h3>Experience</h3>
+                  <div class="cv-row"><b>Accounts trainee (part time), R. Kamath &amp; Co., Chartered Accountants</b><span>Jan – May 2025</span></div>
+                  <ul>
+                    <li>Prepared GST returns for 20 small-business clients.</li>
+                    <li>Reconciled bank statements and ledgers in Tally Prime.</li>
+                  </ul>
+                  <h3>Project</h3>
+                  <ul><li>Ratio analysis of three listed FMCG companies, B.Com final-year project.</li></ul>
+                  <h3>Skills</h3>
+                  <p>Tally Prime · MS Excel · GST filing · Basic SQL</p>
+                </article>
+                <article class="cv-page">
+                  <h3>Achievements</h3>
+                  <ul>
+                    <li>Treasurer, Commerce Association, Mount Carmel College, 2024–25.</li>
+                    <li>Second place, inter-college stock-market simulation, 2024.</li>
+                  </ul>
+                  <h3>Languages</h3>
+                  <p>English · Kannada · Hindi</p>
+                  <h3>Declaration</h3>
+                  <p>I declare that the details above are true to the best of my knowledge.</p>
+                  <p class="cv-sign">Priya Shetty<br>Bengaluru, 01 Aug 2025</p>
+                </article>
+              </div>
+            </div>
+            <p class="paper-note"><span class="icon">info</span>This is her own file, exactly as she uploaded it. Download gives you the same PDF.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================= SKILLS -->
+      <section class="panel" role="tabpanel" id="p-skills" aria-labelledby="tab-skills" hidden>
+        <div class="card">
+          <div class="card-head"><div><h2 class="card-title">Skills at a glance</h2><div class="card-sub">Badges are earned only when staff verify the evidence</div></div></div>
+          <div class="stage-strip" aria-label="REEP stage">
+            <span class="stage done"><span class="icon">check</span> Reboot</span><span class="stage-sep icon">chevron_right</span>
+            <span class="stage now">Excel · now</span><span class="stage-sep icon">chevron_right</span>
+            <span class="stage">Elevate</span>
+          </div>
+          <div class="stat-row">
+            <div class="stat"><b>11</b><span>verified of 48</span></div>
+            <div class="stat"><b>130</b><span>badge points</span></div>
+            <div class="stat"><b>2</b><span>waiting for a decision</span></div>
+            <div class="stat"><b>1</b><span>sent back to Priya</span></div>
+          </div>
+        </div>
+
+        <div class="grid-2 even">
+          <div class="card">
+            <div class="card-head"><h2 class="card-title">By category</h2></div>
+            <div class="cat-rows">
+              <div class="cat-row"><span>Managerial</span><div class="meter"><span style="width:41.7%"></span></div><span class="n">5/12</span></div>
+              <div class="cat-row"><span>Sectoral · Finance</span><div class="meter"><span style="width:12.5%"></span></div><span class="n">2/16</span></div>
+              <div class="cat-row"><span>Platform &amp; technical</span><div class="meter"><span style="width:30%"></span></div><span class="n">3/10</span></div>
+              <div class="cat-row"><span>Thinking</span><div class="meter"><span style="width:16.7%"></span></div><span class="n">1/6</span></div>
+              <div class="cat-row"><span>Readiness</span><div class="meter"><span style="width:0%"></span></div><span class="n">0/4</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Skills she listed herself</h2><div class="card-sub">From her profile. Nobody has checked these.</div></div></div>
+            <div class="self-skills">
+              <span class="chip">Tally Prime</span><span class="chip">Power BI</span><span class="chip">SQL</span><span class="chip">Bloomberg Terminal basics</span><span class="chip">Financial modelling</span>
+            </div>
+            <div class="notice" style="margin-top:14px"><span class="icon">info</span><span>Power BI and SQL are also claimed as badges below. They count as verified only after a decision.</span></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h2 class="card-title">Verified skills</h2><div class="card-sub">11 badges, newest first</div></div></div>
+          <div class="badge-grid" id="badgeGrid"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h2 class="card-title">Claims not decided yet</h2><div class="card-sub">Decisions are made on the Verifications screen</div></div></div>
+          <ul class="claims">
+            <li class="claim"><span class="hex pending"><span class="icon">hourglass_top</span></span>
+              <div><b>Financial Modelling &amp; Valuation</b><span>Certificate · CFI-Financial-Modelling.pdf · filed 12 Oct 2026 · 20 points</span></div>
+              <button type="button" class="btn small secondary" data-say="Opens Verifications with this claim selected.">Review</button></li>
+            <li class="claim"><span class="hex pending"><span class="icon">hourglass_top</span></span>
+              <div><b>Power BI</b><span>Certificate · PowerBI-Coursera.pdf · filed 08 Oct 2026 · 15 points</span></div>
+              <button type="button" class="btn small secondary" data-say="Opens Verifications with this claim selected.">Review</button></li>
+            <li class="claim"><span class="hex back"><span class="icon">reply</span></span>
+              <div><b>SQL</b><span>Sent back 29 Sep 2026 by Dr. Meera Rao: "Add the course's final assessment, not only the enrolment page."</span></div>
+              <span class="chip">With Priya</span></li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h2 class="card-title">Growth across checkpoints</h2><div class="card-sub">Scores out of 10, entered by staff. A dash means not assessed yet.</div></div></div>
+          <div class="table-scroll">
+            <table class="dt" id="growthTable">
+              <thead><tr><th>Capability</th><th class="n">T0 · entry</th><th class="n">T1</th><th class="n">T2</th><th class="n">T3</th><th class="n">T4 · exit</th><th class="n">Growth</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================= LEADERBOARD -->
+      <section class="panel" role="tabpanel" id="p-leaderboard" aria-labelledby="tab-leaderboard" hidden>
+        <div class="card">
+          <div class="card-head">
+            <div><h2 class="card-title">Where she stands in her batch</h2><div class="card-sub">MBA - Finance · 2025-27 · 58 students</div></div>
+            <span class="chip good">Visible on boards</span>
+          </div>
+          <div class="boards" id="boards" role="group" aria-label="Boards"></div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div><h2 class="card-title" id="lbTitle">Overall</h2><div class="card-sub" id="lbSub"></div></div>
+          </div>
+          <div class="table-scroll">
+            <table class="dt">
+              <thead><tr><th>Rank</th><th>Student</th><th class="n" id="lbValueHead">Score</th></tr></thead>
+              <tbody id="lbRows"></tbody>
+            </table>
+          </div>
+          <p class="soft" id="lbUnranked" style="font-size:12.5px;margin-top:10px"></p>
+        </div>
+        <div class="notice"><span class="icon">visibility_off</span><span>A student can hide themselves from the boards. Then this tab says so and shows no rank, the same as their classmates see.</span></div>
+      </section>
+
+      <!-- ================================================= ACADEMICS -->
+      <section class="panel" role="tabpanel" id="p-academics" aria-labelledby="tab-academics" hidden>
+        <div class="card">
+          <div class="card-head"><div><h2 class="card-title">Results, semester by semester</h2><div class="card-sub">From the VTU results import</div></div></div>
+          <div class="table-scroll">
+            <table class="dt">
+              <thead><tr><th>Semester</th><th class="n">SGPA</th><th class="n">CGPA</th><th class="n">Live backlogs</th><th class="n">Cleared</th><th class="n">Subjects</th><th>Class</th><th>Published</th></tr></thead>
+              <tbody>
+                <tr><td>1</td><td class="n">7.80</td><td class="n">7.80</td><td class="n">0</td><td class="n">0</td><td class="n">7</td><td>First class with distinction</td><td>12 Feb 2026</td></tr>
+                <tr><td>2</td><td class="n">8.04</td><td class="n">7.92</td><td class="n">0</td><td class="n">0</td><td class="n">7</td><td>First class with distinction</td><td>28 Aug 2026</td></tr>
+                <tr><td>3</td><td colspan="7" class="dash">Not imported yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Attendance, last six weeks</h2><div class="card-sub">Weekly percentage, week starting Monday</div></div><span class="chip good">84% average</span></div>
+            <div class="chart" id="attChart" role="img" aria-label="Weekly attendance: 88, 80, 86, 82, 85 and 84 percent, all above the 75 percent requirement"></div>
+            <div class="chart-legend"><span><i></i>75% required</span></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">English baseline</h2><div class="card-sub">Semester 3 attempt · 30 Sep 2026</div></div><span class="chip warn">Provisional</span></div>
+            <div class="ready-head"><span class="big" style="font-size:36px">B2</span><span class="soft">3 of 4 sections scored</span></div>
+            <table class="dt" style="margin-top:8px">
+              <thead><tr><th>Section</th><th>Level</th><th class="n">Score</th></tr></thead>
+              <tbody>
+                <tr><td>Reading</td><td>B2</td><td class="n">72</td></tr>
+                <tr><td>Writing</td><td>B1</td><td class="n">61</td></tr>
+                <tr><td>Listening</td><td>B2</td><td class="n">70</td></tr>
+                <tr><td>Speaking</td><td class="dash">Pending</td><td class="n dash">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================= INTERVIEWS -->
+      <section class="panel" role="tabpanel" id="p-interviews" aria-labelledby="tab-interviews" hidden>
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-head"><div><h2 class="card-title">Score over time</h2><div class="card-sub">Scored interviews only, out of 100</div></div><span class="chip good">+21 since the first</span></div>
+            <div class="chart" id="ivChart" role="img" aria-label="Interview scores: 57, 62, 64, 71 and 78"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2 class="card-title">Today's limit</h2></div>
+            <div class="ready-head"><span class="big" style="font-size:36px">0<small> of 8</small></span><span class="soft">interviews finished today</span></div>
+            <p class="soft" style="font-size:12.5px;margin:6px 0 12px">The limit resets every 24 hours. Dropped calls do not count.</p>
+            <button type="button" class="btn secondary admin-only" data-say="Asks for a reason, then resets today's count. The reason goes on her history."><span class="icon">restart_alt</span> Reset today's limit</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2 class="card-title">Every mock interview</h2></div>
+          <div class="table-scroll">
+            <table class="dt">
+              <thead><tr><th>Date</th><th>Track</th><th class="n">Length</th><th>Reached</th><th class="n">Score</th><th>Status</th><th></th></tr></thead>
+              <tbody>
+                <tr><td class="num">11 Oct 2026, 14:02</td><td>Financial Analytics</td><td class="n">12 min</td><td>Verdict</td><td class="n"><b>78</b></td><td><span class="chip good">Completed</span></td><td><div class="row-actions"><button type="button" class="btn small ghost" data-say="Opens the report for this interview.">Report</button><button type="button" class="btn small ghost" data-say="Opens the transcript for this interview.">Transcript</button></div></td></tr>
+                <tr><td class="num">03 Oct 2026, 17:20</td><td>Financial Analytics</td><td class="n">11 min</td><td>Verdict</td><td class="n"><b>71</b></td><td><span class="chip good">Completed</span></td><td><div class="row-actions"><button type="button" class="btn small ghost" data-say="Opens the report for this interview.">Report</button><button type="button" class="btn small ghost" data-say="Opens the transcript for this interview.">Transcript</button></div></td></tr>
+                <tr><td class="num">22 Sep 2026, 11:05</td><td>HR</td><td class="n">10 min</td><td>Verdict</td><td class="n"><b>64</b></td><td><span class="chip good">Completed</span></td><td><div class="row-actions"><button type="button" class="btn small ghost" data-say="Opens the report for this interview.">Report</button><button type="button" class="btn small ghost" data-say="Opens the transcript for this interview.">Transcript</button></div></td></tr>
+                <tr><td class="num">01 Sep 2026, 09:40</td><td>Financial Analytics</td><td class="n">4 min</td><td>Opening</td><td class="n dash">—</td><td><span class="chip warn">Ended early</span></td><td><div class="row-actions"><button type="button" class="btn small ghost" data-say="Opens the transcript for this interview.">Transcript</button></div></td></tr>
+                <tr><td class="num">02 Apr 2026, 15:12</td><td>Financial Analytics</td><td class="n">11 min</td><td>Verdict</td><td class="n"><b>62</b></td><td><span class="chip good">Completed</span></td><td><div class="row-actions"><button type="button" class="btn small ghost" data-say="Opens the report for this interview.">Report</button><button type="button" class="btn small ghost" data-say="Opens the transcript for this interview.">Transcript</button></div></td></tr>
+                <tr><td class="num">14 Mar 2026, 12:30</td><td>Financial Analytics</td><td class="n">10 min</td><td>Verdict</td><td class="n"><b>57</b></td><td><span class="chip good">Completed</span></td><td><div class="row-actions"><button type="button" class="btn small ghost" data-say="Opens the report for this interview.">Report</button><button type="button" class="btn small ghost" data-say="Opens the transcript for this interview.">Transcript</button></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================= TIME SHEET -->
+      <section class="panel" role="tabpanel" id="p-timesheet" aria-labelledby="tab-timesheet" hidden>
+        <div class="card">
+          <div class="card-head"><div><h2 class="card-title">Last 14 days</h2><div class="card-sub">A day must add up to 24 hours before it can be submitted. Days lock two days after they end.</div></div><span class="chip good">10 of 14 submitted</span></div>
+          <div class="days" id="days"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2 class="card-title">Skilling this week</h2><span class="chip warn">Behind target</span></div>
+          <div class="ready-head"><span class="big" style="font-size:36px">9.5<small> of 12 h</small></span></div>
+          <div class="meter warn" style="margin-top:10px"><span style="width:79%"></span></div>
+        </div>
+      </section>
+
+      <!-- ================================================= DOCUMENTS -->
+      <section class="panel" role="tabpanel" id="p-documents" aria-labelledby="tab-documents" hidden>
+        <div class="card">
+          <div class="card-head"><div><h2 class="card-title">Documents</h2><div class="card-sub">Everything she uploaded, with the decision on each</div></div></div>
+          <div class="table-scroll">
+            <table class="dt">
+              <thead><tr><th>Kind</th><th>File</th><th class="n">Size</th><th>Status</th><th>Uploaded</th><th></th></tr></thead>
+              <tbody id="docRows"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================================================= ACCESS -->
+      <section class="panel" role="tabpanel" id="p-access" aria-labelledby="tab-access" hidden>
+        <div class="card">
+          <div class="card-head">
+            <div><h2 class="card-title">Who can open this record</h2><div class="card-sub">Anyone else needs access from the placement office</div></div>
+            <button type="button" class="btn primary small admin-only" id="giveAccessBtn"><span class="icon">person_add</span> Give access</button>
+          </div>
+          <div id="accessList">
+            <div class="access-row">
+              <span class="av" aria-hidden="true">PO</span>
+              <div><b>Placement office</b><span class="what">Main Admin. Sees everything here and can edit, move and remove students.</span>
+                <div class="reach"><span class="chip brand">Every student</span><span class="chip">Always</span></div></div>
+              <span></span>
+            </div>
+            <div class="access-row">
+              <span class="av" aria-hidden="true">MR</span>
+              <div><b>Dr. Meera Rao</b><span class="what">Faculty mentor. Reads the records of her own mentees.</span>
+                <div class="reach"><span class="chip brand">Her mentees</span><span class="chip">While she is the mentor</span></div></div>
+              <span></span>
+            </div>
+            <div class="access-row" data-grant="kh">
+              <span class="av" aria-hidden="true">KH</span>
+              <div><b>Prof. Kiran Hegde</b><span class="what">Faculty. Read only: can open records and download resumes.</span>
+                <div class="reach"><span class="chip brand">Management Studies</span><span class="chip">Until 31 Dec 2026</span></div>
+                <span class="cellnote" style="margin-top:6px">Given 02 Oct 2026 by the placement office: "Placement coordinator for the MBA batches."</span></div>
+              <button type="button" class="btn small danger admin-only revoke">Remove access</button>
+            </div>
+          </div>
+          <div class="notice" style="margin-top:12px"><span class="icon">info</span><span>The same list is on "Who can do what". Access given here can also be removed there.</span></div>
+        </div>
+
+        <div class="grid-2 even">
+          <div class="card">
+            <div class="card-head"><h2 class="card-title">Sign-in</h2>
+              <button type="button" class="btn small secondary admin-only" data-say="Asks first, then signs Priya out on every device."><span class="icon">logout</span> Sign out everywhere</button></div>
+            <dl class="facts" style="margin-top:0">
+              <div><dt>Google</dt><dd><span class="status good"><span class="icon">check_circle</span>Linked</span></dd></div>
+              <div><dt>Password</dt><dd><span class="status good"><span class="icon">check_circle</span>Set</span></dd></div>
+              <div><dt>Account</dt><dd>Active since 03 Aug 2025</dd></div>
+            </dl>
+            <h3 class="eyebrow" style="margin:14px 0 6px">Recent sign-ins</h3>
+            <div class="table-scroll">
+              <table class="dt">
+                <tbody>
+                  <tr><td class="num">15 Oct, 08:12</td><td>Password</td><td class="soft">Chrome on Android</td></tr>
+                  <tr><td class="num">14 Oct, 19:40</td><td>Google</td><td class="soft">Chrome on Windows</td></tr>
+                  <tr><td class="num">13 Oct, 08:05</td><td>Password</td><td class="soft">Chrome on Android</td></tr>
+                  <tr><td class="num">12 Oct, 21:10</td><td>Google</td><td class="soft">Chrome on Windows</td></tr>
+                  <tr><td class="num">11 Oct, 13:48</td><td>Google</td><td class="soft">Chrome on Windows</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2 class="card-title">History of this record</h2></div>
+            <ul class="feed">
+              <li><span class="icon">download</span><span>Prof. Kiran Hegde downloaded her CV <span class="chip new">New</span></span><time>10 Oct, 16:05</time></li>
+              <li><span class="icon">restart_alt</span><span>Placement office reset today's interview limit: "Two sessions dropped by the network"</span><time>22 Sep, 17:10</time></li>
+              <li><span class="icon">school</span><span>Placement office promoted the batch, semester 2 to 3</span><time>21 Jul, 09:00</time></li>
+              <li><span class="icon">verified</span><span>Dr. Meera Rao verified the semester 2 marks card</span><time>14 Jul, 12:20</time></li>
+              <li><span class="icon">group_add</span><span>Placement office assigned Dr. Meera Rao as mentor</span><time>04 Sep 2025</time></li>
+              <li><span class="icon">how_to_reg</span><span>Placement office approved her application</span><time>03 Aug 2025</time></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===================================================== give access dialog -->
+<dialog id="accessDialog" aria-labelledby="dlgTitle">
+  <form id="accessForm" novalidate>
+    <div class="dlg">
+      <div class="dlg-head">
+        <div><h2 id="dlgTitle">Give access to student records</h2><p class="soft" style="font-size:12.5px;margin-top:3px">They will see this page, read only.</p></div>
+        <button type="button" class="icon-btn" id="dlgClose" aria-label="Close"><span class="icon">close</span></button>
+      </div>
+
+      <div class="field">
+        <label for="dlgPerson">Faculty member</label>
+        <select id="dlgPerson" required>
+          <option value="">Choose a faculty member</option>
+          <option value="Dr. Anil Kumar|AK">Dr. Anil Kumar · Management Studies</option>
+          <option value="Prof. Sunita Desai|SD">Prof. Sunita Desai · Management Studies</option>
+          <option value="Dr. Ravi Naik|RN">Dr. Ravi Naik · Computer Science</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <span class="flabel" id="reachLabel">Which students</span>
+        <div class="reach-opts" role="radiogroup" aria-labelledby="reachLabel">
+          <label class="reach-opt"><input type="radio" name="reach" value="Only Priya Shetty"><span><b>Only Priya Shetty</b><span>For a one-off review of this student</span></span></label>
+          <label class="reach-opt"><input type="radio" name="reach" value="MBA - Finance · 2025-27"><span><b>Her batch</b><span>MBA - Finance · 2025-27 · 58 students</span></span></label>
+          <label class="reach-opt"><input type="radio" name="reach" value="Management Studies" checked><span><b>Her department</b><span>Management Studies · 312 students</span></span></label>
+          <label class="reach-opt"><input type="radio" name="reach" value="Every student at BGSCET"><span><b>Every student at the college</b><span>BGSCET · 1,140 students</span></span></label>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="flabel">What they can do</span>
+        <ul class="can-list">
+          <li><span class="icon yes">check</span>Open student records and download resumes and documents</li>
+          <li><span class="icon no">close</span>Edit, move or remove students. That is a separate permission, Students.</li>
+        </ul>
+      </div>
+
+      <div class="field">
+        <label for="dlgUntil">Until</label>
+        <input type="date" id="dlgUntil" value="2027-03-31" min="2026-10-16">
+        <span class="hint">Access ends on its own on this date.</span>
+      </div>
+
+      <div class="field">
+        <label for="dlgReason">Reason</label>
+        <textarea id="dlgReason" required placeholder="For example: placement coordinator for the 2025-27 MBA batches"></textarea>
+        <span class="hint">Shown beside their name and kept in the history.</span>
+      </div>
+    </div>
+    <div class="dlg-foot">
+      <button type="button" class="btn secondary" id="dlgCancel">Cancel</button>
+      <button type="submit" class="btn primary" id="dlgSubmit" disabled><span class="icon">person_add</span> Give access</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Icons appear once the face reports itself loaded. */
+  try {
+    document.fonts.load('24px "Material Symbols Outlined"', 'check').then(function (faces) {
+      if (faces && faces.length) document.body.classList.add('fonts-ready');
+    }).catch(function () {});
+  } catch (e) {}
+
+  /* ------------------------------------------------------------ toast */
+  var toastTimer = null;
+  function say(text) {
+    var t = $('#toast');
+    t.textContent = text;
+    t.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.hidden = true; }, 3600);
+  }
+
+  /* ------------------------------------------------------------ tabs */
+  var tabs = $$('[role="tab"]');
+  var keys = tabs.map(function (t) { return t.id.replace('tab-', ''); });
+  function setTab(key, opts) {
+    opts = opts || {};
+    if (keys.indexOf(key) < 0) return;
+    tabs.forEach(function (t) {
+      var on = t.id === 'tab-' + key;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      $('#' + t.getAttribute('aria-controls')).hidden = !on;
+      if (on) {
+        if (opts.focus) t.focus();
+        t.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+      }
+    });
+    try { history.replaceState(null, '', '#' + key); } catch (e) {}
+    if (opts.scroll) {
+      $('.tabs-wrap').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+    }
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener('click', function () { setTab(keys[i]); });
+    t.addEventListener('keydown', function (e) {
+      var next = null;
+      if (e.key === 'ArrowRight') next = (i + 1) % tabs.length;
+      if (e.key === 'ArrowLeft') next = (i - 1 + tabs.length) % tabs.length;
+      if (e.key === 'Home') next = 0;
+      if (e.key === 'End') next = tabs.length - 1;
+      if (next !== null) { e.preventDefault(); setTab(keys[next], { focus: true }); }
+    });
+  });
+  document.addEventListener('click', function (e) {
+    var go = e.target.closest('[data-goto]');
+    if (go) { closeMenu(); setTab(go.getAttribute('data-goto'), { scroll: true }); return; }
+    var s = e.target.closest('[data-say]');
+    if (s) { closeMenu(); say('In REEP: ' + s.getAttribute('data-say')); return; }
+    var d = e.target.closest('[data-download]');
+    if (d) {
+      say('In REEP this downloads ' + d.getAttribute('data-download') + ', and the download goes on her history.');
+      return;
+    }
+    var c = e.target.closest('[data-copy]');
+    if (c) {
+      var text = c.getAttribute('data-copy');
+      var done = function () { say('Copied ' + text); };
+      try { navigator.clipboard.writeText(text).then(done, function () { say(text); }); } catch (err) { say(text); }
+    }
+  });
+  if (window.innerWidth < 700) $('#changes').open = false;
+  var start = (location.hash || '').replace('#', '');
+  if (keys.indexOf(start) >= 0) setTab(start);
+
+  /* ------------------------------------------------------------ more menu */
+  var moreBtn = $('#moreBtn'), moreMenu = $('#moreMenu');
+  function closeMenu() { if (!moreMenu.hidden) { moreMenu.hidden = true; moreBtn.setAttribute('aria-expanded', 'false'); } }
+  moreBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    var open = moreMenu.hidden;
+    moreMenu.hidden = !open;
+    moreBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) $('button', moreMenu).focus();
+  });
+  document.addEventListener('click', function (e) { if (!e.target.closest('.menu-wrap')) closeMenu(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !moreMenu.hidden) { closeMenu(); moreBtn.focus(); } });
+
+  /* ------------------------------------------------------------ preview as */
+  function previewAs(who) {
+    var faculty = who === 'faculty';
+    document.body.classList.toggle('as-faculty', faculty);
+    $('#asAdmin').setAttribute('aria-pressed', faculty ? 'false' : 'true');
+    $('#asFaculty').setAttribute('aria-pressed', faculty ? 'true' : 'false');
+    $('#whoAv').textContent = faculty ? 'KH' : 'PO';
+    $('#whoName').textContent = faculty ? 'Prof. Kiran Hegde' : 'Placement office';
+    $('#whoRole').textContent = faculty ? 'Faculty' : 'Main Admin';
+  }
+  $('#asAdmin').addEventListener('click', function () { previewAs('admin'); });
+  $('#asFaculty').addEventListener('click', function () { previewAs('faculty'); });
+
+  /* ------------------------------------------------------------ small charts */
+  var SVGNS = 'http://www.w3.org/2000/svg';
+  function el(name, attrs, text) {
+    var n = document.createElementNS(SVGNS, name);
+    Object.keys(attrs || {}).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function svg(w, h, cls) {
+    return el('svg', { viewBox: '0 0 ' + w + ' ' + h, preserveAspectRatio: 'none', 'class': cls || '' });
+  }
+  /* A line sparkline: values on [lo, hi], last point emphasised. */
+  function sparkLine(host, values, lo, hi) {
+    var w = 120, h = 28, pad = 3;
+    var s = svg(w, h, 'chart spark');
+    var x = function (i) { return pad + i * (w - 2 * pad) / (values.length - 1); };
+    var y = function (v) { return h - pad - (v - lo) / (hi - lo) * (h - 2 * pad); };
+    var pts = values.map(function (v, i) { return x(i).toFixed(1) + ',' + y(v).toFixed(1); });
+    s.appendChild(el('polygon', { 'class': 'area', points: x(0).toFixed(1) + ',' + h + ' ' + pts.join(' ') + ' ' + x(values.length - 1).toFixed(1) + ',' + h }));
+    s.appendChild(el('polyline', { 'class': 'line', points: pts.join(' '), 'vector-effect': 'non-scaling-stroke' }));
+    host.appendChild(s);
+  }
+  /* A bar sparkline on 0..100 with a threshold line. */
+  function sparkBars(host, values, threshold) {
+    var w = 120, h = 28, n = values.length, gap = 4, bw = (w - gap * (n - 1)) / n;
+    var s = svg(w, h, 'chart spark');
+    values.forEach(function (v, i) {
+      var bh = v / 100 * h;
+      s.appendChild(el('rect', { 'class': 'bar' + (i === n - 1 ? ' last' : ''), x: (i * (bw + gap)).toFixed(1), y: (h - bh).toFixed(1), width: bw.toFixed(1), height: bh.toFixed(1), rx: 2 }));
+    });
+    var ty = h - threshold / 100 * h;
+    s.appendChild(el('line', { 'class': 'threshold', x1: 0, x2: w, y1: ty, y2: ty, 'vector-effect': 'non-scaling-stroke' }));
+    host.appendChild(s);
+  }
+  sparkBars($('#sparkAttendance'), [88, 80, 86, 82, 85, 84], 75);
+  sparkLine($('#sparkInterviews'), [57, 62, 64, 71, 78], 40, 100);
+
+  /* Attendance bar chart, to scale on 0..100. */
+  (function () {
+    var weeks = [['7 Sep', 88], ['14 Sep', 80], ['21 Sep', 86], ['28 Sep', 82], ['5 Oct', 85], ['12 Oct', 84]];
+    var W = 520, H = 220, L = 36, R = 10, T = 14, B = 28, pw = W - L - R, ph = H - T - B;
+    var s = el('svg', { viewBox: '0 0 ' + W + ' ' + H });
+    var y = function (v) { return T + ph - v / 100 * ph; };
+    var g = el('g', { 'class': 'grid' });
+    [0, 25, 50, 75, 100].forEach(function (v) {
+      g.appendChild(el('line', { x1: L, x2: W - R, y1: y(v), y2: y(v) }));
+      s.appendChild(el('text', { 'class': 'tick', x: L - 8, y: y(v) + 4, 'text-anchor': 'end' }, v + '%'));
+    });
+    s.insertBefore(g, s.firstChild);
+    var slot = pw / weeks.length, bw = slot * 0.52;
+    weeks.forEach(function (wk, i) {
+      var cx = L + slot * i + slot / 2;
+      s.appendChild(el('rect', { 'class': 'bar' + (wk[1] < 75 ? ' low' : ''), x: cx - bw / 2, y: y(wk[1]), width: bw, height: y(0) - y(wk[1]), rx: 4 }));
+      s.appendChild(el('text', { 'class': 'val-label', x: cx, y: y(wk[1]) - 6, 'text-anchor': 'middle' }, wk[1] + '%'));
+      s.appendChild(el('text', { 'class': 'xl', x: cx, y: H - 8, 'text-anchor': 'middle' }, wk[0]));
+    });
+    s.appendChild(el('line', { 'class': 'threshold', x1: L, x2: W - R, y1: y(75), y2: y(75) }));
+    $('#attChart').appendChild(s);
+  })();
+
+  /* Interview score line, to scale on 40..100, one point per scored interview. */
+  (function () {
+    var pts = [['14 Mar', 57], ['2 Apr', 62], ['22 Sep', 64], ['3 Oct', 71], ['11 Oct', 78]];
+    var W = 520, H = 220, L = 36, R = 24, T = 18, B = 28, pw = W - L - R, ph = H - T - B, lo = 40, hi = 100;
+    var s = el('svg', { viewBox: '0 0 ' + W + ' ' + H });
+    var y = function (v) { return T + ph - (v - lo) / (hi - lo) * ph; };
+    var x = function (i) { return L + 12 + i * (pw - 24) / (pts.length - 1); };
+    var g = el('g', { 'class': 'grid' });
+    [40, 60, 80, 100].forEach(function (v) {
+      g.appendChild(el('line', { x1: L, x2: W - R, y1: y(v), y2: y(v) }));
+      s.appendChild(el('text', { 'class': 'tick', x: L - 8, y: y(v) + 4, 'text-anchor': 'end' }, v));
+    });
+    s.appendChild(g);
+    var line = pts.map(function (p, i) { return x(i) + ',' + y(p[1]); }).join(' ');
+    s.appendChild(el('polygon', { 'class': 'area', points: x(0) + ',' + y(lo) + ' ' + line + ' ' + x(pts.length - 1) + ',' + y(lo) }));
+    s.appendChild(el('polyline', { 'class': 'line', points: line }));
+    pts.forEach(function (p, i) {
+      var last = i === pts.length - 1;
+      s.appendChild(el('circle', { 'class': 'pt' + (last ? ' end' : ''), cx: x(i), cy: y(p[1]), r: last ? 5 : 4 }));
+      s.appendChild(el('text', { 'class': 'val-label', x: x(i), y: y(p[1]) - 10, 'text-anchor': 'middle' }, p[1]));
+      s.appendChild(el('text', { 'class': 'xl', x: x(i), y: H - 8, 'text-anchor': 'middle' }, p[0]));
+    });
+    $('#ivChart').appendChild(s);
+  })();
+
+  /* ------------------------------------------------------------ builder versions */
+  var BUILT = [
+    ['Finance Analyst', 'Version 3 · finalised 09 Oct 2026', 'resume-v3.pdf'],
+    ['Equity Research', 'Version 2 · draft · 28 Sep 2026', 'resume-v2.pdf'],
+    ['General', 'Version 1 · draft · 02 Sep 2026', 'resume-v1.pdf']
+  ];
+  var builderHost = $('#builderRows');
+  BUILT.forEach(function (r) {
+    var row = document.createElement('div');
+    row.className = 'file-row';
+    row.innerHTML = '<div class="doc-ico"><span class="icon">description</span></div><div><b></b><span></span></div>' +
+      '<button type="button" class="icon-btn" title="Download"><span class="icon">download</span></button>';
+    $('b', row).textContent = r[0];
+    $('span:not(.icon)', row).textContent = r[1];
+    var btn = $('button', row);
+    btn.setAttribute('aria-label', 'Download ' + r[0] + ', ' + r[1]);
+    btn.setAttribute('data-download', r[2]);
+    builderHost.appendChild(row);
+  });
+
+  /* ------------------------------------------------------------ verified badges */
+  var BADGES = [
+    ['Analytical Thinking', 'Thinking · Excel', 15, '14 Sep 2026', 'Dr. Meera Rao'],
+    ['Banking & BFSI Fundamentals', 'Sectoral · Finance', 15, '26 Aug 2026', 'Dr. Meera Rao'],
+    ['Emotional Intelligence', 'Managerial · Excel', 10, '05 Aug 2026', 'Dr. Meera Rao'],
+    ['Decision-Making', 'Managerial · Excel', 10, '06 May 2026', 'Placement office'],
+    ['Financial Statement Analysis', 'Sectoral · Finance', 15, '11 Apr 2026', 'Dr. Meera Rao'],
+    ['Microsoft Excel – Advanced Business Applications', 'Platform · Excel', 15, '20 Mar 2026', 'Dr. Meera Rao'],
+    ['Presentation Skills', 'Managerial · Excel', 10, '02 Mar 2026', 'Dr. Meera Rao'],
+    ['Business Communication', 'Managerial · Excel', 10, '18 Feb 2026', 'Dr. Meera Rao'],
+    ['Teamwork', 'Managerial · Excel', 10, '19 Jan 2026', 'Dr. Meera Rao'],
+    ['PowerPoint for Business', 'Platform · Reboot', 10, '03 Dec 2025', 'Dr. Meera Rao'],
+    ['Microsoft Excel – Foundation', 'Platform · Reboot', 10, '12 Nov 2025', 'Dr. Meera Rao']
+  ];
+  var grid = $('#badgeGrid');
+  BADGES.forEach(function (b) {
+    var d = document.createElement('div');
+    d.className = 'badge-tile';
+    d.innerHTML = '<span class="hex"><span class="icon fill">verified</span></span><div><b></b><span class="meta"></span><span class="by"><span class="icon">check_circle</span><span class="byt"></span></span></div>';
+    $('b', d).textContent = b[0];
+    $('.meta', d).textContent = b[1] + ' · ' + b[2] + ' points';
+    $('.byt', d).textContent = 'Verified ' + b[3] + ' by ' + b[4];
+    grid.appendChild(d);
+  });
+
+  /* ------------------------------------------------------------ growth table */
+  var GROWTH = [
+    ['Reading', 6, 7, 7], ['Writing', 5, 6, 7], ['Listening', 6, 7, 8], ['Speaking', 4, 5, 6],
+    ['Quantitative', 7, 7, 8], ['Data interpretation', 5, 6, 7], ['Logical reasoning', 6, 6, 7]
+  ];
+  var gb = $('#growthTable tbody');
+  GROWTH.forEach(function (r) {
+    var tr = document.createElement('tr');
+    var growth = r[3] - r[1];
+    tr.innerHTML = '<td></td><td class="n">' + r[1] + '</td><td class="n">' + r[2] + '</td><td class="n">' + r[3] + '</td>' +
+      '<td class="n dash">—</td><td class="n dash">—</td><td class="n"><span class="growth-up">+' + growth + '</span></td>';
+    tr.firstChild.textContent = r[0];
+    gb.appendChild(tr);
+  });
+
+  /* ------------------------------------------------------------ leaderboard */
+  var BOARDS = [
+    { key: 'overall', label: 'Overall', head: 'Score', ranked: 52, me: 4, mine: '81 points', unranked: 6,
+      note: 'Skills, VTU results, streak and mocks, each worth up to 25 points against the best in the batch.',
+      rows: [[1, 'Ananya Rao', '92'], [2, 'Rohan Kulkarni', '88'], [3, 'Sneha Patil', '84'], [4, 'Priya Shetty', '81', 1], [5, 'Karthik Nayak', '79'], [6, 'Divya Hegde', '77'], [7, 'Arjun Bhat', '76']] },
+    { key: 'skills', label: 'Skills', head: 'Verified skills', ranked: 47, me: 6, mine: '11 verified skills', unranked: 11,
+      note: 'Badges verified by staff.',
+      rows: [[1, 'Sneha Patil', '15'], [2, 'Ananya Rao', '14'], [3, 'Divya Hegde', '13'], [3, 'Rohan Kulkarni', '13'], [5, 'Meghana Gowda', '12'], [6, 'Priya Shetty', '11', 1], [7, 'Arjun Bhat', '10']] },
+    { key: 'vtu', label: 'VTU results', head: 'CGPA', ranked: 55, me: 3, mine: 'CGPA 7.92', unranked: 3,
+      note: 'Latest CGPA from the results import.',
+      rows: [[1, 'Ananya Rao', '8.41'], [2, 'Vikram Shenoy', '8.10'], [3, 'Priya Shetty', '7.92', 1], [4, 'Sneha Patil', '7.88'], [5, 'Rohan Kulkarni', '7.75'], [6, 'Pooja Kamath', '7.61']] },
+    { key: 'streak', label: 'Streak', head: 'Active days', ranked: 58, me: 12, mine: '41 active days', unranked: 0,
+      note: 'Days on which the student signed in.',
+      rows: [[1, 'Rohan Kulkarni', '63'], [2, 'Karthik Nayak', '60'], [3, 'Ananya Rao', '57'], [4, 'Nikhil Joshi', '55'], [5, 'Divya Hegde', '52'], null, [11, 'Shreya Iyer', '42'], [12, 'Priya Shetty', '41', 1], [13, 'Rahul Menon', '40']] },
+    { key: 'mocks', label: 'Mocks taken', head: 'Mocks', ranked: 39, me: 2, mine: '6 mocks', unranked: 19,
+      note: 'Mock interviews finished.',
+      rows: [[1, 'Karthik Nayak', '8'], [2, 'Aditya Prabhu', '6'], [2, 'Priya Shetty', '6', 1], [4, 'Ananya Rao', '5'], [4, 'Sneha Patil', '5']] }
+  ];
+  function initials(name) {
+    return name.replace(/^(Dr|Prof)\.\s*/, '').split(/\s+/).map(function (p) { return p[0]; }).join('').slice(0, 2).toUpperCase();
+  }
+  var boardsHost = $('#boards');
+  function showBoard(key) {
+    var b = BOARDS.filter(function (x) { return x.key === key; })[0];
+    $$('.board', boardsHost).forEach(function (n) { n.setAttribute('aria-pressed', n.getAttribute('data-key') === key ? 'true' : 'false'); });
+    $('#lbTitle').textContent = b.label;
+    $('#lbSub').textContent = b.note;
+    $('#lbValueHead').textContent = b.head;
+    var body = $('#lbRows');
+    body.textContent = '';
+    b.rows.forEach(function (r) {
+      var tr = document.createElement('tr');
+      if (!r) {
+        tr.className = 'gap';
+        tr.innerHTML = '<td colspan="3" aria-label="Ranks in between not shown">···</td>';
+      } else {
+        if (r[3]) tr.className = 'me';
+        tr.innerHTML = '<td class="rank-cell num">#' + r[0] + '</td><td><span class="lb-name"><span class="av" aria-hidden="true"></span><span class="nm"></span></span></td><td class="n"></td>';
+        $('.av', tr).textContent = initials(r[1]);
+        $('.nm', tr).textContent = r[1];
+        if (r[3]) {
+          var c = document.createElement('span');
+          c.className = 'chip brand';
+          c.textContent = 'This student';
+          $('.lb-name', tr).appendChild(c);
+        }
+        tr.lastChild.textContent = r[2];
+      }
+      body.appendChild(tr);
+    });
+    $('#lbUnranked').textContent = b.unranked
+      ? b.unranked + ' classmate' + (b.unranked === 1 ? ' has' : 's have') + ' nothing on this board yet, so they are not ranked.'
+      : 'Every student in the batch is on this board.';
+  }
+  BOARDS.forEach(function (b, i) {
+    var top = Math.ceil(b.me / b.ranked * 100);
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'board';
+    btn.setAttribute('data-key', b.key);
+    btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+    btn.innerHTML = '<span class="name"></span><span class="rank num">#' + b.me + '<small> of ' + b.ranked + '</small></span>' +
+      '<span class="val"></span><span class="meter"><span style="width:' + (100 - top) + '%"></span></span>' +
+      '<span class="val">Top ' + top + '%</span>';
+    $('.name', btn).textContent = b.label;
+    $('.val', btn).textContent = b.mine;
+    btn.addEventListener('click', function () { showBoard(b.key); });
+    boardsHost.appendChild(btn);
+  });
+  showBoard('overall');
+
+  /* ------------------------------------------------------------ time sheet */
+  var DAYS = [
+    ['Fri 2 Oct', 'sub'], ['Sat 3 Oct', 'sub'], ['Sun 4 Oct', 'none'], ['Mon 5 Oct', 'sub'], ['Tue 6 Oct', 'sub'],
+    ['Wed 7 Oct', 'sub'], ['Thu 8 Oct', 'sub'], ['Fri 9 Oct', 'sub'], ['Sat 10 Oct', 'sub'], ['Sun 11 Oct', 'none'],
+    ['Mon 12 Oct', 'sub'], ['Tue 13 Oct', 'sub'], ['Wed 14 Oct', 'draft'], ['Thu 15 Oct', 'today']
+  ];
+  var LABEL = { sub: ['Submitted', '24 h'], none: ['Not logged', 'Locked'], draft: ['Draft', '22.5 h · open'], today: ['Today', 'Not started'] };
+  var daysHost = $('#days');
+  DAYS.forEach(function (d) {
+    var n = document.createElement('div');
+    n.className = 'day ' + d[1];
+    n.innerHTML = '<span class="d"></span><span class="s"></span><span class="h"></span>';
+    $('.d', n).textContent = d[0];
+    $('.s', n).textContent = LABEL[d[1]][0];
+    $('.h', n).textContent = LABEL[d[1]][1];
+    daysHost.appendChild(n);
+  });
+
+  /* ------------------------------------------------------------ documents */
+  var DOCS = [
+    ['Certificate', 'CFI-Financial-Modelling.pdf', '1.2 MB', ['warn', 'Pending review'], '12 Oct 2026', 'Behind the Financial Modelling claim'],
+    ['Certificate', 'PowerBI-Coursera.pdf', '640 KB', ['warn', 'Pending review'], '08 Oct 2026', 'Behind the Power BI claim'],
+    ['Certificate', 'NISM-Equity-Derivatives.pdf', '530 KB', ['risk', 'Needs changes'], '20 Aug 2026', 'Scan is cut off at the bottom'],
+    ['Document', 'Sem2-marks-card.pdf', '410 KB', ['good', 'Verified'], '14 Jul 2026', ''],
+    ['Resume', 'Priya_Shetty_CV.pdf', '214 KB', ['good', 'Verified'], '03 Aug 2025', 'With her application'],
+    ['Photo', 'photo.jpg', '88 KB', ['good', 'Verified'], '03 Aug 2025', 'With her application']
+  ];
+  var docBody = $('#docRows');
+  DOCS.forEach(function (d) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = '<td></td><td><b class="fn"></b><span class="cellnote"></span></td><td class="n"></td><td><span class="chip ' + d[3][0] + '"></span></td><td class="num"></td>' +
+      '<td><div class="row-actions"><button type="button" class="icon-btn" title="Open"><span class="icon">visibility</span></button><button type="button" class="icon-btn" title="Download"><span class="icon">download</span></button></div></td>';
+    var tds = tr.children;
+    tds[0].textContent = d[0];
+    $('.fn', tr).textContent = d[1];
+    $('.cellnote', tr).textContent = d[5];
+    tds[2].textContent = d[2];
+    $('.chip', tr).textContent = d[3][1];
+    tds[4].textContent = d[4];
+    var btns = $$('button', tr);
+    btns[0].setAttribute('aria-label', 'Open ' + d[1]);
+    btns[0].setAttribute('data-say', 'Opens ' + d[1] + ' in a new tab.');
+    btns[1].setAttribute('aria-label', 'Download ' + d[1]);
+    btns[1].setAttribute('data-download', d[1]);
+    docBody.appendChild(tr);
+  });
+
+  /* ------------------------------------------------------------ access */
+  var extra = 1;
+  function refreshRail() {
+    var total = 2 + extra;
+    $('#railAccessCount').textContent = total + ' people';
+    $('#railAccessLine').textContent = 'The placement office, her faculty mentor, and ' +
+      (extra === 0 ? 'nobody else.' : extra + ' ' + (extra === 1 ? 'person' : 'people') + ' you gave access.');
+  }
+  $('#accessList').addEventListener('click', function (e) {
+    var r = e.target.closest('.revoke');
+    if (!r) return;
+    if (r.getAttribute('data-armed') !== '1') {
+      r.setAttribute('data-armed', '1');
+      r.textContent = 'Press again to remove';
+      setTimeout(function () { if (r.isConnected) { r.removeAttribute('data-armed'); r.textContent = 'Remove access'; } }, 4000);
+      return;
+    }
+    var row = r.closest('.access-row');
+    var name = $('b', row).textContent;
+    var init = $('.av', row).textContent;
+    row.remove();
+    extra -= 1;
+    $$('#railAvatars .av').forEach(function (a) { if (a.textContent === init) a.remove(); });
+    refreshRail();
+    say(name + ' can no longer open student records. This is on the history.');
+  });
+
+  var dlg = $('#accessDialog'), form = $('#accessForm');
+  function validate() {
+    $('#dlgSubmit').disabled = !($('#dlgPerson').value && $('#dlgReason').value.trim().length >= 4 && $('#dlgUntil').value);
+  }
+  ['change', 'input'].forEach(function (ev) { form.addEventListener(ev, validate); });
+  function openDialog() {
+    form.reset();
+    validate();
+    if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
+    $('#dlgPerson').focus();
+  }
+  function closeDialog() { if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open'); }
+  $('#giveAccessBtn').addEventListener('click', openDialog);
+  $('#dlgClose').addEventListener('click', closeDialog);
+  $('#dlgCancel').addEventListener('click', closeDialog);
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    validate();
+    if ($('#dlgSubmit').disabled) return;
+    var parts = $('#dlgPerson').value.split('|');
+    var reach = (form.querySelector('input[name="reach"]:checked') || {}).value || 'Management Studies';
+    var until = new Date($('#dlgUntil').value + 'T00:00:00');
+    var untilText = until.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+    var row = document.createElement('div');
+    row.className = 'access-row';
+    row.innerHTML = '<span class="av" aria-hidden="true"></span><div><b></b><span class="what">Faculty. Read only: can open records and download resumes.</span>' +
+      '<div class="reach"><span class="chip brand rch"></span><span class="chip unt"></span></div><span class="cellnote rsn" style="margin-top:6px"></span></div>' +
+      '<button type="button" class="btn small danger admin-only revoke">Remove access</button>';
+    $('.av', row).textContent = parts[1];
+    $('b', row).textContent = parts[0];
+    $('.rch', row).textContent = reach;
+    $('.unt', row).textContent = 'Until ' + untilText;
+    $('.rsn', row).textContent = 'Given today by the placement office: "' + $('#dlgReason').value.trim() + '"';
+    $('#accessList').appendChild(row);
+    var av = document.createElement('span');
+    av.className = 'av sm';
+    av.title = parts[0];
+    av.textContent = parts[1];
+    $('#railAvatars').appendChild(av);
+    extra += 1;
+    refreshRail();
+    closeDialog();
+    say(parts[0] + ' can now open records for ' + reach + ' until ' + untilText + '.');
+  });
+})();
+</script>

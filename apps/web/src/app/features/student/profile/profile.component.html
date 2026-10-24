@@ -1,0 +1,419 @@
+<div class="panel">
+  <div class="dt-header">
+    <div>
+      <h1 class="dt-title">Profile</h1>
+      <div class="dt-sub">
+        The details your resume and job matches are built from. Some fields are synced from your
+        student record and locked.
+      </div>
+    </div>
+    <div class="dt-toolbar">
+      <!-- Save-state machine: one status pill next to the button. -->
+      @if (loaded()) {
+        <span
+          class="save-state"
+          [attr.data-kind]="saveStatus().kind"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="icon" [class.spin]="saveStatus().kind === 'saving'" aria-hidden="true">{{
+            saveStatus().icon
+          }}</span>
+          <span>{{ saveStatus().text }}</span>
+          @if (saveStatus().kind === 'saved') {
+            <span class="save-time">· {{ savedAtLabel() }}</span>
+          }
+        </span>
+      }
+      <button type="button" class="dt-btn primary" [disabled]="!canSave()" (click)="save()">
+        <span class="icon" style="font-size: 15px" aria-hidden="true">save</span>
+        {{ saving() ? 'Saving…' : 'Save changes' }}
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="card">
+      <div class="reg-approval flag">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>{{ error() }}</div>
+      </div>
+    </div>
+  } @else if (!loaded()) {
+    <div class="card">Loading your profile…</div>
+  } @else {
+    @if (anyError()) {
+      <div class="reg-approval flag validation-summary">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>Some fields need fixing before you can save. Corrections are marked in red below.</div>
+      </div>
+    }
+
+    <!-- Placement completion — a meter over the fields that help placements -->
+    <div class="card completion-card">
+      <div class="completion-head">
+        <h4 class="completion-title">Placement profile completion</h4>
+        <span
+          class="completion-pct"
+          [attr.data-band]="
+            completion().pct >= 100 ? 'full' : completion().pct >= 60 ? 'mid' : 'low'
+          "
+        >
+          {{ completion().pct }}% complete
+        </span>
+      </div>
+      <div
+        class="meter"
+        role="progressbar"
+        [attr.aria-valuenow]="completion().pct"
+        aria-valuemin="0"
+        aria-valuemax="100"
+      >
+        <div
+          class="meter-fill"
+          [attr.data-band]="
+            completion().pct >= 100 ? 'full' : completion().pct >= 60 ? 'mid' : 'low'
+          "
+          [style.width.%]="completion().pct"
+        ></div>
+      </div>
+      <div class="dt-sub card-note">
+        {{ completion().done }} of {{ completion().total }} placement fields filled.
+        {{ completionHint() }}
+      </div>
+    </div>
+
+    <!-- Identity — who you are, not what you prefer.
+
+         Filled in from the programme's roster, which exists before you ever
+         sign in, and from the Google account that sign-in verified. Rendered
+         as readonly inputs: already filled, selectable and copyable, and
+         impossible to type into. Nothing here is sent on save — PUT
+         /student/profile has no usn or name field, and no API route lets a
+         student set their own USN. -->
+    <div class="card">
+      <h4>
+        Identity
+        <span class="chip warn"><span class="icon" aria-hidden="true">lock</span>Synced · read-only</span>
+      </h4>
+      <div class="reg-grid identity-grid">
+        <div class="field">
+          <label for="identity-name">Full name</label>
+          <input
+            id="identity-name"
+            class="locked-value"
+            type="text"
+            readonly
+            [value]="nameValue()"
+            aria-describedby="identity-note"
+          />
+        </div>
+        <div class="field">
+          <label for="identity-usn">USN</label>
+          <input
+            id="identity-usn"
+            class="locked-value tabular"
+            type="text"
+            readonly
+            [value]="usnValue()"
+            aria-describedby="identity-note"
+          />
+        </div>
+      </div>
+
+      @if (identityUnreadable()) {
+        <div class="reg-approval flag">
+          <span class="icon" aria-hidden="true">error</span>
+          <div>
+            Your student record could not be read just now, so your name and USN are not shown. They
+            are still on file — reload the page to try again.
+          </div>
+        </div>
+      } @else if (usnMissing()) {
+        <div class="reg-approval flag">
+          <span class="icon" aria-hidden="true">warning</span>
+          <div>
+            No USN is on your student record yet. Ask the placement office to add it — it cannot be
+            entered here.
+          </div>
+        </div>
+      }
+
+      <div class="dt-sub card-note" id="identity-note">
+        Your name and USN come from the programme's student record. Ask the office if either is
+        wrong.
+      </div>
+    </div>
+
+    <!-- Institutional assignment — the locked card.
+
+         Read THROUGH students.cohort_id -> cohorts -> departments -> colleges
+         (and the optional course / specialization), never stored on the
+         student. Rendered from `levels`, in the server's order with the
+         server's labels, so a new level costs this template nothing.
+
+         A blank means one of two things and the card must not confuse them:
+         `pending` is a value the office owes you (dash + "Not yet recorded",
+         text and colour together); `not_in_use` is a level this institution
+         does not use at all — the row is hidden and the omission is stated
+         once in the footnote, because a dash there would tell you your record
+         is incomplete when it is complete. -->
+    <div class="card">
+      <h4>
+        Institutional assignment
+        <span class="chip warn"><span class="icon" aria-hidden="true">lock</span>Verified by Main Admin · read-only</span>
+      </h4>
+
+      @if (institution(); as inst) {
+        <div class="reg-grid identity-grid">
+          @for (lv of institutionRows(); track lv.key) {
+            <div class="field">
+              <label [attr.for]="'inst-' + lv.key">{{ lv.label }}</label>
+              @if (lv.state === 'set') {
+                <input
+                  [id]="'inst-' + lv.key"
+                  class="locked-value"
+                  type="text"
+                  readonly
+                  [value]="lv.value"
+                  aria-describedby="institution-note"
+                />
+              } @else {
+                <input
+                  [id]="'inst-' + lv.key"
+                  class="locked-value"
+                  type="text"
+                  readonly
+                  value="—"
+                  [attr.aria-describedby]="'inst-pending-' + lv.key"
+                />
+                <span class="chip warn" [id]="'inst-pending-' + lv.key">
+                  <span class="icon" aria-hidden="true">warning</span>Not yet recorded
+                </span>
+              }
+            </div>
+          }
+          @if (institutionDates(); as d) {
+            <div class="field">
+              <label for="inst-entry">Entry date</label>
+              <input id="inst-entry" class="locked-value tabular" type="text" readonly [value]="d.entry ?? '—'" aria-describedby="institution-note" />
+            </div>
+            <div class="field">
+              <label for="inst-done">Expected completion</label>
+              <input id="inst-done" class="locked-value tabular" type="text" readonly [value]="d.done ?? '—'" aria-describedby="institution-note" />
+            </div>
+          }
+        </div>
+
+        @if (inst.not_in_use_note) {
+          <div class="dt-sub card-note">{{ inst.not_in_use_note }}</div>
+        }
+        <div class="dt-sub card-note" id="institution-note">
+          Locked — not editable by students. Your college, department and batch are set by the
+          Main Admin; ask the office if any of it is wrong.
+        </div>
+      } @else {
+        <div class="dt-sub card-note">
+          Your institutional assignment will appear here once your profile has been created.
+        </div>
+      }
+    </div>
+
+    <!-- Contact & links — editable, with inline validation -->
+    <div class="card">
+      <h4>Contact &amp; links</h4>
+      <div class="reg-grid">
+        <div class="field" [class.field--invalid]="showError('phone')">
+          <label>Phone</label>
+          <input
+            [ngModel]="phone()"
+            (ngModelChange)="phone.set($event); onEdit()"
+            (blur)="touch('phone')"
+            name="phone"
+            autocomplete="tel"
+            inputmode="tel"
+            placeholder="e.g. 98765 43210"
+            [attr.aria-invalid]="showError('phone')"
+          />
+          @if (showError('phone')) {
+            <div class="field-error"><span class="icon" aria-hidden="true">error</span>{{ errorText('phone') }}</div>
+          }
+        </div>
+        <div class="field" [class.field--invalid]="showError('email')">
+          <label>Contact email</label>
+          <input
+            [ngModel]="email()"
+            (ngModelChange)="email.set($event); onEdit()"
+            (blur)="touch('email')"
+            name="email"
+            type="email"
+            placeholder="you@example.com"
+            [attr.aria-invalid]="showError('email')"
+          />
+          @if (showError('email')) {
+            <div class="field-error"><span class="icon" aria-hidden="true">error</span>{{ errorText('email') }}</div>
+          }
+        </div>
+        <div class="field" [class.field--invalid]="showError('linkedinUrl')">
+          <label>LinkedIn</label>
+          <input
+            [ngModel]="linkedinUrl()"
+            (ngModelChange)="linkedinUrl.set($event); onEdit()"
+            (blur)="touch('linkedinUrl')"
+            name="linkedinUrl"
+            placeholder="linkedin.com/in/…"
+            [attr.aria-invalid]="showError('linkedinUrl')"
+          />
+          @if (showError('linkedinUrl')) {
+            <div class="field-error">
+              <span class="icon" aria-hidden="true">error</span>{{ errorText('linkedinUrl') }}
+            </div>
+          }
+        </div>
+        <div class="field" [class.field--invalid]="showError('githubUrl')">
+          <label>GitHub</label>
+          <input
+            [ngModel]="githubUrl()"
+            (ngModelChange)="githubUrl.set($event); onEdit()"
+            (blur)="touch('githubUrl')"
+            name="githubUrl"
+            placeholder="github.com/…"
+            [attr.aria-invalid]="showError('githubUrl')"
+          />
+          @if (showError('githubUrl')) {
+            <div class="field-error">
+              <span class="icon" aria-hidden="true">error</span>{{ errorText('githubUrl') }}
+            </div>
+          }
+        </div>
+        <div class="field" [class.field--invalid]="showError('portfolioUrl')">
+          <label>Portfolio</label>
+          <input
+            [ngModel]="portfolioUrl()"
+            (ngModelChange)="portfolioUrl.set($event); onEdit()"
+            (blur)="touch('portfolioUrl')"
+            name="portfolioUrl"
+            placeholder="your-site.com"
+            [attr.aria-invalid]="showError('portfolioUrl')"
+          />
+          @if (showError('portfolioUrl')) {
+            <div class="field-error">
+              <span class="icon" aria-hidden="true">error</span>{{ errorText('portfolioUrl') }}
+            </div>
+          }
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input
+            [ngModel]="city()"
+            (ngModelChange)="city.set($event); onEdit()"
+            name="city"
+            placeholder="e.g. Bengaluru"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Career summary — editable -->
+    <div class="card">
+      <h4>Career summary</h4>
+      <div class="field field--last">
+        <label>The headline at the top of your resume</label>
+        <textarea
+          [ngModel]="careerSummary()"
+          (ngModelChange)="careerSummary.set($event); onEdit()"
+          name="careerSummary"
+          rows="3"
+          placeholder="A short headline in your own words — what you do and what you are aiming for."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Placement preferences — editable, plus the admin-set clearance chip -->
+    <div class="card">
+      <h4>
+        Placement preferences
+        @if (placementEligible()) {
+          <span class="chip good"><span class="icon" aria-hidden="true">verified</span>Cleared for placements</span>
+        } @else {
+          <span class="chip risk"><span class="icon" aria-hidden="true">block</span>Not cleared</span>
+        }
+      </h4>
+      <div class="group-note">
+        <span class="icon" aria-hidden="true">info</span>
+        <div>
+          These settings gate which opportunities you appear against — turn one off and you drop out
+          of matching for that kind of role.
+        </div>
+      </div>
+      <label class="pref-row">
+        <input
+          type="checkbox"
+          [ngModel]="interestedInJobs()"
+          (ngModelChange)="interestedInJobs.set($event); onEdit()"
+          name="interestedInJobs"
+        />
+        <span>Interested in jobs</span>
+      </label>
+      <label class="pref-row">
+        <input
+          type="checkbox"
+          [ngModel]="interestedInInternships()"
+          (ngModelChange)="interestedInInternships.set($event); onEdit()"
+          name="interestedInInternships"
+        />
+        <span>Interested in internships</span>
+      </label>
+      <div class="dt-sub card-note">
+        Placement clearance is set by the placement office and can't be changed here.
+      </div>
+    </div>
+
+    <!-- Privacy — kept separate from what you are looking for -->
+    <div class="card">
+      <h4>Privacy</h4>
+      <div class="group-note">
+        <span class="icon" aria-hidden="true">visibility_off</span>
+        <div>
+          Controls who can see you here. It does not change which jobs or internships you are
+          matched against.
+        </div>
+      </div>
+      <label class="pref-row">
+        <input
+          type="checkbox"
+          [ngModel]="leaderboardOptOut()"
+          (ngModelChange)="leaderboardOptOut.set($event); onEdit()"
+          name="leaderboardOptOut"
+        />
+        <span>Hide me from the leaderboards</span>
+      </label>
+    </div>
+
+    <!-- Skills — synced from the Skilling page, read-only -->
+    <div class="card">
+      <h4>
+        Skills <span class="chip warn"><span class="icon" aria-hidden="true">lock</span>From Skilling</span>
+      </h4>
+      @if (skills().length > 0) {
+        <div class="badge-row skills-wrap">
+          @for (s of skills(); track s) {
+            <span class="chip good">{{ s }}</span>
+          }
+        </div>
+      } @else {
+        <div class="dropzone">
+          <span class="icon" aria-hidden="true">workspace_premium</span>
+          No skills yet — claim skills on the Skilling page and they appear here.
+        </div>
+      }
+    </div>
+
+    @if (saveError()) {
+      <div class="reg-approval flag">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>{{ saveError() }}</div>
+      </div>
+    }
+  }
+</div>

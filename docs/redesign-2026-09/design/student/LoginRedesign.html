@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>Student · Sign in · redesign</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap">
+  <style>
+    body { margin: 0; background: linear-gradient(180deg, #ece4f5 0%, #f2e7f8 45%, #fbe6f2 100%); color: #1e1b29; font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 13px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+    a { color: #552c7e; text-decoration: none; } a:hover { color: #4a2668; text-decoration: underline; }
+    .root { width: 1440px; height: 900px; display: flex; flex-direction: column; overflow: hidden; background: linear-gradient(180deg, #ece4f5 0%, #f2e7f8 45%, #fbe6f2 100%); }
+    .appbar { height: 52px; flex: none; background: linear-gradient(180deg, #faf6fd, #ece0f2); border-bottom: 1px solid rgba(160, 138, 178, 0.38); display: flex; align-items: center; gap: 14px; padding: 0 16px; }
+    .brand { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0.06em; color: #552c7e; }
+    .brand-mark { width: 26px; height: 26px; border-radius: 8px; background: linear-gradient(120deg, #552c7e, #7a2f9e 38%, #a0248f 68%, #ba2185); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; box-shadow: 0 5px 14px rgba(85, 44, 126, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.55); }
+    .env { white-space: nowrap; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #137a4a; background: rgba(19, 122, 74, 0.12); border-radius: 999px; padding: 3px 9px; }
+    .badge { position: absolute; top: -5px; right: -6px; min-width: 16px; height: 16px; border-radius: 8px; background: #ad2452; color: #fff; font-size: 10px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; padding: 0 4px; }
+    .shell { flex: 1 1 0; min-height: 0; display: flex; }
+    .sidebar { width: 220px; flex: none; display: flex; flex-direction: column; padding: 10px 12px 12px; gap: 2px; }
+    .nav-group { display: flex; flex-direction: column; gap: 2px; }
+    .nav-label { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #7c7891; padding: 9px 12px 4px; font-weight: 700; }
+    .nav-item { display: flex; align-items: center; gap: 12px; padding: 5px 12px; border-radius: 999px; color: #5b3080; font-size: 13px; font-weight: 600; }
+    .nav-item.active { background: linear-gradient(120deg, #552c7e, #7a2f9e 38%, #a0248f 68%, #ba2185); color: #ffffff; box-shadow: 0 5px 14px rgba(85, 44, 126, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.55); }
+    .nav-foot { margin-top: auto; padding-top: 8px; border-top: 1px solid rgba(160, 138, 178, 0.26); font-size: 12px; }
+    .main { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; }
+    .scope { display: flex; align-items: center; gap: 6px; height: 32px; white-space: nowrap; padding: 0 12px; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 12px; background: #ffffff; font-size: 12px; font-weight: 600; box-shadow: 0 2px 6px rgba(58, 31, 82, 0.06), inset 0 1px 0 #fff; }
+    .scope-k { color: #585566; } .scope-v { font-weight: 700; color: #4a2668; } .scope-sep { color: #7c7891; margin: 0 2px; }
+    .search { display: flex; align-items: center; gap: 8px; height: 32px; width: 300px; white-space: nowrap; padding: 0 12px; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 12px; background: #ffffff; color: #7c7891; font-size: 12.5px; font-weight: 500; box-shadow: inset 0 1px 2px rgba(58, 31, 82, 0.12); }
+    .kbd { margin-left: auto; font-size: 10.5px; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 6px; padding: 0 5px; color: #585566; background: #faf6fd; }
+    .content { flex: 1 1 0; min-height: 0; padding: 16px 20px 16px 8px; overflow: hidden; display: flex; flex-direction: column; }
+    .crumb { font-size: 11.5px; color: #7c7891; font-weight: 600; margin-bottom: 2px; }
+    .h1 { margin: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.2; color: #1e1b29; }
+    .sub { color: #585566; font-size: 12.5px; margin-top: 3px; }
+    .card { background: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(245, 237, 250, 0.7)); border: 1px solid rgba(160, 138, 178, 0.38); border-radius: 16px; box-shadow: 0 10px 26px rgba(58, 31, 82, 0.1), inset 0 1px 0 #fff; }
+    .card-title { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 13.5px; font-weight: 700; color: #1e1b29; }
+    .eyebrow { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #7c7891; font-weight: 700; }
+    .kpi { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 24px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; color: #1e1b29; }
+    .chip { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 700; white-space: nowrap; border: 1px solid transparent; }
+    .btn { display: inline-flex; align-items: center; gap: 7px; border-radius: 12px; font-size: 12.5px; font-weight: 700; white-space: nowrap; }
+    .select { display: flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 12px; background: #ffffff; font-size: 12.5px; box-shadow: 0 2px 6px rgba(58, 31, 82, 0.06), inset 0 1px 0 #fff; }
+    .sel-label { color: #585566; font-weight: 500; } .sel-value { font-weight: 700; color: #4a2668; flex: 1 1 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lbl { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 11.5px; font-weight: 700; color: #4a2668; letter-spacing: 0.02em; }
+    .input { min-height: 34px; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 12px; padding: 0 10px; display: flex; align-items: center; background: #ffffff; font-size: 12.8px; box-shadow: inset 0 1px 2px rgba(58, 31, 82, 0.12); }
+    .input.multi { min-height: 56px; align-items: flex-start; padding: 8px 10px; line-height: 1.4; }
+    .help { font-size: 11.5px; color: #585566; } .err { font-size: 11.5px; color: #ad2452; display: flex; gap: 5px; align-items: center; font-weight: 600; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; font-variant-numeric: tabular-nums; }
+    .muted { color: #585566; } .faint { color: #7c7891; }
+    .step { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #585566; font-weight: 600; }
+    .step.active { color: #1e1b29; font-weight: 700; } .step.done { color: #1e1b29; }
+    .step-n { width: 22px; height: 22px; border-radius: 11px; border: 1px solid rgba(160, 138, 178, 0.42); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; background: #ffffff; }
+    .step-n.active { background: linear-gradient(120deg, #552c7e, #7a2f9e 38%, #a0248f 68%, #ba2185); border-color: transparent; color: #ffffff; }
+    .step-n.done { background: #137a4a; border-color: #137a4a; }
+    .note { display: flex; gap: 8px; align-items: flex-start; padding: 10px 12px; border-radius: 12px; font-size: 12.5px; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+    .tab { padding: 6px 12px; font-size: 12.5px; font-weight: 700; color: #5b3080; border-radius: 999px; }
+    .tab.active { background: linear-gradient(120deg, #552c7e, #7a2f9e 38%, #a0248f 68%, #ba2185); color: #ffffff; box-shadow: 0 5px 14px rgba(85, 44, 126, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.55); }
+    .tree-row { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 999px; font-size: 13px; font-weight: 500; white-space: nowrap; }
+    .tree-row > span:first-of-type { overflow: hidden; text-overflow: ellipsis; } .tree-row > span:last-child { flex: none; }
+    .tree-row.sel { background: #efe4f6; color: #552c7e; font-weight: 700; }
+    .quad { border: 1px solid rgba(160, 138, 178, 0.38); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: #ffffff; }
+    .entry { border-top: 1px solid rgba(160, 138, 178, 0.26); padding-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+    /* AG Grid (Quartz-style) themed with REEP tokens */
+    .ag { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; min-height: 0; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 12px; background: #ffffff; overflow: hidden; }
+    .ag-toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid rgba(160, 138, 178, 0.26); background: #faf6fd; }
+    .qf { display: inline-flex; align-items: center; gap: 6px; height: 30px; width: 240px; padding: 0 10px; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 10px; background: #fff; color: #7c7891; font-size: 12px; }
+    .ag-body { display: flex; flex: 1 1 auto; min-height: 0; }
+    .ag-scroll { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+    .agt { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12.5px; table-layout: fixed; }
+    .agt th { height: 40px; padding: 0 10px; text-align: left; font-size: 12px; font-weight: 600; color: #4a2668; background: #faf6fd; border-bottom: 1px solid rgba(160, 138, 178, 0.42); border-right: 1px solid rgba(160, 138, 178, 0.26); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .agt th:last-child { border-right: none; }
+    .agt td { padding: 0 10px; border-bottom: 1px solid rgba(160, 138, 178, 0.26); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; font-variant-numeric: tabular-nums; }
+    .agt tr.selected td { background: #f5edfa; }
+    .agt tr.selected td:first-child { box-shadow: inset 3px 0 0 #552c7e; }
+    .agt .pinned { box-shadow: inset -1px 0 0 rgba(160, 138, 178, 0.42); }
+    .agt tr.frow td { height: 32px; background: #fff; }
+    .ffilter { display: inline-flex; align-items: center; gap: 6px; height: 24px; width: 100%; padding: 0 8px; border: 1px solid rgba(160, 138, 178, 0.26); border-radius: 6px; color: #7c7891; font-size: 11.5px; font-weight: 400; background: #fff; }
+    .ag-status { display: flex; align-items: center; gap: 12px; height: 38px; padding: 0 12px; border-top: 1px solid rgba(160, 138, 178, 0.42); background: #faf6fd; font-size: 12px; color: #585566; }
+    .pgsize { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 8px; background: #fff; color: #1e1b29; }
+    .ag-side { width: 36px; flex: none; border-left: 1px solid rgba(160, 138, 178, 0.42); background: #faf6fd; display: flex; flex-direction: column; align-items: center; padding-top: 8px; gap: 8px; }
+    .ag-side-tab { writing-mode: vertical-rl; transform: rotate(180deg); font-size: 11px; font-weight: 600; color: #585566; padding: 10px 4px; display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; }
+    .ag-side-tab.active { color: #552c7e; background: #efe4f6; }
+    .dense .agt td { padding: 4px 10px; font-size: 11.5px; line-height: 1.3; } .dense .agt th { height: 34px; padding: 0 10px; }
+    /* ECharts-style tooltip */
+    .etip { position: absolute; background: rgba(255, 255, 255, 0.96); border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 8px; box-shadow: 0 6px 18px rgba(58, 31, 82, 0.16); padding: 8px 10px; font-size: 11.5px; color: #1e1b29; min-width: 130px; pointer-events: none; }
+</style>
+
+</head>
+<body style="margin:0">
+
+
+<style>
+    .lg-root { width: 1440px; height: 900px; display: flex; background: linear-gradient(180deg, #ece4f5 0%, #f2e7f8 45%, #fbe6f2 100%); overflow: hidden; }
+    .lg-panel { width: 560px; flex: none; display: flex; flex-direction: column; justify-content: space-between; padding: 44px 48px; box-sizing: border-box; }
+    .lg-main { flex: 1 1 0; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .lg-card { width: 440px; background: #fff; border: 1px solid rgba(160, 138, 178, 0.38); border-radius: 16px; box-shadow: 0 10px 26px rgba(58, 31, 82, 0.1), inset 0 1px 0 #fff; padding: 24px 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; }
+    .lg-h1 { margin: 0; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; color: #1e1b29; }
+    .lg-sub { color: #585566; font-size: 12.5px; }
+    .portals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .portal { border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 12px; padding: 10px 10px 9px; background: #fff; display: flex; flex-direction: column; gap: 3px; box-shadow: 0 2px 6px rgba(58, 31, 82, 0.06), inset 0 1px 0 #fff; }
+    .portal.on { border-color: #552c7e; background: #f5edfa; box-shadow: 0 0 0 2px rgba(85, 44, 126, 0.18); }
+    .portal .p-l { font-weight: 700; font-size: 12.5px; color: #1e1b29; display: flex; align-items: center; gap: 6px; }
+    .portal .p-d { font-size: 11px; color: #585566; line-height: 1.3; }
+    .door { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px dashed rgba(160, 138, 178, 0.45); border-radius: 12px; font-size: 12px; font-weight: 600; color: #5b3080; background: #faf6fd; }
+    .google { display: flex; align-items: center; justify-content: center; gap: 8px; height: 38px; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 12px; background: #fff; font-size: 12.5px; font-weight: 700; color: #1e1b29; box-shadow: 0 2px 6px rgba(58, 31, 82, 0.06), inset 0 1px 0 #fff; }
+    .google.off { color: #7c7891; background: #faf6fd; box-shadow: none; }
+    .or { display: flex; align-items: center; gap: 10px; color: #7c7891; font-size: 11.5px; } .or:before, .or:after { content: ""; flex: 1; height: 1px; background: rgba(160, 138, 178, 0.26); }
+    .primary { display: flex; align-items: center; justify-content: center; gap: 8px; height: 38px; border-radius: 12px; background: linear-gradient(120deg, #552c7e, #7a2f9e 38%, #a0248f 68%, #ba2185); color: #fff; font-size: 13px; font-weight: 700; box-shadow: 0 8px 18px rgba(85, 44, 126, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.5); }
+    .primary.off { opacity: 0.55; box-shadow: none; }
+    .doors { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; }
+    .foot { font-size: 11.5px; color: #585566; text-align: center; }
+    .eyebrow2 { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: #7c7891; font-weight: 700; }
+    .points { display: flex; flex-direction: column; gap: 10px; } .points > div { display: flex; gap: 10px; align-items: center; font-size: 13px; }
+    .pt-ic { width: 30px; height: 30px; border-radius: 9px; background: #efe4f6; color: #552c7e; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+    .code { display: flex; gap: 8px; } .code span { width: 44px; height: 46px; border: 1px solid rgba(160, 138, 178, 0.42); border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; background: #fff; }
+    .code span.f { border-color: #552c7e; box-shadow: 0 0 0 2px rgba(85, 44, 126, 0.18); }
+    .state-card { background: #fff; border: 1px solid rgba(160, 138, 178, 0.38); border-radius: 16px; box-shadow: 0 10px 26px rgba(58, 31, 82, 0.1), inset 0 1px 0 #fff; padding: 18px 20px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+    .state-tag { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: #7c7891; letter-spacing: 0.08em; text-transform: uppercase; }
+    .m-root { width: 390px; height: 844px; background: linear-gradient(180deg, #ece4f5 0%, #f2e7f8 45%, #fbe6f2 100%); overflow: hidden; display: flex; flex-direction: column; }
+</style><div class="lg-root"><div class="lg-panel"><div style="display: flex; align-items: center; gap: 12px;"><span class="brand" style="font-size: 19px;"><span class="brand-mark" style="width: 36px; height: 36px; font-size: 18px;">R</span><span>REEP</span></span><span style="border-left: 1px solid rgba(160, 138, 178, 0.42); padding-left: 12px; font-size: 12px; color: #585566;">BGSCET Career Readiness Platform</span></div><div style="display: flex; flex-direction: column; gap: 16px; max-width: 430px;"><div class="h1" style="font-size: 34px; line-height: 1.15;">Career readiness, opportunities and progress — all in one place.</div><div style="font-size: 14px; color: #585566; line-height: 1.55;">One workspace for skilling, mentorship and placements — built for students, faculty and alumni alike.</div><div class="points"><div><span class="pt-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4"/><path d="M12 3l2.1 1.6 2.6-.3 1 2.4 2.3 1.3-.4 2.6 1.4 2.2-1.4 2.2.4 2.6-2.3 1.3-1 2.4-2.6-.3L12 21l-2.1-1.6-2.6.3-1-2.4-2.3-1.3.4-2.6L3 12l1.4-2.2-.4-2.6 2.3-1.3 1-2.4 2.6.3z"/></svg></span><span>Build and verify skills with mentor-backed evidence</span></div><div><span class="pt-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/></svg></span><span>Discover curated jobs and internships</span></div><div><span class="pt-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span>Stay on track with mentor guidance</span></div></div><div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px;"><span class="chip" style="background: #efe4f6; color: #552c7e;">Roster-only access</span><span class="chip" style="background: #f5edfa; color: #4a2668;">Google or REEP password</span><span class="chip" style="background: rgba(19, 122, 74, 0.12); color: #137a4a;"><span style="width: 7px; height: 7px; border-radius: 4px; background: #137a4a; display: inline-block;"></span>Data stays in ap-south-1</span></div></div><div class="faint" style="font-size: 11.5px;">© REEP · BGSCET Placement &amp; Skilling Cell · Privacy · Terms</div></div><div class="lg-main"><div class="lg-card"><div style="display: flex; align-items: center; justify-content: space-between;"><span class="brand" style="font-size: 13px;"><span class="brand-mark" style="width: 24px; height: 24px; font-size: 12px;">R</span><span>REEP</span></span><span class="faint" style="font-size: 11px;">One device at a time · 12-hour sessions</span></div><div><h1 class="lg-h1">Welcome back</h1><div class="lg-sub">Sign in to continue to your REEP workspace.</div></div><div><div class="eyebrow2" style="margin-bottom: 6px;">Choose your portal</div><div class="portals"><div class="portal on"><span class="p-l"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#552c7e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 9 12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11.5V16c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3v-4.5M21.5 9v5"/></svg>Student</span><span class="p-d">Track skills, jobs &amp; growth</span></div><div class="portal"><span class="p-l"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5b3080" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/><path d="M15.2 19a4.4 4.4 0 0 1 5.3-4.2"/></svg>Faculty</span><span class="p-d">Guide students, verify skills</span></div><div class="portal"><span class="p-l"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5b3080" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 9 12 4l10 5-10 5z"/><path d="M6 11.5V17c2 2 10 2 12 0v-5.5M22 9v6"/></svg>Alumni</span><span class="p-d">Explore roles, stay connected</span></div></div></div><div class="door" style=""><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/></svg>Main Admin — open the REEP Admin Console<span style="margin-left: auto;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h15M13 6l6 6-6 6"/></svg></span></div><div class="google"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#552c7e" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>Continue with Google</div><div class="faint" style="font-size: 11.5px; text-align: center; margin-top: -6px;">Continues to your Student workspace</div><div class="or">or continue with your REEP account</div><div style="display: flex; flex-direction: column; gap: 6px; flex: 1 1 0;"><label class="lbl">Institutional email or USN</label><div class="input" style="border-color: rgba(160, 138, 178, 0.42); color: #7c7891;">asha.rao@bgscet.ac.in or 1BG24MBA001</div><div class="help">Use your BGSCET student email or University Seat Number.</div></div><div style="display: flex; flex-direction: column; gap: 6px;"><label class="lbl">Password</label><div class="input" style="color: #7c7891; justify-content: space-between;"><span>Enter your password</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#585566" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div></div><div style="display: flex; align-items: center; justify-content: space-between; font-size: 12px;"><span style="display: inline-flex; gap: 6px; align-items: center;"><span style="width: 16px; height: 16px; border-radius: 4px; background: #552c7e; display: inline-flex; align-items: center; justify-content: center;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 4.5 4.5L19 7"/></svg></span> Remember me</span><a href="#" style="font-weight: 600;">Forgot password?</a></div><div class="primary">Sign in</div><div class="doors"><a href="#">New student? Register →</a><a href="#">Already approved? Sign in →</a></div><div class="foot">Need help signing in? <a href="#" style="font-weight: 600;">Reset your password</a></div></div></div></div>
+
+</body>
+</html>

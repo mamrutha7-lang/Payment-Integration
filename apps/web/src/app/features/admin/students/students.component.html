@@ -1,0 +1,699 @@
+<div class="panel" data-p="students">
+  <div class="dt-header">
+    <div>
+      <div class="crumb"><span>People</span><span class="sep">/</span><span>Students &amp; batches</span></div>
+      <h1 class="dt-title">Students &amp; batches</h1>
+      <div class="dt-sub">{{ summaryLine() }}</div>
+    </div>
+    <div class="dt-toolbar">
+      <button
+        type="button"
+        class="btn secondary"
+        [disabled]="!hasOneBatchInView() || busy()"
+        [title]="batchActionsHint()"
+        (click)="openBatchActions()"
+      >
+        <span class="icon" aria-hidden="true">edit_note</span> Batch actions
+      </button>
+      <button
+        type="button"
+        class="btn secondary"
+        [disabled]="!hasOneBatchInView()"
+        [title]="batchActionsHint()"
+        (click)="openGraduateDialog()"
+      >
+        <span class="icon" aria-hidden="true">school</span> Graduate batch
+      </button>
+      <button
+        type="button"
+        class="btn primary"
+        [disabled]="!hasOneBatchInView()"
+        [title]="batchActionsHint()"
+        (click)="openPromoteDialog()"
+      >
+        <span class="icon" aria-hidden="true">arrow_forward</span> {{ promoteButtonLabel() }}
+      </button>
+    </div>
+  </div>
+
+  @if (error()) {
+    <div class="notice" role="alert">
+      <span class="icon" aria-hidden="true">error</span>{{ error() }}
+    </div>
+  }
+  @if (flash()) {
+    <div class="notice good" role="status">
+      <span class="icon" aria-hidden="true">check_circle</span>{{ flash() }}
+    </div>
+  }
+
+  @if (hierarchyUnavailable()) {
+    <div class="notice warn" role="status">
+      <span class="icon" aria-hidden="true">warning</span>
+      The college structure could not be read, so the Department, Course, Specialization and Batch
+      pickers are empty.
+    </div>
+  }
+
+  <!-- The board's filter row. Batch is the one the API applies (`cohort_id` /
+       `unseated`); the other four narrow what is already loaded, each reading a
+       field the roster row already carries. -->
+  <div class="filters">
+    <div class="select">
+      <span class="lbl">Department</span>
+      <span class="val">{{ departmentFilterLabel() }}</span>
+      <select aria-label="Department" (change)="setDepartmentFilter(selectValue($event))">
+        <option value="">All departments</option>
+        @for (department of departments(); track department.id) {
+          <option [value]="department.id" [selected]="department.id === departmentFilter()">{{ department.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">Course</span>
+      <span class="val">{{ courseFilterLabel() }}</span>
+      <select aria-label="Course" (change)="setCourseFilter(selectValue($event))">
+        <option value="">All courses</option>
+        @for (course of courseOptions(); track course.id) {
+          <option [value]="course.id" [selected]="course.id === courseFilter()">{{ course.name }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">Specialization</span>
+      <span class="val">{{ specializationFilterLabel() }}</span>
+      <select aria-label="Specialization" (change)="setSpecializationFilter(selectValue($event))">
+        <option value="">All specializations</option>
+        @for (specialization of specializationOptions(); track specialization.id) {
+          <option [value]="specialization.id" [selected]="specialization.id === specializationFilter()">{{ specialization.name }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Batch sits LAST because the three selects above narrow it. It lists
+         each YEAR once, the way /register does (2026-10-06): which course and
+         specialization is what the selects above say, and a year resolves to
+         one batch once they narrow it that far — see `resolveYear`. -->
+    <div class="select batch-select">
+      <span class="lbl">Batch</span>
+      <span class="val">{{ batchFilterLabel() }}</span>
+      <select aria-label="Batch" (change)="setBatchYear(selectValue($event))">
+        <option value="" [selected]="batchFilter() === '' && yearFilter() === ''">Every student</option>
+        <option value="unseated" [selected]="batchFilter() === 'unseated'">No batch yet</option>
+        @for (year of batchYearOptions(); track year.label) {
+          <option [value]="year.label" [selected]="year.label === yearFilter()">
+            {{ year.label }}{{ year.isRunning ? '' : ' (ended)' }}
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="select">
+      <span class="lbl">Status</span>
+      <span class="val">{{ statusFilterLabel() }}</span>
+      <select aria-label="Status" (change)="setStatusFilter(selectValue($event))">
+        <option value="" [selected]="statusFilter() === ''">All</option>
+        <option value="active" [selected]="statusFilter() === 'active'">Active · has signed in</option>
+        <option value="invited" [selected]="statusFilter() === 'invited'">Invited · not signed in yet</option>
+        <option value="removed" [selected]="statusFilter() === 'removed'">Removed · off the roster, record kept</option>
+      </select>
+    </div>
+
+    <!-- No "Add student", deliberately: a student account is minted by
+         approving a registration and nothing else. -->
+    <a class="btn ghost filters-end" routerLink="/admin/registrations">
+      <span class="icon" aria-hidden="true">how_to_reg</span> Students arrive from Registrations
+    </a>
+  </div>
+
+  <div class="roster">
+    <!-- ---------------------------------------------------------- grid -->
+    <div class="dt-frame roster-grid">
+      <div class="dt-gridbar">
+        <input
+          class="dt-quickfilter"
+          type="search"
+          placeholder="Quick filter…"
+          aria-label="Search students by name, email or USN"
+          (input)="onSearchInput($event)"
+        />
+
+        <button
+          type="button"
+          class="btn secondary sm"
+          [disabled]="!hasSelection() || busy()"
+          (click)="openSelectionDialog('mentor')"
+        >
+          <span class="icon" aria-hidden="true">group</span>
+          Assign faculty to {{ selectedCount() }} selected
+        </button>
+        <button
+          type="button"
+          class="btn secondary sm"
+          [disabled]="!hasSelection() || busy()"
+          (click)="openSelectionDialog('move')"
+        >
+          <span class="icon" aria-hidden="true">sync</span>
+          Move {{ selectedCount() }} selected
+        </button>
+
+        <span class="gridbar-end">
+          <button
+            type="button"
+            class="btn secondary sm"
+            [attr.aria-expanded]="columnsPanelOpen()"
+            aria-label="Choose which columns are shown"
+            (click)="toggleColumnsPanel()"
+          >
+            <span class="icon" aria-hidden="true">table_rows</span>
+          </button>
+          <button
+            type="button"
+            class="btn secondary sm"
+            [attr.aria-pressed]="isCompact()"
+            aria-label="Toggle compact rows"
+            (click)="toggleDensity()"
+          >
+            <span class="icon" aria-hidden="true">tune</span>
+          </button>
+        </span>
+
+        @if (columnsPanelOpen()) {
+          <div class="columns-panel">
+            <div class="columns-panel__title">Columns</div>
+            @for (column of toggleableColumns; track column.id) {
+              <label class="columns-panel__row">
+                <input type="checkbox" [checked]="isColumnVisible(column.id)" (change)="toggleColumn(column.id)" />
+                <span>{{ column.label }}</span>
+              </label>
+            }
+          </div>
+        }
+      </div>
+
+      @if (isLoading()) {
+        <p class="roster-state" role="status">Loading…</p>
+      } @else {
+        <!-- Mounted once and never torn down: an @if around the grid destroys
+             the GridApi the toolbar and the status bar hold, so the empty case
+             is main's own words in the no-rows overlay instead.
+             Hidden columns stay in the quick filter: the server's `q` reads
+             the name, the address and the USN whichever columns are shown,
+             and a filter that read only the shown ones emptied the grid
+             under a row the server had just matched. -->
+        <ag-grid-angular
+          class="roster-ag"
+          [theme]="gridTheme"
+          [context]="gridContext()"
+          [rowData]="visibleRows()"
+          [columnDefs]="columns"
+          [defaultColDef]="defaultColumn"
+          [rowSelection]="rowSelection"
+          [selectionColumnDef]="selectionColumn"
+          [overlayNoRowsTemplate]="emptyOverlay()"
+          [getRowId]="rowId"
+          [quickFilterText]="quickFilter()"
+          [includeHiddenColumnsInQuickFilter]="true"
+          [rowHeight]="rowHeight()"
+          [pagination]="true"
+          [paginationPageSize]="pageSize()"
+          [suppressPaginationPanel]="true"
+          [suppressCellFocus]="true"
+          (gridReady)="onGridReady($event)"
+          (selectionChanged)="onSelectionChanged()"
+          (paginationChanged)="onPaginationChanged()"
+          (cellClicked)="onCellClicked($event)"
+        />
+      }
+
+      <div class="dt-statusbar">
+        <span>Rows: <b>{{ filteredRowCount() }}</b></span>
+        <span>Selected: <b>{{ selectedCount() }}</b></span>
+        <span class="pager">
+          <label class="pagesize">
+            <span>Page size</span>
+            <select aria-label="Rows per page" (change)="setPageSize(numberValue($event))">
+              @for (size of pageSizes; track size) {
+                <option [value]="size" [selected]="size === pageSize()">{{ size }}</option>
+              }
+            </select>
+          </label>
+          <span>{{ rowRangeLabel() }}</span>
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="isFirstPage()"
+            aria-label="Previous page"
+            (click)="goToPreviousPage()"
+          >
+            <span class="icon" aria-hidden="true">chevron_left</span>
+          </button>
+          <span>{{ pagerLabel() }}</span>
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="isLastPage()"
+            aria-label="Next page"
+            (click)="goToNextPage()"
+          >
+            <span class="icon" aria-hidden="true">chevron_right</span>
+          </button>
+        </span>
+      </div>
+    </div>
+
+    <!-- ------------------------------------------------- the right rail -->
+    <aside class="roster-rail">
+      <section class="card rail-card">
+        <div class="rail-card__head">
+          <h2 class="card-heading">
+            <!-- `yearLabel`, the same string the picker offered: the Course,
+                 Specialization and Department facts are spelled out directly
+                 below, so a heading carrying the spine said them twice. -->
+            @if (selectedBatch(); as batch) { Batch · {{ batch.yearLabel }} } @else { Roster }
+          </h2>
+        </div>
+
+        @if (selectedBatch(); as batch) {
+          <dl class="rail-facts">
+            <div><dt>Course</dt><dd>{{ batch.courseName ?? 'Not named on this batch' }} · {{ batch.degreeLevel }}</dd></div>
+            <div><dt>Specialization</dt><dd>{{ batch.specializationName ?? 'Not named on this batch' }}</dd></div>
+            <div><dt>Department</dt><dd>{{ batch.departmentName }}</dd></div>
+            <div><dt>Current semester</dt><dd>{{ semesterLabel() }}</dd></div>
+            <div><dt>Students</dt><dd>{{ batchRosterCount() }}</dd></div>
+            <div><dt>No faculty member</dt><dd>{{ batchUnseatedCount() }}</dd></div>
+            @if (rosterIsNarrowed()) {
+              <div><dt>In view</dt><dd>{{ studentCount() }} after the filters</dd></div>
+            }
+            <div><dt>Term</dt><dd>{{ batch.isRunning ? 'Running · ' + batch.batchLabel : 'Ended · ' + batch.batchLabel }}</dd></div>
+          </dl>
+          @if (rosterIsNarrowed()) {
+            <p class="rail-hint" role="status">{{ batchActionsHint() }}</p>
+          }
+        } @else {
+          <dl class="rail-facts">
+            <div><dt>Students in view</dt><dd>{{ studentCount() }}</dd></div>
+            <div><dt>With a faculty member</dt><dd>{{ seatedCount() }}</dd></div>
+            <div><dt>No faculty member</dt><dd>{{ unseatedCount() }}</dd></div>
+            <div><dt>Batches</dt><dd>{{ batches().length }}</dd></div>
+          </dl>
+          <p class="rail-hint">Pick one batch above to act on it, promote it or graduate it.</p>
+        }
+      </section>
+
+      <!-- LIVE: GET /api/admin/cohorts/{id}/promotion-history. Four states,
+           and they are four different facts — no batch chosen, still reading,
+           read and empty, refused. The endpoint deliberately refuses a holder
+           who reaches only PART of a batch rather than returning the part they
+           may see, so a refusal must never be drawn as "nothing on record". -->
+      <section class="card rail-card">
+        <div class="rail-card__head">
+          <h2 class="card-heading">Promotion history</h2>
+          @if (promotionHistoryState() === 'ready' && promotionHistory().length > 0) {
+            <span class="chip neutral">{{ promotionHistory().length | plural: 'move' }}</span>
+          }
+        </div>
+
+        @switch (promotionHistoryState()) {
+          @case ('no-batch') {
+            <div class="notice accent">
+              <span class="icon" aria-hidden="true">history</span>
+              <div>
+                Pick one batch above.
+              </div>
+            </div>
+          }
+          @case ('loading') {
+            <p class="rail-hint" role="status">
+              <span class="icon" aria-hidden="true">hourglass_top</span>
+              Reading this batch’s history…
+            </p>
+          }
+          @case ('refused') {
+            <div class="notice" role="alert">
+              <span class="icon" aria-hidden="true">block</span>
+              <div>
+                {{ promotionHistoryError() }}
+              </div>
+            </div>
+          }
+          @default {
+            @if (promotionHistory().length === 0) {
+              <div class="notice accent">
+                <span class="icon" aria-hidden="true">history</span>
+                <div>
+                  Nothing has been promoted, held back or graduated in this batch yet.
+                </div>
+              </div>
+            } @else {
+              <ol class="history-list">
+                @for (row of promotionHistory(); track row.id) {
+                  <li class="history-row">
+                    <div class="history-row__head">
+                      <span class="chip {{ promotionKind(row.kind).tone }}">
+                        {{ promotionKind(row.kind).label }}
+                      </span>
+                      <strong>{{ row.student_name }}</strong>
+                      @if (row.usn) {
+                        <span class="history-row__usn">{{ row.usn }}</span>
+                      }
+                    </div>
+                    <div class="history-row__move">
+                      {{ promotionMove(row) }} · effective {{ when(row.effective_on) }}
+                    </div>
+                    <div class="history-row__by">
+                      Recorded by {{ promotionActor(row) }} on {{ when(row.created_at) }}
+                    </div>
+                    @if (row.reason) {
+                      <p class="history-row__reason">“{{ row.reason }}”</p>
+                    } @else {
+                      <p class="history-row__reason muted">No reason was recorded.</p>
+                    }
+                  </li>
+                }
+              </ol>
+            }
+          }
+        }
+      </section>
+
+      <div class="notice good">
+        <span class="icon" aria-hidden="true">check_circle</span>
+        Promotion keeps every record: results, ledger, interviews and badges stay keyed to the student and
+        their semester. Logins are unchanged.
+      </div>
+    </aside>
+  </div>
+
+  <!-- =================================================== the dialogs === -->
+
+  <!-- `completed` fires once the write has LANDED, and it is bound: without it
+       the grid and the history card behind this dialog stay at the read they
+       were taken from, which is a screen quietly showing the old semester. It
+       does not close the dialog — the result panel is carrying the server's own
+       counts and the reader dismisses it. -->
+  @if (openDialog() === 'promote' && batchSummary(); as summary) {
+    <app-promote-batch-dialog
+      [batch]="summary"
+      (completed)="onBatchWriteCompleted()"
+      (dismissed)="closeDialog()"
+    />
+  }
+
+  @if (openDialog() === 'graduate' && batchSummary(); as summary) {
+    <app-graduate-batch-dialog
+      [batch]="summary"
+      (completed)="onBatchWriteCompleted()"
+      (dismissed)="closeDialog()"
+    />
+  }
+
+  @if (openDialog() === 'edit') {
+    <div class="dialog-backdrop" (click)="closeDialog()">
+      <div class="dialog narrow" role="dialog" aria-modal="true" aria-labelledby="edit-student-title" (click)="$event.stopPropagation()">
+        <header class="dialog-head">
+          <div>
+            <h2 class="dialog-title" id="edit-student-title">Edit {{ draft().name }}</h2>
+            <p class="dialog-sub">Nothing here sets a password.</p>
+          </div>
+          <button type="button" class="btn ghost sm" aria-label="Close this dialog" (click)="closeDialog()">
+            <span class="icon" aria-hidden="true">close</span>
+          </button>
+        </header>
+
+        <div class="dialog-body">
+          <div class="edit-grid">
+            <label class="field">
+              <span>Name</span>
+              <input class="ctrl" type="text" [value]="draft().name" (input)="setDraft('name', inputValue($event))" />
+            </label>
+            <label class="field">
+              <span>College email</span>
+              <input class="ctrl" type="email" [value]="draft().email" (input)="setDraft('email', inputValue($event))" />
+            </label>
+            <label class="field">
+              <span>USN</span>
+              <input class="ctrl" type="text" [value]="draft().usn" (input)="setDraft('usn', inputValue($event))" />
+            </label>
+            <label class="field">
+              <span>Batch</span>
+              <select class="ctrl" (change)="setDraft('cohortId', selectValue($event))">
+                <option value="">No batch</option>
+                @for (batch of batches(); track batch.id) {
+                  <option [value]="batch.id" [selected]="batch.id === draft().cohortId">{{ batch.displayLabel }}</option>
+                }
+              </select>
+            </label>
+            <!-- DUAL SPECIALIZATION (2026-09-23): the batch is the first of the
+                 two; this is the other. Offered from the batch's course, minus
+                 the batch's own - `secondSpecializationOptions`. -->
+            <label class="field">
+              <span>Second specialization</span>
+              <select
+                class="ctrl"
+                [disabled]="!secondSpecializationChoices().length"
+                (change)="setDraft('secondSpecializationId', selectValue($event))"
+              >
+                <option value="">{{ secondSpecializationChoices().length ? 'None' : 'None available' }}</option>
+                @for (spec of secondSpecializationChoices(); track spec.id) {
+                  <option [value]="spec.id" [selected]="spec.id === draft().secondSpecializationId">{{ spec.name }}</option>
+                }
+              </select>
+              @if (draftBatchSpecialization(); as first) {
+                <span class="help">Dual with {{ first }}, from the batch.</span>
+              }
+            </label>
+            <label class="field">
+              <span>Department</span>
+              <select class="ctrl" (change)="setDraft('departmentId', selectValue($event))">
+                <option value="">Not filed</option>
+                @for (department of departments(); track department.id) {
+                  <option [value]="department.id" [selected]="department.id === draft().departmentId">{{ department.label }}</option>
+                }
+              </select>
+              <span class="help">The batch decides the department whenever it names one.</span>
+            </label>
+            <label class="field">
+              <span>Faculty member</span>
+              <select class="ctrl" (change)="setDraft('mentorUserId', selectValue($event))">
+                <option value="">Not assigned</option>
+                @for (member of faculty(); track member.userId) {
+                  <option [value]="member.userId" [selected]="member.userId === draft().mentorUserId">{{ member.name }}</option>
+                }
+              </select>
+            </label>
+            <label class="field">
+              <span>Stage</span>
+              <select class="ctrl" (change)="setDraft('stage', selectValue($event))">
+                @for (stage of stages; track stage.key) {
+                  <option [value]="stage.key" [selected]="stage.key === draft().stage">{{ stage.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="field">
+              <span>Semester</span>
+              <select class="ctrl" (change)="setDraft('semester', numberValue($event))">
+                @for (semester of semesters; track semester) {
+                  <option [value]="semester" [selected]="semester === draft().semester">{{ semester }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <footer class="dialog-foot">
+          <!-- Remove-or-delete on the left, save on the right (2026-09-16).
+               A removed student's only act here is Restore: editing a row
+               that is off the roster is a question nobody has asked. -->
+          @if (editingRow()?.isRemoved) {
+            <button type="button" class="btn secondary" [disabled]="busy()" (click)="restoreStudent()">
+              <span class="icon" aria-hidden="true">undo</span> Restore to the roster
+            </button>
+          } @else {
+            <button type="button" class="btn danger" [disabled]="busy()" (click)="openDeleteDialog()">
+              <span class="icon" aria-hidden="true">person_remove</span> Remove or delete…
+            </button>
+          }
+          <span class="dialog-foot-gap"></span>
+          <button type="button" class="btn secondary" (click)="closeDialog()">Cancel</button>
+          <button type="button" class="btn primary" [disabled]="busy() || !!editingRow()?.isRemoved" (click)="saveEdit()">
+            <span class="icon" aria-hidden="true">save</span> Save
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  @if (deletingStudent(); as target) {
+    <app-admin-delete-dialog
+      [target]="target"
+      (dismissed)="cancelDeleteDialog()"
+      (done)="onDeleteDone($event)"
+    />
+  }
+
+  @if (openDialog() === 'selection') {
+    <div class="dialog-backdrop" (click)="closeDialog()">
+      <div class="dialog narrow" role="dialog" aria-modal="true" aria-labelledby="selection-title" (click)="$event.stopPropagation()">
+        <header class="dialog-head">
+          <div>
+            <h2 class="dialog-title" id="selection-title">
+              @if (selectionAction() === 'mentor') { Assign a faculty member } @else { Move to another batch }
+            </h2>
+            <p class="dialog-sub">{{ selectionSummary() }} ticked in the grid.</p>
+          </div>
+          <button type="button" class="btn ghost sm" aria-label="Close this dialog" (click)="closeDialog()">
+            <span class="icon" aria-hidden="true">close</span>
+          </button>
+        </header>
+
+        <div class="dialog-body">
+          @if (selectionAction() === 'mentor') {
+            <label class="field">
+              <span>Faculty member</span>
+              <select class="ctrl" (change)="assignToFacultyId.set(selectValue($event))">
+                <option value="">Nobody · release them</option>
+                @for (member of faculty(); track member.userId) {
+                  <option [value]="member.userId" [selected]="member.userId === assignToFacultyId()">
+                    {{ member.name }} — {{ member.menteeCount }} of {{ member.capacity }}
+                  </option>
+                }
+              </select>
+              @if (facultyUnavailable()) {
+                <span class="err" role="status">
+                  <span class="icon" aria-hidden="true">warning</span>
+                  The faculty list could not be read, so only “release them” can be chosen here.
+                </span>
+              } @else {
+                <span class="help">A faculty account becomes a mentor on its first assignment.</span>
+              }
+            </label>
+          } @else {
+            <label class="field">
+              <span>Destination batch</span>
+              <select class="ctrl" (change)="moveToBatchId.set(selectValue($event))">
+                <option value="">Choose a batch</option>
+                @for (batch of otherBatches(); track batch.id) {
+                  <option [value]="batch.id" [selected]="batch.id === moveToBatchId()">{{ batch.displayLabel }}</option>
+                }
+              </select>
+              <span class="help">The destination batch's department travels with the move.</span>
+            </label>
+          }
+
+        </div>
+
+        <footer class="dialog-foot">
+          <button type="button" class="btn secondary" (click)="closeDialog()">Cancel</button>
+          <button type="button" class="btn primary" [disabled]="busy() || !canApplyToSelection()" (click)="applyToSelection()">
+            <span class="icon" aria-hidden="true">check</span> Apply to {{ selectionSummary() }}
+          </button>
+        </footer>
+      </div>
+    </div>
+  }
+
+  @if (openDialog() === 'batch' && selectedBatch(); as batch) {
+    <div class="dialog-backdrop" (click)="closeDialog()">
+      <div class="dialog narrow" role="dialog" aria-modal="true" aria-labelledby="batch-actions-title" (click)="$event.stopPropagation()">
+        <header class="dialog-head">
+          <div>
+            <h2 class="dialog-title" id="batch-actions-title">Batch actions · {{ batch.displayLabel }}</h2>
+            <p class="dialog-sub">Every action here touches all {{ batchRosterCount() | plural: 'student' }} in this batch — the filters above do not narrow it.</p>
+          </div>
+          <button type="button" class="btn ghost sm" aria-label="Close this dialog" (click)="closeDialog()">
+            <span class="icon" aria-hidden="true">close</span>
+          </button>
+        </header>
+
+        <div class="dialog-body">
+          <div class="batch-action">
+            <label class="field">
+              <span>Move every student to</span>
+              <select class="ctrl" (change)="moveToBatchId.set(selectValue($event))">
+                <option value="">Choose a batch</option>
+                @for (destination of otherBatches(); track destination.id) {
+                  <option [value]="destination.id" [selected]="destination.id === moveToBatchId()">{{ destination.displayLabel }}</option>
+                }
+              </select>
+            </label>
+            <button type="button" class="btn secondary" [disabled]="busy() || moveToBatchId() === '' || batchRosterCount() === 0" (click)="applyBatchAction('move')">Move</button>
+          </div>
+
+          <div class="batch-action">
+            <label class="field">
+              <span>Assign every student to</span>
+              <select class="ctrl" (change)="assignToFacultyId.set(selectValue($event))">
+                <option value="">Nobody · release them</option>
+                @for (member of faculty(); track member.userId) {
+                  <option [value]="member.userId" [selected]="member.userId === assignToFacultyId()">{{ member.name }}</option>
+                }
+              </select>
+              @if (facultyUnavailable()) {
+                <span class="err" role="status">
+                  <span class="icon" aria-hidden="true">warning</span>
+                  The faculty list could not be read.
+                </span>
+              }
+            </label>
+            <button type="button" class="btn secondary" [disabled]="busy() || batchRosterCount() === 0" (click)="applyBatchAction('mentor')">Assign</button>
+          </div>
+
+          <div class="batch-action">
+            <label class="field">
+              <span>Set stage</span>
+              <select class="ctrl" (change)="setStageTo.set(selectValue($event))">
+                @for (stage of stages; track stage.key) {
+                  <option [value]="stage.key" [selected]="stage.key === setStageTo()">{{ stage.label }}</option>
+                }
+              </select>
+            </label>
+            <button type="button" class="btn secondary" [disabled]="busy() || batchRosterCount() === 0" (click)="applyBatchAction('stage')">Set</button>
+          </div>
+
+          <div class="batch-action">
+            <label class="field">
+              <span>Set semester</span>
+              <select class="ctrl" (change)="setSemesterTo.set(numberValue($event))">
+                @for (semester of semesters; track semester) {
+                  <option [value]="semester" [selected]="semester === setSemesterTo()">{{ semester }}</option>
+                }
+              </select>
+            </label>
+            <button type="button" class="btn secondary" [disabled]="busy() || batchRosterCount() === 0" (click)="applyBatchAction('semester')">Set</button>
+          </div>
+
+          <div class="batch-danger">
+            @if (canRemoveBatch()) {
+              @if (confirmBatchRemoval()) {
+                <p class="batch-danger__warn" role="alert">This removes the batch itself. It is empty, so nothing else goes with it.</p>
+                <div class="batch-danger__row">
+                  <button type="button" class="btn danger" [disabled]="busy()" (click)="removeEmptyBatch()">Yes, remove the batch</button>
+                  <button type="button" class="btn secondary" (click)="confirmBatchRemoval.set(false)">Keep it</button>
+                </div>
+              } @else {
+                <button type="button" class="btn danger" [disabled]="busy()" (click)="confirmBatchRemoval.set(true)">
+                  <span class="icon" aria-hidden="true">delete</span> Remove this empty batch…
+                </button>
+              }
+            } @else {
+              <!-- No bulk delete, deliberately: it erased marks, attendance,
+                   uploads, interviews and mentor notes from a control sitting
+                   beside "set semester". -->
+              <p class="batch-danger__hint">
+                Move the {{ batchRosterCount() | plural: 'student' }} in this batch to another one to empty it. There is no
+                delete for a student here — emptying a deployment of people is <code>app.purge_people</code>.
+              </p>
+            }
+          </div>
+        </div>
+
+        <footer class="dialog-foot">
+          <button type="button" class="btn secondary" (click)="closeDialog()">Done</button>
+        </footer>
+      </div>
+    </div>
+  }
+</div>

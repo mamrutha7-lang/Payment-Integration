@@ -1,0 +1,62 @@
+<kit-page-intro
+  title="Mock interview"
+  subtitle="A realtime AI interviewer calibrated to a Tier-1 multinational's campus round. One question at a time, a one-line critique of each answer, and a scored practice report at the end — out loud, like the real thing."
+>
+  <button
+    action
+    type="button"
+    class="btn secondary sm"
+    [disabled]="!canClear()"
+    (click)="clearConversation()"
+  >
+    Clear conversation
+  </button>
+</kit-page-intro>
+
+<!--
+  THE SENTENCE ABOUT CLEAR IS NOT OPTIONAL WORDING. The interview record is
+  keyed on the interview, not the conversation, and deliberately SURVIVES Clear
+  conversation — being durable is what makes it a record. Promising a delete
+  control that does not delete it would be a broken promise to the student.
+-->
+<p class="assist-note reep-body2">
+  The interviewer hears your voice and nothing else — it cannot see your marks, attendance or USN.
+  For your own figures, open <a class="assist-note__link" routerLink="/student/records">your records</a>.
+  Each interview is kept as a record with its transcript and practice report — see
+  <a class="assist-note__link" routerLink="/student/interviews">your past interviews</a>. Clearing
+  the conversation below does not delete those.
+</p>
+
+@if (historyError()) {
+  <p class="err reep-body2" role="alert">{{ historyError() }}</p>
+}
+
+<app-interview-room variant="page" />
+
+<section class="convo" aria-label="Saved conversation">
+  <button
+    type="button"
+    class="convo__toggle link-btn"
+    [attr.aria-expanded]="historyOpen()"
+    (click)="toggleHistory()"
+  >
+    {{ historyOpen() ? 'Hide' : 'Show' }} saved conversation ({{ history().length }})
+  </button>
+
+  @if (historyOpen()) {
+    @if (history().length === 0) {
+      <p class="convo__empty reep-body2">
+        Nothing saved yet. Finish an interview and its questions and answers appear here.
+      </p>
+    } @else {
+      <div class="convo__log" role="log">
+        @for (turn of history(); track $index) {
+          <p class="cturn" [class.cturn--user]="turn.role === 'user'">
+            <span class="cturn__who">{{ turn.role === 'user' ? 'You' : 'Interviewer' }}</span>
+            <span class="cturn__text">{{ turnText(turn) }}</span>
+          </p>
+        }
+      </div>
+    }
+  }
+</section>

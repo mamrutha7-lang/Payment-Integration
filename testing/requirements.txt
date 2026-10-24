@@ -1,0 +1,10 @@
+# Tooling for testing/ (API, Selenium). Separate from apps/api-py on purpose:
+# none of it belongs in the API image or its dev venv. Pinned to the set the
+# committed results in testing/results/ were produced with.
+pytest==9.1.1
+pytest-html==4.2.0
+requests==2.34.2
+jsonschema==4.26.0
+openapi-spec-validator==0.9.0
+schemathesis==4.28.0
+selenium==4.49.0

@@ -1,0 +1,174 @@
+{
+  "color": [
+    "#9e6cd5",
+    "#c47c00",
+    "#009592",
+    "#89275b"
+  ],
+  "backgroundColor": "transparent",
+  "textStyle": {
+    "fontFamily": "Inter, system-ui, sans-serif",
+    "color": "#1e1b29"
+  },
+  "title": {
+    "textStyle": {
+      "fontFamily": "Plus Jakarta Sans, system-ui, sans-serif",
+      "fontWeight": 700,
+      "fontSize": 13.5,
+      "color": "#1e1b29"
+    }
+  },
+  "legend": {
+    "textStyle": {
+      "color": "#1e1b29",
+      "fontSize": 12
+    },
+    "inactiveColor": "#7c7891",
+    "itemWidth": 16,
+    "itemHeight": 8,
+    "icon": "roundRect",
+    "selectedMode": true
+  },
+  "tooltip": {
+    "backgroundColor": "rgba(255,255,255,0.96)",
+    "borderColor": "rgba(160, 138, 178, 0.42)",
+    "borderWidth": 1,
+    "textStyle": {
+      "color": "#1e1b29",
+      "fontSize": 11.5
+    },
+    "extraCssText": "box-shadow:0 6px 18px rgba(58,31,82,.16);border-radius:8px;",
+    "axisPointer": {
+      "type": "cross",
+      "lineStyle": {
+        "color": "#7c7891",
+        "type": "dashed"
+      },
+      "crossStyle": {
+        "color": "#7c7891"
+      }
+    }
+  },
+  "grid": {
+    "left": 44,
+    "right": 24,
+    "top": 24,
+    "bottom": 36,
+    "containLabel": false
+  },
+  "categoryAxis": {
+    "axisLine": {
+      "lineStyle": {
+        "color": "#7c7891",
+        "opacity": 0.5
+      }
+    },
+    "axisTick": {
+      "show": false
+    },
+    "axisLabel": {
+      "color": "#7c7891",
+      "fontSize": 10.5
+    },
+    "splitLine": {
+      "show": false
+    }
+  },
+  "valueAxis": {
+    "axisLine": {
+      "show": false
+    },
+    "axisTick": {
+      "show": false
+    },
+    "axisLabel": {
+      "color": "#7c7891",
+      "fontSize": 10.5
+    },
+    "splitLine": {
+      "lineStyle": {
+        "color": "rgba(160, 138, 178, 0.26)"
+      }
+    }
+  },
+  "line": {
+    "smooth": false,
+    "symbol": "circle",
+    "symbolSize": 6,
+    "lineStyle": {
+      "width": 2
+    },
+    "itemStyle": {
+      "borderWidth": 2,
+      "borderColor": "#fff"
+    },
+    "emphasis": {
+      "focus": "series",
+      "blurScope": "global"
+    }
+  },
+  "bar": {
+    "itemStyle": {
+      "borderRadius": [
+        3,
+        3,
+        0,
+        0
+      ]
+    },
+    "barMaxWidth": 28,
+    "emphasis": {
+      "focus": "series",
+      "blurScope": "global"
+    }
+  },
+  "pie": {
+    "itemStyle": {
+      "borderColor": "#fff",
+      "borderWidth": 2
+    }
+  },
+  "dataZoom": {
+    "borderColor": "rgba(160, 138, 178, 0.42)",
+    "backgroundColor": "#faf6fd",
+    "fillerColor": "#efe4f6",
+    "handleStyle": {
+      "color": "#552c7e"
+    },
+    "dataBackground": {
+      "lineStyle": {
+        "color": "#c9b8d8"
+      },
+      "areaStyle": {
+        "color": "#efe4f6"
+      }
+    },
+    "textStyle": {
+      "color": "#585566",
+      "fontSize": 10
+    }
+  },
+  "visualMap": {
+    "inRange": {
+      "color": [
+        "#c9b8d8",
+        "#552c7e"
+      ]
+    },
+    "textStyle": {
+      "color": "#585566"
+    }
+  },
+  "_status": {
+    "good": "#137a4a",
+    "warn": "#d99a00",
+    "risk": "#ad2452",
+    "neutral": "#c9b8d8"
+  },
+  "_tracks": {
+    "FIN": "#9e6cd5",
+    "HR": "#c47c00",
+    "MKT": "#009592",
+    "BA": "#89275b"
+  }
+}

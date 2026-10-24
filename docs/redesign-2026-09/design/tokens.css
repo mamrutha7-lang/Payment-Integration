@@ -1,0 +1,41 @@
+/* REEP design tokens — 2026-09 redesign. Merge into apps/web/src/styles/reep-v2.scss (existing names kept). */
+:root {
+  --brand-purple: #552c7e;
+  --brand-magenta: #ba2185;      /* only inside --primary-gradient */
+  --purple-mid: #7a2f9e;
+  --magenta-mid: #a0248f;
+  --ink: #1e1b29;
+  --ink-soft: #4a2668;
+  --ink-nav: #5b3080;
+  --muted: #585566;
+  --faint: #7c7891;
+  --surface: #ffffff;
+  --tint-1: #efe4f6;
+  --tint-2: #f5edfa;
+  --tint-3: #faf6fd;
+  --hairline: rgba(160, 138, 178, 0.38);
+  --hairline-26: rgba(160, 138, 178, 0.26);
+  --hairline-42: rgba(160, 138, 178, 0.42);
+  --hairline-45: rgba(160, 138, 178, 0.45);
+  --good: #137a4a;  --good-bg: rgba(19, 122, 74, 0.12);
+  --warn: #8f6100;  --warn-dot: #d99a00;  --warn-bg: rgba(217, 154, 0, 0.12);
+  --risk: #ad2452;  --risk-bg: rgba(173, 36, 82, 0.1);
+  --page-wash: linear-gradient(180deg, #ece4f5 0%, #f2e7f8 45%, #fbe6f2 100%);
+  --primary-gradient: linear-gradient(120deg, #552c7e, #7a2f9e 38%, #a0248f 68%, #ba2185);
+  --card-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(245, 237, 250, 0.7));
+  --titlebar-gradient: linear-gradient(180deg, #faf6fd, #ece0f2);
+  --sh-card: 0 10px 26px rgba(58, 31, 82, 0.1), inset 0 1px 0 #fff;
+  --sh-ctrl: 0 2px 6px rgba(58, 31, 82, 0.06), inset 0 1px 0 #fff;
+  --sh-primary: 0 8px 18px rgba(85, 44, 126, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  --sh-navpill: 0 5px 14px rgba(85, 44, 126, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --sh-well: inset 0 1px 2px rgba(58, 31, 82, 0.12);
+  --cat-1: #9e6cd5;  --cat-2: #c47c00;  --cat-3: #009592;  --cat-4: #89275b;   /* FIN, HR, MKT, BA */
+  --seq: #552c7e;  --seq-light: #c9b8d8;
+  --axis: #7c7891;  --split: rgba(160, 138, 178, 0.26);
+  --st-good: #137a4a;  --st-warn: #d99a00;  --st-risk: #ad2452;  --st-neutral: #c9b8d8;
+  --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --nav-width: 220px;
+  --appbar-height: 52px;
+  --r-card: 16px;  --r-control: 12px;  --r-tile: 10px;  --r-pill: 999px;
+}

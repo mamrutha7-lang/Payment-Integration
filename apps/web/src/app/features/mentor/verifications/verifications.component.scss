@@ -1,0 +1,212 @@
+/* Skill verifications queue. Panel / card / chip / btn / icon are global. */
+:host {
+  display: block;
+}
+
+.queue-chip {
+  align-self: center;
+}
+
+.claim {
+  margin-bottom: 12px;
+}
+.claim-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.claim-head strong {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+}
+.claim-lvl {
+  color: var(--muted);
+  font-size: 13px;
+}
+.claim-who {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.claim-actions-right {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.claim-body {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--hairline);
+}
+.claim-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 18px;
+  margin-bottom: 12px;
+}
+@media (max-width: 560px) {
+  .claim-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.fld {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.fld-hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+.val {
+  font-size: 13px;
+  color: var(--ink);
+  margin-top: 2px;
+  line-height: 1.5;
+}
+.val--strong {
+  font-weight: 700;
+}
+
+.claim-note-block {
+  margin-bottom: 12px;
+}
+.claim-file {
+  margin-bottom: 12px;
+}
+
+.rubric {
+  background: var(--tint-3);
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+}
+.rubric ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.note-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.note-field input {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: 12px;
+  border: 1px solid var(--hairline-45);
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 13px;
+  box-shadow: var(--sh-well);
+}
+.note-error {
+  color: var(--risk);
+  font-size: 12.5px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.decide-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+/* Both non-approval actions read as their own tone, and each carries a word —
+   never colour alone. */
+.btn-changes {
+  color: var(--warn);
+  border-color: rgba(217, 154, 0, 0.35);
+}
+.btn-reject {
+  color: var(--risk);
+  border-color: rgba(173, 36, 82, 0.35);
+}
+
+.vq-lede {
+  max-width: 70ch;
+}
+.vq-notice {
+  margin-bottom: 12px;
+}
+
+/* The clear queue: one green line, the handoff's exact words. */
+.empty-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 18px;
+  color: var(--good);
+  font-size: 13px;
+  font-weight: 600;
+}
+.empty-card > .icon {
+  font-size: 18px;
+}
+
+/* Recently reviewed: outcome chip, then skill · student · the note given. */
+.history {
+  margin-top: 18px;
+}
+.history-title {
+  margin: 0 0 10px 4px;
+  font-family: var(--font);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.history-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+  margin-bottom: 10px;
+}
+.history-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 13px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.history-text strong {
+  font-weight: 700;
+}
+.history-meta {
+  color: var(--muted);
+}
+
+.state-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.state-note .icon {
+  font-size: 16px;
+  color: var(--purple-mid);
+}
+.state-note.risk {
+  color: var(--risk);
+}
+.state-note.risk .icon {
+  color: var(--risk);
+}

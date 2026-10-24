@@ -1,0 +1,173 @@
+/* The chrome the two leave dialogs wear — Leave policy and Calendar.
+ *
+ * The same 760x560 panel `students/batch-dialog.scss` draws, for the same
+ * reason it is repeated rather than shared: reep-v2.scss has no dialog
+ * vocabulary, and a global class is the design system's to add, not a
+ * component's to invent from the side. These rules are component-scoped, so
+ * they claim none of the two global sheets' names.
+ *
+ * `.btn` `.chip` `.notice` `.field` `.ctrl` `.icon` `.dt-table` are global and
+ * are used exactly as they are.
+ */
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(30, 27, 41, 0.42);
+  backdrop-filter: blur(2px);
+}
+
+.dialog {
+  width: 860px;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: 0 24px 60px rgba(58, 31, 82, 0.3);
+}
+
+.dialog-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 14px;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.dialog-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.dialog-sub {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin: 5px 0 0;
+}
+
+.dialog-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.dialog-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 14px 24px;
+  border-top: 1px solid var(--hairline);
+}
+
+/* --- a row of controls that wraps on a narrow screen --------------------- */
+
+.row-fields {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.row-fields .field {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.row-fields .field.narrow {
+  flex: 0 0 150px;
+}
+
+.row-fields .btn {
+  flex: none;
+}
+
+/* --- the summary line over the table ------------------------------------- */
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.summary b {
+  color: var(--ink);
+}
+
+.section-head {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 4px 0 0;
+}
+
+/* `flex: none`, or a short window squeezes the table to nothing. It is the one
+   child of `.dialog-body` that is itself a scroll container, which makes its
+   minimum height 0, so it took the whole shortfall before the body scrolled:
+   0 px of a 106 px table at 1280 x 600, and the rows could not be clicked. At
+   its own height, up to the 300 px below, it is the body that scrolls. */
+.table-scroll {
+  flex: none;
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+}
+
+.num-cell {
+  width: 92px;
+}
+
+.num-cell .ctrl {
+  width: 100%;
+  padding: 4px 6px;
+  font-size: 12.5px;
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.empty-row {
+  padding: 18px 14px;
+  color: var(--muted);
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.check-row {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.check-row label {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}

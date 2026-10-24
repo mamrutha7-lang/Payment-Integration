@@ -1,0 +1,176 @@
+/* Exports — this screen's layout only.
+   panel / card / chip / btn / notice / icon / crumb / dt-* are global
+   (styles/reep-v2.scss); nothing here redefines one. */
+:host {
+  display: block;
+}
+
+/* The warning sits between the head and the cards, tight to both. */
+.data-note {
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.data-note .icon {
+  font-size: 18px;
+  color: var(--purple-mid);
+}
+
+/* The live region that confirms a download started. */
+.request-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  color: var(--good);
+}
+.request-note .icon {
+  font-size: 16px;
+}
+
+/* The board's three-column card grid, falling to one column when narrow. */
+.extract-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.extract-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  min-width: 0;
+}
+.extract-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+.extract-title {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+.extract-desc {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* The file's header row, verbatim, on one line — a reader matches it against
+   the spreadsheet they just opened. */
+.extract-columns {
+  margin: 0;
+  font-size: 11.5px;
+  color: var(--faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.extract-columns-unknown {
+  font-style: italic;
+}
+
+.extract-gate {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.35;
+  color: var(--warn);
+}
+.extract-gate .icon {
+  font-size: 14px;
+}
+
+.extract-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: auto;
+  padding-top: 4px;
+}
+.extract-last {
+  font-size: 11.5px;
+  color: var(--faint);
+}
+.extract-foot .btn {
+  margin-left: auto;
+}
+
+/* Download history: a card whose body is the grid, so its own padding stops
+   at the head and the grid runs to the card's edges. */
+.history-card {
+  margin-top: 12px;
+  padding: 14px 14px 0;
+  overflow: hidden;
+}
+.history-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.history-title {
+  font-family: var(--font-display);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+.history-sub {
+  margin: 1px 0 0;
+  font-size: 11.5px;
+  color: var(--faint);
+}
+
+/* The caller's own reach, under the card's sub-line: chip and sentence on one
+   wrapping row. Text AND colour — `programme` and `none` are opposite facts. */
+.history-scope {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 6px 0 0;
+}
+.history-scope-text {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Refresh, and (for the office account) the audit log, kept on one row so the
+   head does not reflow when the second one is absent. */
+.history-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.history-empty,
+.history-failed {
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+.history-grid {
+  width: 100%;
+}
+.history-card .dt-statusbar {
+  margin: 0 -14px;
+}
+/* `.statusbar-note` is a per-screen convention, not a global: view
+   encapsulation means the audit screen's copy does not reach this one. */
+.statusbar-note {
+  margin-left: auto;
+  color: var(--faint);
+}

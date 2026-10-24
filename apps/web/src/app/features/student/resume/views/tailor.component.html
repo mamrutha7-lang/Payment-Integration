@@ -1,0 +1,107 @@
+<div class="rb-view">
+  <section class="main">
+    <div class="main-head">
+      <div>
+        <h2>Tailor to opportunity</h2>
+        <div class="sub">
+          How this resume reads against the posting you picked, and what would strengthen it.
+        </div>
+      </div>
+      <div class="head-actions">
+        <button type="button" class="btn" (click)="navigate.emit('build')">
+          <span class="icon" aria-hidden="true">edit</span> Back to content
+        </button>
+        <button type="button" class="btn primary" (click)="navigate.emit('preview')">
+          <span class="icon" aria-hidden="true">visibility</span> Preview
+        </button>
+      </div>
+    </div>
+
+    <div class="body">
+      @if (goalSvc.jobsError()) {
+        <div class="state-note"><span class="icon" aria-hidden="true">error</span>{{ goalSvc.jobsError() }}</div>
+      }
+
+      <!-- Verdict first, and separate from the score. -->
+      @if (goalSvc.selectedJob(); as job) {
+        <div class="card verdict" [class.verdict--ok]="job.eligible">
+          <div class="verdict-head">
+            <span class="icon" aria-hidden="true">{{ job.eligible ? 'task_alt' : 'info' }}</span>
+            <div>
+              <div class="verdict-title">
+                {{
+                  job.eligible ? 'You are eligible to apply' : 'Not yet eligible for this posting'
+                }}
+              </div>
+              <div class="verdict-sub">
+                {{ job.title }} · {{ job.company }}
+                @if (job.location) {
+                  · {{ job.location }}
+                }
+              </div>
+            </div>
+            <span class="verdict-pct"
+              >{{ job.match_percent | number: '1.0-0' }}%<small>skill match</small></span
+            >
+          </div>
+          @if (!job.eligible && job.reasons.length) {
+            <ul class="verdict-reasons">
+              @for (r of job.reasons; track $index) {
+                <li>{{ r }}</li>
+              }
+            </ul>
+            <div class="verdict-foot">
+              A stronger resume does not change these — they are set by the posting itself.
+            </div>
+          }
+        </div>
+      }
+
+      <div class="card tailored">
+        <h3 class="tailored-title">
+          @if (role(); as r) {
+            Tailored for {{ r }}
+          } @else {
+            Tailored for your target role
+          }
+        </h3>
+        <div class="tailored-lede">
+          Guidance below reflects your current verified skills — nothing here overstates your
+          eligibility.
+        </div>
+
+        @if (!goalSvc.selectedJob()) {
+          <div class="state-note">
+            <span class="icon" aria-hidden="true">info</span>
+            Choose a posting in <b>Selected opportunity</b> above to see which of its requirements
+            you can already evidence.
+          </div>
+        } @else if (missing().length) {
+          <div class="block block--risk">
+            <div class="block-title">Still missing for this role</div>
+            @for (ms of missing(); track ms.name) {
+              <div class="block-row">
+                <span>{{ ms.name }}</span>
+                <span class="block-status">{{ ms.status }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="state-note">
+            <span class="icon" aria-hidden="true">check_circle</span>
+            Every requirement this posting lists is covered by a verified, included skill.
+          </div>
+        }
+
+        @if (missingEssentials().length) {
+          <div class="block block--tint">
+            <div class="block-title">Missing essentials</div>
+            @for (me of missingEssentials(); track $index) {
+              <div class="block-line">• {{ me }}</div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,122 @@
+# REEP API — RUNTIME dependencies only.
+#
+# Pinned exactly (==), matching requirements-voice.txt. `>=` bounds meant a
+# rebuild three months from now resolved a different dependency set than the one
+# these tests passed against: the image would drift from the venv silently, and
+# the first sign of it would be a production-only failure nobody could reproduce
+# locally. These are the versions the suite is green on.
+#
+# Test-only packages live in requirements-dev.txt. They must NOT be here — this
+# file is what `Dockerfile` installs, and pytest in a production image is extra
+# attack surface plus a bigger download for nothing.
+#
+# Bumping: change the pin, run the suite, commit both together.
+
+fastapi==0.141.1
+uvicorn[standard]==0.52.3
+# Upstream client for wss://api.openai.com/v1/realtime (app/interview_relay.py).
+#
+# uvicorn[standard] already pulls `websockets` in for the SERVER side of the
+# browser socket, so this is not a NEW dependency — it is the missing PIN. The
+# relay imports websockets.asyncio.client directly, and a resolver free to pick
+# the version would eventually break it two ways, both at CONNECT time rather
+# than import time (i.e. surviving CI and failing on a student's first call):
+# websockets >= 14 RENAMED connect()'s `extra_headers=` to
+# `additional_headers=`, which app/interview_relay.py uses, and the modern
+# asyncio API it imports does not exist on the older line.
+websockets==15.0.1
+sqlalchemy==2.0.52
+alembic==1.19.1
+pydantic==2.13.4
+pydantic-settings==2.15.0
+psycopg[binary]==3.3.4
+# pgvector `vector` column type + SQLAlchemy adapter for the Knowledge-Base
+# semantic search (docker image pgvector/pgvector:pg17 + CREATE EXTENSION vector).
+pgvector==0.5.0
+# [crypto] is the Google sign-in change, not a version bump: the pin is
+# unchanged. PyJWT signs our own HS256 session with pure Python, but verifying
+# Google's ID token is RS256, and without the extra `jwt.decode(...,
+# algorithms=["RS256"])` raises "Algorithm 'RS256' could not be found. Do you
+# have cryptography installed?" — at CALLBACK time, in the image, on a path no
+# unit test exercises without a live Google. cryptography is pinned on the next
+# line as well because it reaches this environment today only as a TRANSITIVE
+# dependency of google-adk; the day it drops it, ID-token
+# verification would break with nothing in this file having changed.
+pyjwt[crypto]==2.15.1
+cryptography==50.0.0
+python-multipart==0.0.32
+# Also the Google sign-in HTTP client: the server-to-server token exchange
+# (oauth2.googleapis.com/token) and the JWKS fetch. Already pinned for the
+# realtime relay, so OAuth adds no new dependency here.
+httpx==0.28.1
+# Amazon Bedrock (Nova) transport in app/ai/llm.py. The import is lazy — only a
+# deployment that sets BEDROCK_MODEL pays it — but it is DECLARED here per the
+# api-imports rule: a lazy import of an undeclared package only moves the crash
+# from boot to the first request that reaches the path.
+boto3==1.43.80
+# Amazon Nova 2 Sonic, the speech-to-speech engine behind INTERVIEW_ENGINE=nova
+# (app/interview_nova.py). A SEPARATE package from boto3 and not a duplicate of
+# it: boto3 has no InvokeModelWithBidirectionalStream at all — the bidirectional
+# API is served only by this experimental smithy-based SDK, which is why AWS's
+# own Python samples import it alongside boto3 rather than instead of it.
+#
+# The import is lazy, for the same reason boto3's is above: it pulls aiohttp and
+# the smithy stack in, and a deployment on another engine should not pay that at
+# boot. It is DECLARED here anyway, per the api-imports rule.
+aws-sdk-bedrock-runtime==0.11.0
+# awscrt is what actually CARRIES that stream, and it is not optional.
+# aws-sdk-bedrock-runtime does not depend on it, so pip resolves a set that
+# imports fine, passes api-imports, and passes every test that fakes the
+# upstream — and then refuses the one call the engine exists to make:
+# resolve() falls back to the aiohttp transport, which answers
+# UnsupportedTransportError to invoke_model_with_bidirectional_stream before
+# a packet leaves the process. Not a region problem and not an IAM problem;
+# it fails identically on a laptop with no credentials at all.
+# The wheel is cp313-abi3, so the 3.14 image installs it without a compiler.
+awscrt==0.36.2
+# Sentry — the single observability + traceability tool: errors + performance
+# traces, initialised in app/main.py only when SENTRY_DSN is set (blank = every
+# sentry_sdk call is a no-op). [fastapi] pulls the ASGI/Starlette integration.
+sentry-sdk[fastapi]==2.68.1
+# Server-side PDF rendering for /student/resume/{id}/pdf (local, no network — so
+# the student-data egress gate does not apply: nothing leaves the machine)
+reportlab==5.0.0
+# ReportLab reads PNG signatures (app/leave_paper.py) through Pillow; JPEG alone needs nothing.
+pillow==12.3.0
+# The leave paper is the official form PDF with the fields written onto it (app/leave_paper.py): pypdf merges the overlay.
+pypdf==6.20.1
+
+# Audio maths for the LOCAL interview engine (app/interview_local.py): RMS for
+# the voice-activity gate, and linear resampling between the browser's 24 kHz
+# PCM and whatever rate the local models want.
+#
+# A RUNTIME dependency, not a dev one, and it was missing entirely. The module
+# reached main importing numpy with no requirements entry, which is the exact
+# failure requirements-voice.txt already carries a warning about and CI has a
+# whole `worker-imports` job to prevent for the other process: the import is
+# lazy inside a request handler, so the API still BOOTS, and the break only
+# surfaces as a ModuleNotFoundError on the first student to use the local
+# engine — and as a pytest COLLECTION error, because tests/test_interview_local.py
+# imports it at module scope. That takes the whole suite down, not one test.
+numpy==2.3.5
+
+# XLSX for the office's spreadsheet imports (B8.1): reading the workbook a
+# registrar uploads to `POST /api/admin/imports/preview`, and writing the blank
+# templates `GET /api/admin/imports/templates/{kind}.xlsx` hands back. CSV is
+# stdlib; .xlsx is not, and .xlsx is what an examination section actually sends.
+#
+# A RUNTIME dependency, not a dev one, and this pin lands BEFORE the parser that
+# needs it. That ordering is the whole lesson of the `api-imports` CI job: the
+# parse happens inside a REQUEST HANDLER, so an undeclared openpyxl would let
+# the image build, the API boot and every test pass, and would surface as a
+# ModuleNotFoundError in front of the first person who ever imported a file — or
+# as a pytest COLLECTION error the moment a test module imports the parser at
+# module scope, which takes the whole suite down rather than one test. A lazy
+# import does not make an undeclared dependency acceptable; it only moves the
+# crash. Verified with `python tools/ci/check_api_imports.py`.
+openpyxl==3.1.5
+
+# AI agent framework (Google Agent Development Kit) — pairs natively with Gemini
+google-adk==2.7.0
+# Lets ADK reach non-Gemini providers (Groq, Mistral, OpenRouter, …)
+litellm==1.96.2

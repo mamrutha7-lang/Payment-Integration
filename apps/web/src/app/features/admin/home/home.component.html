@@ -1,0 +1,61 @@
+<div class="panel" data-p="admin-home">
+  <div class="dt-header">
+    <h1 class="dt-title">What do you want to do?</h1>
+    <label class="home-find">
+      <span class="icon" aria-hidden="true">search</span>
+      <input
+        type="search"
+        placeholder="Find a task…"
+        aria-label="Find a task"
+        autocomplete="off"
+        [value]="query()"
+        (input)="setQuery($event)"
+      />
+    </label>
+  </div>
+
+  <!-- Hidden while the finder is in use: a person typing "leave" wants the
+       leave button, not the leave count above it. -->
+  @if (!query() && queues.length) {
+    <section class="home-section" aria-labelledby="home-waiting">
+      <h2 class="eyebrow" id="home-waiting">Waiting for you</h2>
+      <div class="home-queues">
+        @for (queue of queues; track queue.key) {
+          <a
+            class="home-queue"
+            [routerLink]="queue.path"
+            [class.home-queue--none]="queue.count() === 0"
+          >
+            <span class="home-queue__num" [attr.aria-busy]="queue.count() === null">{{
+              countText(queue)
+            }}</span>
+            <span class="home-queue__label">{{ queue.label }}</span>
+            <span class="icon home-queue__go" aria-hidden="true">chevron_right</span>
+          </a>
+        }
+      </div>
+    </section>
+  }
+
+  @for (group of groups(); track group.title) {
+    <section class="home-section">
+      <h2 class="eyebrow">{{ group.title }}</h2>
+      <div class="home-tiles">
+        @for (tile of group.tiles; track tile.label) {
+          <a class="home-tile" [routerLink]="tile.path">
+            <span class="home-tile__icon"
+              ><span class="icon" aria-hidden="true">{{ tile.icon }}</span></span
+            >
+            <span class="home-tile__label">{{ tile.label }}</span>
+            <span class="icon home-tile__go" aria-hidden="true">chevron_right</span>
+          </a>
+        }
+      </div>
+    </section>
+  } @empty {
+    <div class="empty" role="status">
+      <span class="icon" aria-hidden="true">search</span>
+      Nothing called “{{ query() }}”.
+    </div>
+  }
+</div>

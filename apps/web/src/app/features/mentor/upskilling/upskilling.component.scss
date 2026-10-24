@@ -1,0 +1,174 @@
+/* Upskilling — the upload strip and the shelf. card / chip / btn / notice /
+   icon are global; this is the form grid and the shelf's own table. */
+:host {
+  display: block;
+}
+
+.up-form {
+  margin-bottom: 16px;
+}
+.up-card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  margin-bottom: 14px;
+}
+.up-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 200px) minmax(0, 170px);
+  gap: 12px;
+  align-items: end;
+}
+@media (max-width: 760px) {
+  .up-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.up-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  min-width: 0;
+}
+.up-opt {
+  font-weight: 400;
+  color: var(--muted);
+}
+.up-field input {
+  width: 100%;
+  padding: 9px 11px;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--hairline-45);
+  background: var(--surface);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ink);
+  box-shadow: inset 0 1px 2px rgba(58, 31, 82, 0.06);
+}
+.up-field input:focus {
+  outline: none;
+  border-color: var(--purple-mid);
+  box-shadow: var(--focus-ring);
+}
+.up-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+.up-accepted {
+  color: var(--muted);
+  font-size: 13px;
+}
+.up-accepted strong {
+  font-weight: 700;
+}
+.up-notice {
+  margin-top: 12px;
+}
+.up-notice + .up-section,
+.up-form + .up-notice {
+  margin-top: 0;
+}
+.panel > .up-notice {
+  margin-bottom: 14px;
+}
+
+.up-section {
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  color: var(--muted);
+  margin: 0 0 10px 4px;
+}
+.up-count {
+  color: var(--muted);
+}
+
+.up-scroll {
+  overflow-x: auto;
+}
+.up-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+}
+.up-table th {
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--hairline-45);
+}
+.up-table td {
+  padding: 9px 10px;
+  font-size: 13px;
+  color: var(--ink);
+  border-bottom: 1px solid rgba(160, 138, 178, 0.28);
+  vertical-align: middle;
+}
+.up-table td strong {
+  font-weight: 700;
+}
+.up-sub {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 2px;
+}
+.up-num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.up-file {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.up-cell-actions {
+  white-space: nowrap;
+}
+.up-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.up-btn {
+  padding: 6px 11px;
+  font-size: 13px;
+  color: var(--brand-purple);
+}
+.up-btn--remove {
+  color: var(--risk);
+  border-color: rgba(173, 36, 82, 0.35);
+  box-shadow: none;
+}
+.up-btn--remove:hover:not([disabled]) {
+  background: rgba(173, 36, 82, 0.06);
+  border-color: rgba(173, 36, 82, 0.35);
+}
+.up-row-note {
+  padding: 16px 10px;
+  color: var(--muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

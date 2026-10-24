@@ -1,0 +1,1519 @@
+{
+  "STALE": "Generated before the 2026-09 changes. The stack described here is the pre-migration one (Prisma / NestJS apps/api / Next.js), all deleted; DIRECTOR was removed as a role on 2026-09-10; the LiveKit voice stack was removed in 2026-09. Kept as the record of the survey and the plan it produced. Current truth is AGENTS.md.",
+  "summary": "Exhaustive survey of the REEP codebase against the full product spec, then a critiqued implementation plan",
+  "agentCount": 17,
+  "logs": [
+    "12/12 surveys returned",
+    "[stall] agent \"synthesize-plan\" stalled (no progress) after 726s — retrying (1/5)",
+    "[synthesize-plan] failed: API Error: The response stopped arriving. The response above may be incomplete.",
+    "critiques: Spec coverage — clause-by-clause audit of the REEP spec against the supplied plan=unsound, Feasibility and sequencing=unsound, Correctness and safety risk — data leakage, scope enforcement, egress gating, upload validation=unsound — 31 blockers"
+  ],
+  "result": {
+    "plan": {
+      "groundTruth": "**What this app is today.** `reep-dashboard` is a Next 16 / React 19 / MUI 9 / Prisma 6 (Postgres) app for \"BGSCET MBA — REEP Tracking Dashboard\" (package.json description). It has three role areas under `src/app` — `student/` (page, courses, certifications, time-log, uploads, profile, resume, assistant), `mentor/` ((overview), student, student/[id], alerts, reports, uploads, settings, assistant), `director/` — plus `login/` and `api/` (activity, activity/bulk, alerts/scan, agent, auth/logout, checkin, export/*, resume/generate, sync, uploads, uploads/[id], uploads/[id]/review). Auth is a jose JWT cookie (`src/lib/auth.ts`) with `middleware.ts` matching only `['/student/:path*','/mentor/:path*','/director/:path*']` and redirecting cookie-less requests to `/login`. Every account today is created by `prisma/seed.ts` (927 lines). Domain logic lives in pure, `server-only`-free modules (`activity-rules.ts`, `llm-parse.ts`, `analytics.ts`, `progress.ts`, `reep.ts`, `rules.ts`, `mentor-scope.ts`) with vitest tests; `server-only` modules (`queries.ts`, `auth.ts`, `uploads.ts`, `upload-access.ts`, `ai/llm.ts`, …) are stubbed in tests via `vitest.config.mts`. Migrations: 4, ending at `20260805061500_lab_session_created_at`.\n\n**How much of the spec it already satisfies: roughly 15%, and two of those are load-bearing-broken.**\n\nAlready present and reusable: shared login (`src/app/login/`) covers spec 6 in substance; mentee list + drill-through exists (`src/app/mentor/student/page.tsx`, `mentee-grid.tsx`, `student/[id]/page.tsx`) for spec 7; `MentorNote` with `createdAt` and a write path (`src/app/mentor/student/[id]/actions.ts`) covers most of spec 8; `StudentProfile.linkedinUrl` exists (spec 1); `UploadKind.PROFILE_PHOTO` / `RESUME` / `CERTIFICATE_PROOF` plus a hardened storage layer (`src/lib/uploads.ts`: generated UUID filenames, `safeExtension`, `resolveInsideRoot`) and a mentor review flow (`UploadStatus`, `src/app/api/uploads/[id]/review/route.ts`, `src/app/mentor/uploads/review-panel.tsx`) exist; the resume builder (`Resume.jobDescription`, `src/lib/ai/resume.ts`, `src/app/api/resume/generate/route.ts`, `src/app/student/resume/[id]`) is a near-fit for spec 2(d); attendance data (`AttendanceRecord`) and `Stage` back two tiles of spec 1; `exceljs` is already a dependency, so XLSX ingest needs no new package.\n\nConfirmed absent — verified by reading `prisma/schema.prisma` end to end and grepping `src/`: **no** registration route or model, **no** profile approval status, **no** email verification, **no** domain allowlist, **no** CV parser, **no** VTU/marks model of any kind, **no** SWOC, **no** mock-attempt record, **no** login-day history (only `User.lastLoginAt`, a single overwritten timestamp), **no** normalised skill table (skills are `StudentProfile.skills Json`), **no** Job / JobApplication, **no** degree-level field anywhere, **no** mail capability (dependencies are @anthropic-ai/sdk, @emotion/*, @mui/*, @prisma/client, exceljs, jose, next, react, react-dom, zod), **no** scheduler (`npm start` is plain `next start -p 3100`; the only \"cron\" mention is an aspirational comment in `src/app/api/sync/route.ts`), **no** leaderboard route, **no** student-to-student read path (`visibleStudentWhere` pins a STUDENT to `{ id: selfStudentId }`), and **no** leave model.\n\nTwo existing-code hazards the plan must fix before building on them, both verified: (a) `src/app/mentor/student/[id]/page.tsx:143` reads `if (session.mentorId && data.student.mentorId !== session.mentorId) notFound();` — the exact anti-pattern `src/lib/mentor-scope.ts` was written to eliminate; a MENTOR with no `Mentor` row short-circuits to false and reads *any* student's full detail, and the same test at `actions.ts:48` and `:221` lets that account *write* notes on any student. Same shape at `mentor/student/page.tsx:36`, `mentor/reports/page.tsx:120/140/146`, `mentor/reports/export/route.ts:41`, `api/alerts/scan/route.ts:32`. (b) `src/lib/ai/resume.ts:249` enters the Anthropic path on `ANTHROPIC_API_KEY` alone with no `studentDataEgressAllowed()` check, and `resumeWriterBlocked()` returns false in that configuration — so the banner says nothing while the student's name, USN, marks and attendance go to api.anthropic.com. Spec 2(d) (per-job CV) would inherit both.\n\nEverything else in the spec is net-new, and the plan below sequences it so no page phase depends on a model that has not landed.",
+      "conflicts": [
+        {
+          "conflict": "\"Exactly 5 activities\" for the student time sheet vs. a live 15-value ActivityType enum that the whole analytics engine is keyed to. Collapsing the enum destroys the mocks-taken chart the SAME spec asks for (spec 1 lists GD/Interview/Aptitude, currently the only mock signal is MOCK_INTERVIEW/APTITUDE_PREP), plus focus quality, the LOW_FOCUS_QUALITY alert rule, pace, and every export.",
+          "spec": "Spec 5: \"Student time sheet: must be very easy to fill. Exactly 5 activities: sleeping, engaged in leisure, engaged in lectures, engaged in coursework, engaged in skilling.\"",
+          "existing": "prisma/schema.prisma:126 enum ActivityType has 15 members; prisma/schema.prisma:355 LabSession.activity is non-null with @default(ONLINE_COURSE). Consumers: src/lib/activity-rules.ts, src/lib/analytics.ts, src/lib/ai/agent/tools.ts, src/app/api/activity/route.ts, src/app/api/activity/bulk/route.ts, src/app/student/time-log/*, src/lib/export/collect.ts, scripts/verify-formulas.ts, prisma/seed.ts, and the assertions in src/lib/activity-rules.test.ts and src/lib/analytics.test.ts.",
+          "recommendation": "Do NOT mutate ActivityType. Add a NEW enum `DayActivity { SLEEPING, LEISURE, LECTURES, COURSEWORK, SKILLING }` and a NEW model `TimeSheetEntry(studentId, day @db.Date, activity DayActivity, minutes Int)` with @@unique([studentId, day, activity]). The spec clause is scoped to the student time sheet, and a time sheet whose picker offers exactly five buttons satisfies it literally. `/student/time-log` becomes that five-bucket sheet as its default view; the existing course-linked session log moves to `/student/time-log/sessions` (unchanged semantics, still the source of pace/focus/cert progress). Nothing is dropped and nothing is reinterpreted. Sleeping and leisure minutes are excluded from every learning aggregate by construction because they live in a different table."
+        },
+        {
+          "conflict": "The mocks-taken chart cannot be derived from time-log data at all, whichever way the enum question is resolved. APTITUDE_PREP is preparation time, not a test taken with a score, and there is no GD value.",
+          "spec": "Spec 1: \"mocks taken chart (GD, Interview, Aptitude tests)\".",
+          "existing": "prisma/schema.prisma:126 ActivityType has MOCK_INTERVIEW, APTITUDE_PREP, PRESENTATION_PREP; no GD; no score field anywhere on LabSession.",
+          "recommendation": "New model `MockAttempt(studentId, type MockType {GD|INTERVIEW|APTITUDE}, takenOn, score Float?, maxScore Float?, evaluatorUserId, notes)`. Never alias this onto ActivityType or TimeSheetEntry."
+        },
+        {
+          "conflict": "A public leaderboard \"by VTU results\" publishes one student's exam performance to their whole cohort, and the codebase has no student-to-student read path at all — so whatever gets written will be a fresh unscoped prisma.student.findMany(), which is precisely the class of bug src/lib/mentor-scope.ts exists to prevent.",
+          "spec": "Spec 4: \"Leaderboards page: several different leaderboards — by certificate uploads, by skills, by VTU results, by login streak, by mocks taken.\"",
+          "existing": "src/lib/ai/agent/scope.ts:49 `STUDENT: 'self'` and :95 `{ id: scope.selfStudentId ?? '__none__' }`; src/lib/upload-access.ts restricts a STUDENT to their own files. Nothing in src/lib exposes a multi-student list to a STUDENT session.",
+          "recommendation": "Build all five boards (do not drop any), but behind a new `src/lib/leaderboard-scope.ts` that (a) caps a STUDENT to their own cohort, (b) projects a hard field whitelist — display name, rank, and a bucketed score band — and never `usn`, raw marks, attendance %, or upload titles, (c) honours a per-student `leaderboardOptOut` flag on StudentProfile. The viewer always sees their own exact figure. A unit test must assert the student-facing payload type contains none of the forbidden fields."
+        },
+        {
+          "conflict": "\"Auto-approve if within specified domains\" makes an unverified email claim into a trust decision. Combined with the leaderboards (spec 4), a stranger typing an @bgscet.ac.in address they do not control would get a STUDENT session that reads other students' data.",
+          "spec": "Spec 1: \"Auto-approve the profile if within specified domains; else flag for review & approve.\"",
+          "existing": "src/app/ has no register route; prisma/schema.prisma User.email is @unique with no verification field; .env.example has no domain key; StudentProfile has no status column so \"approved\" is not representable.",
+          "recommendation": "Auto-approval fires only on a *verified* address: mandatory email round-trip (single-use token, 24h expiry) before the domain rule is evaluated. Verification failure routes to the review queue, never to an error page. The allowlist lives in a DB table (`RegistrationRule`), not in a component or an env var, so a director can edit it. See open question on what \"domains\" means."
+        },
+        {
+          "conflict": "The per-job CV builder (spec 2d) would be built on generateResume, whose Anthropic branch bypasses the egress gate entirely — and the UI banner reports \"not blocked\" in exactly that configuration.",
+          "spec": "Spec 2(d): \"clickable CV builder that builds a CV targeted at that specific job.\"",
+          "existing": "src/lib/ai/resume.ts:249 `if (!content && (process.env.ANTHROPIC_API_KEY ?? '').trim().length > 0)` — no studentDataEgressAllowed() call; :104 resumeWriterBlocked() returns `config !== null && !studentDataEgressAllowed(config)`, i.e. false when LLM_BASE_URL is unset, so the banner stays silent while the full student brief is POSTed to api.anthropic.com.",
+          "recommendation": "Fix the gate before adding the feature (Phase 0): treat a configured ANTHROPIC_API_KEY as a remote host requiring LLM_ALLOW_REMOTE_STUDENT_DATA, make resumeWriterBlocked() reflect it, and add a case to src/lib/ai/egress.test.ts. Then route the per-job CV through the same single gate. This is required by AGENTS.md ('Route any new path that sends student data to a model through the same check')."
+        },
+        {
+          "conflict": "Spec 7 and 8 (mentor landing + mentee drill-through + timestamped notes) land directly on files that today contain the `session.mentorId ? … : …` anti-pattern AGENTS.md forbids. Building new mentor surface on them ships the leak.",
+          "spec": "Spec 7: \"Mentor landing page: list of mentees, each clickable through to that student's profile.\" Spec 8: \"Mentor's student page: write mentor meeting notes.\"",
+          "existing": "src/app/mentor/student/[id]/page.tsx:143; src/app/mentor/student/[id]/actions.ts:48 and :221; src/app/mentor/student/page.tsx:36; src/app/mentor/reports/page.tsx:120/140/146; src/app/mentor/reports/export/route.ts:41; src/app/api/alerts/scan/route.ts:32. Only mentor/alerts and mentor/uploads currently call menteeWhere().",
+          "recommendation": "Phase 0 converts all six to mentorScope()/menteeWhere() with `{ kind: 'none' }` rendering notFound()/403, before any new mentor feature. Spec 7 is then 'verify + extend', not 'build' — do not re-implement the mentee list."
+        },
+        {
+          "conflict": "The AI assistant already grants every MENTOR programme-wide read over student records, contradicting mentor-scope.ts. Any new mentee data routed through agent tools widens an already-open hole.",
+          "spec": "Cross-cutting: all mentor-facing student data.",
+          "existing": "src/lib/ai/agent/scope.ts:48-53 `SCOPE_BY_ROLE = { STUDENT: 'self', MENTOR: 'programme', DIRECTOR: 'programme', ADMIN: 'programme' }` vs src/lib/mentor-scope.ts, which maps a MENTOR without mentorId to `{ kind: 'none' }`.",
+          "recommendation": "Add a `mentees` ScopeKind and derive resolveScope() from mentorScope(session) so there is one rule. If the programme decides faculty may discuss any student, that must be an explicit written decision, not a default inherited from a code comment."
+        },
+        {
+          "conflict": "Registration-time CV upload is circular against the Upload model: Upload.studentId is a required FK to a Student that does not exist until the registration is approved.",
+          "spec": "Spec 1: \"upload a CV and the system auto-fills the form from it.\"",
+          "existing": "prisma/schema.prisma Upload: `studentId String` + `student Student @relation(..., onDelete: Cascade)`, non-nullable; src/lib/uploads.ts saveUpload(studentId, file) writes to path.join(UPLOAD_ROOT, studentId); src/app/api/uploads/route.ts:15-18 returns 401 without session.studentId.",
+          "recommendation": "Quarantine path: a separate root `storage/registration/<registrationToken>/` keyed on a server-generated token (never user input), a `RegistrationUpload` row on the Registration record, a TTL sweep for abandoned uploads, and promotion of the file into the normal Upload table only when the registration is approved and the Student row exists. Do not relax Upload.studentId to nullable."
+        },
+        {
+          "conflict": "A public /register route is unreachable under the current middleware, and a self-registering student cannot be inserted anyway because Student.cohortId is a required FK with no default and usn is @unique with no provenance.",
+          "spec": "Spec 1: \"Self-file the registration form.\"",
+          "existing": "src/middleware.ts matcher `['/student/:path*','/mentor/:path*','/director/:path*']` redirects any cookie-less request to /login; prisma/schema.prisma Student: `cohortId String` non-null, `usn String @unique`.",
+          "recommendation": "Registration writes to a NEW `Registration` table that has no FK into Student. Student/User rows are created only at approval, when a director assigns the cohort and confirms the USN. `/register` sits outside the middleware matcher and is the app's first unauthenticated write endpoint, so it needs its own rate limit."
+        },
+        {
+          "conflict": "The spec is written for UG and PG; the deployed system is MBA-only end to end.",
+          "spec": "Spec 2: \"Undergraduate and Post Graduate separation.\"",
+          "existing": "package.json description \"BGSCET MBA — REEP Tracking Dashboard\"; prisma/schema.prisma Student.usn comment `// e.g. 1BG24MBA001`; Cohort.code `// e.g. MBA-2026-B`; enum Stage and the whole course catalogue are MBA-shaped. No degree-level field on Student, Cohort or anywhere else.",
+          "recommendation": "Add `enum DegreeLevel { UG, PG }` on Cohort (source of truth, inherited by Student) and on Job, and implement real filtering. See open question on whether UG curriculum/stage modelling is in scope — a UI tab that filters nothing is not coverage, but nor is rebuilding the stage model."
+        },
+        {
+          "conflict": "\"The jobs list sheet is updated every week\" implies a scheduler this deployment does not have and cannot self-provide.",
+          "spec": "Spec 2: \"The jobs list sheet is updated every week and an automatic job alert email is sent.\"",
+          "existing": "package.json scripts have no cron/worker entry; npm start is `next start -p 3100`; docker-compose.yml provisions Postgres only; src/app/api/sync/route.ts's docstring 'Nightly this would be a cron job' is aspirational; there is no sheet client and no googleapis dependency.",
+          "recommendation": "Split into source → idempotent importer → trigger. The trigger is an authenticated POST `/api/jobs/import/run` guarded by a `JOBS_CRON_TOKEN`, invoked by an external scheduler (Windows Task Scheduler on the host, documented in README). Per AGENTS.md, the parse/match/compose logic must live in `server-only`-free modules so a `tsx scripts/*.ts` runner also works; do not install the `server-only` package."
+        },
+        {
+          "conflict": "A dedicated mentor login page under /mentor would be caught by the middleware matcher and redirected to /login before it ever renders.",
+          "spec": "Spec 6: \"Mentor login page.\"",
+          "existing": "src/middleware.ts matcher includes '/mentor/:path*' and redirects on a missing session cookie.",
+          "recommendation": "Add `/mentor/login` and exclude it from the matcher (regex-negated matcher entry), rendering the shared login form with mentor-facing copy and a post-login redirect to /mentor. Keep one authenticate() path — do not fork auth."
+        },
+        {
+          "conflict": "MentorNote records when the row was written, not when the meeting happened, so \"with a captured timestamp\" is ambiguous and today resolves to the weaker reading.",
+          "spec": "Spec 8: \"write mentor meeting notes, with a captured timestamp.\"",
+          "existing": "prisma/schema.prisma MentorNote:406-418 has only `createdAt DateTime @default(now())`; no meetingAt.",
+          "recommendation": "Add `meetingAt DateTime` (defaulting to now in the form, editable) and keep createdAt as the immutable audit stamp. Display both, labelled. This is the only reading that satisfies the clause under either interpretation."
+        },
+        {
+          "conflict": "Leaderboard \"by skills\" and job match % both need to rank and join on skills, which are an unindexed JSON blob.",
+          "spec": "Spec 4 \"by skills\"; spec 2(c) \"match percentage based on match between the student's skills and the job description\"; spec 3 \"upload a certificate to claim a skill\".",
+          "existing": "prisma/schema.prisma StudentProfile.skills `Json @default(\"[]\")  /// [{ name, level }]`, self-edited via src/app/student/profile/actions.ts, with no relation to Upload or Certification — nothing distinguishes a claimed skill from an evidenced one.",
+          "recommendation": "Promote to `Skill` (catalogue) + `StudentSkill` (studentId, skillId, level, verified, evidenceUploadId) + `SkillClaim`. Backfill the JSON in the same migration phase and switch readers (src/lib/ai/profile.ts, the resume path) to the table. Keep the JSON column populated write-through for one release, marked deprecated in the schema comment."
+        }
+      ],
+      "openQuestions": [
+        {
+          "question": "\"Auto-approve the profile if within specified domains\" — does \"domains\" mean the applicant's email domain (e.g. @bgscet.ac.in), or their academic/skill domain (branch, programme, discipline)?",
+          "whyItBlocks": "It decides the shape of RegistrationRule and of the whole auto-approve branch. Guessing wrong means rebuilding the rule engine, the review queue filters and the director settings screen. Nothing in the repo hints either way — there is no allowlist config anywhere.",
+          "defaultIfUnanswered": "Implement BOTH as an AND: a verified email-domain allowlist AND a declared programme/branch allowlist, each editable by a director in a `RegistrationRule` table, each independently disableable. An applicant passing both is auto-approved; anything else goes to review. This satisfies either reading without a rewrite."
+        },
+        {
+          "question": "Is Undergraduate onboarding actually in scope for this iteration, or only UG/PG *separation* on the jobs page?",
+          "whyItBlocks": "Full UG support means USN parsing, cohort structure, semester counts (8 vs 4), and the REEP Stage definitions all need review — that is a programme-modelling exercise, not a filter. Doing it unasked burns weeks; skipping it silently ships a UG tab with nothing in it.",
+          "defaultIfUnanswered": "Model DegreeLevel on Cohort/Student/Job and implement real filtering plus UG-capable registration, but do NOT redesign Stage, the course catalogue, or semester logic for UG. Flag in the director UI that UG cohorts have no REEP curriculum loaded."
+        },
+        {
+          "question": "In the SWOC chart's \"three sources: placement, mentor, PM\" — who are \"placement\" and \"PM\" in the role model? Are they new staff accounts, or existing directors wearing a hat?",
+          "whyItBlocks": "prisma/schema.prisma enum Role is only STUDENT|MENTOR|DIRECTOR|ADMIN, and requireMentor() admits MENTOR/DIRECTOR/ADMIN. Adding Role values changes HOME_FOR_ROLE (a Record<Role,string>), mentorScope's PROGRAMME_WIDE list and every role switch — cheap to do now, expensive to retrofit after four more screens exist.",
+          "defaultIfUnanswered": "Add `PLACEMENT` and `PM` to enum Role, map both to '/mentor' in HOME_FOR_ROLE, and explicitly keep them OUT of mentorScope()'s PROGRAMME_WIDE list (they are not mentors and get `{ kind: 'none' }` for mentee screens). Grant them programme-wide SWOC authorship only, through a separate `swocAuthorScope()`. SwocEntry.source is a hard three-value enum regardless of who typed it."
+        },
+        {
+          "question": "Where do VTU marks come from — a director/office bulk upload, per-student manual entry by staff, or a scrape of the VTU results portal?",
+          "whyItBlocks": "Both the VTU marks chart (spec 1) and the VTU leaderboard (spec 4) are undeliverable without a real source. A scrape is a different project with its own legal and reliability profile.",
+          "defaultIfUnanswered": "Director-facing XLSX/CSV upload (exceljs is already a dependency, so no new package) with a documented column format, plus per-student manual correction. No scraping. A dry-run preview before commit, and re-import is idempotent on (studentId, semester, subjectCode)."
+        },
+        {
+          "question": "What exactly is \"the jobs list sheet\"? A Google Sheet the placement office maintains, an XLSX someone emails around, or a form the office fills in the dashboard?",
+          "whyItBlocks": "A Google Sheet means a googleapis dependency, a service account and a shared-credential story; an uploaded file means none of that. This decides Phase 7's first three tasks and is a product decision, not an implementation detail.",
+          "defaultIfUnanswered": "XLSX/CSV upload by a director or placement user at /director/jobs, parsed with exceljs, plus an authenticated `/api/jobs/import/run` for an external scheduler. Dedupe key: (sourceRef ?? normalised(company + title + applyUrl)). If it turns out to be a Google Sheet, only the fetch step changes — the parser takes rows, not a file."
+        },
+        {
+          "question": "May a student see another student's raw VTU marks on the leaderboard, and may students opt out of appearing?",
+          "whyItBlocks": "Spec 4 demands the board; publishing exam performance cohort-wide is a privacy decision the spec does not explicitly authorise and that no code in this repo currently permits. Building it the naive way and retracting it later means the data has already been shown.",
+          "defaultIfUnanswered": "Show display name + rank + a coarse band (e.g. 'First Class'), never the raw mark or USN, and only within the viewer's own cohort. The viewer always sees their own exact figure. A `leaderboardOptOut` toggle on the profile removes the student from all boards. Same rule for the certificate-uploads board (count only, no titles)."
+        },
+        {
+          "question": "Must the five time-sheet buckets total 24 hours for a day, and is that a hard block or a warning?",
+          "whyItBlocks": "'Sleeping' as a bucket strongly implies whole-day accounting, and the validation rule changes the entire interaction design of the sheet — which the spec explicitly grades ('must be very easy to fill').",
+          "defaultIfUnanswered": "Soft-require: block a total above 24h, warn (do not block) below it, and show remaining hours live. Save is allowed at any total so the sheet is never a wall."
+        },
+        {
+          "question": "Does the five-bucket time sheet replace the existing per-course session log the student fills at /student/time-log, or sit alongside it?",
+          "whyItBlocks": "Course-linked session hours drive pace status, focus quality, the LOW_FOCUS_QUALITY alert and cert progress (src/lib/progress.ts, src/lib/analytics.ts). Removing the student's ability to log them would quietly hollow out the mentor screens.",
+          "defaultIfUnanswered": "Alongside. The five-bucket sheet becomes the default view at /student/time-log; the existing session log moves to /student/time-log/sessions with unchanged semantics and a link between them. No existing data is migrated or reinterpreted."
+        },
+        {
+          "question": "Who reviews a registration from an applicant who has no mentor yet, and who are the first and second approvers for a mentor's leave request?",
+          "whyItBlocks": "mentorScope() has no answer for an applicant with no mentorId, and the Mentor model has no reporting-line field at all — so 'second approver' has no source. Both flows stall on this.",
+          "defaultIfUnanswered": "Registrations: DIRECTOR and ADMIN only (mentors see nothing until assignment). Leave: `firstApproverUserId` becomes a configurable field on the Mentor record (director-set, defaults to the cohort's director); the second approver is any DIRECTOR. Second approver sees the request only after the first has approved; a rejection at either stage ends it."
+        },
+        {
+          "question": "Does an unverified certificate-backed skill claim count toward badges, the skills leaderboard and the job match percentage?",
+          "whyItBlocks": "If yes, all three are trivially gamed by uploading any file. If no, a student's genuine skills are invisible until a mentor gets to them, which changes the perceived value of the whole skilling page.",
+          "defaultIfUnanswered": "Only VERIFIED claims light a badge, score on the leaderboard, or count in the match percentage. Pending claims show to the student as 'awaiting verification' and to their mentor in the existing /mentor/uploads review queue."
+        },
+        {
+          "question": "Which mail transport and which sender identity for the weekly job alert and the registration verification email?",
+          "whyItBlocks": "There is no mail capability at all in this repo (no nodemailer/resend/sendgrid, no MAIL_* keys in .env.example). Institutional mail usually needs an authorised relay or a verified sending domain — that is a request to the college's IT, with lead time.",
+          "defaultIfUnanswered": "nodemailer over SMTP, configured by MAIL_HOST/MAIL_PORT/MAIL_USER/MAIL_PASS/MAIL_FROM in .env.example, with a console transport as the automatic dev default so nothing blocks on credentials. Every send is recorded so a re-run cannot double-send."
+        },
+        {
+          "question": "Is it acceptable for a prospective student's CV (name, phone, address) to be sent to a remote model for auto-fill, or must parsing stay on the machine?",
+          "whyItBlocks": "AGENTS.md makes this an explicit project rule, and LLM_BASE_URL may legitimately point at OpenRouter/Groq/Gemini. If remote is forbidden, CV auto-fill must be deterministic-first and the UX must say what it could not extract.",
+          "defaultIfUnanswered": "Treat a CV as student data: route the parse through studentDataEgressAllowed() exactly as generateResume does. When the gate refuses, fall back to deterministic regex/heading extraction and tell the applicant which fields to fill in by hand. Never silently send."
+        }
+      ],
+      "phases": [
+        {
+          "name": "Phase 0 — Safety prerequisites (must land before any new surface)",
+          "rationale": "Three of the spec's clauses (7, 8, 2d) build directly on code that today leaks student data, and two more (registration CV upload, job alert email) need infrastructure that does not exist. Every one of these is a blocker raised by the safety review and verified against the repo. Doing them first means the new features inherit correct behaviour instead of propagating the bug; doing them later means auditing twice as much surface.",
+          "tasks": [
+            {
+              "task": "Convert every mentor screen still using the `session.mentorId ? … : …` short-circuit to mentorScope()/menteeWhere(). The `{ kind: 'none' }` case must render notFound() (pages), return 403 (routes), or throw in server actions — never fall through to the programme. Specifically: mentor/student/[id]/page.tsx:143, mentor/student/[id]/actions.ts:48 and :221, mentor/student/page.tsx:36, mentor/reports/page.tsx:120/140/146, mentor/reports/export/route.ts:41, api/alerts/scan/route.ts:32.",
+              "files": [
+                "src/app/mentor/student/[id]/page.tsx",
+                "src/app/mentor/student/[id]/actions.ts",
+                "src/app/mentor/student/page.tsx",
+                "src/app/mentor/reports/page.tsx",
+                "src/app/mentor/reports/export/route.ts",
+                "src/app/api/alerts/scan/route.ts",
+                "src/app/mentor/(overview)/resolve-mentor.ts",
+                "src/lib/mentor-scope.ts"
+              ],
+              "specItems": [
+                "Spec 7 mentor landing page / mentee drill-through",
+                "Spec 8 mentor's student page",
+                "cross-cutting: AGENTS.md 'Staff scope is decided by role, not by a missing field'"
+              ],
+              "risk": "high",
+              "notes": "A MENTOR account with no Mentor row currently reads AND writes any student in the programme. Check whether getMentorCohort(mentorId) in src/lib/queries.ts needs a scope-aware sibling rather than a bare mentorId argument — reports/page.tsx and reports/export/route.ts both call it after the broken guard. Do not change what a DIRECTOR sees."
+            },
+            {
+              "task": "Add regression tests asserting a MENTOR session with `mentorId: undefined` gets zero students from each converted call site, and that menteeWhere() never returns `{}` for a MENTOR.",
+              "files": [
+                "src/lib/mentor-scope.test.ts",
+                "test/confirmed-defects.test.ts",
+                "test/fixtures.ts"
+              ],
+              "specItems": [
+                "cross-cutting scope enforcement"
+              ],
+              "risk": "low",
+              "notes": "test/confirmed-defects.test.ts is the existing home for 'this bug is fixed and stays fixed' cases — follow its shape."
+            },
+            {
+              "task": "Reconcile the assistant's scope with mentor-scope.ts: add a `mentees` ScopeKind, derive resolveScope() from mentorScope(session), and make visibleStudentWhere() yield `{ mentorId }` for it. A MENTOR with no Mentor row must resolve to a refusing scope, not 'programme'.",
+              "files": [
+                "src/lib/ai/agent/scope.ts",
+                "src/lib/ai/agent/types.ts",
+                "src/lib/ai/agent/tools.ts",
+                "src/lib/ai/agent/scope.test.ts"
+              ],
+              "specItems": [
+                "cross-cutting: mentor data scope"
+              ],
+              "risk": "medium",
+              "notes": "scope.ts:48-53 hard-codes MENTOR: 'programme' with a comment saying to change this one line if faculty should see only their group. AgentRun.scope is stamped at run time and is a string — add the new value without breaking historical rows."
+            },
+            {
+              "task": "Close the ungated Anthropic egress path: treat a configured ANTHROPIC_API_KEY as a remote host requiring LLM_ALLOW_REMOTE_STUDENT_DATA, make resumeWriterBlocked() report it, and keep the /student/resume banner truthful.",
+              "files": [
+                "src/lib/ai/llm.ts",
+                "src/lib/ai/resume.ts",
+                "src/lib/ai/egress.test.ts",
+                "src/app/student/resume/page.tsx",
+                "src/app/student/resume/generator-form.tsx",
+                ".env.example"
+              ],
+              "specItems": [
+                "Spec 2(d) per-job CV builder (inherits this path)",
+                "AGENTS.md: 'Route any new path that sends student data to a model through the same check'"
+              ],
+              "risk": "medium",
+              "notes": "resume.ts:249 enters the Anthropic branch on the key alone; resume.ts:104 resumeWriterBlocked() returns false when llmConfig() is null, so the banner is silent in exactly that configuration. Introduce a single `studentDataEgressAllowedFor(host: 'local'|'remote'|'anthropic')` so there is one gate for all three paths and future callers cannot miss it."
+            },
+            {
+              "task": "Harden upload handling ahead of two new upload kinds: derive mimeType from magic bytes instead of the client-declared file.type, keep ACCEPTED_TYPES closed (no image/svg+xml, no text/*), and add X-Content-Type-Options: nosniff plus Content-Security-Policy: sandbox to the file GET.",
+              "files": [
+                "src/lib/upload-sniff.ts",
+                "src/lib/upload-sniff.test.ts",
+                "src/lib/uploads.ts",
+                "src/app/api/uploads/[id]/route.ts"
+              ],
+              "specItems": [
+                "Spec 1 professional photo",
+                "Spec 3 certificate upload",
+                "Spec 1 CV upload"
+              ],
+              "risk": "medium",
+              "notes": "validateUpload currently checks only file.size and accepted.includes(file.type), both attacker-controlled; the GET echoes upload.mimeType back as Content-Type with `inline` disposition. upload-sniff.ts must be server-only-free (pure Buffer prefix checks for %PDF, PNG, JPEG SOI, RIFF/WEBP, ZIP for docx, D0CF11E0 for doc) so it can be reused by the registration quarantine path and the job importer. Keep generated UUID filenames — never store originalName on disk."
+            },
+            {
+              "task": "Add a small in-process rate limiter for unauthenticated endpoints (fixed-window per IP + per token), as a pure module.",
+              "files": [
+                "src/lib/rate-limit.ts",
+                "src/lib/rate-limit.test.ts"
+              ],
+              "specItems": [
+                "Spec 1 self-file registration (first unauthenticated write endpoint in the app)"
+              ],
+              "risk": "low",
+              "notes": "Single-process is adequate for a `next start -p 3100` deployment; state the limitation in the module docstring so a future multi-instance deploy does not silently lose it."
+            },
+            {
+              "task": "Provision mail: add nodemailer, a server-only transport module, a pure compose module, MAIL_* keys, and a console transport that is the automatic default when MAIL_HOST is unset. Record every send in a MailLog row so re-runs are idempotent.",
+              "files": [
+                "src/lib/mail/transport.ts",
+                "src/lib/mail/compose.ts",
+                "src/lib/mail/compose.test.ts",
+                ".env.example",
+                "package.json",
+                "prisma/schema.prisma"
+              ],
+              "specItems": [
+                "Spec 2 automatic job alert email",
+                "Spec 1 registration email verification"
+              ],
+              "risk": "medium",
+              "notes": "AGENTS.md's server-only rule applies: compose.ts must be pure so a scheduled `tsx` worker can build the message without importing transport.ts's environment reads. MailLog(kind, recipientUserId, dedupeKey @unique, sentAt, status) is what makes 'sent every week' not mean 'sent five times on Monday'. The MailLog model lands here in schema.prisma and is included in the Phase 1 migration."
+            }
+          ]
+        },
+        {
+          "name": "Phase 1 — Schema foundation (one migration, seed updated in the same tasks)",
+          "rationale": "Nine of the spec's features have no data model at all. Every page phase that follows names the model it reads, so the schema must land first or those phases cannot compile. Per the feasibility review, seed updates ship inside the same task as the model — `npm run db:reset` runs `prisma migrate reset --skip-seed && npm run db:seed`, so a model added without seed rows breaks the project's own reset path.",
+          "tasks": [
+            {
+              "task": "Registration & onboarding models: `Registration` (no FK to Student), `RegistrationUpload`, `RegistrationRule`, `enum RegistrationStatus { DRAFT, PENDING_VERIFICATION, PENDING_REVIEW, AUTO_APPROVED, APPROVED, REJECTED }`, `EmailVerification(token @unique, expiresAt, consumedAt)`. Add `photoUploadId` and `leaderboardOptOut` to StudentProfile.",
+              "files": [
+                "prisma/schema.prisma",
+                "prisma/seed.ts"
+              ],
+              "specItems": [
+                "Spec 1 self-file registration form",
+                "Spec 1 auto-approve within domains / else flag for review",
+                "Spec 1 professional photo",
+                "Spec 1 LinkedIn link"
+              ],
+              "risk": "medium",
+              "notes": "Registration carries the applicant's typed fields as columns (name, email, phone, degreeLevel, programme, branch, linkedinUrl) plus `parsedFromCv Json?`. It must not reference Student — Upload.studentId is a required FK and Student.cohortId is a required FK, so no row can exist pre-approval. StudentProfile.linkedinUrl already exists at schema.prisma:501; do not re-model it. Seed: two registrations, one auto-approvable, one flagged."
+            },
+            {
+              "task": "Skills models: `Skill` (catalogue: slug @unique, name, category, aliases), `StudentSkill` (@@unique([studentId, skillId]), level, verified, evidenceUploadId), `SkillClaim` (studentId, skillId, uploadId, status reusing UploadStatus semantics, reviewedById, reviewedAt).",
+              "files": [
+                "prisma/schema.prisma",
+                "prisma/seed.ts"
+              ],
+              "specItems": [
+                "Spec 1 skills badges",
+                "Spec 3 upload a certificate to claim a skill",
+                "Spec 3 browse suggested skills",
+                "Spec 4 leaderboard by skills",
+                "Spec 2(c) match percentage"
+              ],
+              "risk": "medium",
+              "notes": "StudentProfile.skills Json stays for now, marked deprecated in a schema comment, and is written through until readers are switched in Phase 3. Seed a catalogue of ~80 skills so the browse and recommend surfaces are not empty."
+            },
+            {
+              "task": "VTU marks models: `SemesterResult` (studentId, semester, sgpa, cgpa, resultClass, publishedOn, @@unique([studentId, semester])) and `SubjectMark` (semesterResultId, subjectCode, subjectName, credits, internal, external, total, passed, @@unique([semesterResultId, subjectCode])).",
+              "files": [
+                "prisma/schema.prisma",
+                "prisma/seed.ts"
+              ],
+              "specItems": [
+                "Spec 1 VTU marks chart",
+                "Spec 4 leaderboard by VTU results"
+              ],
+              "risk": "medium",
+              "notes": "grep -i vtu across src/ and prisma/ returns zero hits today; StudentProfile.education Json holds one score per degree and is not a substitute. Seed 2-3 semesters for each seeded student so the chart and leaderboard have shape."
+            },
+            {
+              "task": "SWOC model: `enum SwocSource { PLACEMENT, MENTOR, PM }`, `enum SwocKind { STRENGTH, WEAKNESS, OPPORTUNITY, CHALLENGE }`, `SwocEntry(studentId, source, kind, text, weight Int, authorUserId, recordedAt)`. Add PLACEMENT and PM to enum Role and fix every Record<Role, …> the compiler flags.",
+              "files": [
+                "prisma/schema.prisma",
+                "prisma/seed.ts",
+                "src/lib/auth.ts",
+                "src/lib/mentor-scope.ts",
+                "src/lib/ai/agent/scope.ts"
+              ],
+              "specItems": [
+                "Spec 1 SWOC chart (three sources: placement, mentor, PM)"
+              ],
+              "risk": "high",
+              "notes": "HOME_FOR_ROLE in src/lib/auth.ts is a Record<Role,string> and SCOPE_BY_ROLE in agent/scope.ts is a Record<Role,ScopeKind> — both fail typecheck until updated, which is the desired forcing function. Deliberately keep PLACEMENT and PM OUT of mentorScope()'s PROGRAMME_WIDE array: they are not mentors. See the open question; if the answer is 'no new roles', drop the Role change only — SwocEntry.source stays a hard three-value enum either way."
+            },
+            {
+              "task": "Mock attempts: `enum MockType { GD, INTERVIEW, APTITUDE }`, `MockAttempt(studentId, type, takenOn, score Float?, maxScore Float?, evaluatorUserId String?, notes String?)`.",
+              "files": [
+                "prisma/schema.prisma",
+                "prisma/seed.ts"
+              ],
+              "specItems": [
+                "Spec 1 mocks taken chart (GD, Interview, Aptitude tests)",
+                "Spec 4 leaderboard by mocks taken"
+              ],
+              "risk": "low",
+              "notes": "Must NOT be aliased onto ActivityType — APTITUDE_PREP is prep time, there is no GD value, and a time-log row carries no score."
+            },
+            {
+              "task": "Login history: `LoginDay(userId, day @db.Date, @@unique([userId, day]))`.",
+              "files": [
+                "prisma/schema.prisma",
+                "prisma/seed.ts"
+              ],
+              "specItems": [
+                "Spec 1 login streak",
+                "Spec 4 leaderboard by login streak"
+              ],
+              "risk": "low",
+              "notes": "User.lastLoginAt is a single overwritten timestamp — a streak is unrecoverable from it. Seed a plausible 60-day login history per student so the leaderboard has a distribution on day one; state in the UI copy that real streaks begin accruing at deploy."
+            },
+            {
+              "task": "Jobs models: `enum DegreeLevel { UG, PG }`, `Job` (sourceRef @unique?, title, company, degreeLevel, location, applyUrl, description, requiredSkills String[], postedOn, closesOn, importRunId), `JobApplication` (@@unique([studentId, jobId]), appliedAt, selfReported Boolean), `JobImportRun` (startedAt, rowsSeen, rowsCreated, rowsUpdated, errors Json). Add `degreeLevel` to Cohort and `jobId` to Resume.",
+              "files": [
+                "prisma/schema.prisma",
+                "prisma/seed.ts"
+              ],
+              "specItems": [
+                "Spec 2 jobs list page",
+                "Spec 2 UG/PG separation",
+                "Spec 2 weekly sheet update",
+                "Spec 2(a) click to apply",
+                "Spec 2(b) check if applied",
+                "Spec 2(d) per-job CV builder"
+              ],
+              "risk": "medium",
+              "notes": "Cohort.degreeLevel is the source of truth; Student inherits via cohort (add a denormalised column only if a query proves it necessary). Resume.jobDescription already exists at schema.prisma:530 — add jobId alongside it, do not replace it. Seed ~20 jobs across both levels."
+            },
+            {
+              "task": "Time sheet: `enum DayActivity { SLEEPING, LEISURE, LECTURES, COURSEWORK, SKILLING }` and `TimeSheetEntry(studentId, day @db.Date, activity DayActivity, minutes Int, @@unique([studentId, day, activity]))`. ActivityType is NOT modified.",
+              "files": [
+                "prisma/schema.prisma",
+                "prisma/seed.ts"
+              ],
+              "specItems": [
+                "Spec 5 exactly 5 activities"
+              ],
+              "risk": "medium",
+              "notes": "See the conflicts entry. Collapsing the existing 15-value ActivityType would destroy the mocks chart, focus quality, the LOW_FOCUS_QUALITY alert rule, pace, exports and the assertions in activity-rules.test.ts / analytics.test.ts — all of which the same spec depends on. A separate day-shape table delivers 'exactly 5' literally with zero lossy migration."
+            },
+            {
+              "task": "Leave workflow: `enum LeaveStatus { SUBMITTED, FIRST_APPROVED, APPROVED, REJECTED, CANCELLED }`, `LeaveRequest(requesterUserId, fromDate, toDate, reason, status, firstApproverUserId, firstDecision, firstDecidedAt, firstNote, secondApproverUserId, secondDecision, secondDecidedAt, secondNote, createdAt)`. Add `firstApproverUserId` to Mentor. Add `meetingAt DateTime` to MentorNote.",
+              "files": [
+                "prisma/schema.prisma",
+                "prisma/seed.ts"
+              ],
+              "specItems": [
+                "Spec 9 apply for leave with a first approver and a second approver",
+                "Spec 8 mentor meeting notes with a captured timestamp"
+              ],
+              "risk": "medium",
+              "notes": "Two separate approver blocks, never one `approved` boolean — the sequencing, the per-stage rejection and the audit trail are the clause. requesterUserId (not mentorId) so the same model serves a student leave flow later without a migration. MentorNote.meetingAt must be backfilled to createdAt for existing rows in the migration SQL."
+            },
+            {
+              "task": "Generate the single migration, run it, and prove the project still bootstraps end to end.",
+              "files": [
+                "prisma/migrations/",
+                "prisma/seed.ts",
+                "prisma/schema.prisma"
+              ],
+              "specItems": [
+                "all of Phase 1"
+              ],
+              "risk": "medium",
+              "notes": "Run `npm run db:migrate` once for the whole phase, then `npm run db:reset && npm run typecheck && npm run test`. Any column added to an existing table must be nullable or defaulted, or the migration fails on seeded data. Hand-edit the generated SQL to backfill MentorNote.meetingAt = createdAt and Cohort.degreeLevel = 'PG'."
+            }
+          ]
+        },
+        {
+          "name": "Phase 2 — Registration & onboarding",
+          "rationale": "This is the spec's entry point and the app's first unauthenticated write surface. It depends on Phase 0 (rate limiter, upload sniffing, mail transport, egress gate) and Phase 1 (Registration models), and everything downstream assumes students can exist without prisma/seed.ts.",
+          "tasks": [
+            {
+              "task": "Open the public route surface: exclude /register, /register/*, /mentor/login and /api/register/* from the middleware matcher, and add a public layout that does not assume a session.",
+              "files": [
+                "src/middleware.ts",
+                "src/app/register/layout.tsx"
+              ],
+              "specItems": [
+                "Spec 1 self-file the registration form",
+                "Spec 6 mentor login page"
+              ],
+              "risk": "medium",
+              "notes": "The current matcher is ['/student/:path*','/mentor/:path*','/director/:path*'] — '/mentor/login' is caught by it and would redirect to /login before rendering. Use a negated-path matcher entry and add a test-by-inspection note in the file; getting this wrong either locks out registration or opens the dashboard."
+            },
+            {
+              "task": "Build the self-file registration form and its server action: validated with zod, rate-limited, writing a Registration row in PENDING_VERIFICATION.",
+              "files": [
+                "src/app/register/page.tsx",
+                "src/app/register/registration-form.tsx",
+                "src/app/register/actions.ts",
+                "src/lib/registration/schema.ts",
+                "src/lib/registration/schema.test.ts"
+              ],
+              "specItems": [
+                "Spec 1 self-file the registration form",
+                "Spec 1 capture LinkedIn profile link"
+              ],
+              "risk": "medium",
+              "notes": "registration/schema.ts is pure (zod only, no server-only) so the same validation runs in the CV-parse mapper and in tests. Fields: name, email, phone, degreeLevel, programme, branch, usn (optional — see below), linkedinUrl, city. Never accept role, cohortId or status from the client."
+            },
+            {
+              "task": "Anonymous CV upload into a quarantine root keyed on a server-generated registration token, with TTL sweep and rate limiting.",
+              "files": [
+                "src/app/api/register/cv/route.ts",
+                "src/lib/registration/quarantine.ts",
+                "scripts/sweep-quarantine.ts"
+              ],
+              "specItems": [
+                "Spec 1 upload a CV"
+              ],
+              "risk": "high",
+              "notes": "Upload.studentId is a non-null FK and saveUpload() keys the directory on studentId, so the normal path cannot be reused. Write to storage/registration/<token>/ with a UUID filename, validate with the Phase 0 magic-byte sniffer, cap at MAX_UPLOAD_BYTES, and rate-limit by IP. Promote to a real Upload row only at approval, when the Student exists. Sweep abandoned tokens after 7 days."
+            },
+            {
+              "task": "Extract text from an uploaded CV (PDF/DOCX) and map it to form fields deterministically.",
+              "files": [
+                "src/lib/registration/cv-text.ts",
+                "src/lib/registration/cv-map.ts",
+                "src/lib/registration/cv-map.test.ts",
+                "package.json"
+              ],
+              "specItems": [
+                "Spec 1 the system auto-fills the form from it"
+              ],
+              "risk": "medium",
+              "notes": "Adds pdf-parse and mammoth. cv-map.ts must be server-only-free (headings/regex over plain text → name, email, phone, linkedin, education, skills) so it is testable and runnable outside a Next request — this is the activity-rules.ts / llm-parse.ts split AGENTS.md asks you to preserve. cv-text.ts touches the filesystem and may be server-only."
+            },
+            {
+              "task": "Optional LLM-assisted CV field extraction, gated by studentDataEgressAllowed(), falling back to the deterministic mapper and telling the applicant which fields it could not fill.",
+              "files": [
+                "src/lib/registration/cv-llm.ts",
+                "src/lib/ai/egress.test.ts",
+                "src/app/register/registration-form.tsx"
+              ],
+              "specItems": [
+                "Spec 1 the system auto-fills the form from it"
+              ],
+              "risk": "medium",
+              "notes": "A CV carries name, phone and address — student data by AGENTS.md's definition. Route it through the same gate as generateResume (and through the Phase 0 fix, so the Anthropic path is covered too). When the gate refuses, say so on screen rather than silently degrading."
+            },
+            {
+              "task": "Email verification round trip: send a single-use token on submit, consume it at /register/verify, and only then evaluate the auto-approve rule.",
+              "files": [
+                "src/app/api/register/verify/route.ts",
+                "src/app/register/verify/page.tsx",
+                "src/lib/registration/verify.ts",
+                "src/lib/mail/compose.ts"
+              ],
+              "specItems": [
+                "Spec 1 auto-approve the profile if within specified domains"
+              ],
+              "risk": "medium",
+              "notes": "Without this, 'within specified domains' is a claim, not a fact, and auto-approval hands a stranger a STUDENT session that can read the Phase 6 leaderboards. Token: 32 random bytes, hashed at rest, 24h expiry, single use. Verification failure routes to review, never to an error page."
+            },
+            {
+              "task": "Auto-approve rule engine plus a director screen to edit the allowlists.",
+              "files": [
+                "src/lib/registration/rules.ts",
+                "src/lib/registration/rules.test.ts",
+                "src/app/director/registrations/settings/page.tsx",
+                "src/app/director/registrations/settings/actions.ts"
+              ],
+              "specItems": [
+                "Spec 1 auto-approve the profile if within specified domains; else flag for review & approve"
+              ],
+              "risk": "medium",
+              "notes": "rules.ts is pure: (registration, rules) => 'AUTO_APPROVED' | 'PENDING_REVIEW' with a stated reason string that is stored on the row. Implements both readings of 'domains' (verified email domain AND programme/branch), each independently disableable — see the open question. Never hard-code the list in a component or an env var."
+            },
+            {
+              "task": "Registration review queue: list, inspect (including the parsed CV and photo), approve with cohort assignment and USN confirmation, or reject with a reason. Approval provisions User + Student + StudentProfile + promotes quarantined uploads.",
+              "files": [
+                "src/app/director/registrations/page.tsx",
+                "src/app/director/registrations/review-panel.tsx",
+                "src/app/director/registrations/actions.ts",
+                "src/lib/registration/provision.ts",
+                "src/lib/registration/provision.test.ts"
+              ],
+              "specItems": [
+                "Spec 1 else flag for review & approve"
+              ],
+              "risk": "high",
+              "notes": "DIRECTOR/ADMIN only — an applicant has no mentor, so mentorScope() cannot answer for them and mentors must see nothing here (see open question). This is a distinct queue from /mentor/uploads, which reviews Upload rows, not profiles; do not overload it. provision.ts runs in one prisma.$transaction: create User (with a generated password + reset mail, or an invite link), Student (cohortId chosen by the reviewer, usn confirmed), StudentProfile, move quarantined files under storage/uploads/<studentId>/ and create Upload rows."
+            },
+            {
+              "task": "Capture and render the professional photo and the LinkedIn link on registration and on the student profile.",
+              "files": [
+                "src/app/register/registration-form.tsx",
+                "src/app/student/profile/page.tsx",
+                "src/app/student/profile/profile-form.tsx",
+                "src/app/student/profile/actions.ts",
+                "src/components/student-photo.tsx"
+              ],
+              "specItems": [
+                "Spec 1 capture LinkedIn profile link & professional photo"
+              ],
+              "risk": "low",
+              "notes": "StudentProfile.linkedinUrl already exists (schema.prisma:501) — add form capture and URL validation only, do not re-model it. 'Professional' is enforced as: image types only (already the ACCEPTED_TYPES rule for PROFILE_PHOTO), min 300x300, plus written guidance and mentor verification via the existing UploadStatus flow. Write that decision into the module docstring so it is not silently dropped. StudentProfile.photoUploadId is the canonical pointer; render it on the profile, the landing page and the resume header."
+            }
+          ]
+        },
+        {
+          "name": "Phase 3 — Skills, certificate claims and recommendations",
+          "rationale": "Skills are the shared dependency of four separate spec clauses (badges, skilling page, skills leaderboard, job match %). Promoting them out of the JSON blob once, here, is what makes those four buildable; leaving it until the jobs page means writing the match algorithm twice.",
+          "tasks": [
+            {
+              "task": "Seed the skill catalogue and build the 'browse suggested skills' surface.",
+              "files": [
+                "prisma/seed.ts",
+                "src/app/student/skilling/page.tsx",
+                "src/app/student/skilling/skill-browser.tsx",
+                "src/lib/skills/catalogue.ts"
+              ],
+              "specItems": [
+                "Spec 3 browse suggested skills"
+              ],
+              "risk": "low",
+              "notes": "Catalogue is shared with the top-5 recommender — build it once, reference it twice. Categories should map onto the existing Dimension enum where they sensibly can, so the skilling page speaks REEP's own language."
+            },
+            {
+              "task": "Backfill StudentProfile.skills JSON into StudentSkill and switch readers to the table, keeping the JSON column written through and marked deprecated.",
+              "files": [
+                "prisma/migrations/",
+                "src/lib/skills/backfill.ts",
+                "src/lib/ai/profile.ts",
+                "src/lib/queries.ts",
+                "src/app/student/profile/actions.ts",
+                "src/app/student/profile/json-lists.ts"
+              ],
+              "specItems": [
+                "Spec 1 skills badges",
+                "Spec 4 leaderboard by skills",
+                "Spec 2(c) match percentage"
+              ],
+              "risk": "high",
+              "notes": "src/lib/ai/profile.ts normaliseProfile() and the resume path both read the JSON today; a half-switched reader means the resume silently loses skills. Match free-text skill names against Skill.aliases, and put anything unmatched into a Skill row flagged `uncurated` rather than dropping it."
+            },
+            {
+              "task": "Certificate-uploads-a-skill claim flow, wired into the existing mentor review queue.",
+              "files": [
+                "src/app/student/skilling/claim-panel.tsx",
+                "src/app/api/skills/claim/route.ts",
+                "src/app/api/uploads/[id]/review/route.ts",
+                "src/app/mentor/uploads/review-panel.tsx",
+                "src/lib/skills/claims.ts"
+              ],
+              "specItems": [
+                "Spec 3 upload a certificate to claim a skill"
+              ],
+              "risk": "medium",
+              "notes": "Reuse UploadKind.CERTIFICATE_PROOF and the PENDING_REVIEW/VERIFIED/REJECTED lifecycle rather than inventing a second approval mechanism. Verifying an upload promotes the linked SkillClaim and sets StudentSkill.verified. Only VERIFIED claims light a badge or score on a leaderboard (see open question) — otherwise the board is gameable by uploading anything."
+            },
+            {
+              "task": "Skills badges component, showing verified badges and pending claims distinctly.",
+              "files": [
+                "src/components/skill-badges.tsx",
+                "src/app/student/skilling/page.tsx"
+              ],
+              "specItems": [
+                "Spec 1 skills badges"
+              ],
+              "risk": "low",
+              "notes": "Consumed by the Phase 5 landing page; build it standalone so the landing page composes rather than duplicates."
+            },
+            {
+              "task": "Top-5 skilling recommender as a pure module with a hard take(5).",
+              "files": [
+                "src/lib/skills/recommend.ts",
+                "src/lib/skills/recommend.test.ts",
+                "src/components/skill-recommendations.tsx"
+              ],
+              "specItems": [
+                "Spec 1 top 5 skilling recommendations"
+              ],
+              "risk": "medium",
+              "notes": "Ranks catalogue skills the student lacks by: frequency across open Job.requiredSkills for their degreeLevel, then stage relevance, then certification coverage. Deterministic and offline — no LLM, no egress. The literal number 5 must appear in the module (`export const RECOMMENDATION_COUNT = 5`) and in its test, so it survives refactoring. Before Phase 7 lands jobs, the job-frequency term is simply zero and stage relevance carries the ranking; the test must cover that empty-jobs case."
+            }
+          ]
+        },
+        {
+          "name": "Phase 4 — Academic signals: VTU marks, SWOC, mocks, login streak",
+          "rationale": "These four are the landing page's missing tiles and three of the five leaderboards. Each is model + ingest + display, and each is independent of the others, so they can be worked in parallel by different hands once Phase 1 has landed.",
+          "tasks": [
+            {
+              "task": "VTU marks ingest: XLSX/CSV upload with a documented column format, dry-run preview, and idempotent commit keyed on (studentId, semester, subjectCode). Plus per-student manual correction.",
+              "files": [
+                "src/lib/marks/parse.ts",
+                "src/lib/marks/parse.test.ts",
+                "src/app/api/marks/import/route.ts",
+                "src/app/director/marks/page.tsx",
+                "src/app/director/marks/import-panel.tsx",
+                "src/app/director/marks/actions.ts"
+              ],
+              "specItems": [
+                "Spec 1 VTU marks chart",
+                "Spec 4 leaderboard by VTU results"
+              ],
+              "risk": "high",
+              "notes": "exceljs is already a dependency — no new package. parse.ts is server-only-free and takes rows, not a file, so a future portal feed changes only the fetch step. No scraping (see open question). Reject rows whose USN is not in the programme rather than creating students."
+            },
+            {
+              "task": "VTU marks chart on the student landing page: SGPA per semester plus a subject breakdown for the latest semester.",
+              "files": [
+                "src/components/marks-chart.tsx",
+                "src/lib/queries.ts"
+              ],
+              "specItems": [
+                "Spec 1 VTU marks chart"
+              ],
+              "risk": "low",
+              "notes": "@mui/x-charts is already in use (src/components/reep-charts.tsx) — match its conventions and the palette in src/components/tone.ts."
+            },
+            {
+              "task": "SWOC capture for all three sources and the student-facing SWOC chart.",
+              "files": [
+                "prisma/schema.prisma",
+                "src/app/mentor/student/[id]/swoc-panel.tsx",
+                "src/app/mentor/student/[id]/actions.ts",
+                "src/app/director/swoc/page.tsx",
+                "src/app/director/swoc/actions.ts",
+                "src/components/swoc-chart.tsx",
+                "src/lib/swoc/scope.ts",
+                "src/lib/swoc/scope.test.ts"
+              ],
+              "specItems": [
+                "Spec 1 SWOC chart (three sources: placement, mentor, PM)"
+              ],
+              "risk": "high",
+              "notes": "The three-source sub-clause is the part most likely to collapse into one free-text box — the chart must visibly distinguish PLACEMENT / MENTOR / PM (grouped or stacked by source). A mentor writing SWOC goes through menteeWhere(); PLACEMENT and PM authorship goes through the new swocAuthorScope() and is programme-wide by design. source is set server-side from the author's role, never from the form."
+            },
+            {
+              "task": "Mock attempt recording (staff-entered) and the student mocks-taken chart across GD, Interview and Aptitude.",
+              "files": [
+                "src/app/mentor/student/[id]/mocks-panel.tsx",
+                "src/app/mentor/student/[id]/actions.ts",
+                "src/app/api/mocks/route.ts",
+                "src/components/mocks-chart.tsx"
+              ],
+              "specItems": [
+                "Spec 1 mocks taken chart (GD, Interview, Aptitude tests)",
+                "Spec 4 leaderboard by mocks taken"
+              ],
+              "risk": "medium",
+              "notes": "All three categories must render even at zero — a chart with two series is a silently dropped clause. Writes are scoped by menteeWhere(); evaluatorUserId is the session user, not a form field."
+            },
+            {
+              "task": "Record a LoginDay on every successful authenticate(), compute streaks in a pure module, and show the streak on the landing page.",
+              "files": [
+                "src/lib/auth.ts",
+                "src/lib/streak.ts",
+                "src/lib/streak.test.ts",
+                "src/components/streak-tile.tsx"
+              ],
+              "specItems": [
+                "Spec 1 login streak",
+                "Spec 4 leaderboard by login streak"
+              ],
+              "risk": "medium",
+              "notes": "authenticate() already does a prisma.user.update for lastLoginAt — add an upsert on (userId, day) in the same call. streak.ts takes an array of day keys and returns current/longest with NO window cap: consistency() in src/lib/analytics.ts is a different metric (lab check-in days over a hard-coded 30-day window) and must not be reused, or every top-ranked student ties at 30. State in the UI copy that streaks begin accruing at deploy — the data is unrecoverable from User.lastLoginAt."
+            }
+          ]
+        },
+        {
+          "name": "Phase 5 — Student landing page",
+          "rationale": "The landing page is pure composition over Phases 3 and 4 plus what already exists (stage, attendance). Assembling it after its inputs exist means each tile is wired to real data once, rather than to a placeholder that is later rewired.",
+          "tasks": [
+            {
+              "task": "Add a single landing query that loads all eight tiles in one pass.",
+              "files": [
+                "src/lib/queries.ts"
+              ],
+              "specItems": [
+                "Spec 1 student landing page"
+              ],
+              "risk": "medium",
+              "notes": "Follow the existing `cache(async (studentId) => …)` shape of getStudentHome. Keep it to one round of parallel queries; the page has eight independent tiles and N+1 here is very easy to write by accident."
+            },
+            {
+              "task": "Compose the landing page: stage of REEP, attendance chart, VTU marks chart, SWOC chart, skills badges, top 5 skilling recommendations, mocks taken chart, login streak.",
+              "files": [
+                "src/app/student/page.tsx",
+                "src/components/reep-charts.tsx"
+              ],
+              "specItems": [
+                "Spec 1 stage of REEP",
+                "Spec 1 attendance chart",
+                "Spec 1 VTU marks chart",
+                "Spec 1 SWOC chart",
+                "Spec 1 skills badges",
+                "Spec 1 top 5 skilling recommendations",
+                "Spec 1 mocks taken chart",
+                "Spec 1 login streak"
+              ],
+              "risk": "medium",
+              "notes": "All eight tiles must render for a brand-new student with no data — an empty state per tile, never a crash or a blank. Stage and attendance already have data (Student.currentStage, AttendanceRecord); the other six come from Phases 3 and 4."
+            }
+          ]
+        },
+        {
+          "name": "Phase 6 — Leaderboards",
+          "rationale": "All five boards depend on models from Phases 1, 3 and 4. This is also the app's first student-to-student read path, so the scoping helper is a prerequisite task within the phase, not an afterthought.",
+          "tasks": [
+            {
+              "task": "Build src/lib/leaderboard-scope.ts: cohort-capped student selection for a STUDENT session, a hard field whitelist on the returned payload, and honouring StudentProfile.leaderboardOptOut.",
+              "files": [
+                "src/lib/leaderboard-scope.ts",
+                "src/lib/leaderboard-scope.test.ts"
+              ],
+              "specItems": [
+                "Spec 4 leaderboards page"
+              ],
+              "risk": "high",
+              "notes": "No student-to-student read path exists today — visibleStudentWhere() pins a STUDENT to `{ id: selfStudentId }` and upload-access.ts to their own files. Without this helper the boards will be written as an unscoped prisma.student.findMany(). The test must assert the returned row type contains no usn, no raw mark, no attendance %, and no upload titles."
+            },
+            {
+              "task": "Build the five boards behind that helper: certificate uploads, skills, VTU results, login streak, mocks taken — each with an explicit ranking key, an explicit tie-break, and the viewer's own row always visible.",
+              "files": [
+                "src/app/student/leaderboards/page.tsx",
+                "src/app/student/leaderboards/board-table.tsx",
+                "src/lib/leaderboard/boards.ts",
+                "src/lib/leaderboard/boards.test.ts"
+              ],
+              "specItems": [
+                "Spec 4 by certificate uploads",
+                "Spec 4 by skills",
+                "Spec 4 by VTU results",
+                "Spec 4 by login streak",
+                "Spec 4 by mocks taken"
+              ],
+              "risk": "medium",
+              "notes": "Exactly five named boards — delivering three is not coverage. Ranking keys: VERIFIED upload count; VERIFIED StudentSkill count; latest CGPA (displayed as rank + class band, not the raw figure — see open question); current login streak; MockAttempt count. Tie-break on earliest achievement date, then name, so the order is stable between renders."
+            },
+            {
+              "task": "Add the leaderboard opt-out control to the student profile.",
+              "files": [
+                "src/app/student/profile/profile-form.tsx",
+                "src/app/student/profile/actions.ts"
+              ],
+              "specItems": [
+                "Spec 4 leaderboards page"
+              ],
+              "risk": "low",
+              "notes": "An opted-out student still sees their own position; they simply do not appear in anyone else's list."
+            }
+          ]
+        },
+        {
+          "name": "Phase 7 — Jobs: ingest, alerts, list page, match, per-job CV",
+          "rationale": "The largest unbuilt surface in the spec. It depends on the mail transport (Phase 0), the Job models (Phase 1), and the normalised skills table (Phase 3) for the match percentage. Ingest comes before display because a jobs page with no jobs cannot be reviewed.",
+          "tasks": [
+            {
+              "task": "Pure job-sheet parser: rows in, normalised Job records out, with a stable dedupe key and per-row error reporting.",
+              "files": [
+                "src/lib/jobs/parse.ts",
+                "src/lib/jobs/parse.test.ts"
+              ],
+              "specItems": [
+                "Spec 2 the jobs list sheet is updated every week"
+              ],
+              "risk": "medium",
+              "notes": "server-only-free per AGENTS.md, because the weekly runner may be a plain tsx script — 23 files under src/ import server-only and none of them may be pulled in here. Dedupe key: sourceRef when present, else normalised(company + title + applyUrl). Required columns documented in the module docstring and mirrored in a template at scripts/templates/."
+            },
+            {
+              "task": "Idempotent importer + upload UI + authenticated import endpoint, recording a JobImportRun each time.",
+              "files": [
+                "src/lib/jobs/import.ts",
+                "src/app/api/jobs/import/route.ts",
+                "src/app/api/jobs/import/run/route.ts",
+                "src/app/director/jobs/page.tsx",
+                "src/app/director/jobs/import-panel.tsx"
+              ],
+              "specItems": [
+                "Spec 2 the jobs list sheet is updated every week"
+              ],
+              "risk": "medium",
+              "notes": "exceljs already handles XLSX; CSV via the existing src/lib/export/csv.ts conventions. Re-importing the same sheet must update, never duplicate. /api/jobs/import/run is guarded by a JOBS_CRON_TOKEN bearer check (not a session) so an external scheduler can call it."
+            },
+            {
+              "task": "Document and provide the weekly trigger: an npm script, a token-authenticated endpoint, and a README runbook for the host scheduler.",
+              "files": [
+                "package.json",
+                "scripts/run-weekly-jobs.ts",
+                "README.md",
+                ".env.example"
+              ],
+              "specItems": [
+                "Spec 2 updated every week",
+                "Spec 2 an automatic job alert email is sent"
+              ],
+              "risk": "medium",
+              "notes": "Nothing in this deployment can self-schedule — npm start is a plain `next start -p 3100` and docker-compose provisions Postgres only. Name the actual runner (Windows Task Scheduler on the host, weekly) rather than implying cron exists. The script must import only server-only-free modules plus a thin Prisma entry point."
+            },
+            {
+              "task": "Compose and send the weekly job alert, audience-filtered by degree level, deduped through MailLog.",
+              "files": [
+                "src/lib/jobs/alert-copy.ts",
+                "src/lib/jobs/alert-copy.test.ts",
+                "src/lib/jobs/alert-send.ts",
+                "src/lib/mail/transport.ts"
+              ],
+              "specItems": [
+                "Spec 2 an automatic job alert email is sent"
+              ],
+              "risk": "high",
+              "notes": "alert-copy.ts is pure (student summary + job list in, subject/body out). Audience rule: students whose cohort degreeLevel matches the job's, excluding jobs already alerted (MailLog dedupeKey = `job-alert:<studentId>:<isoWeek>`). Sending a student's name to their own address is not an egress concern, but do not put marks or SWOC in the mail body."
+            },
+            {
+              "task": "Jobs list page with Undergraduate / Post Graduate separation.",
+              "files": [
+                "src/app/student/jobs/page.tsx",
+                "src/app/student/jobs/jobs-table.tsx",
+                "src/lib/queries.ts"
+              ],
+              "specItems": [
+                "Spec 2 jobs list page: Undergraduate and Post Graduate separation"
+              ],
+              "risk": "medium",
+              "notes": "The student's own level (from cohort.degreeLevel) is the default tab, and both tabs are browsable. Filtering must be real — a tab that filters nothing is not coverage."
+            },
+            {
+              "task": "Columns (a) click to apply and (b) check if applied.",
+              "files": [
+                "src/app/student/jobs/jobs-table.tsx",
+                "src/app/api/jobs/[id]/apply/route.ts"
+              ],
+              "specItems": [
+                "Spec 2(a) click to apply",
+                "Spec 2(b) check if applied"
+              ],
+              "risk": "low",
+              "notes": "(a) opens Job.applyUrl in a new tab (rel=noopener) and records an intent. (b) is a student-set checkbox writing JobApplication with selfReported=true, unique on (studentId, jobId) — the spec's wording reads as self-attestation, so label it as such in the UI rather than implying verification."
+            },
+            {
+              "task": "Column (c) match percentage: deterministic skills-to-JD scoring in a pure module.",
+              "files": [
+                "src/lib/jobs/match.ts",
+                "src/lib/jobs/match.test.ts",
+                "src/app/student/jobs/jobs-table.tsx"
+              ],
+              "specItems": [
+                "Spec 2(c) show match percentage based on match between the student's skills and the job description"
+              ],
+              "risk": "medium",
+              "notes": "No LLM and therefore no egress question: overlap of VERIFIED StudentSkill (plus Skill.aliases) against Job.requiredSkills and tokens extracted from Job.description, weighted by skill level. Must define and test the empty-skills case explicitly (show 'add skills to see your match', not 0%). If an LLM is ever added here, the JD alone is public data but the student's skill list is not — it would have to go through studentDataEgressAllowed()."
+            },
+            {
+              "task": "Column (d) per-job CV builder: link from the row into the generator with the JD prefilled and jobId recorded.",
+              "files": [
+                "src/app/student/jobs/jobs-table.tsx",
+                "src/app/student/resume/page.tsx",
+                "src/app/student/resume/generator-form.tsx",
+                "src/app/api/resume/generate/route.ts",
+                "src/lib/ai/resume.ts"
+              ],
+              "specItems": [
+                "Spec 2(d) clickable CV builder that builds a CV targeted at that specific job"
+              ],
+              "risk": "medium",
+              "notes": "Resume.jobDescription already exists (schema.prisma:530) and generateResume already targets a JD — set Resume.jobId as well so the CV is traceable to the posting. The jobs page must surface the same resumeWriterBlocked() message the resume screen does, using the Phase 0 fix so the Anthropic path is covered too. Do not fork generateResume."
+            }
+          ]
+        },
+        {
+          "name": "Phase 8 — Time sheet",
+          "rationale": "Independent of the jobs work and safe to run in parallel with Phase 7, but it must come after Phase 1 so TimeSheetEntry exists. Placed late because it touches the analytics engine, and doing that while other phases are mid-flight makes failures hard to attribute.",
+          "tasks": [
+            {
+              "task": "Time-sheet rules as a pure module: the five buckets, whole-day validation, and copy-yesterday semantics.",
+              "files": [
+                "src/lib/timesheet/rules.ts",
+                "src/lib/timesheet/rules.test.ts"
+              ],
+              "specItems": [
+                "Spec 5 exactly 5 activities",
+                "Spec 5 must be very easy to fill"
+              ],
+              "risk": "low",
+              "notes": "`export const DAY_ACTIVITIES` is exactly five entries with the spec's own labels — sleeping, engaged in leisure, engaged in lectures, engaged in coursework, engaged in skilling — and a test asserts length === 5. Validation per the open question: block above 24h, warn below. server-only-free, following activity-rules.ts."
+            },
+            {
+              "task": "Rebuild /student/time-log as the five-bucket sheet with an explicit ease-of-use bar, and move the existing course-linked session log to /student/time-log/sessions.",
+              "files": [
+                "src/app/student/time-log/page.tsx",
+                "src/app/student/time-log/day-sheet.tsx",
+                "src/app/student/time-log/sessions/page.tsx",
+                "src/app/student/time-log/activity-entry-grid.tsx",
+                "src/app/student/time-log/activity-session-grid.tsx",
+                "src/app/student/time-log/mode-legend.tsx"
+              ],
+              "specItems": [
+                "Spec 5 student time sheet: must be very easy to fill"
+              ],
+              "risk": "medium",
+              "notes": "Acceptance bar, written into the page docstring so it is not rationalised away at review: one screen, five steppers in 30-minute increments, a live 'X h remaining of 24', one tap to copy yesterday, whole day saveable in under 30 seconds without scrolling on a 1366x768 laptop. The existing session grids move unchanged — no re-implementation."
+            },
+            {
+              "task": "Time-sheet write API with upsert-per-(student, day, activity) semantics.",
+              "files": [
+                "src/app/api/timesheet/route.ts",
+                "src/lib/timesheet/store.ts"
+              ],
+              "specItems": [
+                "Spec 5 student time sheet"
+              ],
+              "risk": "low",
+              "notes": "Own route — do NOT extend /api/activity/bulk, which writes LabSession rows against the 15-value ActivityType and serves a different purpose. Re-saving a day replaces that day's five rows atomically."
+            },
+            {
+              "task": "Keep sleeping and leisure out of every learning aggregate, and prove it.",
+              "files": [
+                "src/lib/analytics.ts",
+                "src/lib/progress.ts",
+                "src/lib/analytics.test.ts",
+                "src/lib/progress.test.ts",
+                "src/lib/export/collect.ts",
+                "scripts/verify-formulas.ts"
+              ],
+              "specItems": [
+                "Spec 5 exactly 5 activities (sleeping, leisure)"
+              ],
+              "risk": "medium",
+              "notes": "Because TimeSheetEntry is a separate table, no existing aggregate changes by default — this task exists to VERIFY that, and to add TimeSheetEntry's learning buckets (lectures/coursework/skilling) to exports and to the mentor view as a clearly-labelled separate figure that never feeds Student.weeklyHourTarget or pace. If any aggregate is found reading both tables, it is a bug; fix it here. Run scripts/verify-formulas.ts as the proof."
+            }
+          ]
+        },
+        {
+          "name": "Phase 9 — Mentor pages and the leave workflow",
+          "rationale": "Three of these four clauses are already partly built and were corrected in Phase 0, so this phase is mostly verify-and-extend. The leave workflow is the one genuinely new mentor surface and it depends on the mail transport for stage notifications.",
+          "tasks": [
+            {
+              "task": "Add /mentor/login: the shared authenticate() path with mentor-facing copy and a post-login redirect to /mentor.",
+              "files": [
+                "src/app/mentor/login/page.tsx",
+                "src/app/mentor/login/login-form.tsx",
+                "src/app/login/actions.ts",
+                "src/middleware.ts"
+              ],
+              "specItems": [
+                "Spec 6 mentor login page"
+              ],
+              "risk": "low",
+              "notes": "Requires the Phase 2 middleware change — '/mentor/login' is otherwise caught by the '/mentor/:path*' matcher and redirected to /login before rendering. One authenticate() implementation, one session shape; a student signing in here is redirected by HOME_FOR_ROLE as usual."
+            },
+            {
+              "task": "Verify the mentee list and drill-through against the Phase 0 conversion; add a regression test that a mentor with no Mentor row sees an empty list rather than the programme.",
+              "files": [
+                "src/app/mentor/student/page.tsx",
+                "src/app/mentor/student/mentee-grid.tsx",
+                "test/confirmed-defects.test.ts"
+              ],
+              "specItems": [
+                "Spec 7 list of mentees, each clickable through to that student's profile"
+              ],
+              "risk": "low",
+              "notes": "Extend, do not rebuild — the grid and the route already exist. Forbid any new mentee-listing query that bypasses mentorScope()/menteeWhere()."
+            },
+            {
+              "task": "Add meetingAt to the mentor note form and display both the meeting time and the immutable written-at stamp.",
+              "files": [
+                "src/app/mentor/student/[id]/actions.ts",
+                "src/app/mentor/student/[id]/page.tsx",
+                "src/components/focus-notes.tsx"
+              ],
+              "specItems": [
+                "Spec 8 write mentor meeting notes, with a captured timestamp"
+              ],
+              "risk": "low",
+              "notes": "meetingAt defaults to now and is editable (a note written a week later should record the meeting, not the typing); createdAt stays immutable and is labelled 'recorded'. Both are shown."
+            },
+            {
+              "task": "Leave request submission for staff.",
+              "files": [
+                "src/app/mentor/leave/page.tsx",
+                "src/app/mentor/leave/leave-form.tsx",
+                "src/app/mentor/leave/actions.ts",
+                "src/lib/leave/rules.ts",
+                "src/lib/leave/rules.test.ts"
+              ],
+              "specItems": [
+                "Spec 9 apply for leave"
+              ],
+              "risk": "medium",
+              "notes": "rules.ts is pure: valid date range, overlap detection against existing non-rejected requests, and resolution of the two default approvers (Mentor.firstApproverUserId, else the cohort's director; second = any DIRECTOR). See the open question."
+            },
+            {
+              "task": "Two-stage approval: first approver decides, then and only then the second sees it; rejection at either stage ends the request; every transition is stamped and notified.",
+              "files": [
+                "src/app/mentor/leave/approvals/page.tsx",
+                "src/app/mentor/leave/approvals/approval-panel.tsx",
+                "src/app/mentor/leave/approvals/actions.ts",
+                "src/lib/leave/scope.ts",
+                "src/lib/leave/scope.test.ts",
+                "src/lib/mail/compose.ts"
+              ],
+              "specItems": [
+                "Spec 9 with a first approver and a second approver"
+              ],
+              "risk": "high",
+              "notes": "Never collapse this into a single `approved` boolean — the ordering, the per-stage decision and the audit trail are the clause. Approver eligibility is computed, following the accessForStudent() pattern: an approver must be the named approver for that request, and a MENTOR with `{ kind: 'none' }` scope is rejected outright. A request is visible to the second approver only in FIRST_APPROVED. Notification at each transition goes through the Phase 0 mail transport with a MailLog dedupe key."
+            }
+          ]
+        },
+        {
+          "name": "Phase 10 — Programme widening and clause acceptance",
+          "rationale": "UG/PG touches every student-facing clause and is cheapest to verify once everything else is in place. The clause-by-clause acceptance sweep is what turns 'implemented' into 'demonstrably covers the spec', which is the standard the spec author set.",
+          "tasks": [
+            {
+              "task": "Wire DegreeLevel through cohort administration, registration, the jobs page and the leaderboards, and confirm a UG cohort is creatable end to end.",
+              "files": [
+                "src/app/director/mentors/page.tsx",
+                "src/app/director/registrations/review-panel.tsx",
+                "src/app/student/jobs/page.tsx",
+                "src/lib/leaderboard-scope.ts",
+                "prisma/seed.ts"
+              ],
+              "specItems": [
+                "Spec 2 Undergraduate and Post Graduate separation"
+              ],
+              "risk": "medium",
+              "notes": "Seed one UG cohort so the separation is visibly exercised rather than asserted. Per the open question, Stage / course catalogue / semester counts are NOT redesigned for UG in this iteration — the director UI should say so plainly where a UG cohort has no REEP curriculum loaded, rather than showing empty charts that look broken."
+            },
+            {
+              "task": "Update the project's own documentation: README runbook (weekly job import, marks import, mail setup), .env.example (MAIL_*, JOBS_CRON_TOKEN), package.json description, and an AGENTS.md project-notes entry recording the new pure-module boundaries.",
+              "files": [
+                "README.md",
+                ".env.example",
+                "package.json",
+                "AGENTS.md"
+              ],
+              "specItems": [
+                "cross-cutting"
+              ],
+              "risk": "low",
+              "notes": "AGENTS.md's server-only section names activity-rules.ts and llm-parse.ts as the pattern to preserve — add src/lib/jobs/*, src/lib/skills/recommend.ts, src/lib/timesheet/rules.ts, src/lib/streak.ts, src/lib/marks/parse.ts, src/lib/registration/cv-map.ts and src/lib/mail/compose.ts to that list so the next contributor keeps them clean. Note the AGENTS.md block is regenerated by `next dev` — commit the change with the work rather than fighting it."
+            },
+            {
+              "task": "Clause-by-clause acceptance sweep against the spec, recorded as a checked table.",
+              "files": [
+                "scripts/spec-acceptance.ts",
+                "README.md"
+              ],
+              "specItems": [
+                "all"
+              ],
+              "risk": "low",
+              "notes": "One row per spec clause with the route or module that satisfies it and the test that proves it. The three clauses most likely to be silently under-delivered and therefore checked explicitly: SWOC shows three distinct sources; the mocks chart shows all three of GD, Interview and Aptitude; the leaderboards page has exactly five boards. Also assert the time sheet offers exactly five activities and the recommender returns at most five."
+            }
+          ]
+        }
+      ],
+      "newDependencies": [
+        "nodemailer — the project has no mail capability at all (dependencies are @anthropic-ai/sdk, @emotion/*, @mui/*, @prisma/client, exceljs, jose, next, react, react-dom, zod; .env.example has no MAIL_* key), and spec 2 requires an automatic job alert email while spec 1's auto-approve rule requires an email verification round trip.",
+        "@types/nodemailer (dev) — nodemailer ships no bundled types and `npm run typecheck` sweeps every .ts file.",
+        "pdf-parse — spec 1's CV auto-fill must read PDFs, which are already an accepted UploadKind.RESUME type in src/lib/uploads.ts ACCEPTED_TYPES; nothing in the repo can extract text from one.",
+        "mammoth — the same CV path accepts .doc/.docx (ACCEPTED_TYPES RESUME includes both Word MIME types) and needs DOCX text extraction.",
+        "(explicitly NOT added) server-only — AGENTS.md documents that installing it converts a resolution error into a runtime throw; the weekly job worker must instead import only server-only-free modules.",
+        "(explicitly NOT added) googleapis — the jobs sheet is ingested as XLSX/CSV via the existing exceljs dependency; add this only if the open question resolves to a live Google Sheet.",
+        "(explicitly NOT added) a cron/scheduler package — the weekly trigger is an authenticated POST endpoint invoked by the host's scheduler, documented in the README, because `next start -p 3100` cannot self-schedule."
+      ],
+      "verification": "**Per-phase exit gate (every phase, non-negotiable).** `npm run db:reset && npm run typecheck && npm run test` must all pass before the phase is considered done. `db:reset` is `prisma migrate reset --force --skip-seed && npm run db:seed`, so any schema change that is not accompanied by a matching prisma/seed.ts update fails here rather than three phases later — this is why every Phase 1 task carries its seed edit inside the task. `npm run lint` and `npm run build` additionally run at the end of each phase that adds a route, because a client/server boundary mistake (importing a `server-only` module into a client component) is a build error, not a test failure.\n\n**Phase 0 (safety).** Unit-level: new cases in src/lib/mentor-scope.test.ts and test/confirmed-defects.test.ts assert a MENTOR session with `mentorId: undefined` yields zero students from every converted call site and that menteeWhere() never returns `{}` for a MENTOR; a new src/lib/ai/agent/scope.test.ts asserts the same for the assistant; src/lib/ai/egress.test.ts gains a case proving the Anthropic path is refused when LLM_ALLOW_REMOTE_STUDENT_DATA is unset and that resumeWriterBlocked() reports true in that configuration; src/lib/upload-sniff.test.ts asserts a file declaring `image/png` with a `<svg` body is rejected. Manual: sign in as the seeded mentor account with its Mentor row deleted and confirm /mentor/student/<other-student-id> returns 404 and the note form refuses.\n\n**Phase 1 (schema).** `npm run db:migrate` generates exactly one migration for the phase; `npm run db:reset` proves it applies to an empty database and that the seed populates every new model. Hand-check the generated SQL for the two backfills (MentorNote.meetingAt = createdAt, Cohort.degreeLevel = 'PG'). `npx prisma validate` and `npm run typecheck` catch the Record<Role, …> sites the Role enum change breaks (src/lib/auth.ts HOME_FOR_ROLE, src/lib/ai/agent/scope.ts SCOPE_BY_ROLE) — that failure is expected and is the forcing function.\n\n**Phases 2-9 (features).** Every pure module lands with its own `*.test.ts` next to it, per the repo's existing convention (activity-rules.test.ts, analytics.test.ts, mentor-scope.test.ts, llm-parse.test.ts): registration/schema, registration/rules, registration/cv-map, registration/provision, skills/recommend (asserts exactly 5), leaderboard-scope (asserts the payload type carries no usn / raw mark / attendance %), leaderboard/boards (asserts five boards and stable tie-breaks), marks/parse, jobs/parse, jobs/match (including the empty-skills case), jobs/alert-copy, timesheet/rules (asserts exactly 5 activities and the 24h rule), streak, leave/rules, leave/scope, swoc/scope, mail/compose, rate-limit, upload-sniff.\n\nManual run-through per phase against the seeded database, using `npm run dev` (port 3100) and the seeded accounts: Phase 2 — register with a non-allowlisted address and confirm it lands in the review queue, register with an allowlisted address and confirm the verification mail is required before auto-approval (console transport prints the link), approve one and sign in as the created student. Phase 3 — upload a certificate, claim a skill, verify it as a mentor, watch the badge light. Phase 4 — import a marks sheet twice and confirm the second import creates nothing new. Phase 5 — load /student for a brand-new student with no data and confirm all eight tiles render empty states rather than crashing. Phase 6 — sign in as two students in the same cohort and confirm neither can see the other's raw marks in the network payload (check the RSC response, not just the DOM). Phase 7 — run `npm run jobs:weekly` twice and confirm MailLog prevents a second send. Phase 8 — fill a whole day on /student/time-log and time it; run `tsx scripts/verify-formulas.ts` to prove no learning aggregate moved. Phase 9 — submit a leave request, confirm the second approver cannot see it until the first has approved, and confirm a rejection at stage one ends it.\n\n**Final acceptance (Phase 10).** `scripts/spec-acceptance.ts` prints one row per spec clause with the route/module satisfying it and the test proving it, and exits non-zero on any unchecked row. The three clauses most prone to silent under-delivery get dedicated assertions: SWOC renders three distinct sources, the mocks chart renders GD + Interview + Aptitude, and /student/leaderboards renders exactly five boards. Plus the existing whole-app smoke scripts: `tsx scripts/smoke.ts`, `tsx scripts/sanity-check.ts`, `tsx scripts/test-uploads.ts`, `tsx scripts/test-activity.ts` — and note that any NEW standalone script must import only `server-only`-free modules or it will die with MODULE_NOT_FOUND, per AGENTS.md."
+    },
+    "critiqueVerdicts": [
+      {
+        "lens": "Spec coverage — clause-by-clause audit of the REEP spec against the supplied plan",
+        "verdict": "unsound",
+        "findings": 30
+      },
+      {
+        "lens": "Feasibility and sequencing",
+        "verdict": "unsound",
+        "findings": 15
+      },
+      {
+        "lens": "Correctness and safety risk — data leakage, scope enforcement, egress gating, upload validation",
+        "verdict": "unsound",
+        "findings": 11
+      }
+    ],
+    "blockersFound": 31,
+    "surveysCompleted": 12
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Survey"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 2,
+      "title": "Synthesize"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 3,
+      "title": "Critique"
+    },
+    {
+      "type": "workflow_phase",
+      "index": 4,
+      "title": "Revise"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "survey:schema",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "ae0d89383f0ed88bd",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435415282,
+      "queuedAt": 1786435412645,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Prisma data model (prisma/schema.prisma, prisma/migrations/…",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: Prisma data model\n\nRead c:/Users/Admin/Projects/reep-dashboard/prisma/schema.prisma IN FULL, plus every migration under prisma/migrations/ and prisma/see…",
+      "lastProgressAt": 1786435845455,
+      "tokens": 110967,
+      "toolCalls": 42,
+      "durationMs": 430173,
+      "resultPreview": "{\"area\":\"Prisma data model (prisma/schema.prisma, prisma/migrations/**, prisma/seed.ts)\",\"summary\":\"The schema is a single 628-line Postgres model with 19 models and 17 enums, all snake_case-`@@map`ped, built around REEP curriculum tracking: identity (User/Cohort/Mentor/Student), curriculum (Course/Certification), progress (Enrollment/CertificationProgress), time usage (LabSession/AttendanceRecord…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "survey:auth",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "a1bbb7e4b58b289ef",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435414892,
+      "queuedAt": 1786435412645,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Auth, roles, sessions, registration",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: Auth, roles, sessions, registration\n\nRead c:/Users/Admin/Projects/reep-dashboard/src/lib/auth.ts, src/lib/mentor-scope.ts, any middleware.ts, and every l…",
+      "lastProgressAt": 1786435653039,
+      "tokens": 96120,
+      "toolCalls": 44,
+      "durationMs": 238147,
+      "resultPreview": "{\"area\":\"Auth, roles, sessions, registration\",\"summary\":\"Auth is bespoke and small: a scrypt password hash plus a `jose` HS256 JWT held in an httpOnly cookie named `reep_session` (12 h TTL). There is exactly one entry point — `/login` — and one exit — `POST /api/auth/logout` (plus a `logoutAction`). `src/middleware.ts` is an Edge-safe presence check only (does the cookie exist), matched on `/stude…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 3,
+      "label": "survey:student-pages",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "ae5a6ad8e8863471b",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435415105,
+      "queuedAt": 1786435412645,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Existing student pages and routes (src/app/student/**, plus…",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: Existing student pages and routes\n\nExhaustively list every route under c:/Users/Admin/Projects/reep-dashboard/src/app/student/** and any other student-fa…",
+      "lastProgressAt": 1786435837717,
+      "tokens": 160485,
+      "toolCalls": 57,
+      "durationMs": 422612,
+      "resultPreview": "{\"area\":\"Existing student pages and routes (src/app/student/**, plus the student-facing shell, login and student API routes)\",\"summary\":\"There are seven student routes today — /student (REEP journey overview), /student/certifications, /student/time-log, /student/courses, /student/uploads, /student/resume (+ /student/resume/[id]), /student/assistant, /student/profile — all rendered inside one shell…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 4,
+      "label": "survey:mentor-pages",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "a55c6852c3b6155f3",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435415472,
+      "queuedAt": 1786435412646,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Existing mentor/staff pages and routes (src/app/mentor, src…",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: Existing mentor/staff pages and routes\n\nExhaustively list every route under c:/Users/Admin/Projects/reep-dashboard/src/app that is mentor-, director-, ad…",
+      "lastProgressAt": 1786435721795,
+      "tokens": 132659,
+      "toolCalls": 54,
+      "durationMs": 306322,
+      "resultPreview": "{\"area\":\"Existing mentor/staff pages and routes (src/app/mentor, src/app/director, /login, staff-facing API routes)\",\"summary\":\"The staff surface is already substantial and mature: seven mentor screens (/mentor cohort overview, /mentor/student index, /mentor/student/[id] detail, /mentor/alerts, /mentor/uploads, /mentor/reports, /mentor/settings, /mentor/assistant) plus a CSV route handler under /m…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 5,
+      "label": "survey:analytics",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "ad8e2d3e60f54e568",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435414917,
+      "queuedAt": 1786435412646,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "REEP stage, attendance, marks, progress, scoring",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: REEP stage, attendance, marks, progress, scoring\n\nRead c:/Users/Admin/Projects/reep-dashboard/src/lib/reep.ts, analytics.ts, progress.ts, rules.ts, and t…",
+      "lastProgressAt": 1786435812233,
+      "tokens": 109011,
+      "toolCalls": 32,
+      "durationMs": 397316,
+      "resultPreview": "{\"area\":\"REEP stage, attendance, marks, progress, scoring\",\"summary\":\"This subsystem is a clean two-layer engine: `src/lib/reep.ts` (vocabulary + formatting), `src/lib/progress.ts` (completion/pace/attendance/placement maths) and `src/lib/analytics.ts` (time-series, focus quality, streaks, forecast) are pure and Prisma-free, while `src/lib/queries.ts` (`import 'server-only'` at line 1) is the sole…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 6,
+      "label": "survey:timesheet",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "aa2fe5b4030d551a3",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435414904,
+      "queuedAt": 1786435412646,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Time usage log / activity tracking",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: Time usage log / activity tracking\n\nRead c:/Users/Admin/Projects/reep-dashboard/src/lib/activity-rules.ts, activity-log.ts, and any UI that writes or rea…",
+      "lastProgressAt": 1786435701570,
+      "tokens": 117061,
+      "toolCalls": 40,
+      "durationMs": 286666,
+      "resultPreview": "{\"area\":\"Time usage log / activity tracking\",\"summary\":\"There is a complete, mature time-log subsystem already. A hand-entered day is written as a `LabSession` row through one function, `recordActivity()` in `src/lib/activity-log.ts:119`, which both the student's bulk grid (`/api/activity/bulk`) and the mentor's \\\"log on their behalf\\\" Server Action call, so no path skips a rule. The activity voca…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 7,
+      "label": "survey:ai",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "a2d5cccc70d429d9e",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435414898,
+      "queuedAt": 1786435412646,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "AI subsystem: resume/CV builder, LLM adapter, egress gate, …",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: AI subsystem: resume/CV builder, LLM, egress gate, agent\n\nRead c:/Users/Admin/Projects/reep-dashboard/src/lib/ai/** in full: llm.ts, llm-parse.ts, resume…",
+      "lastProgressAt": 1786435720981,
+      "tokens": 117209,
+      "toolCalls": 41,
+      "durationMs": 306083,
+      "resultPreview": "{\"area\":\"AI subsystem: resume/CV builder, LLM adapter, egress gate, agent\",\"summary\":\"The AI subsystem is a mature, evidence-grounded resume generator plus a scoped tool-calling agent, both riding one OpenAI-compatible HTTP adapter (`src/lib/ai/llm.ts`). `generateResume` (resume.ts:207-289) builds an evidence pack from live REEP tables, tries a configured local/self-hosted model, then Anthropic, t…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 8,
+      "label": "survey:uploads",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "a6299fbff2b678f35",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435414858,
+      "queuedAt": 1786435412646,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "File uploads: CV, certificates, photos",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: File uploads: CV, certificates, photos\n\nFind and read every upload path in c:/Users/Admin/Projects/reep-dashboard: storage/ layout, any route or server a…",
+      "lastProgressAt": 1786435731040,
+      "tokens": 87266,
+      "toolCalls": 41,
+      "durationMs": 316182,
+      "resultPreview": "{\"area\":\"File uploads: CV, certificates, photos\",\"summary\":\"There is exactly one file-accepting endpoint in the whole app: `POST /api/uploads` (src/app/api/uploads/route.ts:13). No Server Action anywhere takes a file — a grep for `instanceof File` / `request.formData()` across `src/` matches only that route. Bytes are written to `storage/uploads/<studentId>/<uuid><ext>` by `saveUpload` (src/lib/up…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 9,
+      "label": "survey:api",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "a8051f5a516b4383d",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435414887,
+      "queuedAt": 1786435412647,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "API routes and server actions (src/app/api/**/route.ts and …",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: API routes and server actions\n\nExhaustively list every route.ts under c:/Users/Admin/Projects/reep-dashboard/src/app/api/** and every server action (file…",
+      "lastProgressAt": 1786435815950,
+      "tokens": 94699,
+      "toolCalls": 56,
+      "durationMs": 401063,
+      "resultPreview": "{\"area\":\"API routes and server actions (src/app/api/**/route.ts and all 'use server' modules under src/app)\",\"summary\":\"There are exactly 15 `route.ts` files under `src/app/api/**` (17 handler exports: GET/POST/DELETE) and exactly 8 server-action modules under `src/app`, every one of which carries `'use server'` on line 1 — there are no inline function-level `'use server'` directives anywhere in `…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 10,
+      "label": "survey:ui",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "a0f4916e84a2a3550",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435415255,
+      "queuedAt": 1786435412647,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "UI toolkit, components, charts, styling",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: UI toolkit, components, charts, styling\n\nDetermine exactly what UI stack this project uses: read c:/Users/Admin/Projects/reep-dashboard/package.json depe…",
+      "lastProgressAt": 1786435802208,
+      "tokens": 131790,
+      "toolCalls": 44,
+      "durationMs": 386953,
+      "resultPreview": "{\"area\":\"UI toolkit, components, charts, styling\",\"summary\":\"This is a mature, opinionated MUI v9 design system, not a blank slate. `@mui/material` 9.2.0, `@mui/icons-material` 9.2.0, `@mui/x-charts` 9.10.1 and `@mui/x-data-grid` 9.10.1 are all installed (package.json:33-37), on Next 16.3.0 / React 19.2.8 with Emotion. A charting library is therefore already present and no new dependency is requir…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 11,
+      "label": "survey:email-cron",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "a815449d1dd80bc63",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435414976,
+      "queuedAt": 1786435412647,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Email, scheduling, background jobs, external integrations",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: Email, scheduling, background jobs, external integrations\n\nSearch c:/Users/Admin/Projects/reep-dashboard exhaustively for any email capability (nodemaile…",
+      "lastProgressAt": 1786435759979,
+      "tokens": 70934,
+      "toolCalls": 41,
+      "durationMs": 345002,
+      "resultPreview": "{\"area\":\"Email, scheduling, background jobs, external integrations\",\"summary\":\"There is no email capability, no scheduler, and no queue anywhere in this repo — verified by dependency, node_modules, and source-level searches that all returned empty. The entire external-integration surface is four things declared in `.env.example` (36 lines, read in full): Postgres, an OpenAI-compatible LLM, Anthrop…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 12,
+      "label": "survey:conventions",
+      "phaseIndex": 1,
+      "phaseTitle": "Survey",
+      "agentId": "a566500642bb9470b",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786435414878,
+      "queuedAt": 1786435412647,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Project conventions, tests, build, Next.js version specifics",
+      "promptPreview": "You are surveying ONE subsystem of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard, so that a large product spec can be implemented on top of it WITHOUT duplicating or breaking what is already there.\n\nYour area: Project conventions, tests, build, Next.js version specifics\n\nRead c:/Users/Admin/Projects/reep-dashboard/AGENTS.md and CLAUDE.md in full, README.md, vit…",
+      "lastProgressAt": 1786435932059,
+      "tokens": 198690,
+      "toolCalls": 75,
+      "durationMs": 517180,
+      "resultPreview": "{\"area\":\"Project conventions, tests, build, Next.js version specifics\",\"summary\":\"This is Next.js **16.3.0** on **React 19.2.8** (package.json:41-43) with the App Router under `src/app` — 28 `page.tsx`, 4 `layout.tsx`, 16 `route.ts`, 8 `actions.ts` across 87 files. `cacheComponents` is NOT enabled (next.config.mjs has only `reactStrictMode` and `serverExternalPackages`), so the project runs the *p…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 13,
+      "label": "synthesize-plan (retry 1)",
+      "phaseIndex": 2,
+      "phaseTitle": "Synthesize",
+      "agentId": "adc47c9ae71d579c4",
+      "model": "claude-opus-5[1m]",
+      "state": "error",
+      "startedAt": 1786435940591,
+      "queuedAt": 1786435934309,
+      "attempt": 2,
+      "lastAttemptReason": "stalled",
+      "lastToolName": "Bash",
+      "lastToolSummary": "sed -n '96,124p' src/lib/reep.ts; echo \"===egress===\"; sed …",
+      "promptPreview": "Twelve independent surveys of an existing Next.js + Prisma application at c:/Users/Admin/Projects/reep-dashboard are below. Turn them into ONE implementation plan for the spec.\n\nTHE SPEC:\n\nREEP DASHBOARD — FULL PRODUCT SPEC (verbatim from the user)\n\nSTUDENT REGISTRATION\n- Self-file the registration form, OR upload a CV and the system auto-fills the form from it.\n- Auto-approve the profile if withi…",
+      "lastProgressAt": 1786437137596,
+      "error": "API Error: The response stopped arriving. The response above may be incomplete.",
+      "tokens": 370831,
+      "toolCalls": 20,
+      "durationMs": 1197004
+    },
+    {
+      "type": "workflow_agent",
+      "index": 14,
+      "label": "critique:coverage",
+      "phaseIndex": 3,
+      "phaseTitle": "Critique",
+      "agentId": "a3abe5e08bbaa8c9f",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786437143793,
+      "queuedAt": 1786437137602,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Spec coverage — clause-by-clause audit of the REEP spec aga…",
+      "promptPreview": "You are adversarially reviewing an implementation plan for the REEP dashboard at c:/Users/Admin/Projects/reep-dashboard. Your job is to find what is WRONG with it, not to praise it. Default to skepticism.\n\nYOUR LENS:\nSPEC COVERAGE. Go through the spec line by line — every clause, including sub-clauses like \"timestamp to be captured\", \"first approver and second approver\", \"UG and PG separation\", \"t…",
+      "lastProgressAt": 1786437319255,
+      "tokens": 30135,
+      "toolCalls": 11,
+      "durationMs": 175462,
+      "resultPreview": "{\"lens\":\"Spec coverage — clause-by-clause audit of the REEP spec against the supplied plan\",\"verdict\":\"unsound\",\"findings\":[{\"problem\":\"No plan was supplied. The PLAN (JSON) field is literally `null`. There is nothing to review, and therefore zero of the ~30 spec clauses are delivered. A spec whose author said \\\"without fails, do not compromise\\\" cannot be signed off against an empty artifact. Eve…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 15,
+      "label": "critique:feasibility",
+      "phaseIndex": 3,
+      "phaseTitle": "Critique",
+      "agentId": "a6344f2c4b4ab2583",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786437143619,
+      "queuedAt": 1786437137604,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Feasibility and sequencing",
+      "promptPreview": "You are adversarially reviewing an implementation plan for the REEP dashboard at c:/Users/Admin/Projects/reep-dashboard. Your job is to find what is WRONG with it, not to praise it. Default to skepticism.\n\nYOUR LENS:\nFEASIBILITY AND SEQUENCING. Attack the plan's ordering and realism. Does any phase depend on something built in a LATER phase? Are the file paths real (verify a sample against the rep…",
+      "lastProgressAt": 1786437344586,
+      "tokens": 39758,
+      "toolCalls": 12,
+      "durationMs": 200967,
+      "resultPreview": "{\"lens\":\"Feasibility and sequencing\",\"verdict\":\"unsound\",\"findings\":[{\"problem\":\"The plan under review is literally `null`. There is no phase list, no task breakdown, no file paths, and no effort estimate. Nothing was submitted that can be checked for ordering, dependency inversion, or realism. Any downstream 'the feasibility reviewer approved it' claim would be false.\",\"severity\":\"blocker\",\"evide…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 16,
+      "label": "critique:correctness",
+      "phaseIndex": 3,
+      "phaseTitle": "Critique",
+      "agentId": "a0570ebdb80b9800c",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786437144073,
+      "queuedAt": 1786437137604,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "Correctness and safety risk — data leakage, scope enforceme…",
+      "promptPreview": "You are adversarially reviewing an implementation plan for the REEP dashboard at c:/Users/Admin/Projects/reep-dashboard. Your job is to find what is WRONG with it, not to praise it. Default to skepticism.\n\nYOUR LENS:\nCORRECTNESS AND SAFETY RISK. Attack the plan for the ways it would produce WRONG behaviour or leak data.\nCheck specifically: (a) does every new staff-facing query use mentorScope()/me…",
+      "lastProgressAt": 1786437342055,
+      "tokens": 48296,
+      "toolCalls": 15,
+      "durationMs": 197982,
+      "resultPreview": "{\"lens\":\"Correctness and safety risk — data leakage, scope enforcement, egress gating, upload validation\",\"verdict\":\"unsound\",\"findings\":[{\"problem\":\"There is no plan. The plan payload delivered to this review is literally `null`, and no plan document exists anywhere in the repo (searched for `*plan*` outside node_modules/.next — zero hits). Every specific check I was asked to perform — mentorScop…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 17,
+      "label": "revise-plan",
+      "phaseIndex": 4,
+      "phaseTitle": "Revise",
+      "agentId": "a9d3c93b295375b42",
+      "model": "claude-opus-5[1m]",
+      "state": "done",
+      "startedAt": 1786437348966,
+      "queuedAt": 1786437346413,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "**What this app is today.** `reep-dashboard` is a Next 16 /…",
+      "promptPreview": "Fold three adversarial critiques into the implementation plan for the REEP dashboard at c:/Users/Admin/Projects/reep-dashboard, and return the corrected plan in the SAME schema.\n\nTHE SPEC:\n\nREEP DASHBOARD — FULL PRODUCT SPEC (verbatim from the user)\n\nSTUDENT REGISTRATION\n- Self-file the registration form, OR upload a CV and the system auto-fills the form from it.\n- Auto-approve the profile if with…",
+      "lastProgressAt": 1786437875216,
+      "tokens": 73333,
+      "toolCalls": 14,
+      "durationMs": 526249,
+      "resultPreview": "{\"groundTruth\":\"**What this app is today.** `reep-dashboard` is a Next 16 / React 19 / MUI 9 / Prisma 6 (Postgres) app for \\\"BGSCET MBA — REEP Tracking Dashboard\\\" (package.json description). It has three role areas under `src/app` — `student/` (page, courses, certifications, time-log, uploads, profile, resume, assistant), `mentor/` ((overview), student, student/[id], alerts, reports, uploads, set…"
+    }
+  ],
+  "totalTokens": 1989244,
+  "totalToolCalls": 639
+}

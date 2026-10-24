@@ -1,0 +1,454 @@
+name: Deploy
+
+# DEPLOY FROM THE BROWSER. Actions → Deploy → "Run workflow" in GitHub, and
+# this ships the API and the SPA to AWS. No terminal, no credentials on a
+# laptop: the job assumes infra/aws's `reep-github-deploy` role through OIDC,
+# which is pinned to this repository and to main, so a fork or a pull request
+# from a stranger cannot reach the account.
+#
+# It deploys CODE, never infrastructure. `terraform apply` stays a human action
+# at a terminal where the plan can be read first — a button that can silently
+# recreate a database is not a button anyone should have.
+#
+# One-time setup: the repository variables below. Terraform used to print
+# them (`terraform -chdir=infra/aws output -raw github_actions_setup`), but
+# infra/aws/ was deleted at the cutover (2026-09-07). They are now the
+# reep-core stack's outputs:
+#     aws cloudformation describe-stacks --stack-name reep-core \n#       --query 'Stacks[0].Outputs' --output table
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "What to ship"
+        type: choice
+        default: api-and-web
+        options: [api-and-web, api-only, web-only]
+      run_migrations:
+        description: "Run `alembic upgrade head` before rolling the API"
+        type: boolean
+        default: true
+      seed_kb:
+        description: "Seed the assistant Knowledge Base (idempotent, no accounts)"
+        type: boolean
+        default: false
+      confirm:
+        description: 'Type "deploy" to confirm this goes to production'
+        required: true
+
+concurrency:
+  # Two deploys racing would interleave an image push with a service roll and
+  # leave nobody able to say which build is live.
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  id-token: write   # the OIDC token this trades for AWS credentials
+  contents: read
+
+jobs:
+  guard:
+    name: Confirm
+    runs-on: ubuntu-latest
+    steps:
+      # A collaborator with write access can press "Run workflow" here, and the
+      # run would assume the main-pinned AWS role like any other. Only the owner
+      # ships to production. github-actions[bot] is agent-release.yml's
+      # dispatch; it can only ever run this file as it is on main, so it ships
+      # code that already passed review. triggering_actor, not actor: a re-run
+      # is judged by whoever pressed Re-run.
+      - name: Only the repository owner may deploy
+        env:
+          ACTOR: ${{ github.triggering_actor }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          if [ "$ACTOR" != "$OWNER" ] && [ "$ACTOR" != "github-actions[bot]" ]; then
+            echo "::error::Only $OWNER may deploy. This run was started by $ACTOR. Nothing was changed."
+            exit 1
+          fi
+
+      - name: Check the confirmation word
+        run: |
+          if [ "${{ inputs.confirm }}" != "deploy" ]; then
+            echo "::error::Type 'deploy' in the confirm box to run this. Nothing was changed."
+            exit 1
+          fi
+          echo "Confirmed. Target: ${{ inputs.target }} · migrations: ${{ inputs.run_migrations }}"
+
+  api:
+    name: API → ECR + ECS
+    needs: guard
+    if: inputs.target != 'web-only'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN || 'arn:aws:iam::445363794125:role/reep-github-deploy' }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+          role-session-name: reep-deploy-${{ github.run_id }}
+
+      - uses: aws-actions/amazon-ecr-login@v2
+
+      # Tagged with the commit AND latest: `latest` is what the task definition
+      # references (so the migration task below picks up this build), and the
+      # sha tag is what makes "which commit is live" answerable afterwards.
+      # MULTI-ARCH, and the arm64 half is NOT optional any more. `cdk.json`
+      # carries `apiArm64: true`, so the api task definition asks for ARM64
+      # unconditionally (reep_core/stack.py, docs/cost-review-2026-09.md):
+      # Graviton Fargate is ~20% cheaper for the same vCPU and the same memory.
+      # An amd64-only image pushed to `latest` is therefore a service that
+      # cannot start, not merely a flag somebody must remember not to set.
+      #
+      # BOTH architectures, never arm64 alone. The manifest is what makes the
+      # switch reversible: rolling back is the CDK flag on its own, with no
+      # rebuild and no retag, because the image ECS pulls already answers for
+      # either platform. An arm64-only image would have been one line shorter
+      # and would have made the rollback a release.
+      #
+      # QEMU rather than a native arm64 runner, deliberately. Every C and Rust
+      # extension this image installs publishes a cp314 or abi3 manylinux
+      # aarch64 wheel (verified against PyPI for all 40, psycopg, cryptography,
+      # awscrt, pillow, numpy, pydantic-core, grpcio and uvloop among them), so
+      # emulation unpacks wheels rather than compiling and costs minutes, not
+      # hours. `ubuntu-24.04-arm` would be faster and is a fine swap later — but
+      # it is a runner label whose availability depends on the plan, and a
+      # deploy path that fails with "no runner matching labels" on the evening
+      # somebody needs to ship is a worse trade than a slower build.
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build and push the image
+        run: |
+          IMAGE="${{ vars.ECR_REPOSITORY || '445363794125.dkr.ecr.ap-south-1.amazonaws.com/reep/api' }}"
+          # GIT_SHA becomes SENTRY_RELEASE inside the image (apps/api-py/Dockerfile):
+          # the same string the SPA reports and the same string the source maps
+          # are uploaded under, so one deploy is one release across both halves.
+          #
+          # buildx pushes both architectures and the manifest list in ONE
+          # invocation: `docker push` cannot publish a manifest list, so the
+          # build and the push are no longer two steps.
+          # --provenance=false: buildx otherwise attaches SBOM/provenance
+          # attestations, which land in the manifest list as extra entries whose
+          # platform reads `unknown/unknown`. ECR stores them happily and some
+          # pull paths do not, so the failure would be a task that cannot start
+          # — at 3am, on the roll, not here. Nothing in this deploy consumes an
+          # attestation, so the honest setting is off.
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            --provenance=false \
+            --build-arg GIT_SHA="${{ github.sha }}" \
+            -t "$IMAGE:${{ github.sha }}" -t "$IMAGE:latest" \
+            --push apps/api-py
+
+      # A manifest that lost an architecture is a task that cannot start, and
+      # the failure lands at PULL time on the next roll rather than here. Assert
+      # it while the evidence is still in front of us.
+      #
+      # THIS CHECK IS LOAD-BEARING, not belt-and-braces. Since `apiArm64: true`
+      # moved into cdk.json the running service is ARM64 with no flag to unset,
+      # so this assertion is the only thing standing between a routine image
+      # build and every task dying at pull with "Manifest does not contain
+      # descriptor matching platform linux/arm64". Do not remove it, and do not
+      # weaken it to a warning.
+      - name: Both architectures are in the manifest
+        run: |
+          IMAGE="${{ vars.ECR_REPOSITORY || '445363794125.dkr.ecr.ap-south-1.amazonaws.com/reep/api' }}"
+          PLATFORMS=$(docker buildx imagetools inspect "$IMAGE:${{ github.sha }}" --raw \
+            | jq -r '.manifests[] | select(.platform.os=="linux") | "\(.platform.os)/\(.platform.architecture)"' \
+            | sort -u | tr '\n' ' ')
+          echo "manifest carries: $PLATFORMS"
+          case "$PLATFORMS" in
+            *linux/amd64*) ;;
+            *) echo "::error::linux/amd64 missing from the manifest"; exit 1 ;;
+          esac
+          case "$PLATFORMS" in
+            *linux/arm64*) ;;
+            *) echo "::error::linux/arm64 missing — the service runs ARM64 (cdk.json apiArm64), so this image CANNOT be deployed."
+               echo "::error::Do not work around this by unsetting the flag: that is a full ECS task-definition change."
+               echo "::error::Fix the buildx step so the manifest carries both architectures, then re-run."
+               exit 1 ;;
+          esac
+
+      # Migrations run on the image just pushed, BEFORE the service rolls, so
+      # the new code never meets an old schema. A failed migration fails the
+      # job here and the running service is left untouched.
+      - name: Run database migrations
+        if: inputs.run_migrations
+        run: |
+          TASK_ARN=$(aws ecs run-task \
+            --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" \
+            --task-definition "${{ vars.ECS_TASK_FAMILY || 'reep-api' }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ vars.ECS_SUBNETS || 'subnet-0792c0ddcdd02f34f,subnet-0a41b8c5a98485d1a' }}],securityGroups=[${{ vars.ECS_SECURITY_GROUP || 'sg-0dfa5c76167d79093' }}],assignPublicIp=DISABLED}" \
+            --overrides '{"containerOverrides":[{"name":"api","command":["python","-m","alembic","upgrade","head"]}]}' \
+            --query 'tasks[0].taskArn' --output text)
+          echo "Migration task: $TASK_ARN"
+          aws ecs wait tasks-stopped --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" --tasks "$TASK_ARN"
+          EXIT=$(aws ecs describe-tasks --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[0].exitCode' --output text)
+          REASON=$(aws ecs describe-tasks --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" --tasks "$TASK_ARN" \
+            --query 'tasks[0].stoppedReason' --output text)
+          echo "Exit code: $EXIT ($REASON)"
+          # A non-zero exit means the schema did NOT move. Stop before rolling
+          # the service rather than deploying code its database cannot serve.
+          [ "$EXIT" = "0" ] || { echo "::error::Migration failed — the service was not rolled."; exit 1; }
+
+      # `python -m app.seed_kb` is the PRODUCTION-SAFE seed: approved public
+      # policy text for the grounded assistant, and no accounts. It is
+      # idempotent, so re-running it is a no-op rather than a duplicate.
+      #
+      # `python -m app.seed` is deliberately NOT offered here and never should
+      # be. It creates the demo logins whose passwords are published in
+      # AGENTS.md -- including a DIRECTOR, who by rule 2 reads every student's
+      # marks, attendance and USN. It refuses to run on ENV=prod for that
+      # reason; a button for it would be a way around its own guard.
+      #
+      # `app.seed_roster` is also absent: it needs the cohort's USNs as input,
+      # which is real student data and does not belong in a workflow file.
+      # Run it as a one-off task with the roster to hand.
+      - name: Seed the Knowledge Base
+        if: inputs.seed_kb
+        run: |
+          TASK_ARN=$(aws ecs run-task \
+            --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" \
+            --task-definition "${{ vars.ECS_TASK_FAMILY || 'reep-api' }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ vars.ECS_SUBNETS || 'subnet-0792c0ddcdd02f34f,subnet-0a41b8c5a98485d1a' }}],securityGroups=[${{ vars.ECS_SECURITY_GROUP || 'sg-0dfa5c76167d79093' }}],assignPublicIp=DISABLED}" \
+            --overrides '{"containerOverrides":[{"name":"api","command":["python","-m","app.seed_kb"]}]}' \
+            --query 'tasks[0].taskArn' --output text)
+          echo "Seed task: $TASK_ARN"
+          aws ecs wait tasks-stopped --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" --tasks "$TASK_ARN"
+          EXIT=$(aws ecs describe-tasks --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[0].exitCode' --output text)
+          REASON=$(aws ecs describe-tasks --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" --tasks "$TASK_ARN" \
+            --query 'tasks[0].stoppedReason' --output text)
+          echo "Exit code: $EXIT ($REASON)"
+          [ "$EXIT" = "0" ] || { echo "::error::Knowledge Base seed failed."; exit 1; }
+
+      - name: Roll the service
+        run: |
+          aws ecs update-service --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" \
+            --service "${{ vars.ECS_SERVICE || 'api' }}" --force-new-deployment >/dev/null
+          echo "Waiting for the new tasks to become healthy…"
+          # NOT `aws ecs wait services-stable`. That waiter gives up after
+          # 40 x 15 s = 600 s, and the target group's deregistration delay is
+          # 600 s (infra/cdk/reep_core/stack.py — it keeps a live interview's
+          # WebSocket open through a deploy). Every old task therefore lingers
+          # in `draining` for the whole of the waiter's budget, and the waiter
+          # exited 255 on a roll that had in fact succeeded. Poll the service's
+          # own view instead: one deployment left, running == desired.
+          CLUSTER="${{ vars.ECS_CLUSTER || 'reep' }}"; SERVICE="${{ vars.ECS_SERVICE || 'api' }}"
+          for i in $(seq 1 100); do   # 100 x 15 s = 25 min, comfortably past two drains
+            read -r DEPLOYMENTS RUNNING DESIRED ROLLOUT < <(aws ecs describe-services --cluster "$CLUSTER" --services "$SERVICE" \
+              --query 'services[0].[length(deployments), runningCount, desiredCount, deployments[0].rolloutState]' --output text)
+            if [ "$ROLLOUT" = "FAILED" ]; then echo "::error::ECS rolled the deployment back (circuit breaker)."; exit 1; fi
+            if [ "$DEPLOYMENTS" = "1" ] && [ "$RUNNING" = "$DESIRED" ] && [ "$ROLLOUT" = "COMPLETED" ]; then
+              echo "API deployed: ${{ github.sha }} (running=$RUNNING desired=$DESIRED)"; exit 0
+            fi
+            echo "  deployments=$DEPLOYMENTS running=$RUNNING desired=$DESIRED rollout=$ROLLOUT"; sleep 15
+          done
+          echo "::error::The service did not settle within 25 minutes."; exit 1
+
+  web:
+    name: SPA → S3 + CloudFront
+    needs: guard
+    if: inputs.target != 'api-only'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install
+        working-directory: apps/web
+        run: npm ci
+
+      # The client Sentry DSN is baked in at build time (main.ts only imports
+      # the SDK when it is set). Optional: with no secret configured the SPA
+      # simply ships without client telemetry.
+      # `secrets` is not a named value the workflow parser admits inside an
+      # `if:` -- the whole file fails to parse and every dispatch is rejected
+      # before any job starts. Route it through env and test that instead.
+      - name: Point the SPA at Sentry
+        env:
+          WEB_SENTRY_DSN: ${{ secrets.WEB_SENTRY_DSN }}
+        working-directory: apps/web
+        run: |
+          if [ -z "$WEB_SENTRY_DSN" ]; then
+            echo "no WEB_SENTRY_DSN secret; shipping without client telemetry"
+            exit 0
+          fi
+          sed -i "s|sentryDsn: ''|sentryDsn: '$WEB_SENTRY_DSN'|" \
+            src/environments/environment.ts
+          grep -q "sentryDsn: 'https" src/environments/environment.ts
+          # The release, the environment and the sample rate travel in the same
+          # file, by the same sed, proved by the same grep — and behind the same
+          # `exit 0` above, which is right: with no DSN main.ts never imports
+          # the SDK, so there is nothing for a release to label. `prod` is not a
+          # typo: it is the api task definition's ENV, so the two halves of one
+          # distributed trace land in ONE Sentry environment.
+          sed -i "s|sentryRelease: ''|sentryRelease: '${{ github.sha }}'|" \
+            src/environments/environment.ts
+          sed -i "s|sentryEnvironment: 'development'|sentryEnvironment: 'prod'|" \
+            src/environments/environment.ts
+          sed -i "s|sentryTracesSampleRate: 0.1|sentryTracesSampleRate: ${{ vars.WEB_SENTRY_TRACES_SAMPLE_RATE || '0.1' }}|" \
+            src/environments/environment.ts
+          grep -q "sentryRelease: '${{ github.sha }}'" src/environments/environment.ts
+          grep -q "sentryEnvironment: 'prod'" src/environments/environment.ts
+          grep -q "sentryTracesSampleRate: [01]\(\.[0-9]\+\)\?," src/environments/environment.ts
+
+      - name: Build (the bundle budget is enforced here too)
+        working-directory: apps/web
+        run: npx ng build
+
+      # Debug IDs are the matching key, so this must run AFTER the bundler and
+      # BEFORE anything is published: the file that reaches CloudFront has to be
+      # the file whose id was uploaded. Angular already stamps ids when
+      # sourceMap.scripts is on (angular.json) and `inject` skips files that
+      # carry one, so here it is a no-op that costs a second and covers the
+      # case where it is not. The auth token is CI-only: it never reaches the
+      # bundle, the bucket or a log line (sentry-cli does not echo it).
+      - name: Upload source maps to Sentry
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG || 'bgs-college-of-engineering-and' }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT_WEB || 'reep-web' }}
+        working-directory: apps/web
+        run: |
+          if [ -z "$SENTRY_AUTH_TOKEN" ]; then
+            echo "no SENTRY_AUTH_TOKEN secret; browser stack traces will stay minified"
+          else
+            CLI="npx --yes @sentry/cli@3.7.0"
+            $CLI sourcemaps inject dist/web/browser
+            # --strict is not advisory: a zero-file upload fails here rather
+            # than shipping an empty artifact bundle nobody notices for a month.
+            $CLI sourcemaps upload --release "${{ github.sha }}" --strict dist/web/browser
+          fi
+          # UNCONDITIONAL, and outside the branch on purpose: a missing secret
+          # must not publish the application's source to CloudFront. Deleted
+          # here rather than excluded from `s3 sync`, because an --exclude'd
+          # path is also excluded from --delete, and a map that reached the
+          # bucket once would then stay there forever.
+          find dist/web/browser -name '*.map' -delete
+          test "$(find dist/web/browser -name '*.map' | wc -l)" = "0"
+
+      # AFTER both steps above, because both of them touch the built directory
+      # and the service worker validates every file against a SHA-1 recorded at
+      # build time. A file that changed since then does not make the worker
+      # update slowly — it makes it refuse the new version and keep serving the
+      # old one to every installed student, forever, with the bucket and
+      # CloudFront both holding the new build. Fail here instead.
+      - name: The service worker's manifest still matches the build
+        run: python3 tools/ci/check_ngsw_integrity.py apps/web/dist/web/browser
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN || 'arn:aws:iam::445363794125:role/reep-github-deploy' }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+          role-session-name: reep-deploy-web-${{ github.run_id }}
+
+      # THREE passes. Hashed assets are immutable, so they get a year;
+      # index.html must NOT be cached, or a browser keeps loading the old app
+      # shell that points at chunks the new deploy has already deleted.
+      #
+      # THE SERVICE WORKER'S CONTROL FILES ARE THE THIRD PASS, AND THEY ARE NOT
+      # HASHED. `ngsw.json` is how an installed app learns a new version
+      # exists, and `ngsw-worker.js` is the worker that reads it — both are
+      # fetched at fixed names. Served with `immutable` and a year, as the
+      # first pass would, an installed student's browser never re-requests
+      # them, so the app on their home screen is frozen on the build they
+      # installed for as long as that entry lives: a permanent freeze with a
+      # green deploy, which is the same shape of failure as the immutable
+      # index.html this step already guards against, but worse, because a
+      # service worker survives a tab close and a reboot.
+      #
+      # `reep-sw.js` IS THE REGISTERED SCRIPT SINCE 2026-10-01 and goes with
+      # them: it takes /api/ away from ngsw and then importScripts
+      # ngsw-worker.js, so BOTH are fixed names a browser byte-compares when
+      # it checks for a worker update. Leave either out of this pass, the loop
+      # or the invalidation and that update never reaches an installed phone.
+      # apps/api-py/tests/test_codebase_guards.py §38 fails the build on a missing one.
+      - name: Publish
+        working-directory: apps/web/dist/web/browser
+        run: |
+          aws s3 sync . "s3://${{ vars.WEB_BUCKET || 'reep-web-20260827213147410900000003' }}" --delete \
+            --exclude "index.html" \
+            --exclude "ngsw.json" --exclude "ngsw-worker.js" --exclude "reep-sw.js" \
+            --exclude "safety-worker.js" --exclude "worker-basic.min.js" \
+            --cache-control "public,max-age=31536000,immutable"
+          aws s3 cp index.html "s3://${{ vars.WEB_BUCKET || 'reep-web-20260827213147410900000003' }}/index.html" \
+            --cache-control "no-cache,no-store,must-revalidate"
+          # --exclude above also excludes these from --delete, which is what we
+          # want: they are overwritten here every time and never orphaned.
+          for f in ngsw.json ngsw-worker.js reep-sw.js safety-worker.js worker-basic.min.js; do
+            [ -f "$f" ] || continue
+            aws s3 cp "$f" "s3://${{ vars.WEB_BUCKET || 'reep-web-20260827213147410900000003' }}/$f" \
+              --cache-control "no-cache,no-store,must-revalidate"
+          done
+
+      - name: Invalidate the entry point
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "${{ vars.CLOUDFRONT_ID || 'EW482RJIK9CVE' }}" \
+            --paths "/" "/index.html" "/ngsw.json" "/ngsw-worker.js" "/reep-sw.js" >/dev/null
+          echo "SPA deployed: ${{ github.sha }}"
+
+  release:
+    name: Sentry release
+    needs: [guard, api, web]
+    # THREE clauses, and each one is a different failure.
+    #  * `needs` on a SKIPPED job skips this one too, and api-only / web-only
+    #    deploys skip a sibling by design — hence `!cancelled()` and a gate on
+    #    failure rather than on completion.
+    #  * But `skipped` is NOT `failure`, and a failed `guard` skips BOTH
+    #    siblings: without the guard clause this job would record a release
+    #    and `Deploys: 1` for a run that typed the confirmation word wrong.
+    #  * And at least one half must actually have succeeded.
+    if: >-
+      ${{ !cancelled()
+          && needs.guard.result == 'success'
+          && needs.api.result != 'failure'
+          && needs.web.result != 'failure'
+          && (needs.api.result == 'success' || needs.web.result == 'success') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # `set-commits --auto` diffs against history. The default depth is 1,
+          # which is one commit and nothing to diff — the association silently
+          # comes back empty and Suspect Commits stays blank forever.
+          fetch-depth: 0
+
+      # Optional, exactly like "Point the SPA at Sentry": `secrets` cannot be
+      # read inside an `if:`, so the token goes through env and is tested there.
+      # No release is recorded without it, and the run stays green — a note in
+      # the log, not a failed deploy.
+      - name: Create, associate, finalize, mark deployed
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG || 'bgs-college-of-engineering-and' }}
+          SENTRY_PROJECT_API: ${{ vars.SENTRY_PROJECT_API || 'reep-api' }}
+          SENTRY_PROJECT_WEB: ${{ vars.SENTRY_PROJECT_WEB || 'reep-web' }}
+        run: |
+          if [ -z "$SENTRY_AUTH_TOKEN" ]; then
+            echo "no SENTRY_AUTH_TOKEN secret; no release was recorded"
+            exit 0
+          fi
+          CLI="npx --yes @sentry/cli@3.7.0"
+          SHA="${{ github.sha }}"
+          # One release, both projects: an interview that fails half in the
+          # browser and half in the api is one deploy, not two.
+          $CLI releases new -p "$SENTRY_PROJECT_API" -p "$SENTRY_PROJECT_WEB" "$SHA"
+          # --ignore-missing survives the first release and a rebased history.
+          $CLI releases set-commits "$SHA" --auto --ignore-missing
+          # Finalize AFTER both halves are live: this timestamp is what orders
+          # SHA-named releases, and finalizing at build time marks a release
+          # shipped that a circuit-breaker rollback then un-shipped.
+          $CLI releases finalize "$SHA"
+          $CLI deploys new --release "$SHA" -e prod

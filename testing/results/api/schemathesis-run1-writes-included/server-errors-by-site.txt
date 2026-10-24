@@ -1,0 +1,13 @@
+    104 sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) null value in column "interested_in_jobs" of relation "student_profiles" violates not-null constraint
+     14 sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "lab_sessions" violates foreign key constraint "lab_sessions_course_code_fkey"
+     13 sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) null value in column "interested_in_internships" of relation "student_profiles" violates not-null constraint
+      2 sqlalchemy.exc.IntegrityError: (psycopg.errors.NotNullViolation) null value in column "leaderboard_opt_out" of relation "student_profiles" violates not-null constraint
+      1 sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "swoc_entries" violates foreign key constraint "fk_swoc_linked_skill"
+      1 sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "swoc_entries" violates foreign key constraint "fk_swoc_linked_session"
+      1 sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "swoc_entries" violates foreign key constraint "fk_swoc_linked_job"
+      1 sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "placement_criteria" violates foreign key constraint "fk_placement_criteria_course"
+      1 sqlalchemy.exc.IntegrityError: (psycopg.errors.ForeignKeyViolation) insert or update on table "jobs" violates foreign key constraint "fk_jobs_course"
+      1 sqlalchemy.exc.DataError: (psycopg.errors.UntranslatableCharacter) unsupported Unicode escape sequence
+      1 sqlalchemy.exc.DataError: (psycopg.DataError) PostgreSQL text fields cannot contain NUL (0x00) bytes
+      1 psycopg.DataError: PostgreSQL text fields cannot contain NUL (0x00) bytes
+      1 INFO:     127.0.0.1:52018 - "POST /api/admin/catalogue/copy?dry_run=true HTTP/1.1" 500 Internal Server Error

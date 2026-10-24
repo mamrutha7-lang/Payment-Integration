@@ -1,0 +1,188 @@
+/* Export & share. Card / btn / chip / icon are global. */
+:host {
+  display: block;
+}
+
+.versions-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+}
+
+/* one saved version per row */
+.version {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline);
+  border-radius: 14px;
+  margin-bottom: 8px;
+  background: var(--surface);
+}
+.version--on {
+  border-color: rgba(122, 47, 158, 0.5);
+  background: var(--tint-3);
+}
+.version-body {
+  min-width: 0;
+}
+.version-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+.version-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.version-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin-top: 6px;
+}
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--brand-purple);
+  cursor: pointer;
+}
+.link-btn .icon {
+  font-size: 15px;
+}
+.link-btn.danger {
+  color: var(--risk);
+}
+.link-btn:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+}
+.rename {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+}
+.rename input {
+  flex: 1 1 180px;
+  min-width: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  font: inherit;
+  font-size: 13px;
+}
+.use-btn {
+  flex: none;
+  padding: 7px 13px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.export-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+.export-btn {
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 13.5px;
+}
+
+.share-target {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--tint-2);
+  border: 1px solid var(--hairline);
+  font-size: 13px;
+  color: var(--ink);
+  margin: 12px 0 14px;
+}
+.share-target .icon {
+  font-size: 18px;
+  color: var(--purple-mid);
+  flex: none;
+}
+.share-warn {
+  font-size: 12.5px;
+  color: var(--warn);
+  margin-top: 4px;
+}
+
+.opt-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-top: 1px solid var(--hairline-26);
+  font-size: 13px;
+  color: var(--ink);
+  cursor: pointer;
+}
+.opt-row input {
+  margin-top: 2px;
+  flex: none;
+}
+.opt-row small {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+  line-height: 1.45;
+}
+.opt-hint {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.share-done {
+  display: flex;
+  gap: 9px;
+  align-items: flex-start;
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--good-bg);
+  color: var(--good);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.share-done .icon {
+  font-size: 18px;
+  flex: none;
+}
+
+.state-note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+.state-note .icon {
+  font-size: 16px;
+  color: var(--purple-mid);
+}

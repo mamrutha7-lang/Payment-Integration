@@ -1,0 +1,75 @@
+# An automatic first review on every pull request, against THIS repository's
+# rules rather than generic style advice.
+#
+# WHY. There is one maintainer (see .github/CODEOWNERS), so every PR is
+# reviewed by the person who wrote it or asked an agent to. The PR template's
+# rule-1 / rule-2 / schema boxes are claims, not evidence; this job reads the
+# diff and checks the claims. It is ADVISORY: it comments, it never approves,
+# and it is not a required check (§34 — see claude.yml's header).
+#
+# Draft PRs are skipped until they are marked ready, so an agent iterating on a
+# draft does not pay for a review of every intermediate push.
+#
+# Fork PRs are skipped: `pull_request` from a fork gets no secrets, and running
+# this on `pull_request_target` would hand a stranger's diff a write token.
+
+name: Claude review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    if: |
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          track_progress: true
+          prompt: |
+            REPO: ${{ github.repository }}
+            PR NUMBER: ${{ github.event.pull_request.number }}
+
+            Review this pull request. Read AGENTS.md first; it is the rulebook.
+            Report only real problems, most severe first. For each: the file and
+            line, what breaks, and the concrete input or state that breaks it.
+            No praise, no style nits, no restating the diff.
+
+            Check these specifically, because they are where a wrong line here
+            costs the most:
+            1. Rule 1 — every new complete_chat / stream_chat call passes
+               carries_student_data= explicitly, and no student record reaches
+               a remote model, Sentry, a log line or a mail body.
+            2. Rule 2 — every new route with {student_id} reaches
+               _assert_can_access_student / assert_student_scope before touching
+               a student row; "no mentor group" never widens to the programme.
+            3. Schema — a changed model has a migration, one alembic head, enum
+               gotchas followed, indexes declared on the model too.
+            4. Frontend — routes stay loadComponent; every <form> has an owner
+               for submit; no new global class duplicates reep-v2-resume.scss.
+            5. The PR description's ticked boxes match what the diff does.
+
+            Put line-specific findings as inline comments. Finish with ONE
+            summary comment: "No blocking issues" or the list of blocking ones.
+          claude_args: |
+            --max-turns 40
+            --allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*),Read,Grep,Glob"

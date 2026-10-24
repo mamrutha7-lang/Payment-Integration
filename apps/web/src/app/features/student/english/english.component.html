@@ -1,0 +1,303 @@
+<div class="eb-head">
+  <div>
+    <p class="eyebrow">Reboot · Baseline assessment</p>
+    <h1 class="eb-title">English Proficiency Baseline</h1>
+    <p class="eb-sub">
+      AI-scored across reading, writing, listening and speaking · CEFR-aligned · one attempt per
+      semester
+    </p>
+  </div>
+
+  @if (data(); as d) {
+    <div class="eb-actions">
+      @if (d.exists) {
+        <button type="button" class="btn eb-btn" [disabled]="busy()" (click)="downloadReport()">
+          <span class="icon" aria-hidden="true">download</span>
+          Download report
+        </button>
+      }
+      <button
+        type="button"
+        class="btn primary eb-btn eb-btn--primary"
+        [disabled]="busy()"
+        (click)="startOrResume()"
+      >
+        <span class="icon" aria-hidden="true">mic</span>
+        {{ busy() ? 'Working…' : d.exists ? 'Resume assessment' : 'Start assessment' }}
+      </button>
+    </div>
+  }
+</div>
+
+@if (notice(); as message) {
+  <div class="notice info eb-notice" role="status">
+    <span class="icon" aria-hidden="true">info</span>
+    {{ message }}
+  </div>
+}
+
+@switch (state()) {
+  @case ('loading') {
+    <div class="card eb-note">Loading your English baseline…</div>
+  }
+
+  @case ('error') {
+    <div class="card eb-note">
+      @if (refusal(); as message) {
+        {{ message }}
+      } @else {
+        We could not load your English baseline just now. Please refresh in a moment.
+      }
+      <button type="button" class="btn ghost" (click)="load()">Retry</button>
+    </div>
+  }
+
+  @case ('data') {
+    @if (data(); as d) {
+      @if (!d.exists) {
+        <div class="card">
+          <div class="empty">
+            <span class="icon" aria-hidden="true">record_voice_over</span>
+            <p><b>You have not taken the baseline yet.</b></p>
+            <p>
+              It takes about 70 minutes across four sections and places you on the CEFR scale. Your
+              mentor sees the band, not your answers.
+            </p>
+            <button type="button" class="btn primary" [disabled]="busy()" (click)="startOrResume()">
+              <span class="icon" aria-hidden="true">mic</span>
+              Start assessment
+            </button>
+          </div>
+        </div>
+      } @else {
+        <!-- Hero: the overall score dial, the band, and how far along the attempt is -->
+        <div class="card eb-hero">
+          <div class="eb-hero__grid">
+            <div class="eb-dial-row">
+              <div
+                class="eb-dial"
+                role="img"
+                [attr.aria-label]="
+                  d.overall_score !== null
+                    ? 'Overall score ' + d.overall_score + ' out of 100'
+                    : 'Overall score not yet available'
+                "
+                [style.background]="
+                  'conic-gradient(var(--purple-mid) 0% ' +
+                  (d.overall_score ?? 0) +
+                  '%, rgba(58,31,82,.12) ' +
+                  (d.overall_score ?? 0) +
+                  '% 100%)'
+                "
+              >
+                <span class="eb-dial__inner">
+                  <!-- Branching on the value being null, never on it being falsy:
+                       a genuine 0 must print as 0. -->
+                  <span class="eb-dial__score" [class.eb-dial__score--pending]="d.overall_score === null">{{
+                    d.overall_score !== null ? d.overall_score : '--'
+                  }}</span>
+                  <span class="eb-dial__of">/ 100</span>
+                </span>
+              </div>
+              <div>
+                <p class="eyebrow eb-eyebrow">
+                  {{ d.provisional ? 'Provisional band' : 'Band' }}
+                </p>
+                <div class="eb-band">{{ d.band ?? '—' }}</div>
+                <div class="eb-band-label">
+                  {{ d.band_label ?? (d.band ? '' : 'Not yet banded') }}
+                </div>
+              </div>
+            </div>
+
+            <div class="eb-hero__right">
+              <div class="eb-chips">
+                <span class="eb-chip">{{ d.sections_scored }} of {{ d.sections_total }} sections scored</span>
+                @if (d.pending_label) {
+                  <span class="eb-chip eb-chip--warn">{{ d.pending_label }}</span>
+                }
+                @if (d.taken_on) {
+                  <span class="eb-chip">Taken {{ d.taken_on | date: 'd MMM y' }}</span>
+                }
+              </div>
+              <div>
+                <div class="eb-meter-head">
+                  <span>Assessment progress</span><span class="eb-meter-val">{{ d.progress_percent }}%</span>
+                </div>
+                <div
+                  class="eb-meter eb-meter--hero"
+                  role="progressbar"
+                  [attr.aria-valuenow]="d.progress_percent"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-label="Assessment progress"
+                >
+                  <i [style.width.%]="d.progress_percent"></i>
+                </div>
+              </div>
+              <div class="eb-hero__note">
+                @if (d.provisional) {
+                  Your band is provisional until
+                  {{ firstPending(d) ? 'the ' + firstPending(d) + ' section is' : 'every section is' }}
+                  submitted. The final band is shared with your faculty and feeds the Reboot exit
+                  review.
+                } @else {
+                  Every section is scored. Your final band is shared with your faculty and feeds the
+                  Reboot exit review.
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Four skill cards -->
+        <div class="eb-sections">
+          @for (s of d.sections; track s.skill) {
+            <div class="card eb-skill">
+              <div class="eb-skill__head">
+                <div class="eb-skill__id">
+                  <span class="eb-skill__icon"><span class="icon" aria-hidden="true">{{ s.icon }}</span></span>
+                  <span>
+                    <span class="eb-skill__name">{{ s.label }}</span>
+                    <span class="eb-skill__meta">{{ s.minutes ? s.minutes + ' min · AI scored' : 'AI scored' }}</span>
+                  </span>
+                </div>
+                <!-- Status is text + colour together, never colour alone. -->
+                @if (s.status === 'SCORED') {
+                  <span class="eb-chip eb-chip--good">Scored</span>
+                } @else {
+                  <span class="eb-chip eb-chip--warn">Pending</span>
+                }
+              </div>
+
+              <!-- Branching on STATUS, not on a falsy score: `score || '--'`
+                   would also swallow a genuine 0. -->
+              <div class="eb-skill__score">
+                @if (s.status === 'SCORED') {
+                  <div class="eb-skill__big">{{ s.score }}</div>
+                  <div class="eb-skill__of">/ 100 · CEFR <strong>{{ s.band ?? '—' }}</strong></div>
+                } @else {
+                  <div class="eb-skill__big eb-skill__big--pending">--</div>
+                  <div class="eb-skill__of">/ 100 · CEFR <strong>—</strong></div>
+                }
+              </div>
+
+              @if (s.subscores.length) {
+                <div class="eb-subs">
+                  @for (sub of s.subscores; track sub.label) {
+                    <div>
+                      <div class="eb-meter-head eb-meter-head--sub">
+                        <span>{{ sub.label }}</span>
+                        <span class="eb-meter-val" [class.eb-meter-val--pending]="sub.value === null">{{
+                          sub.value !== null ? sub.value : '--'
+                        }}</span>
+                      </div>
+                      <div
+                        class="eb-meter"
+                        role="progressbar"
+                        [attr.aria-valuenow]="sub.value ?? 0"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        [attr.aria-label]="s.label + ' — ' + sub.label"
+                      >
+                        <i
+                          [class.eb-meter__none]="sub.value === null"
+                          [style.width.%]="sub.value ?? 0"
+                        ></i>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (s.status === 'SCORED') {
+                @if (s.has_report) {
+                  <button
+                    type="button"
+                    class="eb-report-btn"
+                    [attr.aria-expanded]="openReport() === s.skill"
+                    (click)="toggleReport(s.skill)"
+                  >
+                    <span class="icon" aria-hidden="true">description</span>
+                    {{ openReport() === s.skill ? 'Hide AI report' : 'View AI report' }}
+                  </button>
+                  @if (openReport() === s.skill && s.ai_report) {
+                    <p class="eb-report">{{ s.ai_report }}</p>
+                  }
+                } @else {
+                  <span class="eb-skill__noreport">No written report for this section.</span>
+                }
+              } @else {
+                <button
+                  type="button"
+                  class="eb-start-btn"
+                  [disabled]="busy()"
+                  (click)="startOrResume()"
+                >
+                  <span class="icon" aria-hidden="true">play_arrow</span>
+                  Start {{ s.label | lowercase }} test
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- AI feedback + Recommended next -->
+        <div class="eb-bottom">
+          <div class="card eb-panel">
+            <h4 class="eb-h4">
+              <span class="icon" aria-hidden="true">auto_awesome</span>AI feedback
+            </h4>
+            <div class="eb-fb">
+              <div class="eb-fb__box eb-fb__box--good">
+                <div class="eb-fb__lbl">Strengths</div>
+                @for (item of d.strengths; track item) {
+                  <div class="eb-fb__row"><span class="eb-fb__dot" aria-hidden="true">·</span><span>{{ item }}</span></div>
+                } @empty {
+                  <div class="eb-fb__empty">No strengths recorded yet — they appear once a section is scored.</div>
+                }
+              </div>
+              <div class="eb-fb__box eb-fb__box--risk">
+                <div class="eb-fb__lbl">Focus areas</div>
+                @for (item of d.focus_areas; track item) {
+                  <div class="eb-fb__row"><span class="eb-fb__dot" aria-hidden="true">·</span><span>{{ item }}</span></div>
+                } @empty {
+                  <div class="eb-fb__empty">No focus areas recorded yet — they appear once a section is scored.</div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <div class="card eb-panel">
+            <h4 class="eb-h4">
+              <span class="icon" aria-hidden="true">trending_up</span>Recommended next
+            </h4>
+            <div class="eb-next">
+              @for (step of d.next_steps; track step.title) {
+                @if (step.target) {
+                  <a class="eb-next__row" [routerLink]="step.target">
+                    <span class="eb-next__arrow"><span class="icon" aria-hidden="true">arrow_forward</span></span>
+                    <span class="eb-next__text">
+                      <span class="eb-next__title">{{ step.title }}</span>
+                      <span class="eb-next__sub">{{ step.sub }}</span>
+                    </span>
+                  </a>
+                } @else {
+                  <div class="eb-next__row eb-next__row--static">
+                    <span class="eb-next__arrow"><span class="icon" aria-hidden="true">arrow_forward</span></span>
+                    <span class="eb-next__text">
+                      <span class="eb-next__title">{{ step.title }}</span>
+                      <span class="eb-next__sub">{{ step.sub }}</span>
+                    </span>
+                  </div>
+                }
+              } @empty {
+                <p class="eb-fb__empty">Nothing recommended yet — suggestions appear once your sections are scored.</p>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    }
+  }
+}

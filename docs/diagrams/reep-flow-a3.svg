@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="420mm" viewBox="0 0 1188 1680">
+<defs>
+<marker id="a-6d28d9" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6d28d9"/></marker>
+<marker id="a-ff9900" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#ff9900"/></marker>
+<marker id="a-1d4ed8" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1d4ed8"/></marker>
+<marker id="a-24292e" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#24292e"/></marker>
+<marker id="a-2088ff" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2088ff"/></marker>
+<marker id="a-4285f4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4285f4"/></marker>
+<marker id="a-336791" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#336791"/></marker>
+<marker id="a-10a37f" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#10a37f"/></marker>
+<marker id="a-362d59" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#362d59"/></marker>
+<marker id="a-111827" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#111827"/></marker>
+<marker id="a-475569" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#475569"/></marker>
+<marker id="a-64748b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#64748b"/></marker>
+</defs>
+<rect width="1188" height="1680" fill="#ffffff"/>
+<text x="594.0" y="58" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="31" font-weight="800" fill="#6d28d9" text-anchor="middle">REEP — Architecture Diagram</text>
+<text x="594.0" y="86" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="500" fill="#475569" text-anchor="middle">Placement-readiness platform for BGSCET MBA · Angular + FastAPI + PostgreSQL on AWS</text>
+<circle cx="221.2" cy="165.4" r="9.7344" fill="#1d4ed8"/>
+<path d="M208.72 212.392 v-14.688 a12.48 12.48 0 0 1 24.96 0 v14.688 z" fill="#1d4ed8"/>
+<circle cx="278.8" cy="165.4" r="9.7344" fill="#1d4ed8"/>
+<path d="M266.32 212.392 v-14.688 a12.48 12.48 0 0 1 24.96 0 v14.688 z" fill="#1d4ed8"/>
+<circle cx="250" cy="155.8" r="12.729600000000001" fill="#1d4ed8"/>
+<path d="M233.68 214.888 v-18.144000000000002 a16.32 16.32 0 0 1 32.64 0 v18.144000000000002 z" fill="#1d4ed8"/>
+<text x="250" y="248.51999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Students · Faculty · Alumni</text>
+<text x="250" y="263.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Main Admin (placement office)</text>
+<text x="307.6" y="146.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="start">1</text>
+<rect x="546.0" y="136.6" width="96" height="76.80000000000001" rx="7" fill="none" stroke="#6d28d9" stroke-width="5"/>
+<path d="M546.0 156.56799999999998 H642.0" stroke="#6d28d9" stroke-width="5"/>
+<circle cx="560.0" cy="146.584" r="3.6" fill="#6d28d9"/>
+<circle cx="573.0" cy="146.584" r="3.6" fill="#6d28d9"/>
+<circle cx="586.0" cy="146.584" r="3.6" fill="#6d28d9"/>
+<circle cx="594" cy="186.52" r="19.200000000000003" fill="none" stroke="#6d28d9" stroke-width="4"/>
+<path d="M574.8 186.52 H613.2 M594 167.32 q14.400000000000002 19.200000000000003 0 38.400000000000006 M594 167.32 q-14.400000000000002 19.200000000000003 0 38.400000000000006" fill="none" stroke="#6d28d9" stroke-width="3.4"/>
+<text x="594" y="248.51999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">REEP Dashboard</text>
+<text x="594" y="263.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">in the browser</text>
+<text x="651.6" y="146.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="start">2</text>
+<path d="M920.72 151.96 V198.04" stroke="#24292e" stroke-width="5"/>
+<path d="M955.28 161.56 v9.600000000000001 q0 15.36 -34.56 15.36" fill="none" stroke="#24292e" stroke-width="5"/>
+<circle cx="920.72" cy="146.2" r="9.600000000000001" fill="#24292e"/>
+<circle cx="920.72" cy="203.8" r="9.600000000000001" fill="#24292e"/>
+<circle cx="955.28" cy="153.88" r="9.600000000000001" fill="#24292e"/>
+<text x="938" y="248.51999999999998" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">GitHub</text>
+<text x="938" y="263.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">darshani8/reep-</text>
+<path d="M553.68 425.36 a16.32 16.32 0 0 1 3.84 -31.68 a21.12 21.12 0 0 1 40.32 -9.600000000000001 a17.28 17.28 0 0 1 36.480000000000004 13.440000000000001 a14.399999999999999 14.399999999999999 0 0 1 -3.84 27.839999999999996 z" fill="#ff9900"/>
+<path d="M594 429.2 l19.200000000000003 6.720000000000001 v11.52 q0 13.440000000000001 -19.200000000000003 19.200000000000003 q-19.200000000000003 -5.76 -19.200000000000003 -19.200000000000003 v-11.52 z" fill="#1f2937"/>
+<text x="594" y="483.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Amazon CloudFront</text>
+<text x="594" y="498.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">+ AWS WAF</text>
+<text x="651.6" y="381.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="start">3</text>
+<circle cx="938" cy="410" r="28.799999999999997" fill="none" stroke="#2088ff" stroke-width="6"/>
+<path d="M930.32 397.52 l21.12 12.48 l-21.12 12.48 z" fill="#2088ff"/>
+<circle cx="966.5105454174416" cy="438.51054541744156" r="4.800000000000001" fill="#2088ff"/>
+<circle cx="909.4894545825584" cy="438.5105454174416" r="4.800000000000001" fill="#2088ff"/>
+<circle cx="909.4894545825584" cy="381.48945458255844" r="4.800000000000001" fill="#2088ff"/>
+<circle cx="966.5105454174416" cy="381.4894545825584" r="4.800000000000001" fill="#2088ff"/>
+<text x="938" y="483.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">GitHub Actions CI</text>
+<text x="938" y="498.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">4 jobs · tests + build</text>
+<path d="M215.44 616.2 L225.04 677.64 H274.96 L284.56 616.2 z" fill="#ff9900"/>
+<ellipse cx="250" cy="616.2" rx="34.56" ry="9.600000000000001" fill="#1f2937" opacity="0.25"/>
+<ellipse cx="250" cy="616.2" rx="34.56" ry="9.600000000000001" fill="none" stroke="#ff9900" stroke-width="4"/>
+<text x="250" y="718.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Amazon S3</text>
+<text x="250" y="733.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Angular 22 SPA</text>
+<text x="307.6" y="616.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="start">4</text>
+<rect x="551.76" y="631.56" width="28.799999999999997" height="26.880000000000003" rx="6" fill="#ff9900"/>
+<path d="M580.56 645 H603.6 V620.04 H617.04" fill="none" stroke="#ff9900" stroke-width="4.5"/>
+<circle cx="624.72" cy="620.04" r="8.64" fill="#ff9900"/>
+<path d="M580.56 645 H603.6 V645 H617.04" fill="none" stroke="#ff9900" stroke-width="4.5"/>
+<circle cx="624.72" cy="645" r="8.64" fill="#ff9900"/>
+<path d="M580.56 645 H603.6 V669.96 H617.04" fill="none" stroke="#ff9900" stroke-width="4.5"/>
+<circle cx="624.72" cy="669.96" r="8.64" fill="#ff9900"/>
+<text x="594" y="718.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Application</text>
+<text x="594" y="733.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Load Balancer</text>
+<text x="651.6" y="616.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="start">5</text>
+<rect x="903.44" y="614.28" width="69.12" height="61.44" rx="8" fill="none" stroke="#ff9900" stroke-width="5"/>
+<rect x="914.0" y="622.92" width="17.28" height="17.28" rx="3" fill="#ff9900"/>
+<rect x="914.0" y="649.8000000000001" width="17.28" height="17.28" rx="3" fill="#ff9900"/>
+<rect x="944.72" y="622.92" width="17.28" height="17.28" rx="3" fill="#ff9900"/>
+<rect x="944.72" y="649.8000000000001" width="17.28" height="17.28" rx="3" fill="#ff9900"/>
+<text x="938" y="718.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Amazon ECR</text>
+<text x="938" y="733.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">container image</text>
+<circle cx="230.8" cy="880" r="17.28" fill="none" stroke="#4285f4" stroke-width="7"/>
+<path d="M247.12 880 H286.48" stroke="#4285f4" stroke-width="7"/>
+<path d="M269.2 880 v13.440000000000001 M282.64 880 v13.440000000000001" stroke="#4285f4" stroke-width="7"/>
+<text x="250" y="953.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Google Workspace</text>
+<text x="250" y="968.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Sign-in · roster gate</text>
+<rect x="555.6" y="847.3599999999999" width="46.08" height="26.880000000000003" rx="6" fill="#ff9900" opacity="0.45"/>
+<rect x="576.72" y="860.8" width="46.08" height="26.880000000000003" rx="6" fill="#ff9900" opacity="0.7"/>
+<rect x="565.2" y="881.92" width="46.08" height="26.880000000000003" rx="6" fill="#ff9900" opacity="1"/>
+<text x="594" y="953.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">ECS Fargate — FastAPI</text>
+<text x="594" y="968.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">autoscales 2 → 10 tasks</text>
+<text x="651.6" y="851.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="start">6</text>
+<path d="M177.36 1084.28 v57.599999999999994 a32.64 11.52 0 0 0 65.28 0 v-57.599999999999994 z" fill="#336791"/>
+<ellipse cx="210" cy="1084.28" rx="32.64" ry="11.52" fill="#336791"/>
+<path d="M177.36 1103.48 a32.64 11.52 0 0 0 65.28 0" fill="none" stroke="#ffffff" stroke-width="3.5" opacity="0.75"/>
+<path d="M177.36 1122.68 a32.64 11.52 0 0 0 65.28 0" fill="none" stroke="#ffffff" stroke-width="3.5" opacity="0.75"/>
+<text x="210" y="1188.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">PostgreSQL 17</text>
+<text x="210" y="1203.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">+ pgvector</text>
+<text x="267.6" y="1086.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="start">7</text>
+<rect x="391.6" y="1086.2" width="76.80000000000001" height="24.96" rx="6" fill="#ff9900"/>
+<rect x="391.6" y="1118.84" width="76.80000000000001" height="24.96" rx="6" fill="#ff9900" opacity="0.62"/>
+<circle cx="454.96" cy="1098.68" r="4.32" fill="#ffffff"/>
+<circle cx="454.96" cy="1131.32" r="4.32" fill="#ffffff"/>
+<text x="430" y="1188.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Amazon EFS</text>
+<text x="430" y="1203.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">uploads + interview audio</text>
+<text x="487.6" y="1086.2" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="start">8</text>
+<rect x="590" y="1046" width="520" height="166" rx="10" fill="none" stroke="#111827" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="606" y="1070" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#475569" text-anchor="start" letter-spacing="1.1">AI PLANE</text>
+<text x="1090" y="1074" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="end">9</text>
+<rect x="699.84" y="1078.52" width="5.76" height="9.600000000000001" fill="#ff9900"/>
+<rect x="699.84" y="1141.88" width="5.76" height="9.600000000000001" fill="#ff9900"/>
+<rect x="683.52" y="1094.84" width="9.600000000000001" height="5.76" fill="#ff9900"/>
+<rect x="746.88" y="1094.84" width="9.600000000000001" height="5.76" fill="#ff9900"/>
+<rect x="717.12" y="1078.52" width="5.76" height="9.600000000000001" fill="#ff9900"/>
+<rect x="717.12" y="1141.88" width="5.76" height="9.600000000000001" fill="#ff9900"/>
+<rect x="683.52" y="1112.12" width="9.600000000000001" height="5.76" fill="#ff9900"/>
+<rect x="746.88" y="1112.12" width="9.600000000000001" height="5.76" fill="#ff9900"/>
+<rect x="734.4" y="1078.52" width="5.76" height="9.600000000000001" fill="#ff9900"/>
+<rect x="734.4" y="1141.88" width="5.76" height="9.600000000000001" fill="#ff9900"/>
+<rect x="683.52" y="1129.3999999999999" width="9.600000000000001" height="5.76" fill="#ff9900"/>
+<rect x="746.88" y="1129.3999999999999" width="9.600000000000001" height="5.76" fill="#ff9900"/>
+<rect x="693.12" y="1088.12" width="53.760000000000005" height="53.760000000000005" rx="7" fill="#ff9900"/>
+<circle cx="720" cy="1115" r="10.56" fill="#ffffff"/>
+<text x="720" y="1188.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Amazon Bedrock</text>
+<text x="720" y="1203.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Nova</text>
+<rect x="967.52" y="1080.44" width="24.96" height="42.24" rx="12.48" fill="#10a37f"/>
+<path d="M955.04 1113.08 a24.96 24.96 0 0 0 49.92 0" fill="none" stroke="#10a37f" stroke-width="5"/>
+<path d="M980 1138.04 v11.52 M964.64 1149.56 H995.36" stroke="#10a37f" stroke-width="5"/>
+<text x="980" y="1188.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">OpenAI Realtime</text>
+<text x="980" y="1203.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">voice interview</text>
+<circle cx="250" cy="1346" r="32.64" fill="none" stroke="#6d28d9" stroke-width="6"/>
+<path d="M250 1326.8 V1346 H267.28" fill="none" stroke="#6d28d9" stroke-width="5.5" stroke-linecap="round"/>
+<text x="250" y="1419.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Daily retention task</text>
+<text x="250" y="1434.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">03:00 IST · Fargate</text>
+<rect x="590" y="1262" width="520" height="182" rx="10" fill="none" stroke="#111827" stroke-width="2" stroke-dasharray="8 6"/>
+<text x="606" y="1286" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12" font-weight="800" fill="#475569" text-anchor="start" letter-spacing="1.1">OBSERVABILITY &amp; TRACEABILITY</text>
+<text x="1090" y="1290" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="26" font-weight="800" fill="#111827" text-anchor="end">10</text>
+<ellipse cx="720" cy="1349.84" rx="21.12" ry="26.880000000000003" fill="#362d59"/>
+<circle cx="720" cy="1319.12" r="12.48" fill="#362d59"/>
+<path d="M700.8 1336.4 l-17.28 7.68" stroke="#362d59" stroke-width="5"/>
+<path d="M700.8 1349.84 l-17.28 7.68" stroke="#362d59" stroke-width="5"/>
+<path d="M700.8 1363.28 l-17.28 7.68" stroke="#362d59" stroke-width="5"/>
+<path d="M712.32 1311.44 l-11.52 -11.52" stroke="#362d59" stroke-width="5"/>
+<path d="M739.2 1336.4 l17.28 7.68" stroke="#362d59" stroke-width="5"/>
+<path d="M739.2 1349.84 l17.28 7.68" stroke="#362d59" stroke-width="5"/>
+<path d="M739.2 1363.28 l17.28 7.68" stroke="#362d59" stroke-width="5"/>
+<path d="M727.68 1311.44 l11.52 -11.52" stroke="#362d59" stroke-width="5"/>
+<text x="720" y="1419.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Sentry</text>
+<text x="720" y="1434.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">errors + traces</text>
+<rect x="947.36" y="1349.84" width="15.36" height="26.880000000000003" rx="4" fill="#ff9900" opacity="0.55"/>
+<rect x="970.4" y="1330.64" width="15.36" height="46.08" rx="4" fill="#ff9900" opacity="0.77"/>
+<rect x="993.44" y="1313.3600000000001" width="15.36" height="63.36" rx="4" fill="#ff9900" opacity="0.99"/>
+<text x="980" y="1419.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">Amazon CloudWatch</text>
+<text x="980" y="1434.52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#111827" text-anchor="middle">logs + alarms</text>
+<polyline points="300,175 542,175" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="594,275 594,358" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="594,510 594,550 250,550 250,593" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="594,510 594,593" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="938,275 938,358" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="938,510 938,593" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="938,745 938,880 646,880" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="594,745 594,828" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="542,868 302,868" fill="none" stroke="#111827" stroke-width="2.2" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="302,892 542,892" fill="none" stroke="#111827" stroke-width="1.7" stroke-dasharray="5 4" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="594,980 594,1020" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="210,1020 1150,1020" fill="none" stroke="#111827" stroke-width="2.6" stroke-linejoin="round"/>
+<polyline points="210,1020 210,1063" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="430,1020 430,1063" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="890,1020 890,1046" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<polyline points="1150,1020 1150,1346 1110,1346" fill="none" stroke="#111827" stroke-width="2.6" marker-end="url(#a-111827)" stroke-linejoin="round"/>
+<rect x="250" y="1470" width="690" height="92" rx="8" fill="none" stroke="#111827" stroke-width="2" stroke-dasharray="8 6"/>
+<rect x="272" y="1494" width="22" height="22" rx="4" fill="#ff9900"/>
+<text x="308" y="1511" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="500" fill="#111827" text-anchor="start">Orange icons are AWS services, provisioned by Terraform in infra/aws —</text>
+<text x="308" y="1529" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="500" fill="#111827" text-anchor="start">see docs/aws-deployment.md for the runbook.</text>
+<text x="308" y="1549" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="600" fill="#475569" text-anchor="start">Numbered steps follow ONE request, from a person to the data behind it.</text>
+<text x="22" y="1640" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="start">Generated by tools/diagrams/render_flow_poster.py</text>
+<text x="1166" y="1640" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="10.5" font-weight="400" fill="#64748b" text-anchor="end">https://github.com/darshani8/reep-</text>
+</svg>

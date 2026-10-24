@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites errors="0" failures="1" skipped="0" tests="34" time="2.282403">
+  <testsuite name="schemathesis" hostname="vm" errors="0" failures="1" skipped="0" tests="34" time="2.282403">
+    <testcase name="GET /api/student/academics" time="0.122757" />
+    <testcase name="GET /api/student/attendance" time="0.033467" />
+    <testcase name="GET /api/student/badges" time="0.058472" />
+    <testcase name="GET /api/student/badges/leaderboards" time="0.378056" />
+    <testcase name="GET /api/student/courses" time="0.024132" />
+    <testcase name="GET /api/student/dashboard" time="0.019847" />
+    <testcase name="GET /api/student/english-baseline" time="0.023732" />
+    <testcase name="GET /api/student/focus" time="0.020523" />
+    <testcase name="GET /api/student/growth" time="0.022819" />
+    <testcase name="GET /api/student/jobs" time="0.032850" />
+    <testcase name="GET /api/student/leaderboards" time="0.155023" />
+    <testcase name="GET /api/student/ledger" time="0.178727" />
+    <testcase name="GET /api/student/ledger/history" time="0.173756" />
+    <testcase name="GET /api/student/mentor-meetings" time="0.042527" />
+    <testcase name="GET /api/student/mocks" time="0.019452" />
+    <testcase name="GET /api/student/next-actions" time="0.027975" />
+    <testcase name="GET /api/student/offers" time="0.021390" />
+    <testcase name="GET /api/student/overview" time="0.062121" />
+    <testcase name="GET /api/student/placement-readiness" time="0.028318" />
+    <testcase name="GET /api/student/profile" time="0.022085" />
+    <testcase name="GET /api/student/programme" time="0.020793" />
+    <testcase name="GET /api/student/recommendations" time="0.018290" />
+    <testcase name="GET /api/student/results" time="0.019150" />
+    <testcase name="GET /api/student/resume" time="0.022674" />
+    <testcase name="GET /api/student/resume-profile" time="0.018058" />
+    <testcase name="GET /api/student/schedule" time="0.170139" />
+    <testcase name="GET /api/student/skill-claims" time="0.022493" />
+    <testcase name="GET /api/student/skills" time="0.018845" />
+    <testcase name="GET /api/student/skills/catalogue" time="0.017694" />
+    <testcase name="GET /api/student/streak" time="0.017462" />
+    <testcase name="GET /api/student/swoc" time="0.018652" />
+    <testcase name="GET /api/student/timesheet" time="0.151893" />
+    <testcase name="GET /api/student/uploads" time="0.052245" />
+    <testcase name="GET /api/student/resume/{resume_id}/pdf" time="0.245986">
+      <failure type="failure">1. Test Case ID: 4jxgGg
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Resume not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/student/resume/0/pdf?appendix=false'</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

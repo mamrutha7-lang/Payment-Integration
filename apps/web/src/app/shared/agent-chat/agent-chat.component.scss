@@ -1,0 +1,489 @@
+/* The REEP Agent thread. The handoff draws this screen in its own quieter
+ * register — flat hairline surfaces, pill controls, no card gradients — so
+ * almost nothing here is a global class. Colours come from the reep-v2 tokens
+ * wherever the handoff's value has one; the three that do not (the user bubble,
+ * the muted lilac hint ink, the 4% purple wash) are declared once below.
+ *
+ * Moved here verbatim from features/agent/agent.component.scss when the thread
+ * became a shared component; the page keeps only its heading and rail rules.
+ * `:host.is-dock` is the dock variant: the frame fills its host instead of
+ * sizing itself to the viewport, and the borders go because the dock draws
+ * its own. */
+
+:host {
+  --ag-bubble-user: #3a1f52;
+  --ag-hint: #8a739f;
+  --ag-wash: rgba(58, 31, 82, 0.04);
+  --ag-rule: rgba(58, 31, 82, 0.12);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+:host.is-dock {
+  flex: 1;
+  height: 100%;
+}
+
+.ag-error {
+  color: var(--ink-nav);
+  margin: 0 0 12px;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+
+/* --- the frame ---------------------------------------------------------- */
+.ag-frame {
+  display: flex;
+  flex-direction: column;
+  /* Tall enough to read as a chat, bounded so the message pane — not the
+     page — is what scrolls. The shell's main column already scrolls; two
+     nested full-height scrollers would fight over the wheel. */
+  height: max(420px, calc(100vh - 330px));
+  border: 1px solid var(--hairline-42);
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--surface);
+}
+:host.is-dock .ag-frame {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.ag-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+:host.is-dock .ag-scroll {
+  padding: 16px 14px;
+}
+.ag-quiet {
+  margin: 0;
+  color: var(--ag-hint);
+  font-size: 0.8125rem;
+}
+
+/* --- turns -------------------------------------------------------------- */
+/* The agent's brand mark sits beside its answers. In a thread where both sides
+   are bubbles, the mark is what says who spoke — without it, "which side is
+   this" rests on the bubble tint alone, and the board makes the answer bubble
+   white. */
+.ag-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+}
+.ag-mark {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin-top: 2px;
+  border-radius: var(--r-pill);
+  background: var(--primary-gradient);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 800;
+}
+.ag-row--user {
+  justify-content: flex-end;
+}
+.ag-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 82%;
+  align-items: flex-start;
+}
+.ag-stack--user {
+  align-items: flex-end;
+}
+/* WHITE, per the board, not the lilac wash. The answer often carries action
+   rows and source chips of its own, and those are tinted — on a tinted bubble
+   they had almost no separation from it. */
+.ag-bubble {
+  padding: 10px 14px;
+  border-radius: 16px;
+  line-height: 1.55;
+  font-size: 0.925rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--hairline-42);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.ag-bubble--user {
+  background: var(--ag-bubble-user);
+  color: #fff;
+  border-color: transparent;
+}
+.ag-turn-state {
+  font-size: 0.75rem;
+  color: var(--ag-hint);
+  padding: 0 6px;
+}
+
+/* actions: "→ label / reason" cards */
+.ag-action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.ag-action {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid var(--hairline-42);
+  background: var(--ag-wash);
+  text-decoration: none;
+  color: var(--ink);
+}
+.ag-action:hover {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+.ag-action__arrow {
+  font-weight: 700;
+  line-height: 1.4;
+}
+.ag-action__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.ag-action__label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.ag-action__reason {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+/* sources */
+.ag-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ag-source {
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--hairline-42);
+  color: var(--muted);
+  background: var(--ag-wash);
+}
+.ag-source--policy {
+  border-color: var(--brand-purple);
+  color: var(--brand-purple);
+  background: var(--tint-2);
+}
+
+/* limitations */
+.ag-limits {
+  margin: 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--ag-rule);
+  color: var(--ag-hint);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+.ag-limits p {
+  margin: 0;
+}
+.ag-limits p + p {
+  margin-top: 4px;
+}
+
+/* feedback row */
+.ag-feedback {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+.ag-textbtn {
+  background: none;
+  border: none;
+  padding: 2px 4px;
+  font-family: var(--font);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--ink);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+}
+.ag-textbtn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.ag-textbtn--muted {
+  color: var(--muted);
+}
+.ag-textbtn--on {
+  color: var(--risk);
+}
+.ag-textbtn .icon {
+  font-size: 13px;
+  margin-right: 3px;
+}
+.ag-votes {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+/* Outlined icon buttons, per the board. */
+.ag-vote {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: var(--muted);
+  border: 1px solid var(--hairline-26);
+  border-radius: var(--r-pill);
+  background: transparent;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+.ag-vote .icon {
+  font-size: 14px;
+}
+.ag-vote:hover {
+  background: var(--ag-wash);
+}
+.ag-vote--on {
+  color: var(--brand-purple);
+  border-color: var(--brand-purple);
+  background: var(--tint-2);
+}
+.ag-thanks {
+  font-size: 0.75rem;
+  color: var(--purple-mid);
+  font-weight: 600;
+}
+
+/* typing indicator */
+.ag-typing {
+  padding: 10px 14px;
+  border-radius: 22px;
+  background: var(--ag-wash);
+  border: 1px solid var(--hairline-42);
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.ag-typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ag-hint);
+  animation: ag-blink 1.2s infinite ease-in-out;
+}
+.ag-typing span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.ag-typing span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+@keyframes ag-blink {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ag-typing span {
+    animation: none;
+    opacity: 0.6;
+  }
+}
+
+/* --- empty state + starters --------------------------------------------- */
+/* The first thing a person sees. A mark, a greeting and the four starters —
+   the shape every assistant a student has used opens with, so nothing here
+   needs explaining. */
+.ag-empty {
+  margin: auto;
+  max-width: 46ch;
+  text-align: center;
+  color: var(--ag-hint);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+}
+.ag-empty p {
+  margin: 0;
+}
+.ag-empty__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 12px;
+  border-radius: var(--r-pill);
+  background: var(--primary-gradient);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  box-shadow: var(--sh-primary);
+}
+.ag-empty__lead {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px !important;
+}
+.ag-starters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.ag-starters--centred {
+  justify-content: center;
+  margin-top: 16px;
+}
+.ag-starters--row {
+  padding: 10px 12px 0;
+}
+.ag-starter {
+  padding: 7px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-42);
+  background: var(--ag-wash);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.ag-starter:hover:not(:disabled) {
+  border-color: var(--ink);
+}
+.ag-starter:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* --- composer ----------------------------------------------------------- */
+.ag-composer {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  padding: 12px;
+  border-top: 1px solid var(--ag-rule);
+}
+.ag-composer textarea {
+  flex: 1;
+  resize: none;
+  max-height: 160px;
+  padding: 10px 12px;
+  border: 1px solid var(--hairline-42);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.ag-composer textarea:focus {
+  outline: none;
+  border-color: var(--purple-mid);
+  box-shadow: var(--focus-ring);
+}
+.ag-composer textarea::placeholder {
+  color: var(--ag-hint);
+}
+.ag-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 16px;
+  font-family: var(--font);
+  font-size: 0.9375rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  /* The gradient, because Send IS this view's one primary action — the case
+     the reservation exists for. */
+  background: var(--primary-gradient);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: var(--sh-navpill);
+  flex-shrink: 0;
+  min-width: 84px;
+  cursor: pointer;
+}
+.ag-send .icon {
+  font-size: 16px;
+}
+.ag-send:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.ag-send--stop {
+  border-color: var(--ink-nav);
+  background: transparent;
+  color: var(--ink-nav);
+  box-shadow: none;
+}
+
+.ag-hint {
+  margin: 8px 12px 12px;
+  color: var(--ag-hint);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+/* The dock's one-line foot: Rule 1 and Clear, on one row. */
+.ag-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px 10px;
+  border-top: 1px solid var(--ag-rule);
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--ag-hint);
+}
+.ag-foot__note a {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .ag-stack {
+    max-width: 94%;
+  }
+  .ag-frame {
+    height: max(420px, calc(100vh - 380px));
+  }
+}

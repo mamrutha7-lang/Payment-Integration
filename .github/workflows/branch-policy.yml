@@ -1,0 +1,44 @@
+name: Branch policy
+
+# Enforces the promotion path in docs/branching-strategy.md:
+#   feature/* -> dev -> stage -> main, and hotfix/* -> main (+ back into dev).
+# A ruleset can demand a PR and green checks; it cannot say which branch the PR
+# comes FROM. This job is that half, and .github/rulesets/{main,stage}.json
+# require it by its display name below -- rename it there too, or it retires.
+#
+# Deliberately NOT a job in ci.yml: §34 in tests/test_codebase_guards.py pins
+# ci.yml's five jobs against preflight.sh, and this has nothing to run locally.
+
+on:
+  pull_request:
+    # `edited` re-runs it when somebody retargets an open PR's base.
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    name: Branch policy (promotion path)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: tools/ci
+      # Branch names arrive through env, never interpolated into the script:
+      # a head ref is chosen by whoever opened the PR.
+      #
+      # Until `stage` and `dev` exist on the remote the strategy is not switched
+      # on, and refusing every PR into main would leave nowhere to merge to. So
+      # the check passes, and SAYS it is not enforcing, until both exist.
+      - name: Is this source allowed into this target?
+        env:
+          BASE: ${{ github.base_ref }}
+          HEAD: ${{ github.head_ref }}
+        run: |
+          if ! git ls-remote --exit-code --heads origin stage >/dev/null \
+             || ! git ls-remote --exit-code --heads origin dev >/dev/null; then
+            echo "::notice::stage and dev do not both exist yet; the promotion path is not enforced (docs/branching-strategy.md, One-time setup)."
+            exit 0
+          fi
+          python3 tools/ci/branch_policy.py "$BASE" "$HEAD"

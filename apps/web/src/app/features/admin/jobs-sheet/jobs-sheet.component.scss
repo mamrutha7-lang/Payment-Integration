@@ -1,0 +1,240 @@
+/* Jobs sheet — this screen's LAYOUT only.
+ *
+ * `.panel` `.card` `.chip` `.btn` `.select` `.field` `.ctrl` `.notice` `.tabs`
+ * `.crumb` `.dt-header` `.dt-title` `.dt-sub` `.dt-toolbar` `.dt-frame`
+ * `.dt-gridbar` `.dt-quickfilter` `.dt-statusbar` `.icon` are global
+ * (styles/reep-v2.scss) and are used as they are. What is here is the shape of
+ * this board: the filter row with its counts, the grid beside the 380px
+ * "Post a job" panel, the grid bar's Columns popover, and the panel's rows.
+ *
+ * Every class below is prefixed `jobs-` (or is scoped inside one that is), so
+ * nothing here can be mistaken for a global the next screen might expect.
+ */
+
+:host {
+  display: block;
+}
+
+/* --- tabs, banners ------------------------------------------------------- */
+
+.jobs-tabs {
+  margin-bottom: 12px;
+}
+
+/* `.tabs .tab` dresses a <button>; the two links beside it need the same
+   colour and no underline. */
+.jobs-tabs a.tab {
+  text-decoration: none;
+}
+
+.jobs-banner {
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.jobs-banner__dismiss {
+  margin-left: auto;
+  flex: none;
+}
+
+/* --- the board's filter row ---------------------------------------------- */
+
+.jobs-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+/* A narrowing select that has nothing to offer: every posting on this sheet
+   names the same college, or none names a track at all. The <select> inside is
+   `disabled` with the reason in its title; this dims the pill it sits in so the
+   row reads as "nothing to choose" at a glance rather than as a menu that will
+   not open. */
+.jobs-filter--empty {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.jobs-stats {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.jobs-stats b {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Past deadline and still on the boards. TEXT AND COLOUR TOGETHER: the words
+   beside the number say it as well, so the colour is emphasis and never the
+   only carrier of the fact. */
+.jobs-stats__warn,
+.jobs-stats__warn b {
+  color: var(--warn);
+}
+
+.jobs-gaps {
+  margin-bottom: 10px;
+}
+
+/* --- the grid beside the panel ------------------------------------------- */
+
+.jobs-body {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+.jobs-grid {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* The grid bar has to be able to hold the Columns popover. */
+  position: relative;
+}
+
+.jobs-ag {
+  display: block;
+  width: 100%;
+  height: clamp(360px, calc(100vh - 400px), 720px);
+}
+
+/* Loading sits where the grid would, in main's own words. */
+.jobs-state {
+  margin: 0;
+  padding: 28px 16px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.jobs-gridbar-end {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.jobs-pagesize {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.jobs-pagesize select {
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-seg);
+  padding: 2px 4px;
+}
+
+/* --- the Columns popover -------------------------------------------------
+   AG Grid's own side panel is an Enterprise feature; this is the Community
+   equivalent of the board's Columns tab, driven by setColumnsVisible. */
+
+.jobs-columns-panel {
+  position: absolute;
+  top: 46px;
+  right: 10px;
+  z-index: 5;
+  width: 190px;
+  padding: 10px;
+  background: var(--surface);
+  border: 1px solid var(--hairline-42);
+  border-radius: var(--r-control);
+  box-shadow: var(--sh-card);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.jobs-columns-panel__title {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--faint);
+  margin-bottom: 2px;
+}
+
+.jobs-columns-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+
+/* --- Post a job ----------------------------------------------------------
+   The board's 380px side panel (01-design-system.md §3). */
+
+.jobs-post {
+  width: 380px;
+  flex: none;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: clamp(420px, calc(100vh - 260px), 820px);
+}
+
+.jobs-post__title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+}
+
+.jobs-post__row {
+  display: flex;
+  gap: 10px;
+}
+
+.jobs-post__row > .field {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.jobs-post__help {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.jobs-post__error {
+  align-items: center;
+}
+
+.jobs-post__foot {
+  display: flex;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+/* `.field label .req` is global (styles/reep-v2-resume.scss) and already paints
+   the asterisk; nothing unprefixed belongs in this file. */
+
+/* The panel is the widest thing on the row; below a laptop it drops under the
+   grid rather than squeezing it to nothing. */
+@media (max-width: 1180px) {
+  .jobs-body {
+    flex-direction: column;
+  }
+
+  .jobs-post {
+    width: auto;
+    max-height: none;
+  }
+}

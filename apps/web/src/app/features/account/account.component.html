@@ -1,0 +1,742 @@
+<div class="panel" data-p="account">
+  <div class="dt-header">
+    <div>
+      <div class="crumb"><span>Account</span></div>
+      <h1 class="dt-title">My account</h1>
+      <!-- The sentence names the cards this account actually gets: a STUDENT
+           and an ALUMNUS have no signature slot, so they are not promised one. -->
+      <div class="dt-sub">
+        {{ roleLabel() }} · {{ emailAddress() }} · sign-in, password,
+        @if (holdsASignatureSlot()) {
+          signature
+        } @else {
+          sessions
+        }
+        and notifications for your own login.
+      </div>
+    </div>
+    <div class="dt-toolbar">
+      <button type="button" class="btn secondary" [disabled]="signingOut()" (click)="signOut()">
+        <span class="icon" aria-hidden="true">logout</span>
+        {{ signingOut() ? 'Signing out…' : 'Sign out' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- The re-read of /auth/me came back with nothing. Under one device at a
+       time that is a real event rather than a fault — this account signed in
+       somewhere else while this page was open — and saying so beats four cards
+       quietly rendering their empty states. -->
+  <div role="alert">
+    @if (accountUnavailable()) {
+      <div class="notice">
+        <span class="icon" aria-hidden="true">error</span>
+        <div>
+          This session is no longer live, so none of the details below could be read. That
+          usually means this account was signed in on another device — REEP allows one at a
+          time. Sign in again to carry on.
+          <div class="account-actions">
+            <button type="button" class="btn secondary" (click)="signOut()">
+              <span class="icon" aria-hidden="true">logout</span> Go to sign in
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="account-grid">
+    <!-- ================= left column ================= -->
+    <div class="account-column">
+      <section class="card account-card" aria-labelledby="account-security-title">
+        <div class="account-card__head">
+          <h2 class="account-card-title" id="account-security-title">Sign-in &amp; security</h2>
+        </div>
+
+        <!-- Google. TWO DIFFERENT FACTS, and they are reported separately: the
+             chip is whether THIS account is pinned to a Google identity
+             (`google_linked` on /auth/me), the hint under it is whether the
+             SERVER offers the Google door at all (/auth/sso/status). An account
+             can be linked on a deployment whose Google client id is blank, and
+             a screen that merged the two would have to lie about one of them.
+
+             `google_linked` IS `bool | null` AND NULL IS "NOT ASKED": /login
+             mints the same model without it, so absent is never rendered as
+             "not linked". -->
+        <div class="account-row">
+          <span class="icon account-row__lead" aria-hidden="true">key</span>
+          <div class="account-row__body">
+            <div>
+              Google · {{ emailAddress() }}
+              @if (googleLinkKnown()) {
+                @if (googleLinked()) {
+                  <span class="chip dot good">Linked</span>
+                } @else {
+                  <span class="chip dot neutral">Not linked</span>
+                }
+              } @else {
+                <span class="chip dot neutral">Link status not loaded</span>
+              }
+            </div>
+            @if (signInDoorsKnown()) {
+              @if (googleDoorShutReason(); as reason) {
+                <div class="account-hint">Google sign-in is off on this server. {{ reason }}</div>
+              } @else if (!googleDoorOpen()) {
+                <div class="account-hint">Google sign-in is off on this server.</div>
+              } @else if (googleLinkKnown() && !googleLinked()) {
+                <div class="account-hint">
+                  Sign in with Google once and this account is pinned to that Google identity.
+                  There is no separate link button: the pin is made by the sign-in itself.
+                </div>
+              }
+            }
+          </div>
+          @if (googleLinked()) {
+            @if (confirmGoogleUnlink()) {
+              <button
+                type="button"
+                class="btn danger sm"
+                [disabled]="unlinkingGoogle()"
+                (click)="unlinkGoogle()"
+              >
+                {{ unlinkingGoogle() ? 'Unlinking…' : 'Yes, unlink' }}
+              </button>
+              <button type="button" class="btn ghost sm" (click)="confirmGoogleUnlink.set(false)">
+                Keep it
+              </button>
+            } @else {
+              <button
+                type="button"
+                class="btn ghost sm"
+                (click)="confirmGoogleUnlink.set(true)"
+              >
+                Unlink
+              </button>
+            }
+          }
+        </div>
+
+        <!-- The server decides whether unlinking is safe — it can see this
+             row's password hash and whether the password door is open at all,
+             and neither is on this screen. Its refusal is shown verbatim. -->
+        <div role="status">
+          @if (googleFlash(); as message) {
+            <div class="notice good">
+              <span class="icon" aria-hidden="true">check</span>
+              <div>{{ message }}</div>
+            </div>
+          }
+        </div>
+        <div role="alert">
+          @if (googleError(); as message) {
+            <div class="notice">
+              <span class="icon" aria-hidden="true">error</span>
+              <div>{{ message }}</div>
+            </div>
+          }
+        </div>
+        <div role="status">
+          @if (confirmGoogleUnlink()) {
+            <p class="account-hint">
+              Unlinking means Google no longer opens this account — you would sign in with your
+              email and password. If that would leave you with no way in, the server refuses and
+              says so.
+            </p>
+          }
+        </div>
+
+        <!-- Password. Three states, and the screen never shows a form that
+             cannot succeed: no password on this account (409), the password
+             door shut on this server (sso/status), or the two-step change. -->
+        @if (!signsInWithGoogleOnly()) {
+          <div class="account-row">
+            <span class="icon account-row__lead" aria-hidden="true">lock</span>
+            <div class="account-row__body">
+              <div>Password · {{ minPasswordLength | plural: 'character' }} or more</div>
+              <div class="account-hint">
+                We email a six-digit code to confirm it is you — being signed in is not the
+                proof, the code is.
+              </div>
+            </div>
+          </div>
+        }
+
+        <div role="status">
+          @if (passwordFlash(); as message) {
+            <div class="notice good">
+              <span class="icon" aria-hidden="true">check</span>
+              <div>{{ message }}</div>
+            </div>
+          }
+        </div>
+        <div role="alert">
+          @if (passwordError(); as message) {
+            <div class="notice">
+              <span class="icon" aria-hidden="true">error</span>
+              <div>{{ message }}</div>
+            </div>
+          }
+        </div>
+
+        <!-- BOTH OF THESE ARRIVE AFTER A REQUEST — the 409 on pressing "Email
+             me a code", the door probe on load — so they sit in a live region
+             that exists before the message does. A message inserted by @if
+             into a plain <div> is announced to nobody. -->
+        <div role="status">
+          @if (accountHoldsNoPassword()) {
+            <div class="notice accent">
+              <span class="icon" aria-hidden="true">info</span>
+              <div>
+                This account has no password yet. Sign in with Google, or finish setting up your
+                account from the link you were emailed.
+              </div>
+            </div>
+          } @else if (passwordDoorShut()) {
+            <div class="notice accent">
+              <span class="icon" aria-hidden="true">info</span>
+              <div>
+                Password sign-in is switched off on this server, so a password would not get you
+                in here — you sign in with Google.
+                @if (collegeDomain(); as domain) {
+                  <span>Use your {{ domain }} address.</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (!signsInWithGoogleOnly()) {
+          <div class="account-password">
+            <div class="wizard-steps">
+              <div class="step" [class.done]="codeSent()" [class.active]="!codeSent()">
+                <span class="n">1</span>
+                <span>Request a code</span>
+              </div>
+              <span class="sep"></span>
+              <div class="step" [class.active]="codeSent()">
+                <span class="n">2</span>
+                <span>Enter the code and a new password</span>
+              </div>
+            </div>
+
+            <!-- The server's own sentence when it mails the code: it names the
+                 address and the expiry, so neither is guessed here. Live
+                 region declared around it, not on it. -->
+            <div role="status">
+              @if (codeNote(); as message) {
+                <p class="account-hint">{{ message }}</p>
+              }
+            </div>
+
+            @if (!codeSent()) {
+              <p class="account-hint">
+                The code goes to the address on this account and never to one typed into a
+                form. It is spent once.
+              </p>
+              <div class="account-actions">
+                <!-- The one primary action on this view. Step 2's "Change
+                     password" replaces it; the two are never on screen
+                     together. -->
+                <button
+                  type="button"
+                  class="btn primary"
+                  [disabled]="sendingCode()"
+                  (click)="sendCode()"
+                >
+                  <span class="icon" aria-hidden="true">mail</span>
+                  {{ sendingCode() ? 'Sending…' : 'Email me a code' }}
+                </button>
+              </div>
+            } @else {
+              <form [formGroup]="passwordForm" (ngSubmit)="changePassword()" novalidate>
+                <div class="account-fields">
+                  <div class="field account-field--code">
+                    <label for="account-code">Emailed code</label>
+                    <input
+                      id="account-code"
+                      type="text"
+                      inputmode="numeric"
+                      autocomplete="one-time-code"
+                      maxlength="6"
+                      formControlName="code"
+                      [attr.aria-invalid]="
+                        passwordForm.controls.code.touched && passwordForm.controls.code.invalid
+                      "
+                    />
+                    @if (passwordForm.controls.code.touched && passwordForm.controls.code.invalid) {
+                      <div class="err" role="alert">
+                        <span class="icon" aria-hidden="true">error</span>The code is six digits.
+                      </div>
+                    }
+                  </div>
+
+                  <div class="field">
+                    <label for="account-new-password">New password</label>
+                    <input
+                      id="account-new-password"
+                      type="password"
+                      autocomplete="new-password"
+                      formControlName="new_password"
+                      [attr.aria-invalid]="
+                        passwordForm.controls.new_password.touched &&
+                        passwordForm.controls.new_password.invalid
+                      "
+                    />
+                    @if (
+                      passwordForm.controls.new_password.touched &&
+                      passwordForm.controls.new_password.hasError('minlength')
+                    ) {
+                      <div class="err" role="alert">
+                        <span class="icon" aria-hidden="true">error</span>
+                        Needs {{ minPasswordLength | plural: 'character' }} or more.
+                      </div>
+                    } @else {
+                      <div class="help">
+                        {{ minPasswordLength }}+ characters. A phrase of four or five words
+                        clears this easily.
+                      </div>
+                    }
+                  </div>
+
+                  <div class="field">
+                    <label for="account-confirm-password">Type it again</label>
+                    <input
+                      id="account-confirm-password"
+                      type="password"
+                      autocomplete="new-password"
+                      formControlName="confirm"
+                      [attr.aria-invalid]="
+                        passwordForm.controls.confirm.touched && passwordForm.hasError('mismatch')
+                      "
+                    />
+                    @if (passwordForm.controls.confirm.touched && passwordForm.hasError('mismatch')) {
+                      <div class="err" role="alert">
+                        <span class="icon" aria-hidden="true">error</span>
+                        The two passwords don’t match.
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="account-actions">
+                  <button type="button" class="btn secondary" (click)="cancelPasswordChange()">
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    class="btn secondary"
+                    [disabled]="sendingCode()"
+                    (click)="sendCode()"
+                  >
+                    <span class="icon" aria-hidden="true">mail</span> Send a new code
+                  </button>
+                  <button
+                    type="submit"
+                    class="btn primary"
+                    [disabled]="savingPassword() || passwordForm.invalid"
+                  >
+                    <span class="icon" aria-hidden="true">check</span>
+                    {{ savingPassword() ? 'Saving…' : 'Change password' }}
+                  </button>
+                </div>
+              </form>
+            }
+          </div>
+        }
+
+        <!-- WHAT IS LEFT OF THE PHASE 2 NOTICE. The link state and unlinking
+             landed with B15; the board's "changed 14 Aug 2026" did not, and
+             nothing on the server records it — there is no column, so this is
+             not a screen waiting on an endpoint. Said once, plainly, rather
+             than left as a date-shaped gap somebody tries to fill. -->
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">info</span>
+          <div>
+            REEP does not record when a password was last changed, so there is no date to show
+            here. The sign-ins list opposite is what answers “has anything happened on this
+            account”.
+          </div>
+        </div>
+      </section>
+
+      <section class="card account-card" aria-labelledby="account-sessions-title">
+        <div class="account-card__head">
+          <div>
+            <h2 class="account-card-title" id="account-sessions-title">Sessions</h2>
+            <p class="account-card-sub">One live session per account, and this is it.</p>
+          </div>
+        </div>
+
+        <div class="account-row">
+          <span class="chip dot good">This device</span>
+          <div class="account-row__body">
+            <div>Signed in as {{ displayName() }} · {{ roleLabel() }}</div>
+          </div>
+        </div>
+
+        <p class="account-hint">
+          One device at a time: signing in anywhere else ends this session, and the device that
+          loses it is told why rather than meeting a login form with no explanation. The newest
+          sign-in wins, deliberately.
+        </p>
+
+        <div role="alert">
+          @if (signOutEverywhereError(); as message) {
+            <div class="notice">
+              <span class="icon" aria-hidden="true">error</span>
+              <div>{{ message }}</div>
+            </div>
+          }
+        </div>
+
+        <!-- THIS DEVICE GOES TOO, so the confirmation says so before it is
+             pressed rather than after. The person is at a login form a second
+             later either way; being surprised by it is the avoidable half. -->
+        <div class="account-actions">
+          @if (confirmSignOutEverywhere()) {
+            <button
+              type="button"
+              class="btn danger"
+              [disabled]="signingOutEverywhere()"
+              (click)="signOutEverywhere()"
+            >
+              <span class="icon" aria-hidden="true">logout</span>
+              {{ signingOutEverywhere() ? 'Signing out…' : 'Yes, sign out everywhere' }}
+            </button>
+            <button
+              type="button"
+              class="btn secondary"
+              [disabled]="signingOutEverywhere()"
+              (click)="confirmSignOutEverywhere.set(false)"
+            >
+              Cancel
+            </button>
+          } @else {
+            <button
+              type="button"
+              class="btn secondary"
+              (click)="confirmSignOutEverywhere.set(true)"
+            >
+              <span class="icon" aria-hidden="true">logout</span> Sign out everywhere
+            </button>
+          }
+        </div>
+
+        <div role="status">
+          @if (confirmSignOutEverywhere()) {
+            <p class="account-hint">
+              This ends every session this account holds, <strong>including this one</strong> —
+              you will be taken to the sign-in page and will need to sign in again. That is what
+              makes it worth pressing for a device you can no longer reach: a shared machine you
+              walked away from, or a phone that was taken.
+            </p>
+          }
+        </div>
+
+        <!-- WHAT THE BOARD DRAWS AND NOTHING ANSWERS: the device, place and
+             expiry of the live session. The cookie is a signed token and no
+             endpoint reports what is in it, so the row above says what is
+             certainly true — this device, this account — and invents nothing. -->
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">info</span>
+          <div>
+            REEP keeps no list of live sessions — one account, one session, and the token itself
+            is the only record of it — so there is no device or expiry to show for this one. The
+            sign-in that created it is the first row under “Recent sign-ins”.
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= right column ================= -->
+    <div class="account-column">
+      <!-- A STUDENT and an ALUMNUS have no signature slot: /api/staff/signature
+           is require_mentor, so the card is not drawn rather than drawn and
+           refused. -->
+      @if (holdsASignatureSlot()) {
+        <section class="card account-card" aria-labelledby="account-signature-title">
+          <div class="account-card__head">
+            <div>
+              <h2 class="account-card-title" id="account-signature-title">Signature</h2>
+              <p class="account-card-sub">Printed on every leave paper you apply on or sanction.</p>
+            </div>
+          </div>
+
+          <div role="status">
+            @if (signatureFlash(); as message) {
+              <div class="notice good">
+                <span class="icon" aria-hidden="true">check</span>
+                <div>{{ message }}</div>
+              </div>
+            }
+          </div>
+          <div role="alert">
+            @if (signatureError(); as message) {
+              <div class="notice">
+                <span class="icon" aria-hidden="true">error</span>
+                <div>{{ message }}</div>
+              </div>
+            }
+          </div>
+
+          <!-- A FAILED READ IS NOT AN EMPTY SLOT. Falling through to "No
+               signature on file" would tell a mentor who has one that they
+               have none, and the upload button beside it would replace it. -->
+          @if (signatureLoadFailed()) {
+            <div class="account-actions">
+              <button type="button" class="btn secondary" (click)="loadSignature()">
+                <span class="icon" aria-hidden="true">sync</span> Try again
+              </button>
+            </div>
+          } @else if (signatureStillLoading()) {
+            <div class="loading-line">Loading…</div>
+          } @else if (signatureOnFile(); as onFile) {
+            <div class="account-signature__paper">
+              <img [src]="signatureImageUrl()" alt="Your signature, as it is printed" />
+            </div>
+            <p class="account-hint">
+              On file since {{ uploadedOn(onFile.uploaded_at) }} ·
+              {{ fileSize(onFile.size_bytes) }} · {{ fileKind(onFile.mime_type) }}. A signature is
+              still a name and a time; the image never replaces either.
+            </p>
+            <div class="account-actions">
+              <label class="btn secondary account-filepick">
+                <span class="icon" aria-hidden="true">upload</span> Replace
+                <input
+                  type="file"
+                  class="account-filepick__input"
+                  accept="image/png,image/jpeg"
+                  [disabled]="signatureBusy()"
+                  (change)="uploadSignature($event)"
+                />
+              </label>
+              @if (confirmSignatureRemoval()) {
+                <button
+                  type="button"
+                  class="btn danger"
+                  [disabled]="signatureBusy()"
+                  (click)="removeSignature()"
+                >
+                  Yes, remove it
+                </button>
+                <button
+                  type="button"
+                  class="btn secondary"
+                  (click)="confirmSignatureRemoval.set(false)"
+                >
+                  Keep it
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="btn danger"
+                  [disabled]="signatureBusy()"
+                  (click)="confirmSignatureRemoval.set(true)"
+                >
+                  <span class="icon" aria-hidden="true">delete</span> Remove…
+                </button>
+              }
+            </div>
+            <div role="status">
+              @if (confirmSignatureRemoval()) {
+                <p class="account-hint">Your papers will show your name and the time only.</p>
+              }
+            </div>
+          } @else {
+            <div class="empty">
+              <span class="icon" aria-hidden="true">draw</span>
+              No signature on file
+            </div>
+            <p class="account-hint">
+              Sign on white paper with a dark pen, photograph or scan it, and upload the picture.
+              PNG or JPEG, under {{ maxSignatureMegabytes }} MB. Crop it close to the signature;
+              it is printed about 14 mm tall.
+            </p>
+            <div class="account-actions">
+              <label class="btn secondary account-filepick">
+                <span class="icon" aria-hidden="true">upload</span> Upload signature
+                <input
+                  type="file"
+                  class="account-filepick__input"
+                  accept="image/png,image/jpeg"
+                  [disabled]="signatureBusy()"
+                  (change)="uploadSignature($event)"
+                />
+              </label>
+            </div>
+          }
+        </section>
+      }
+
+      <section class="card account-card" aria-labelledby="account-digests-title">
+        <div class="account-card__head">
+          <div>
+            <h2 class="account-card-title" id="account-digests-title">Email notifications</h2>
+            <!-- "and how often" is gone from this sentence: the catalogue holds
+                 switches, not frequencies. -->
+            <p class="account-card-sub">Mail REEP sends you that you can switch off.</p>
+          </div>
+        </div>
+
+        <div role="status">
+          @if (prefsFlash(); as message) {
+            <div class="notice good">
+              <span class="icon" aria-hidden="true">check</span>
+              <div>{{ message }}</div>
+            </div>
+          }
+        </div>
+        <div role="alert">
+          @if (prefsError(); as message) {
+            <div class="notice">
+              <span class="icon" aria-hidden="true">error</span>
+              <div>{{ message }}</div>
+            </div>
+          }
+        </div>
+
+        <!-- EVERY KEY THE SERVER SENDS, never a hard-coded list: the map is
+             dense on purpose (auth.py `notification_state`) so an absent key is
+             never readable as "switched off", and a switch this build had not
+             heard of would otherwise be invisible rather than new. -->
+        @if (notificationPrefs().length > 0) {
+          @for (pref of notificationPrefs(); track pref.key) {
+            <div class="account-pref">
+              <label class="account-pref__label">
+                <input
+                  #box
+                  type="checkbox"
+                  [checked]="pref.enabled"
+                  [disabled]="!pref.enforced || savingPrefKey() !== null"
+                  (change)="setNotificationPref(pref.key, box.checked, box)"
+                />
+                <span>{{ pref.label }}</span>
+              </label>
+              <!-- Text AND colour, never colour alone — and "not wired yet" is
+                   a third state rather than a shade of off. -->
+              @if (!pref.enforced) {
+                <span class="chip dot warn">Not wired yet</span>
+              } @else if (savingPrefKey() === pref.key) {
+                <span class="chip dot neutral">Saving…</span>
+              } @else if (pref.enabled) {
+                <span class="chip dot good">On</span>
+              } @else {
+                <span class="chip dot neutral">Off</span>
+              }
+            </div>
+            @if (!pref.enforced) {
+              <p class="account-hint">
+                REEP does not send this mail yet, so there is nothing to switch off. The switch
+                turns itself on here the day something reads it.
+              </p>
+            }
+          }
+        } @else if (rereadingAccount()) {
+          <div class="loading-line">Loading…</div>
+        } @else {
+          <div class="empty">
+            <span class="icon" aria-hidden="true">mail</span>
+            No email preferences to show
+          </div>
+        }
+
+        <!-- REWRITTEN, NOT DELETED. The switch that landed with B15 is one
+             boolean; the board's five topics and its daily / weekly /
+             immediately are not there, and drawing five dropdowns over one
+             switch is the fake data the pending rule exists to prevent. -->
+        <div class="notice accent">
+          <span class="icon" aria-hidden="true">info</span>
+          <div>
+            REEP sends no digests. The mail it does send — a setup link, a code, a decision on an
+            application — is how you get into your account or hear back about it, so none of that
+            can be switched off. The board’s topics (a registration waiting, a leave request to
+            sanction, a grant about to lapse) and the choice of daily, weekly or immediately are
+            not built.
+          </div>
+        </div>
+      </section>
+
+      <section class="card account-card" aria-labelledby="account-signins-title">
+        <div class="account-card__head">
+          <div>
+            <h2 class="account-card-title" id="account-signins-title">Recent sign-ins</h2>
+            <p class="account-card-sub">
+              Don’t recognise one? Change the password, then sign out everywhere.
+            </p>
+          </div>
+          <!-- NOT "All events": there is no longer list to open. The ten below
+               are what /auth/me carries and what REEP keeps, so the button
+               re-reads them — AuthService.refresh(), the same call, so the
+               session the rest of the app holds is refreshed with the page. -->
+          <button
+            type="button"
+            class="btn ghost sm"
+            [disabled]="rereadingAccount()"
+            (click)="rereadAccount()"
+          >
+            <span class="icon" aria-hidden="true">sync</span>
+            {{ rereadingAccount() ? 'Refreshing…' : 'Refresh' }}
+          </button>
+        </div>
+
+        @if (recentSignIns().length > 0) {
+          <div class="account-signins">
+            <table class="dt-table">
+              <thead>
+                <tr>
+                  <th scope="col">When</th>
+                  <th scope="col">Door</th>
+                  <th scope="col">Device</th>
+                  <th scope="col">Seen from</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of recentSignIns(); track row.at + row.door) {
+                  <tr>
+                    <td>{{ signedInOn(row.at) }}</td>
+                    <td>{{ doorLabel(row.door) }}</td>
+                    <td class="account-signins__device">{{ deviceOf(row.user_agent) }}</td>
+                    <td class="account-signins__ip">{{ seenFrom(row.ip) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <!-- THE THREE THINGS THIS LIST CANNOT KNOW, said once under it rather
+               than implied by a column. "Result" is absent because only
+               successes are recorded, and a column reading OK on every row says
+               "nobody has ever failed", which this table cannot see. -->
+          <p class="account-hint">
+            Successful sign-ins only — a mistyped password is not listed here. “Seen from” is the
+            address the request arrived from, which behind the college’s load balancer is the
+            balancer for every row and not the device’s own address. “Device” is whatever the
+            browser calls itself.
+          </p>
+          <p class="account-hint">
+            The last {{ recentSignIns().length }} are kept; there is no longer history.
+          </p>
+        } @else if (rereadingAccount()) {
+          <div class="loading-line">Loading…</div>
+        } @else {
+          <div class="empty">
+            <span class="icon" aria-hidden="true">history</span>
+            No sign-ins recorded yet
+          </div>
+          <!-- REWRITTEN: the table exists now, so the notice explains the
+               EMPTY one. Sign-ins have been recorded since B15 shipped, so an
+               account that has not signed in since then shows nothing — which
+               is not the same as "not built", and would be a worrying sentence
+               to read on a security card. -->
+          <div class="notice accent">
+            <span class="icon" aria-hidden="true">info</span>
+            <div>
+              Sign-ins are recorded from the moment this went live, so an account that has not
+              signed in since then has nothing here yet. Your next sign-in appears at the top.
+            </div>
+          </div>
+        }
+      </section>
+
+    </div>
+  </div>
+</div>

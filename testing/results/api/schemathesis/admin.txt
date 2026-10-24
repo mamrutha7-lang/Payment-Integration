@@ -1,0 +1,643 @@
+Schemathesis v4.28.0
+━━━━━━━━━━━━━━━━━━━━
+
+
+ ✅  Loaded specification from http://localhost:3300/openapi.json (in 0.34s)    
+
+     Base URL:         http://localhost:3300/                                   
+     Specification:    Open API 3.1.0                                           
+     Operations:       64 selected / 370 total                                  
+
+
+ ✅  API capabilities:                                                          
+
+     Supports NULL byte in headers:                            ✘                
+     Accepts backslash and control characters in URL paths:    ✓                
+
+ ⏭   Examples (in 0.03s)                                                        
+                                                                                
+     ⏭  64 skipped                                                              
+
+ ❌  Coverage (in 6.20s)                                                        
+                                                                                
+     ✅ 50 passed  ❌ 14 failed                                                 
+
+ ❌  Fuzzing (in 15.86s)                                                        
+                                                                                
+     ✅ 38 passed  ❌ 26 failed                                                 
+
+=================================== FAILURES ===================================
+_____ GET /api/admin/academic-courses/{course_id}/academic-specializations _____
+1. Test Case ID: SwaCKS
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/academic-courses/%F0%BC%8E%9D%C2%AF/academic-specializations
+    
+    st replay SwaCKS
+
+____________________ GET /api/admin/approved-certifications ____________________
+1. Test Case ID: 557JyF
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/approved-certifications?course_id=null&course_id=null'
+    
+    st replay 557JyF
+
+_____________________________ GET /api/admin/audit _____________________________
+1. Test Case ID: J0079d
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 200, 422
+
+[500] Internal Server Error:
+
+    `Internal Server Error`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/audit?target_type=%F0%B9%B9%B9Be&page=92917030724915670548480&to=0247-02-28T15%3A56%3A38.94%2B18%3A17&page_size=199'
+    
+    st replay J0079d
+
+_______________________ GET /api/admin/audit/{event_id} ________________________
+1. Test Case ID: 2xbuUh
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Audit event not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/audit/0
+    
+    st replay 2xbuUh
+
+_______________________ GET /api/admin/catalogue/badges ________________________
+1. Test Case ID: 0suHa2
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/catalogue/badges?%F2%9C%83%BE%C3%96%F1%A0%8F%BFe%C2%A5=%C8%BA&Y%0C%C2%87v%C3%88%2B%F3%A8%B6%A3%15%C3%BB%C3%925%F1%A4%87%89C%C3%85%C3%B1%C2%A4%C2%98=&=&%28=4.541277403589245e-118&%28=null&course_id=%C3%A9%29%E4%BD%AA%07%F1%92%8C%AE%28&%F2%AB%8E%8D%C2%80%F1%B6%A8%A3%F2%A8%A7%B0%C2%A2=%01'
+    
+    st replay 0suHa2
+
+_____________________ GET /api/admin/catalogue/stage-rules _____________________
+1. Test Case ID: zGuohl
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Course not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/catalogue/stage-rules?course_id=null&course_id=null'
+    
+    st replay zGuohl
+
+_____________ GET /api/admin/cohorts/{cohort_id}/promotion-history _____________
+1. Test Case ID: 6Gqb7g
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Batch not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/%F0%BC%8E%9D%C2%AF/promotion-history
+    
+    st replay 6Gqb7g
+
+_________________ GET /api/admin/cohorts/{cohort_id}/students __________________
+1. Test Case ID: k49g9X
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Batch not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/cohorts/%F0%BC%8E%9D%C2%AF/students
+    
+    st replay k49g9X
+
+_________________ GET /api/admin/colleges/{college_id}/admins __________________
+1. Test Case ID: sFHDD3
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"College not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges/%F0%BC%8E%9D%C2%AF/admins
+    
+    st replay sFHDD3
+
+_______________ GET /api/admin/colleges/{college_id}/delete-plan _______________
+1. Test Case ID: Ps8fri
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"College not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges/%F0%BC%8E%9D%C2%AF/delete-plan
+    
+    st replay Ps8fri
+
+_______________ GET /api/admin/colleges/{college_id}/departments _______________
+1. Test Case ID: btqSrx
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"College not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/colleges/%F0%BC%8E%9D%C2%AF/departments
+    
+    st replay btqSrx
+
+_________ GET /api/admin/departments/{department_id}/academic-courses __________
+1. Test Case ID: PaNPwG
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Department not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/departments/%F0%BC%8E%9D%C2%AF/academic-courses
+    
+    st replay PaNPwG
+
+______________ GET /api/admin/departments/{department_id}/cohorts ______________
+1. Test Case ID: Q1YxgK
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Department not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/departments/%F0%BC%8E%9D%C2%AF/cohorts
+    
+    st replay Q1YxgK
+
+________________ GET /api/admin/governance/effective/{user_id} _________________
+1. Test Case ID: s9I9MN
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"User not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/governance/effective/0
+    
+    st replay s9I9MN
+
+_________________ GET /api/admin/imports/templates/{kind}.xlsx _________________
+1. Test Case ID: KAASg4
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"No template for '0'. Use one of: attendance, marks."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/imports/templates/0.xlsx
+    
+    st replay KAASg4
+
+________________ GET /api/admin/interview-policies/{college_id} ________________
+1. Test Case ID: Pn87jV
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"College not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/interview-policies/%F0%BC%8E%9D%C2%AF
+    
+    st replay Pn87jV
+
+______________________ GET /api/admin/interview-questions ______________________
+1. Test Case ID: ISqOM7
+
+- Response violates schema
+
+    "track must be one of hr, dm, ba, fa." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "track must be one of hr, dm, ba, fa."
+
+[422] Unprocessable Content:
+
+    `{"detail":"track must be one of hr, dm, ba, fa."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/interview-questions?track='
+    
+    st replay ISqOM7
+
+__________________________ GET /api/admin/interviews ___________________________
+1. Test Case ID: 5272T0
+
+- Response violates schema
+
+    "status must be one of: running, completed, abandoned, failed." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "status must be one of: running, completed, abandoned, failed."
+
+[422] Unprocessable Content:
+
+    `{"detail":"status must be one of: running, completed, abandoned, failed."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/interviews?status=null&x-schemathesis-unknown-property=42'
+    
+    st replay 5272T0
+
+______________________ GET /api/admin/interviews/summary _______________________
+1. Test Case ID: LpbzM7
+
+- Response violates schema
+
+    "status must be one of: running, completed, abandoned, failed." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "status must be one of: running, completed, abandoned, failed."
+
+[422] Unprocessable Content:
+
+    `{"detail":"status must be one of: running, completed, abandoned, failed."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/interviews/summary?status=null&x-schemathesis-unknown-property=42'
+    
+    st replay LpbzM7
+
+__________________ GET /api/admin/leave-calendar/{college_id} __________________
+1. Test Case ID: KjnITy
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"College not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/leave-calendar/%C3%A8%C2%B9%C2%BE%5B%C2%8D%0C%F3%B3%A3%BE
+    
+    st replay KjnITy
+
+___________________________ GET /api/admin/placement ___________________________
+1. Test Case ID: E45s5f
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 200, 422
+
+[500] Internal Server Error:
+
+    `Internal Server Error`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/placement?k%7C%F3%BF%85%82Y%11%C2%98m%F1%8A%A9%BD%C3%A1%C2%B2=%3D%1E%04%06%C3%9E%C3%B6&%23xrf1%C3%88%C2%B6n%C2%BF%C2%BE%C3%85%C3%A2=false&%F0%9C%90%8F%C3%82%C3%B8%F4%8B%8B%95S%F2%83%BE%90=%F2%A8%86%9A%F4%81%9D%AB&%F0%9C%90%8F%C3%82%C3%B8%F4%8B%8B%95S%F2%83%BE%90=%CA%87%C7%9D%C9%AF%C9%90+%CA%87%E1%B4%89s+%C9%B9olop+%C9%AFnsd%E1%B4%89+%C9%AF%C7%9D%C9%B9o%CB%A5&%F0%9C%90%8F%C3%82%C3%B8%F4%8B%8B%95S%F2%83%BE%90=%C2%A3%1A%7C&%F0%AD%AB%BE=1.4869239027133633e-177&%F0%AD%AB%BE=false&%F0%AD%AB%BE=%40&%C2%99%24-%C3%92=true&%C2%99%24-%C3%92=true&%C2%99%24-%C3%92=true&%C2%99%24-%C3%92=null&year=-5466912982786&cohort_id=null&%C2%85%C3%89=%7B%27%C3%BB%5CU000fd0e0%C3%AFj%5Cx8a%5CU0008d5bb%5CU000502fdK%C3%BD%C2%AB%5Cx93%27%3A+%27null%27%2C+%27.5P%C2%B9%27%3A+4.844919490942408e-05%7D'
+    
+    st replay E45s5f
+
+___________________ GET /api/admin/students/{student_id}/360 ___________________
+1. Test Case ID: Z788Qe
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/360
+    
+    st replay Z788Qe
+
+_______________ GET /api/admin/students/{student_id}/delete-plan _______________
+1. Test Case ID: MXJsel
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/delete-plan
+    
+    st replay MXJsel
+
+_____________ GET /api/admin/students/{student_id}/mentor-history ______________
+1. Test Case ID: whZSVb
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/mentor-history
+    
+    st replay whZSVb
+
+_________________ GET /api/admin/students/{student_id}/weekly __________________
+1. Test Case ID: VP2fLg
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Student not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/students/0/weekly
+    
+    st replay VP2fLg
+
+_____________________________ GET /api/admin/swoc ______________________________
+1. Test Case ID: 1mwjZv
+
+- Server error
+
+- Undocumented HTTP status code
+
+    Received: 500
+    Documented: 200, 422
+
+[500] Internal Server Error:
+
+    `Internal Server Error`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' 'http://localhost:3300/api/admin/swoc?cohort_id=910dbe4811a64f2b9058759c84eece7a&semester=-954555328274038435872768&page=3214'
+    
+    st replay 1mwjZv
+
+___________________ GET /api/admin/swoc/{student_id}/history ___________________
+1. Test Case ID: XjY75R
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"No such student."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/swoc/0/history
+    
+    st replay XjY75R
+
+__________________ GET /api/admin/users/{user_id}/delete-plan __________________
+1. Test Case ID: PIxfRo
+
+- Undocumented HTTP status code
+
+    Received: 404
+    Documented: 200, 422
+
+[404] Not Found:
+
+    `{"detail":"Account not found."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/0/delete-plan
+    
+    st replay PIxfRo
+
+2. Test Case ID: ZFEOhW
+
+- Response violates schema
+
+    "The Main Admin account cannot be removed or deleted - it is the only way into the console. Hand the office over first (demote it to MENTOR with `python -m app.grant_access`)." is not of type "array"
+
+    Validated against the response schema for status code 422.
+
+    Schema at /components/schemas/HTTPValidationError/properties/detail:
+
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail"
+        }
+
+    Value:
+
+        "The Main Admin account cannot be removed or deleted - it is the only way int...
+
+[422] Unprocessable Content:
+
+    `{"detail":"The Main Admin account cannot be removed or deleted - it is the only way into the console. Hand the office over first (demote it to MENTOR with `python -m app.grant_access`)."}`
+
+Reproduce with:
+
+    curl -X GET -H 'Cookie: [Filtered]' http://localhost:3300/api/admin/users/1c7d10b26d71403e9d19c029a2099ba7/delete-plan
+    
+    st replay ZFEOhW
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 64/370
+  Tested: 64
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (disabled)
+
+Failures:
+  ❌ Server error: 3
+  ❌ Response violates schema: 4
+  ❌ Undocumented HTTP status code: 25
+
+Test cases:
+  1761 generated, 29 found 32 unique failures
+
+Reports:
+  - JUNIT: results/api/schemathesis/admin/junit-20260929T211306Z.xml
+  - NDJSON: results/api/schemathesis/admin/ndjson-20260929T211306Z.ndjson
+
+Seed: 188061488742790290575701464471448972744
+
+============================ 32 failures in 22.16s =============================

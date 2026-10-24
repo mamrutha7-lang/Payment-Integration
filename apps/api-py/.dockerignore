@@ -1,0 +1,16 @@
+# Local virtualenvs — ~875 MB combined, and built for the host's OS/Python.
+# Copying them into an image is both enormous and wrong.
+.venv/
+.venv-voice/
+
+# Secrets. Never in an image layer: layers are cached, pushed and pullable.
+.env
+
+# Local state and caches
+var/
+__pycache__/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

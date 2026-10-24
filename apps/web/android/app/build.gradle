@@ -1,0 +1,81 @@
+apply plugin: 'com.android.application'
+
+// A Play Store build passes its version on the command line
+// (-PreepVersionCode=... -PreepVersionName=...), because Google Play refuses
+// a bundle whose versionCode it has seen before. A local build gets 1 / "1.0".
+def reepVersionCode = Integer.parseInt((project.findProperty('reepVersionCode') ?: '1').toString())
+def reepVersionName = (project.findProperty('reepVersionName') ?: '1.0').toString()
+
+// The UPLOAD key that signs a Play Store bundle. It comes from environment
+// variables, never from a file in the repository: .github/workflows/
+// android-play.yml writes the keystore from a secret into the runner's temp
+// folder and points REEP_UPLOAD_KEYSTORE at it. With the variable unset the
+// release build is simply unsigned, so a debug build or a local release build
+// needs no key at all.
+def uploadKeystore = System.getenv('REEP_UPLOAD_KEYSTORE')
+
+android {
+    namespace = "in.ac.bgscet.reep"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "in.ac.bgscet.reep"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode reepVersionCode
+        versionName reepVersionName
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    signingConfigs {
+        if (uploadKeystore) {
+            release {
+                storeFile file(uploadKeystore)
+                storePassword System.getenv('REEP_UPLOAD_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('REEP_UPLOAD_KEY_ALIAS')
+                keyPassword System.getenv('REEP_UPLOAD_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (uploadKeystore) {
+                signingConfig signingConfigs.release
+            }
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    testImplementation "junit:junit:$junitVersion"
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

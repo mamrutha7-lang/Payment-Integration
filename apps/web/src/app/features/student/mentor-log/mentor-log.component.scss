@@ -1,0 +1,226 @@
+/* Mentor / TPO Log. Cards, chips, the meeting rows and the request form are the
+ * global reep-v2 classes; this file paints the SWOC boxes in the handoff's four
+ * tones (a tinted fill AND a heading, so tone is never the only signal), lays
+ * out the empty state and sizes the date column the way the design does. */
+:host {
+  display: block;
+}
+
+.swoc-card,
+.request-card,
+.log-notice {
+  margin-bottom: 16px;
+}
+
+.h-sub {
+  font-family: var(--font);
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+  margin-left: 6px;
+}
+
+/* The board stacks the caption under the title. Inline, at the card's full
+   width, the caption landed at the far right of a 1150px rule and read as a
+   second column rather than as a caption. */
+h4.stacked {
+  display: block;
+}
+h4.stacked .h-sub {
+  display: block;
+  margin: 3px 0 0;
+  font-size: 12px;
+}
+
+.card-line {
+  color: var(--muted);
+  font-size: 14px;
+}
+.card-line .retry {
+  margin-left: 10px;
+}
+
+.request-lede {
+  margin: 0 0 12px;
+}
+
+/* --- SWOC: the four tinted boxes --- */
+.swoc-grid {
+  gap: 10px;
+}
+/* Each quadrant carries a COLOURED LEFT EDGE as well as its tint, which is the
+   board's treatment and this file's own rule elsewhere: status is text plus
+   colour, never colour alone. The four tints are close enough in value that at
+   a glance they read as one block; the edge is what separates them. */
+.swoc-box {
+  border-radius: 16px;
+  padding: 12px 12px 12px 14px;
+  font-size: 13px;
+  border: 0;
+  border-left: 4px solid currentcolor;
+}
+.swoc-box b {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+  color: inherit;
+}
+.swoc-text {
+  line-height: 1.45;
+}
+.swoc-s {
+  background: var(--good-bg);
+  color: var(--good);
+}
+.swoc-w {
+  background: var(--risk-bg);
+  color: var(--risk);
+}
+.swoc-o {
+  background: rgba(143, 97, 0, 0.1);
+  color: var(--warn);
+}
+.swoc-c {
+  background: var(--surface);
+  color: var(--brand-purple);
+  border: 1px solid var(--hairline-42);
+  border-left: 4px solid var(--brand-purple);
+}
+/* The body text stays ink in every quadrant; only the eyebrow and the edge
+   carry the quadrant's colour. */
+.swoc-box .swoc-text {
+  color: var(--ink);
+}
+
+/* --- B7.5: one line, its author, its date and its acknowledgement ---
+   The lines used to be joined into one sentence per quadrant, which had nowhere
+   to put any of the three. A hairline between them is what keeps two
+   observations from reading as one paragraph now that each carries a footer. */
+.swoc-line + .swoc-line {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--hairline-42);
+}
+.swoc-by {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+/* The name is the half a student reads first — "who said this about me" — so it
+   carries the weight and the rest of the footer stays quiet. */
+.swoc-who {
+  font-weight: 600;
+  color: var(--ink);
+}
+.swoc-read {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--good);
+}
+.swoc-read .icon {
+  font-size: 14px;
+}
+/* Small enough to sit inside a 13px tile without becoming the loudest thing in
+   it: the observation is the content, marking it read is an aside. */
+.swoc-ack {
+  padding: 2px 8px;
+  font-size: 11.5px;
+  min-height: 0;
+}
+.swoc-none {
+  color: var(--muted);
+}
+
+/* --- empty state: icon beside the words --- */
+.log-empty {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.log-empty .icon {
+  font-size: 30px;
+  color: var(--muted);
+  flex: 0 0 auto;
+}
+.log-empty-title {
+  font-weight: 700;
+  font-size: 14px;
+}
+.log-empty-text {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 3px;
+}
+
+/* --- meeting rows --- */
+.meeting {
+  gap: 12px;
+}
+/* A tinted block, as the board draws it: the date is a label on the entry, not
+   a column of loose text beside it. */
+.meeting .date {
+  width: 58px;
+  flex: none;
+  /* Hug the date, do not stretch to the entry's height: `.meeting` is a flex
+     row, whose default align-items:stretch turned the tinted block into a
+     column running the full height of the note beside it. */
+  align-self: flex-start;
+  text-align: center;
+  padding: 8px 6px;
+  border-radius: 12px;
+  background: var(--tint-1);
+  color: var(--brand-purple);
+}
+.meeting .date .d {
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+.meeting .date .m {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brand-purple);
+  opacity: 0.75;
+  margin-top: 2px;
+}
+.title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.title-row .title {
+  font-size: 14px;
+}
+.title-row .loc {
+  font-weight: 400;
+  color: var(--muted);
+}
+.title-row .chip {
+  font-size: 13px;
+  padding: 5px 10px;
+}
+.title-row .chip .icon {
+  font-size: 15px;
+}
+.meeting .note {
+  color: var(--ink-nav);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 0;
+}
+.meeting .by {
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 6px;
+}

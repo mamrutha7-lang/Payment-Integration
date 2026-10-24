@@ -1,0 +1,57 @@
+# EditorConfig for everything OUTSIDE apps/web.  https://editorconfig.org
+#
+# WHY THERE IS A SECOND ONE. apps/web/.editorconfig declares `root = true`,
+# which stops resolution at that directory. That is correct for a tree with its
+# own Prettier config, but it also meant nothing under apps/api-py, tools/,
+# infra/, docker/ or docs/ was covered by any editor configuration at all. On a
+# Windows checkout with core.autocrlf=false that is not a theoretical gap: eight
+# tracked .py files — config.py, interview_relay.py, interview_local.py, the two
+# interview routers, two interview tests and tools/cascade/bench.py, every one
+# of them in the territory this file covers — are committed with CRLF while the
+# other 199 are LF. Nothing told the editor which to write, so it used whatever
+# default it shipped with, and the mixture is now in the history.
+#
+# WHAT THIS FILE CANNOT DO. An .editorconfig is read by editors. It is not read
+# by git, by CI, or by a script that writes a file. It is a default, not a
+# control. For shell and PowerShell scripts the line endings are settled at
+# checkout by the root .gitattributes; for everything else they are not settled
+# at all -- .gitattributes deliberately carries no global `* text=auto`, because
+# 29 tracked files are stored CRLF today and a global rule would renormalise
+# them all. The mixed-line-ending hook in .pre-commit-config.yaml fixes what a
+# developer stages. This file's whole job is to stop the editor from undoing
+# either on the next save.
+#
+# Every value below was measured against the tree it describes rather than
+# chosen from habit. Nothing here imposes a style the repository does not
+# already use — a config that disagrees with the files it governs turns every
+# save into a diff, and gets switched off within the week.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+# Two is the tree's default everywhere except Python: .tf, .yml, .json, .sh and
+# the Dockerfiles are all two-space, and no tracked text file in this repository
+# is indented with tabs.
+indent_size = 2
+
+# PEP 8, and what all 207 tracked .py files actually do.
+#
+# No max_line_length here. There is no formatter config under apps/api-py — no
+# pyproject.toml, no ruff.toml, no setup.cfg — and 513 committed lines are
+# already past 100 characters, so any number in this file would be a rule
+# stated and broken in the same commit. A line-length rule arrives with the
+# formatter that can enforce it, or not at all.
+[*.py]
+indent_size = 4
+
+# Markdown's hard line break is two trailing spaces. Trimming them on save
+# silently reflows a paragraph, which is why apps/web/.editorconfig already
+# exempts .md and why this one does the same.
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off

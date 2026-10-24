@@ -1,0 +1,282 @@
+name: Ops task
+
+# RUN A ONE-OFF DATA TASK FROM THE BROWSER. Actions → "Ops task" → Run
+# workflow. The counterpart to deploy.yml's migration step, for the data
+# modules that are production-safe by design: app.grant_access (one staff row —
+# the operator who has to get in before anyone else), app.seed_roster (the
+# student batch), app.seed_kb (the assistant's knowledge base). It assumes the
+# same `reep-github-deploy` OIDC role, pinned to this repository and to main.
+#
+# The command is chosen from a FIXED menu, never typed: a free-text command
+# input here would be remote code execution on the production cluster for
+# anyone who can press the button. Free text exists only as ARGUMENTS to
+# grant_access (an email, a name), passed as argv entries via jq so a quote or
+# semicolon in a name is a name, not shell.
+#
+# TWO purges, and they are not degrees of the same thing. `purge-people` empties
+# a deployment of everyone but the Main Admin and is for handing one over;
+# `purge-students` deletes the STUDENT accounts and leaves every faculty and
+# alumni account, their signatures, their upskilling shelf and their governance
+# grants exactly where they are, and is for clearing a demonstration cohort out
+# of a deployment that is staying in use. Each has its own typed sentence,
+# because the confirmation is only worth anything if it names the act.
+# A THIRD, `purge-colleges`, deletes STRUCTURE and never people: every college
+# except the one named in college_code, with its departments, courses,
+# specializations and batches, for the deployment that was set up three times
+# over. A college with a student seated, a faculty account filed or an
+# application waiting under it is skipped and named, never taken.
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "Which task"
+        type: choice
+        options:
+          - seed-roster-dry-run
+          - seed-roster
+          - seed-kb
+          - seed-catalogue-dry-run
+          - seed-catalogue
+          - grant-access
+          - purge-people-dry-run
+          - purge-people
+          - purge-students-dry-run
+          - purge-students
+          - purge-colleges-dry-run
+          - purge-colleges
+      college_code:
+        description: "seed-catalogue: which college to write, e.g. 1MP (the catalogue itself lives in app/seed_catalogue.py; an unknown code is refused rather than defaulted). purge-colleges: the ONE college to KEEP - every other college and its structure goes; a college with a student, a faculty account or an open application under it is skipped and named."
+        required: false
+      email:
+        description: "grant-access only: the Google email to allow"
+        required: false
+      display_name:
+        description: "grant-access only: the person's name. Needed ONLY to create an account that does not exist yet. LEAVE IT BLANK to change an existing account's role - whatever you type here is written onto their row, so a placeholder renames them."
+        required: false
+      role:
+        description: "grant-access only: the role. FACULTY is stored as MENTOR - there is no separate mentor role, and mentoring is what the Main Admin confers by assigning a faculty member students. STUDENT also needs usn. ADMIN is accepted only while no Main Admin exists yet, or to update the current one - demote the other first."
+        type: choice
+        options: [FACULTY, ALUMNI, STUDENT, ADMIN]
+        default: FACULTY
+      usn:
+        description: "grant-access + STUDENT only: a USN no roster row will ever claim (e.g. TEST01)"
+        required: false
+      department_id:
+        description: "grant-access only: REQUIRED to CREATE an account, optional to update one. The department this person belongs to - it names their college too. An account filed nowhere gets no college, no batch, and (for a student) a mock interview that can never be scored. Ids are on the Catalogue screen or GET /api/admin/departments."
+        required: false
+      password_hash:
+        description: "grant-access only: ALSO give the account a password, as the HASH from `python -m app.set_password --print-hash`. Never the password itself."
+        required: false
+      with_group:
+        description: "grant-access + MENTOR only, OPTIONAL: create the Mentor group now. Not needed - the Main Admin assigning a student on Mentors & Students creates it, and until then the faculty member sees nobody."
+        type: boolean
+        default: false
+      mentor_email:
+        description: "grant-access + STUDENT only: put the student in this (already granted, with_group) mentor's group"
+        required: false
+      purge_confirm:
+        description: 'purge-people only: type PURGE EVERYONE EXCEPT THE MAIN ADMIN (exactly). Deletes every other account, all student records, and every transcript and recording. There is no undo.'
+        required: false
+      purge_students_confirm:
+        description: 'purge-students only: type DELETE EVERY STUDENT (exactly). Deletes every STUDENT account and everything those accounts produced, including what staff wrote about them. Faculty, alumni and the Main Admin are untouched. There is no undo.'
+        required: false
+      purge_colleges_confirm:
+        description: 'purge-colleges only: type DELETE EVERY OTHER COLLEGE (exactly). Deletes every college except the one in college_code, with its departments, courses, specializations and batches. People are never deleted by it - a college with anybody under it is skipped. There is no undo.'
+        required: false
+      confirm:
+        description: 'Type "run" to confirm this touches production data'
+        required: true
+
+concurrency:
+  group: ops-task
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  run:
+    name: Run on the API image
+    runs-on: ubuntu-latest
+    steps:
+      # A collaborator with write access can press "Run workflow" here, and the
+      # menu includes the three purges and grant-access ADMIN. Only the owner
+      # runs it. triggering_actor, not actor: a re-run is judged by whoever
+      # pressed Re-run. No bot is admitted: nothing dispatches this file.
+      - name: Only the repository owner may run an ops task
+        env:
+          ACTOR: ${{ github.triggering_actor }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          if [ "$ACTOR" != "$OWNER" ]; then
+            echo "::error::Only $OWNER may run an ops task. This run was started by $ACTOR. Nothing was changed."
+            exit 1
+          fi
+
+      - name: Check the confirmation word
+        run: |
+          if [ "${{ inputs.confirm }}" != "run" ]; then
+            echo "::error::Type 'run' in the confirm box. Nothing was changed."
+            exit 1
+          fi
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN || 'arn:aws:iam::445363794125:role/reep-github-deploy' }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+          role-session-name: reep-ops-${{ github.run_id }}
+
+      # Say WHICH deployment this touches before touching it — the same reason
+      # app.grant_access prints the database first. WEB_ORIGIN is read from the
+      # live task definition (ecs:DescribeTaskDefinition is in the role), so the
+      # log names the site the account is being created on. It is also how a
+      # browser-only operator learns the site's URL, which is otherwise only in
+      # Terraform state.
+      - name: Show the target
+        run: |
+          ORIGIN=$(aws ecs describe-task-definition \
+            --task-definition "${{ vars.ECS_TASK_FAMILY || 'reep-api' }}" \
+            --query "taskDefinition.containerDefinitions[0].environment[?name=='WEB_ORIGIN'].value | [0]" \
+            --output text)
+          echo "Target deployment: $ORIGIN"
+          echo "ORIGIN=$ORIGIN" >> "$GITHUB_ENV"
+
+      # The command array is built with jq from the menu choice, so user-typed
+      # values only ever become argv entries of the fixed module invocation.
+      - name: Build the command
+        env:
+          TASK: ${{ inputs.task }}
+          GRANT_EMAIL: ${{ inputs.email }}
+          GRANT_NAME: ${{ inputs.display_name }}
+          GRANT_ROLE: ${{ inputs.role }}
+          CATALOGUE_COLLEGE: ${{ inputs.college_code }}
+          GRANT_USN: ${{ inputs.usn }}
+          GRANT_DEPARTMENT: ${{ inputs.department_id }}
+          GRANT_HASH: ${{ inputs.password_hash }}
+          GRANT_WITH_GROUP: ${{ inputs.with_group }}
+          GRANT_MENTOR: ${{ inputs.mentor_email }}
+          PURGE_CONFIRM: ${{ inputs.purge_confirm }}
+          PURGE_STUDENTS_CONFIRM: ${{ inputs.purge_students_confirm }}
+          PURGE_COLLEGES_CONFIRM: ${{ inputs.purge_colleges_confirm }}
+        run: |
+          case "$TASK" in
+            seed-roster-dry-run)
+              CMD=$(jq -cn '["python","-m","app.seed_roster","--dry-run"]') ;;
+            seed-roster)
+              CMD=$(jq -cn '["python","-m","app.seed_roster"]') ;;
+            seed-kb)
+              CMD=$(jq -cn '["python","-m","app.seed_kb"]') ;;
+            # DRY RUN IS A SEPARATE MENU ENTRY, not a checkbox, for the two
+            # purges' reason: the difference between looking and writing must be
+            # visible in the run's own title afterwards. The dry run does the
+            # whole seed inside a transaction and rolls it back, so its counts
+            # are real rather than guessed -- it catches a unique-constraint
+            # collision that a guess would not.
+            seed-catalogue-dry-run)
+              CMD=$(jq -cn --arg c "$CATALOGUE_COLLEGE" '["python","-m","app.seed_catalogue","--college",$c]') ;;
+            seed-catalogue)
+              CMD=$(jq -cn --arg c "$CATALOGUE_COLLEGE" '["python","-m","app.seed_catalogue","--college",$c,"--apply"]') ;;
+            purge-people-dry-run)
+              CMD=$(jq -cn '["python","-m","app.purge_people"]') ;;
+            purge-people)
+              # A SECOND confirmation, and a sentence rather than a word. The
+              # `confirm: run` box above is typed for every task on this menu,
+              # including the harmless ones, so by the time an operator reaches
+              # this task it is muscle memory. This box is not: it is asked only
+              # here, it states the consequence, and it has to be typed out.
+              # Nothing else on this menu destroys anything.
+              if [ "$PURGE_CONFIRM" != "PURGE EVERYONE EXCEPT THE MAIN ADMIN" ]; then
+                echo "::error::purge-people needs the purge_confirm box to read exactly: PURGE EVERYONE EXCEPT THE MAIN ADMIN. Nothing was changed."
+                exit 1
+              fi
+              CMD=$(jq -cn '["python","-m","app.purge_people","--apply","--i-understand-this-is-permanent"]') ;;
+            purge-students-dry-run)
+              CMD=$(jq -cn '["python","-m","app.purge_students"]') ;;
+            purge-students)
+              # Its own sentence, in its own box. Sharing purge-people's would
+              # mean the words an operator types ("EVERYONE EXCEPT THE MAIN
+              # ADMIN") describe a different act from the one they picked, and
+              # the typed confirmation is the one step here whose whole value is
+              # that it is read rather than repeated.
+              if [ "$PURGE_STUDENTS_CONFIRM" != "DELETE EVERY STUDENT" ]; then
+                echo "::error::purge-students needs the purge_students_confirm box to read exactly: DELETE EVERY STUDENT. Nothing was changed."
+                exit 1
+              fi
+              CMD=$(jq -cn '["python","-m","app.purge_students","--apply","--i-understand-this-is-permanent"]') ;;
+            purge-colleges-dry-run)
+              if [ -z "$CATALOGUE_COLLEGE" ]; then
+                echo "::error::purge-colleges needs college_code: the ONE college to keep. Nothing was changed."
+                exit 1
+              fi
+              CMD=$(jq -cn --arg c "$CATALOGUE_COLLEGE" '["python","-m","app.purge_colleges","--keep",$c]') ;;
+            purge-colleges)
+              # Its own sentence, for the two purges' reason: the words the
+              # operator types must name the act. `college_code` here is the
+              # college that SURVIVES, and app.purge_colleges refuses an
+              # unknown code rather than deleting everything on a typo.
+              if [ -z "$CATALOGUE_COLLEGE" ]; then
+                echo "::error::purge-colleges needs college_code: the ONE college to keep. Nothing was changed."
+                exit 1
+              fi
+              if [ "$PURGE_COLLEGES_CONFIRM" != "DELETE EVERY OTHER COLLEGE" ]; then
+                echo "::error::purge-colleges needs the purge_colleges_confirm box to read exactly: DELETE EVERY OTHER COLLEGE. Nothing was changed."
+                exit 1
+              fi
+              CMD=$(jq -cn --arg c "$CATALOGUE_COLLEGE" '["python","-m","app.purge_colleges","--keep",$c,"--apply","--i-understand-this-is-permanent"]') ;;
+            grant-access)
+              if [ -z "$GRANT_EMAIL" ]; then
+                echo "::error::grant-access needs an email."
+                exit 1
+              fi
+              # FACULTY is the word the college uses; MENTOR is what the enum
+              # stores. Mapped here so the menu never asks an operator to know
+              # the difference -- picking MENTOR by name is how a demotion got
+              # described as "making them a mentor", which it is not.
+              if [ "$GRANT_ROLE" = "FACULTY" ]; then GRANT_ROLE=MENTOR; fi
+              # display_name is NOT required. app.grant_access needs it only for
+              # an account that does not exist yet, and appending it blindly
+              # would overwrite the name of an account being demoted.
+              # Every optional value is appended as its own argv entry, or not at
+              # all: an empty input never becomes an empty argument. The hash is
+              # the one credential-shaped value here and it is deliberately a
+              # HASH — app.grant_access refuses anything that is not exactly
+              # scrypt:<salt>:<digest>, so a password pasted into this box by
+              # mistake is rejected by the task rather than stored as a key.
+              CMD=$(jq -cn --arg e "$GRANT_EMAIL" --arg n "$GRANT_NAME" --arg r "$GRANT_ROLE" \
+                       --arg u "$GRANT_USN" --arg h "$GRANT_HASH" --arg g "$GRANT_WITH_GROUP" --arg m "$GRANT_MENTOR" \
+                       --arg d "$GRANT_DEPARTMENT" \
+                '["python","-m","app.grant_access",$e,"--role",$r]
+                 + (if $n != "" then ["--name",$n] else [] end)
+                 + (if $u != "" then ["--usn",$u] else [] end)
+                 + (if $d != "" then ["--department-id",$d] else [] end)
+                 + (if $h != "" then ["--password-hash",$h] else [] end)
+                 + (if $g == "true" then ["--with-group"] else [] end)
+                 + (if $m != "" then ["--mentor",$m] else [] end)') ;;
+            *)
+              echo "::error::Unknown task."; exit 1 ;;
+          esac
+          echo "CMD=$CMD" >> "$GITHUB_ENV"
+
+      # Same shape as deploy.yml's migration step: run on the image the task
+      # definition already references, wait, and FAIL the job on a non-zero
+      # exit so a silent data failure cannot look green.
+      - name: Run the task
+        run: |
+          OVERRIDES=$(jq -cn --argjson cmd "$CMD" '{containerOverrides:[{name:"api",command:$cmd}]}')
+          TASK_ARN=$(aws ecs run-task \
+            --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" \
+            --task-definition "${{ vars.ECS_TASK_FAMILY || 'reep-api' }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[${{ vars.ECS_SUBNETS || 'subnet-0792c0ddcdd02f34f,subnet-0a41b8c5a98485d1a' }}],securityGroups=[${{ vars.ECS_SECURITY_GROUP || 'sg-0dfa5c76167d79093' }}],assignPublicIp=DISABLED}" \
+            --overrides "$OVERRIDES" \
+            --query 'tasks[0].taskArn' --output text)
+          echo "Task: $TASK_ARN"
+          aws ecs wait tasks-stopped --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" --tasks "$TASK_ARN"
+          EXIT=$(aws ecs describe-tasks --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" --tasks "$TASK_ARN" \
+            --query 'tasks[0].containers[0].exitCode' --output text)
+          REASON=$(aws ecs describe-tasks --cluster "${{ vars.ECS_CLUSTER || 'reep' }}" --tasks "$TASK_ARN" \
+            --query 'tasks[0].stoppedReason' --output text)
+          echo "Exit code: $EXIT ($REASON)"
+          [ "$EXIT" = "0" ] || { echo "::error::Task failed — check the /reep/api log group."; exit 1; }

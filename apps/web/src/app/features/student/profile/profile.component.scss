@@ -1,0 +1,255 @@
+/* Screen-specific tweaks only. Everything visual reuses the global reep-v2
+   classes (.card, .field, .reg-grid, .chip, .dt-btn, .dropzone, .badge-row …). */
+
+:host {
+  display: block;
+}
+
+/* Locked identity: name and USN. These are real <input readonly> elements, not
+   text — the value is already filled in, and stays selectable and copyable (a
+   student pastes their USN into other forms) while being impossible to type
+   into. Drawn as the handoff's tinted pill rather than a field. */
+.locked-value {
+  padding: 10px 12px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--hairline-42);
+  background: var(--tint-1);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-nav);
+}
+.identity-grid {
+  grid-template-columns: 1fr 1fr;
+}
+@media (max-width: 640px) {
+  .identity-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The explanatory line under a card's controls, at the handoff's 14px. */
+.card-note {
+  font-size: 14px;
+}
+
+/* The global `.field input` carries an inset "press" shadow — that shadow is
+   the cue that a box takes typing, so a locked field must not have it. Same
+   for the amber focus ring: keep a visible focus outline for keyboard users,
+   but not the one that says "start typing here". */
+input.locked-value {
+  cursor: default;
+  box-shadow: none;
+}
+input.locked-value:focus,
+input.locked-value:focus-visible {
+  box-shadow: none;
+  border-color: var(--hairline);
+  outline: 2px solid var(--muted);
+  outline-offset: 2px;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Let the summary box grow. */
+.field textarea {
+  min-height: 78px;
+  resize: vertical;
+  line-height: 1.5;
+}
+.field--last {
+  margin-bottom: 0;
+}
+
+/* --- Field-level validation ------------------------------------------------
+   Status is never carried by colour alone: an invalid field pairs the red
+   border with a red icon + message underneath. */
+.field--invalid input,
+.field--invalid textarea {
+  border-color: var(--risk);
+  background: rgba(173, 36, 82, 0.05);
+}
+.field-error {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--risk);
+}
+.field-error .icon {
+  font-size: 14px;
+}
+
+.validation-summary {
+  margin-bottom: 4px;
+}
+
+/* --- Save-state pill -------------------------------------------------------
+   Text + icon + colour together for each state of the save lifecycle. */
+.save-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(58, 31, 82, 0.06);
+  color: var(--muted);
+}
+.save-state .icon {
+  font-size: 16px;
+}
+.save-state .save-time {
+  font-weight: 600;
+  opacity: 0.8;
+}
+.save-state[data-kind='unsaved'] {
+  background: var(--warn-bg);
+  color: var(--warn);
+}
+.save-state[data-kind='saving'] {
+  background: rgba(58, 31, 82, 0.06);
+  color: var(--ink-nav);
+}
+.save-state[data-kind='saved'] {
+  background: var(--good-bg);
+  color: var(--good);
+}
+.save-state[data-kind='error'] {
+  background: var(--risk-bg);
+  color: var(--risk);
+}
+.save-state .icon.spin {
+  animation: profile-spin 0.9s linear infinite;
+}
+@keyframes profile-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .save-state .icon.spin {
+    animation: none;
+  }
+}
+
+/* --- Placement-completion meter ------------------------------------------- */
+.completion-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.completion-title {
+  margin: 0;
+}
+.completion-pct {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.completion-pct[data-band='full'] {
+  color: var(--good);
+}
+.completion-pct[data-band='mid'] {
+  color: var(--warn);
+}
+.completion-pct[data-band='low'] {
+  color: var(--risk);
+}
+.meter {
+  height: 9px;
+  border-radius: 999px;
+  background: var(--tint-1);
+  border: 1px solid var(--hairline-42);
+  overflow: hidden;
+  margin-bottom: 10px;
+  box-shadow: none;
+}
+.meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+.meter-fill[data-band='full'] {
+  background: var(--good);
+}
+.meter-fill[data-band='mid'] {
+  background: var(--warn);
+}
+.meter-fill[data-band='low'] {
+  background: var(--risk);
+}
+
+/* --- Grouped-control explanation note ------------------------------------- */
+.group-note {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  background: var(--tint-1);
+  border: 1px solid var(--hairline-42);
+  border-radius: 16px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--ink-nav);
+  line-height: 1.45;
+}
+.group-note .icon {
+  font-size: 16px;
+  color: var(--purple-mid);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Checkbox preference rows inside the placement / privacy cards. */
+.pref-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  font-size: 14px;
+  color: var(--ink-nav);
+  border-bottom: 1px solid var(--hairline);
+  cursor: pointer;
+}
+.pref-row:last-of-type {
+  border-bottom: none;
+}
+.pref-row input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--purple-mid);
+}
+
+.skills-wrap {
+  gap: 6px;
+}
+
+/* Notices are icon + text side by side, not stacked. */
+.reg-approval {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 13px;
+  border-radius: 16px;
+  padding: 14px;
+}
+.reg-approval .icon {
+  font-size: 21px;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+/* Visible keyboard focus for every interactive control on this screen. */
+.pref-row input:focus-visible,
+.dt-btn:focus-visible {
+  outline: 2px solid var(--purple-mid);
+  outline-offset: 2px;
+}

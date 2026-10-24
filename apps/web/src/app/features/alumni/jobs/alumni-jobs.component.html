@@ -1,0 +1,81 @@
+<div class="dt-header">
+  <div>
+    <h1 class="dt-title">Jobs Sheet</h1>
+    <div class="dt-sub">Openings shared by the placement office — updated weekly.</div>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="feedback feedback--err" role="alert">
+    <span class="icon" aria-hidden="true">wifi_off</span>
+    <div class="feedback__body">{{ error() }}</div>
+  </div>
+} @else if (jobs(); as list) {
+  <div style="margin-bottom: 12px; max-width: 320px">
+    <input
+      type="search"
+      placeholder="Search role, company or location"
+      [ngModel]="filter()"
+      (ngModelChange)="filter.set($event)"
+    />
+  </div>
+
+  @if (list.length === 0) {
+    <div class="card" style="padding: 16px">No openings on the sheet right now.</div>
+  } @else {
+    <table class="dt-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Company</th>
+          <th>Level</th>
+          <th>Location</th>
+          <th>Skills</th>
+          <th>Closes</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (j of filtered(); track j.id) {
+          <tr>
+            <td>
+              <strong>{{ j.title }}</strong>
+            </td>
+            <td>{{ j.company }}</td>
+            <td>{{ j.degree_level }}</td>
+            <td>{{ j.location || '—' }}</td>
+            <td>
+              @for (s of j.required_skills; track s) {
+                <span class="chip neutral">{{ s }}</span>
+              } @empty {
+                —
+              }
+            </td>
+            <td>
+              @if (j.closes_on) {
+                <span class="chip {{ closed(j) ? 'risk' : 'neutral' }}">
+                  {{ closed(j) ? 'Closed' : (j.closes_on | date: 'd MMM y') }}
+                </span>
+              } @else {
+                —
+              }
+            </td>
+            <td>
+              @if (j.apply_url && !closed(j)) {
+                <a class="dt-btn primary" [href]="j.apply_url" target="_blank" rel="noopener">
+                  <span class="icon" aria-hidden="true">open_in_new</span>Apply
+                </a>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7">No opening matches that search.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+} @else {
+  <div class="card" style="padding: 16px">Loading the jobs sheet…</div>
+}

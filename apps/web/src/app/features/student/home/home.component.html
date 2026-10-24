@@ -1,0 +1,392 @@
+@switch (state()) {
+  @case ('loading') {
+    <div class="dt-header">
+      <div>
+        <h1 class="dt-title">Landing</h1>
+        <p class="dt-sub">Loading your overview…</p>
+      </div>
+    </div>
+  }
+
+  @case ('error') {
+    <div class="dt-header">
+      <div>
+        <h1 class="dt-title">Landing</h1>
+        <p class="dt-sub">Could not load your overview.</p>
+      </div>
+    </div>
+    <div class="card" role="alert">
+      <span class="icon" aria-hidden="true">error</span>
+      We couldn’t reach your record. Please try again shortly.
+      <button type="button" class="btn ghost" (click)="load()">Retry</button>
+    </div>
+  }
+
+  @case ('data') {
+    <div class="dt-header">
+      <div>
+        <h1 class="dt-title">
+          @if (firstName(); as name) {
+            Welcome back, {{ name }}
+          } @else {
+            Welcome back
+          }
+        </h1>
+        @if (subline(); as sub) {
+          <p class="dt-sub">{{ sub }}</p>
+        }
+      </div>
+
+      @if (streak(); as s) {
+        @if (s.current > 0) {
+          <span class="chip good">
+            <span class="icon" aria-hidden="true">local_fire_department</span>
+            {{ s.current }}-day login streak
+          </span>
+        }
+      }
+    </div>
+
+    <!-- The three programme stage cards. Structure is the code catalogue; only
+         this student's status per row is data. -->
+    <div class="grid-3">
+      @if (programme(); as p) {
+        @for (stage of p.stages; track stage.key) {
+          <div class="card">
+            <h4>{{ stage.label }}</h4>
+            @if (stage.items.length) {
+              <div class="stage-rows">
+                @for (item of stage.items; track item.key) {
+                  @if (item.route) {
+                    <a class="link-row" [routerLink]="item.route">
+                      <span class="icon lead" aria-hidden="true">chevron_right</span>
+                      <span class="lbl">{{ item.label }}</span>
+                      <span
+                        class="icon state"
+                        [class.good]="item.tone === 'good'"
+                        [class.warn]="item.tone === 'warn'"
+                        [class.neutral]="item.tone === 'neutral'"
+                        [attr.title]="item.title"
+                        [attr.aria-label]="item.title"
+                         aria-hidden="true">{{ item.glyph }}</span
+                      >
+                    </a>
+                  } @else {
+                    <div class="link-row static">
+                      <span class="icon lead" aria-hidden="true">chevron_right</span>
+                      <span class="lbl">{{ item.label }}</span>
+                      <span
+                        class="icon state"
+                        [class.good]="item.tone === 'good'"
+                        [class.warn]="item.tone === 'warn'"
+                        [class.neutral]="item.tone === 'neutral'"
+                        [attr.title]="item.title"
+                        [attr.aria-label]="item.title"
+                         aria-hidden="true">{{ item.glyph }}</span
+                      >
+                    </div>
+                  }
+                }
+              </div>
+            } @else {
+              <div class="card-empty">No modules mapped yet.</div>
+            }
+          </div>
+        }
+      } @else {
+        @for (label of stageCardLabels; track label) {
+          <div class="card">
+            <h4>{{ label }}</h4>
+            <div class="card-empty">
+              @if (programmeError()) {
+                Your programme map is unavailable right now.
+              } @else {
+                No modules mapped yet.
+              }
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    @if (programme()?.total) {
+      <div class="stage-legend" aria-label="Status key">
+        <span
+          ><span class="icon state good" aria-hidden="true">check_circle</span>Completed</span
+        >
+        <span><span class="icon state warn" aria-hidden="true">pending</span>In progress</span>
+        <span
+          ><span class="icon state neutral" aria-hidden="true">radio_button_unchecked</span>Not
+          started yet</span
+        >
+      </div>
+    }
+
+    <!-- SWOC: the four lines the placement office and mentors write for this
+         student. Null means "not written yet" and the tile says so. -->
+    <div class="card swoc">
+      <h4 class="swoc-title">
+        <span>SWOC — Strengths, Weaknesses, Opportunities, Challenges</span>
+        <span class="swoc-from">from TPO and mentor inputs</span>
+      </h4>
+      <div class="swoc-grid">
+        @for (t of swocTiles(); track t.key) {
+          <div class="swoc-tile" [attr.data-tone]="t.tone">
+            <b>{{ t.label }}</b>
+            @if (t.text) {
+              <div>{{ t.text }}</div>
+            } @else {
+              <div class="swoc-empty">Not added yet</div>
+            }
+          </div>
+        }
+      </div>
+      @if (!swocWritten()) {
+        <div class="card-empty swoc-note">Your mentor or the placement cell will fill these in after your reviews.</div>
+      }
+    </div>
+
+    <!-- Attendance by course, beside the VTU marks line. -->
+    <div class="grid-charts">
+      <div class="card">
+        <h4>Attendance</h4>
+        @if (attendanceBars().length) {
+          <div class="att-list">
+            @for (b of attendanceBars(); track b.label) {
+              <div class="att-row">
+                <div class="att-code">{{ b.label }}</div>
+                <div class="att-track" role="img" [attr.aria-label]="b.label + ' ' + b.caption">
+                  <div class="att-fill" [style.width.%]="b.percent"></div>
+                </div>
+                <div class="att-pct">{{ b.caption }}</div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="card-empty">No attendance recorded yet.</div>
+        }
+      </div>
+
+      <div class="card">
+        <h4>VTU marks</h4>
+        @if (marksChart(); as chart) {
+          <div class="marks">
+            <div class="marks-axis" aria-hidden="true">
+              @for (tick of marksAxis; track tick) {
+                <span [style.top.%]="100 - tick * 10">{{ tick }}</span>
+              }
+            </div>
+            <div class="marks-body">
+              <div class="marks-plot">
+                <svg
+                  viewBox="0 0 100 100"
+                  width="100%"
+                  height="120"
+                  preserveAspectRatio="none"
+                  role="img"
+                  [attr.aria-label]="chart.aria"
+                >
+                  <g class="marks-grid">
+                    <line x1="0" y1="0.5" x2="100" y2="0.5" vector-effect="non-scaling-stroke" />
+                    <line x1="0" y1="20" x2="100" y2="20" vector-effect="non-scaling-stroke" />
+                    <line x1="0" y1="40" x2="100" y2="40" vector-effect="non-scaling-stroke" />
+                    <line x1="0" y1="60" x2="100" y2="60" vector-effect="non-scaling-stroke" />
+                    <line x1="0" y1="80" x2="100" y2="80" vector-effect="non-scaling-stroke" />
+                    <line x1="0" y1="99.5" x2="100" y2="99.5" vector-effect="non-scaling-stroke" />
+                  </g>
+                  @if (chart.dashed) {
+                    <polyline
+                      class="marks-pending"
+                      [attr.points]="chart.dashed"
+                      fill="none"
+                      vector-effect="non-scaling-stroke"
+                    />
+                  }
+                  <polyline
+                    class="marks-line"
+                    [attr.points]="chart.solid"
+                    fill="none"
+                    vector-effect="non-scaling-stroke"
+                  />
+                </svg>
+                @for (pt of chart.points; track pt.sem) {
+                  <span
+                    class="marks-dot"
+                    aria-hidden="true"
+                    [style.left.%]="pt.x"
+                    [style.top.%]="pt.y"
+                  ></span>
+                  <span
+                    class="marks-val"
+                    aria-hidden="true"
+                    [style.left.%]="pt.x"
+                    [style.top.%]="pt.y"
+                    >{{ pt.label }}</span
+                  >
+                }
+              </div>
+              <div class="marks-labels" aria-hidden="true">
+                @for (s of chart.semesters; track s) {
+                  <div>{{ s }}</div>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="chart-caption">{{ chart.caption }}</div>
+        } @else {
+          <div class="card-empty">No semester results published yet.</div>
+        }
+      </div>
+    </div>
+
+    <!-- Academic history: the 10th / 12th / UG chain and the declared gaps. -->
+    <section class="acad">
+      <h2 class="acad-title">
+        <span class="icon" aria-hidden="true">history_edu</span> Academic History
+      </h2>
+      @if (qualifications().length) {
+        <div class="acad-grid">
+          @for (q of qualifications(); track q.level + q.year) {
+            <div class="card acad-card">
+              <div class="acad-head">
+                <div class="acad-level">{{ q.level }}</div>
+                <span class="chip year">{{ q.year }}</span>
+              </div>
+              <div class="acad-inst">{{ q.institution }}</div>
+              @if (q.board) {
+                <div class="acad-board">{{ q.board }}</div>
+              }
+              <div class="acad-score">
+                <span class="acad-pct">{{ q.percent }}</span>
+                <span class="acad-marks">{{ q.marks }}</span>
+              </div>
+              @if (q.medium || q.location) {
+                <div class="acad-meta">
+                  @if (q.medium) {
+                    <span>Medium: {{ q.medium }}</span>
+                  }
+                  @if (q.location) {
+                    <span>{{ q.location }}</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="card acad-empty">
+          <div class="card-empty">
+            No academic history recorded yet —
+            <a routerLink="/student/records">add your 10th, 12th and prior degrees</a>.
+          </div>
+        </div>
+      }
+
+      <div class="card">
+        <div class="gap-head">
+          <div class="gap-title">Declared education gaps</div>
+          @if (gap(); as g) {
+            @if (g.total_mo > 0) {
+              <span class="chip warn">
+                <span class="icon" aria-hidden="true">schedule</span>
+                {{ g.total_mo }} month{{ g.total_mo === 1 ? '' : 's' }} declared
+              </span>
+            } @else {
+              <span class="chip good">
+                <span class="icon" aria-hidden="true">check_circle</span>No gaps declared
+              </span>
+            }
+          } @else {
+            <span class="chip neutral">
+              <span class="icon" aria-hidden="true">help</span>Not declared yet
+            </span>
+          }
+        </div>
+        @if (gapLines().length) {
+          <div class="gap-lines">
+            @for (line of gapLines(); track line.label) {
+              <div class="gap-line">
+                <span>{{ line.label }}</span>
+                <b>{{ line.months }} mo</b>
+              </div>
+            }
+          </div>
+          <div class="gap-note">
+            Placement drives set a limit on total gap months — the jobs board applies it to each
+            posting for you.
+          </div>
+        } @else if (gap()) {
+          <div class="gap-note">Your academic timeline is continuous — no gaps to declare.</div>
+        } @else {
+          <div class="gap-note">
+            Gaps are declared on the
+            <a routerLink="/student/records">Academic history</a> screen.
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Placement readiness beside the recommendations. -->
+    <div class="grid-wide">
+      <div class="card">
+        <h4>Placement readiness</h4>
+        @if (readiness(); as r) {
+          <div class="readiness-head">
+            <div class="readiness-score">
+              <div class="readiness-num">{{ r.score ?? '—' }}</div>
+              <div class="dt-sub">{{ r.score === null ? 'not scored' : '/ 100' }}</div>
+            </div>
+            <div class="readiness-band">
+              <span class="chip {{ bandChip(r.band) }}"
+                ><span class="icon" aria-hidden="true">military_tech</span>{{ r.band }}</span
+              >
+              <div class="dt-sub">{{ r.summary }}</div>
+            </div>
+          </div>
+          <div class="factor-list">
+            @for (f of r.factors; track f.label) {
+              @let chip = factorChip(f);
+              <div class="factor-row">
+                <span class="chip {{ chip.tone }}">
+                  <span class="icon" aria-hidden="true">{{ chip.icon }}</span>
+                  {{ chip.text }}
+                </span>
+                <div class="factor-text">
+                  <div class="factor-label">{{ f.label }}</div>
+                  <div class="dt-sub">{{ f.detail }}</div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="card-empty">Your placement readiness is unavailable right now.</div>
+        }
+      </div>
+
+      <div class="card">
+        <h4>Recommended for you</h4>
+        @if (recommendations(); as recs) {
+          @if (recs.length) {
+            @for (rec of recs; track rec.title) {
+              <div class="reco-row">
+                <span class="icon reco-ico" aria-hidden="true">arrow_forward</span>
+                <div class="reco-body">
+                  <div class="reco-title">{{ rec.title }}</div>
+                  <div class="dt-sub">{{ rec.why }}</div>
+                </div>
+                <a class="btn sm" [routerLink]="rec.cta_route">{{ rec.cta_label }}</a>
+              </div>
+            }
+          } @else {
+            <div class="card-empty">
+              Recommendations appear once you claim a skill — take your first action above and
+              check back.
+            </div>
+          }
+        } @else {
+          <div class="card-empty">Recommendations are unavailable right now.</div>
+        }
+      </div>
+    </div>
+  }
+}

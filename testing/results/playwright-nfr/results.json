@@ -1,0 +1,1376 @@
+{
+  "config": {
+    "argv": [
+      "/opt/node-v24.15.0-linux-x64/bin/node",
+      "/home/user/reep-/testing/playwright/node_modules/.bin/playwright",
+      "test"
+    ],
+    "configFile": "/home/user/reep-/testing/playwright/playwright.config.ts",
+    "rootDir": "/home/user/reep-/testing/playwright",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/home/user/reep-/testing/results/playwright-nfr/artifacts",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/home/user/reep-/testing/playwright",
+        "testIgnore": [],
+        "testMatch": [
+          "/.*\\.nfr\\.ts/"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "html",
+        {
+          "outputFolder": "../results/playwright-nfr/html",
+          "open": "never"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "../results/playwright-nfr/junit.xml"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "../results/playwright-nfr/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.63.0",
+    "workers": 1,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "accessibility.nfr.ts",
+      "file": "accessibility.nfr.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "NFR-A11Y-01 /login has no critical WCAG 2.2 AA violation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2018,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "A11Y /login [{\"id\":\"color-contrast\",\"impact\":\"serious\",\"nodes\":3,\"help\":\"Elements must meet minimum color contrast ratio thresholds\"}]\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:43:49.581Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "axe-violations",
+                      "contentType": "application/json",
+                      "body": "WwogIHsKICAgICJpZCI6ICJjb2xvci1jb250cmFzdCIsCiAgICAiaW1wYWN0IjogInNlcmlvdXMiLAogICAgIm5vZGVzIjogMywKICAgICJoZWxwIjogIkVsZW1lbnRzIG11c3QgbWVldCBtaW5pbXVtIGNvbG9yIGNvbnRyYXN0IHJhdGlvIHRocmVzaG9sZHMiCiAgfQpd"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f8e101daca59fdcbf06e-35654efa863f13b045e0",
+          "file": "accessibility.nfr.ts",
+          "line": 18,
+          "column": 7
+        },
+        {
+          "title": "NFR-A11Y-01 /register has no critical WCAG 2.2 AA violation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 22020,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "A11Y /register []\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:43:51.856Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "axe-violations",
+                      "contentType": "application/json",
+                      "body": "W10="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f8e101daca59fdcbf06e-b7f210eb6564c84459f6",
+          "file": "accessibility.nfr.ts",
+          "line": 18,
+          "column": 7
+        },
+        {
+          "title": "NFR-A11Y-01 /student has no critical WCAG 2.2 AA violation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2253,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "A11Y /student [{\"id\":\"color-contrast\",\"impact\":\"serious\",\"nodes\":4,\"help\":\"Elements must meet minimum color contrast ratio thresholds\"}]\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:13.907Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "axe-violations",
+                      "contentType": "application/json",
+                      "body": "WwogIHsKICAgICJpZCI6ICJjb2xvci1jb250cmFzdCIsCiAgICAiaW1wYWN0IjogInNlcmlvdXMiLAogICAgIm5vZGVzIjogNCwKICAgICJoZWxwIjogIkVsZW1lbnRzIG11c3QgbWVldCBtaW5pbXVtIGNvbG9yIGNvbnRyYXN0IHJhdGlvIHRocmVzaG9sZHMiCiAgfQpd"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f8e101daca59fdcbf06e-ffbe5353134a7538fbb1",
+          "file": "accessibility.nfr.ts",
+          "line": 18,
+          "column": 7
+        },
+        {
+          "title": "NFR-A11Y-01 /student/jobs has no critical WCAG 2.2 AA violation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2034,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "A11Y /student/jobs [{\"id\":\"color-contrast\",\"impact\":\"serious\",\"nodes\":2,\"help\":\"Elements must meet minimum color contrast ratio thresholds\"}]\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:16.170Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "axe-violations",
+                      "contentType": "application/json",
+                      "body": "WwogIHsKICAgICJpZCI6ICJjb2xvci1jb250cmFzdCIsCiAgICAiaW1wYWN0IjogInNlcmlvdXMiLAogICAgIm5vZGVzIjogMiwKICAgICJoZWxwIjogIkVsZW1lbnRzIG11c3QgbWVldCBtaW5pbXVtIGNvbG9yIGNvbnRyYXN0IHJhdGlvIHRocmVzaG9sZHMiCiAgfQpd"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f8e101daca59fdcbf06e-d984bb03c469fc4fa3c7",
+          "file": "accessibility.nfr.ts",
+          "line": 18,
+          "column": 7
+        },
+        {
+          "title": "NFR-A11Y-01 /student/time-log has no critical WCAG 2.2 AA violation",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2641,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "A11Y /student/time-log [{\"id\":\"color-contrast\",\"impact\":\"serious\",\"nodes\":3,\"help\":\"Elements must meet minimum color contrast ratio thresholds\"}]\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:18.214Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "axe-violations",
+                      "contentType": "application/json",
+                      "body": "WwogIHsKICAgICJpZCI6ICJjb2xvci1jb250cmFzdCIsCiAgICAiaW1wYWN0IjogInNlcmlvdXMiLAogICAgIm5vZGVzIjogMywKICAgICJoZWxwIjogIkVsZW1lbnRzIG11c3QgbWVldCBtaW5pbXVtIGNvbG9yIGNvbnRyYXN0IHJhdGlvIHRocmVzaG9sZHMiCiAgfQpd"
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f8e101daca59fdcbf06e-fc9aa1c2d25ff39200ce",
+          "file": "accessibility.nfr.ts",
+          "line": 18,
+          "column": 7
+        },
+        {
+          "title": "NFR-A11Y-02 the login form is operable by keyboard alone",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 933,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:20.863Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "f8e101daca59fdcbf06e-c1e1bf2b49da804f06da",
+          "file": "accessibility.nfr.ts",
+          "line": 33,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "performance.nfr.ts",
+      "file": "performance.nfr.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "NFR-PERF-01 /login loads within budget (cold)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 889,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "PERF /login {\"ttfb\":3,\"dcl\":266,\"load\":305,\"lcp\":440,\"jsBytes\":7787122,\"requests\":47}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:21.810Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "timing",
+                      "contentType": "application/json",
+                      "body": "ewogICJ0dGZiIjogMywKICAiZGNsIjogMjY2LAogICJsb2FkIjogMzA1LAogICJsY3AiOiA0NDAsCiAgImpzQnl0ZXMiOiA3Nzg3MTIyLAogICJyZXF1ZXN0cyI6IDQ3Cn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0d2ce6aae4021637b6db-5fcb209fe836ecda57d5",
+          "file": "performance.nfr.ts",
+          "line": 19,
+          "column": 7
+        },
+        {
+          "title": "NFR-PERF-01 /register loads within budget (cold)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 798,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "PERF /register {\"ttfb\":2,\"dcl\":203,\"load\":254,\"lcp\":396,\"jsBytes\":7760616,\"requests\":48}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:22.707Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "timing",
+                      "contentType": "application/json",
+                      "body": "ewogICJ0dGZiIjogMiwKICAiZGNsIjogMjAzLAogICJsb2FkIjogMjU0LAogICJsY3AiOiAzOTYsCiAgImpzQnl0ZXMiOiA3NzYwNjE2LAogICJyZXF1ZXN0cyI6IDQ4Cn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0d2ce6aae4021637b6db-67f803d629e2376c20e9",
+          "file": "performance.nfr.ts",
+          "line": 19,
+          "column": 7
+        },
+        {
+          "title": "NFR-PERF-02 /student renders its heading within budget (signed in)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 980,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "PERF /student heading=414ms {\"ttfb\":2,\"dcl\":223,\"load\":295,\"lcp\":404,\"jsBytes\":7239575,\"requests\":50}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:23.516Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "timing",
+                      "contentType": "application/json",
+                      "body": "ewogICJ0dGZiIjogMiwKICAiZGNsIjogMjIzLAogICJsb2FkIjogMjk1LAogICJsY3AiOiA0MDQsCiAgImpzQnl0ZXMiOiA3MjM5NTc1LAogICJyZXF1ZXN0cyI6IDUwLAogICJoZWFkaW5nVmlzaWJsZU1zIjogNDE0Cn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0d2ce6aae4021637b6db-a227692e8461714ffc60",
+          "file": "performance.nfr.ts",
+          "line": 31,
+          "column": 7
+        },
+        {
+          "title": "NFR-PERF-02 /student/jobs renders its heading within budget (signed in)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 966,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "PERF /student/jobs heading=469ms {\"ttfb\":3,\"dcl\":194,\"load\":259,\"lcp\":396,\"jsBytes\":7655359,\"requests\":48}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:24.502Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "timing",
+                      "contentType": "application/json",
+                      "body": "ewogICJ0dGZiIjogMywKICAiZGNsIjogMTk0LAogICJsb2FkIjogMjU5LAogICJsY3AiOiAzOTYsCiAgImpzQnl0ZXMiOiA3NjU1MzU5LAogICJyZXF1ZXN0cyI6IDQ4LAogICJoZWFkaW5nVmlzaWJsZU1zIjogNDY5Cn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0d2ce6aae4021637b6db-36e4e5f96c72d8d829a2",
+          "file": "performance.nfr.ts",
+          "line": 31,
+          "column": 7
+        },
+        {
+          "title": "NFR-PERF-02 /student/time-log renders its heading within budget (signed in)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 920,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "PERF /student/time-log heading=430ms {\"ttfb\":3,\"dcl\":233,\"load\":272,\"lcp\":384,\"jsBytes\":7222909,\"requests\":50}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:25.476Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "timing",
+                      "contentType": "application/json",
+                      "body": "ewogICJ0dGZiIjogMywKICAiZGNsIjogMjMzLAogICJsb2FkIjogMjcyLAogICJsY3AiOiAzODQsCiAgImpzQnl0ZXMiOiA3MjIyOTA5LAogICJyZXF1ZXN0cyI6IDUwLAogICJoZWFkaW5nVmlzaWJsZU1zIjogNDMwCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0d2ce6aae4021637b6db-38bcebc8ead62d14510f",
+          "file": "performance.nfr.ts",
+          "line": 31,
+          "column": 7
+        },
+        {
+          "title": "NFR-PERF-02 /student/leaderboards renders its heading within budget (signed in)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 997,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "PERF /student/leaderboards heading=396ms {\"ttfb\":3,\"dcl\":241,\"load\":279,\"lcp\":392,\"jsBytes\":7172998,\"requests\":47}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:26.402Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "timing",
+                      "contentType": "application/json",
+                      "body": "ewogICJ0dGZiIjogMywKICAiZGNsIjogMjQxLAogICJsb2FkIjogMjc5LAogICJsY3AiOiAzOTIsCiAgImpzQnl0ZXMiOiA3MTcyOTk4LAogICJyZXF1ZXN0cyI6IDQ3LAogICJoZWFkaW5nVmlzaWJsZU1zIjogMzk2Cn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0d2ce6aae4021637b6db-c6290c1f8fb14d1f0069",
+          "file": "performance.nfr.ts",
+          "line": 31,
+          "column": 7
+        },
+        {
+          "title": "NFR-PERF-02 /student/skilling renders its heading within budget (signed in)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 878,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "PERF /student/skilling heading=389ms {\"ttfb\":2,\"dcl\":190,\"load\":229,\"lcp\":356,\"jsBytes\":7219559,\"requests\":47}\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:27.407Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "timing",
+                      "contentType": "application/json",
+                      "body": "ewogICJ0dGZiIjogMiwKICAiZGNsIjogMTkwLAogICJsb2FkIjogMjI5LAogICJsY3AiOiAzNTYsCiAgImpzQnl0ZXMiOiA3MjE5NTU5LAogICJyZXF1ZXN0cyI6IDQ3LAogICJoZWFkaW5nVmlzaWJsZU1zIjogMzg5Cn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0d2ce6aae4021637b6db-c4d8119398cc53b83d4a",
+          "file": "performance.nfr.ts",
+          "line": 31,
+          "column": 7
+        },
+        {
+          "title": "NFR-PERF-03 client-side navigation between student screens is fast (SPA route change)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1040,
+                  "errors": [],
+                  "stdout": [
+                    {
+                      "text": "PERF route-changes ms [62,124,67,54]\n"
+                    }
+                  ],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:28.292Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "0d2ce6aae4021637b6db-c59a28a6e1fd12b08c58",
+          "file": "performance.nfr.ts",
+          "line": 44,
+          "column": 5
+        }
+      ]
+    },
+    {
+      "title": "responsive-resilience-security.nfr.ts",
+      "file": "responsive-resilience-security.nfr.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "NFR-RESP-01 phone-360 /login has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 464,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:29.350Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-6b7e652f3820fde5a0db",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 phone-360 /register has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20407,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:29.821Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-eab45f55deb9b440f376",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 phone-360 /student has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 810,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:50.235Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-75c286fc044afb913d18",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 phone-360 /student/jobs has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 541,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:51.055Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-ee5ac7cd8499488919c5",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 tablet-768 /login has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 585,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:51.602Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-b84f3ff5f90d8755321d",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 tablet-768 /register has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20473,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:44:52.197Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-34b0c7a4733672d9f5ed",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 tablet-768 /student has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 862,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:12.679Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-db7faf5888decce3c036",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 tablet-768 /student/jobs has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 652,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:13.552Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-4901f87d2effe8e6e688",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 desktop-1366 /login has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 610,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:14.218Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-79703be81d01bef84cbb",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 desktop-1366 /register has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 20555,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:14.840Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-9a026f22d667e9c8fe53",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 desktop-1366 /student has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 920,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:35.408Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-32ba4eb36a152b2e40a5",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-RESP-01 desktop-1366 /student/jobs has no horizontal overflow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 835,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:36.387Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-b58112144b87b21c344e",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 17,
+          "column": 9
+        },
+        {
+          "title": "NFR-REL-01 login with the API unreachable still renders the sign-in screen, not a blank or a hang",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 714,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:37.240Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-720e7b63c6c81292c7a6",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 28,
+          "column": 5
+        },
+        {
+          "title": "NFR-REL-01b with the API unreachable the screen does not claim the server is Google-only",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "fail",
+                  "description": "BUG DEF-009: unreachable API is reported as \"Google only\"",
+                  "location": {
+                    "file": "/home/user/reep-/testing/playwright/responsive-resilience-security.nfr.ts",
+                    "line": 40,
+                    "column": 8
+                  }
+                }
+              ],
+              "expectedStatus": "failed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3731,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByText('This server signs in with Google only')\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByText('This server signs in with Google only') with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for getByText('This server signs in with Google only')\u001b[22m\n\u001b[2m    10 × locator resolved to 1 element\u001b[22m\n\u001b[2m       - unexpected value \"1\"\u001b[22m\n",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByText('This server signs in with Google only')\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByText('This server signs in with Google only') with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for getByText('This server signs in with Google only')\u001b[22m\n\u001b[2m    10 × locator resolved to 1 element\u001b[22m\n\u001b[2m       - unexpected value \"1\"\u001b[22m\n\n    at /home/user/reep-/testing/playwright/responsive-resilience-security.nfr.ts:44:73",
+                    "location": {
+                      "file": "/home/user/reep-/testing/playwright/responsive-resilience-security.nfr.ts",
+                      "column": 73,
+                      "line": 44
+                    },
+                    "snippet": "  42 |   await page.goto('/login');\n  43 |   await expect(page.getByRole('heading', { level: 1, name: 'Welcome back' })).toBeVisible({ timeout: 15_000 });\n> 44 |   await expect(page.getByText('This server signs in with Google only')).toHaveCount(0, { timeout: 3_000 });\n     |                                                                         ^\n  45 | });\n  46 |\n  47 | test('NFR-REL-02 a 500 from one student endpoint does not take the whole screen down', async ({ page }) => {"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "/home/user/reep-/testing/playwright/responsive-resilience-security.nfr.ts",
+                        "column": 73,
+                        "line": 44
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoHaveCount\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m failed\n\nLocator:  getByText('This server signs in with Google only')\nExpected: \u001b[32m0\u001b[39m\nReceived: \u001b[31m1\u001b[39m\nTimeout:  3000ms\n\nCall log:\n\u001b[2m  - Expect \"toHaveCount\" getByText('This server signs in with Google only') with timeout 3000ms\u001b[22m\n\u001b[2m  - waiting for getByText('This server signs in with Google only')\u001b[22m\n\u001b[2m    10 × locator resolved to 1 element\u001b[22m\n\u001b[2m       - unexpected value \"1\"\u001b[22m\n\n\n  42 |   await page.goto('/login');\n  43 |   await expect(page.getByRole('heading', { level: 1, name: 'Welcome back' })).toBeVisible({ timeout: 15_000 });\n> 44 |   await expect(page.getByText('This server signs in with Google only')).toHaveCount(0, { timeout: 3_000 });\n     |                                                                         ^\n  45 | });\n  46 |\n  47 | test('NFR-REL-02 a 500 from one student endpoint does not take the whole screen down', async ({ page }) => {\n    at /home/user/reep-/testing/playwright/responsive-resilience-security.nfr.ts:44:73"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:37.972Z",
+                  "annotations": [
+                    {
+                      "type": "fail",
+                      "description": "BUG DEF-009: unreachable API is reported as \"Google only\"",
+                      "location": {
+                        "file": "/home/user/reep-/testing/playwright/responsive-resilience-security.nfr.ts",
+                        "line": 40,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "/home/user/reep-/testing/results/playwright-nfr/artifacts/responsive-resilience-secu-38d63-m-the-server-is-Google-only-chromium/error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "/home/user/reep-/testing/playwright/responsive-resilience-security.nfr.ts",
+                    "column": 73,
+                    "line": 44
+                  }
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-92738cc58bdeaad6baef",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 35,
+          "column": 5
+        },
+        {
+          "title": "NFR-REL-02 a 500 from one student endpoint does not take the whole screen down",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 838,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:41.742Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-affbad7db58772c597fc",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 47,
+          "column": 5
+        },
+        {
+          "title": "NFR-SEC-01 the session cookie is httpOnly (invisible to page scripts)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 898,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:42.599Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-79498cc8fabb9afab7ea",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 55,
+          "column": 5
+        },
+        {
+          "title": "NFR-SEC-02 no session material or password is written to web storage",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 805,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:43.518Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-8ebf07db217c2a66e26c",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 65,
+          "column": 5
+        },
+        {
+          "title": "NFR-SEC-03 reflected script in a query string is not executed",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2005,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-09-29T21:45:44.335Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bd842b756f6d4c6f66cc-e15ad2cf63df8eaa1544",
+          "file": "responsive-resilience-security.nfr.ts",
+          "line": 74,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-09-29T21:43:48.883Z",
+    "duration": 118119.34,
+    "expected": 32,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,290 @@
+name: CDK deploy
+
+# DEPLOY THE VOICE PLATFORM'S AWS RESOURCES FROM THE BROWSER. Actions → "CDK
+# deploy (voice platform)" → Run workflow. It synthesises infra/cdk and runs
+# `cdk diff` or `cdk deploy` for the reep-voice-platform stack, assuming the
+# same reep-github-deploy role deploy.yml uses (pinned to this repository and
+# to main). The role only assumes the account's CDK bootstrap roles; the
+# resources are created by CloudFormation under the bootstrap's own execution
+# role. That grant is itself part of the stack (infra/cdk, "deploy-cdk-stacks"),
+# so the FIRST deploy is run by a human with admin credentials — `cdk bootstrap`
+# then `cdk deploy`, see infra/cdk/README.md — and every later one is this
+# button. No Terraform is involved anywhere in the platform's path: the api
+# reads the stack's SSM parameters at boot (app/voice_platform/ssm_config.py).
+#
+# After a deploy that changes parameters, run the ordinary Deploy workflow so
+# the api restarts and re-reads them. `diff` is safe any time and changes nothing.
+
+on:
+  workflow_dispatch:
+    inputs:
+      stack:
+        description: "Which stack"
+        type: choice
+        default: voice-platform
+        # `core` IS HERE NOW, AS TWO HALVES. `all` is still absent.
+        #
+        # The history, because the reason has changed twice. `core` was removed
+        # before the import: a deploy of reep-core then would CreateStack a
+        # second VPC, NAT gateway and four security groups before colliding on
+        # the database name. reep-core has been IMPORT_COMPLETE since
+        # 2026-09-07, so that risk is gone and a different one replaced it — a
+        # BARE `cdk deploy reep-core` is the FULL harden, the Multi-AZ database
+        # conversion and the ECS roll in ONE stack update, and step 9 of
+        # docs/cdk-cutover.md splits those two on purpose so that an ECS
+        # circuit-breaker rollback cannot also undo a database conversion that
+        # has no undo.
+        #
+        # So what is offered is NOT `core`. It is the two halves of step 9, each
+        # doing exactly one of them:
+        #
+        #   core-9a  `-c hardenEcs=false` — the database and backup half: the
+        #            Multi-AZ conversion, the 35-day retention, the archive
+        #            plan, the identity-ledger bucket and the task role's IAM
+        #            grants. The api task definition is left BYTE-IDENTICAL to
+        #            the import mirror, so this update has no ECS deployment in
+        #            it and therefore nothing for a circuit breaker to roll back.
+        #   core-9b  the ECS half, AFTER 9a has finished: the task definition's
+        #            new environment (SES_FROM_ADDRESS, IDENTITY_LEDGER_BUCKET),
+        #            the 600 s deregistration delay and the ledger's schedule.
+        #
+        # RUNNING 9b FIRST IS THE BARE DEPLOY THIS SPLIT EXISTS TO PREVENT, and
+        # nothing in CloudFormation knows whether 9a ran — a stack update does
+        # not carry the memory of the last one. That is why 9b asks for a typed
+        # sentence instead of the word "deploy"; see the confirm box below.
+        #
+        # `all` stays absent: it would sweep reep-core into a voice-platform
+        # deploy, which is the bare deploy again wearing a different label.
+        options: [voice-platform, edge-waf, dr-vault, core-9a, core-9b, core-nat-instance, core-nat-retire]
+      action:
+        description: "What to do"
+        type: choice
+        default: diff
+        options: [diff, deploy]
+      confirm:
+        description: 'For deploy: type "deploy" — core-9b wants MULTI-AZ IS AVAILABLE, core-nat-retire wants EGRESS IS PROVEN'
+        required: false
+        default: ""
+
+concurrency:
+  # The two core halves share ONE group. They are two updates to the same
+  # CloudFormation stack, and a stack that is already UPDATE_IN_PROGRESS
+  # rejects the second with a ValidationError -- which reads, in the Actions
+  # log, exactly like a broken workflow rather than like 9a still running.
+  group: cdk-${{ startsWith(inputs.stack, 'core') && 'core' || inputs.stack }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  cdk:
+    name: ${{ inputs.action }} ${{ inputs.stack }}
+    runs-on: ubuntu-latest
+    steps:
+      # A collaborator with write access can press "Run workflow" here, and the
+      # run would assume the main-pinned AWS role with CDK deploy rights. Only
+      # the owner runs it, diff included: a diff holds the same role.
+      # triggering_actor, not actor: a re-run is judged by whoever pressed
+      # Re-run. No bot is admitted: nothing dispatches this file.
+      - name: Only the repository owner may run CDK
+        env:
+          ACTOR: ${{ github.triggering_actor }}
+          OWNER: ${{ github.repository_owner }}
+        run: |
+          if [ "$ACTOR" != "$OWNER" ]; then
+            echo "::error::Only $OWNER may run CDK. This run was started by $ACTOR. Nothing was changed."
+            exit 1
+          fi
+
+      - name: Check the confirmation word
+        if: inputs.action == 'deploy'
+        # Through `env:` and never interpolated into the script body: `confirm`
+        # is free text from the dispatch form, and `${{ }}` inside a `run:` is
+        # substituted before the shell ever sees it, so a value containing a
+        # backtick or `$(...)` would execute here rather than be compared.
+        env:
+          CONFIRM: ${{ inputs.confirm }}
+          STACK: ${{ inputs.stack }}
+        run: |
+          # core-9b asks for a SENTENCE, not the word, and the reason is the
+          # same one the ops task's purge sentence is built on: by the time
+          # anybody reaches this box, "deploy" is muscle memory -- it is what
+          # the other four options take and what the Deploy workflow takes.
+          #
+          # 9b is the one run here whose precondition lives OUTSIDE this
+          # repository. Nothing in the template, the diff or the Actions log
+          # can tell you whether 9a finished; the RDS console can. Typing what
+          # it says is how a human confirms they went and looked, and it is the
+          # only check available -- this workflow's role holds CDK bootstrap
+          # rights, not rds:DescribeDBInstances, so the job cannot read it.
+          # core-nat-retire deletes the NAT GATEWAY, which is the step that
+          # actually stops the ~$43.6/month -- and the step that cannot be
+          # undone cheaply: a re-created gateway gets a NEW public address, so
+          # anything that ever allowlisted the old one breaks. Its precondition
+          # is the same shape as 9b's: nothing in this repository, this
+          # workflow's role, the template or the diff can tell you whether the
+          # NAT INSTANCE is actually forwarding packets. Only a live check can
+          # -- run `curl -sS https://checkip.amazonaws.com` from a task (the
+          # ops-task menu is the easy way) and confirm it answers at all.
+          if [ "$STACK" = "core-nat-retire" ]; then
+            if [ "$CONFIRM" != "EGRESS IS PROVEN" ]; then
+              echo "::error::Before core-nat-retire: run core-nat-instance FIRST and prove egress still works."
+              echo "::error::From a task in a private subnet, an outbound HTTPS call must succeed."
+              echo "::error::Deleting the gateway before that is an outage with a slow undo."
+              echo "::error::Then type exactly: EGRESS IS PROVEN"
+              echo "::error::Nothing was changed."
+              exit 1
+            fi
+          elif [ "$STACK" = "core-9b" ]; then
+            if [ "$CONFIRM" != "MULTI-AZ IS AVAILABLE" ]; then
+              echo "::error::Before 9b: open RDS -> reep-postgres in ap-south-1."
+              echo "::error::Multi-AZ must read Yes, AND Status must be 'available' -- not 'modifying'."
+              echo "::error::A conversion still in progress means 9a has not finished."
+              echo "::error::Then type exactly: MULTI-AZ IS AVAILABLE"
+              echo "::error::Nothing was changed."
+              exit 1
+            fi
+          elif [ "$CONFIRM" != "deploy" ]; then
+            echo "::error::Type 'deploy' in the confirm box to deploy. Nothing was changed."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: infra/cdk/requirements-dev.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install the CDK library and CLI
+        working-directory: infra/cdk
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          npm install -g aws-cdk
+          cdk --version
+
+      # The template assertions run first, without AWS: a stack that does not
+      # synthesise or has drifted from what the api expects never reaches diff.
+      - name: Synthesise and check the template
+        working-directory: infra/cdk
+        run: python -m pytest -q
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN || 'arn:aws:iam::445363794125:role/reep-github-deploy' }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+          role-session-name: reep-cdk-${{ github.run_id }}
+
+      # The stack name(s) for this run. `cdk import` is NOT here on purpose: it
+      # is a one-time, human-attended step (docs/cdk-cutover.md).
+      - name: Resolve the stack selector
+        id: sel
+        env:
+          STACK: ${{ inputs.stack }}
+        run: |
+          case "$STACK" in
+            voice-platform) echo "stacks=reep-voice-platform" >> "$GITHUB_OUTPUT" ;;
+            edge-waf)       echo "stacks=reep-edge-waf" >> "$GITHUB_OUTPUT" ;;
+            dr-vault)       echo "stacks=reep-dr-vault" >> "$GITHUB_OUTPUT" ;;
+            # THE CONTEXT FLAG IS THE ENTIRE DIFFERENCE BETWEEN THE TWO HALVES,
+            # so it is set HERE, beside the stack name, and never left to the
+            # person running the workflow. `hardenEcs=false` is what holds the
+            # api task definition identical to the import mirror: the ECS trio
+            # (SES_FROM_ADDRESS, IDENTITY_LEDGER_BUCKET and the 600 s drain)
+            # and the ledger's schedule all sit behind that one flag in
+            # reep_core/stack.py, and test_the_database_half_does_not_touch_the
+            # _ecs_trio is the guard that keeps them there.
+            core-9a)        echo "stacks=reep-core" >> "$GITHUB_OUTPUT"
+                            echo "context=-c hardenEcs=false" >> "$GITHUB_OUTPUT" ;;
+            core-9b)        echo "stacks=reep-core" >> "$GITHUB_OUTPUT" ;;
+            # THERE IS NO `core-arm64` OPTION, AND THERE MUST NOT BE ONE AGAIN.
+            # Graviton was first deployed from here as `-c apiArm64=true` on a
+            # bare reep-core. That worked once and was wrong twice. The flag
+            # was not written down, so the deployed template carried ARM64
+            # while `main` rendered nothing -- the repo-vs-AWS divergence
+            # infra-drift.yml exists to catch -- and because every other
+            # `core-*` option passes only its OWN flag, the next deploy of any
+            # of them would have rolled the api back to x86 at twice the price
+            # with nothing saying so. `apiArm64: true` lives in cdk.json now,
+            # pinned by test_cdk_json_carries_the_arm64_the_deployment_is_
+            # actually_running, so every option below renders ARM64 and the
+            # flags compose. An option that re-asserts it would be a second
+            # source of truth for one setting, which is how they disagree.
+            #
+            # What made that deploy safe in the first place still applies to
+            # the IMAGE: the api may only run on ARM64 while `:latest` is a
+            # MULTI-ARCH manifest. Against an amd64-only image every task dies
+            # at pull with "Manifest does not contain descriptor matching
+            # platform linux/arm64", before a health check, and the circuit
+            # breaker rolls it back. deploy.yml asserts both architectures are
+            # in the manifest before its job may pass; that assertion is now
+            # the only thing standing between cdk.json and a stopped service,
+            # so it must not be removed.
+            #
+            # The NAT swap, split for the reason 9a/9b is split: the first step
+            # is reversible because it LEAVES THE GATEWAY STANDING, the second
+            # is the one that removes it. Both flags are set here, beside the
+            # stack name, never left to whoever is running the workflow.
+            core-nat-instance)
+                            echo "stacks=reep-core" >> "$GITHUB_OUTPUT"
+                            echo "context=-c natInstance=true -c natGateway=true" >> "$GITHUB_OUTPUT" ;;
+            core-nat-retire)
+                            echo "stacks=reep-core" >> "$GITHUB_OUTPUT"
+                            echo "context=-c natInstance=true -c natGateway=false" >> "$GITHUB_OUTPUT" ;;
+            *)              echo "::error::Unknown stack: $STACK"; exit 1 ;;
+          esac
+      # The context flag travels with BOTH verbs. A `diff` of core-9a run
+      # without it would show the ECS half as pending and then 9a would not
+      # deliver it -- a diff that describes a different deploy from the one the
+      # button next to it runs is worse than no diff.
+      - name: cdk diff
+        if: inputs.action == 'diff'
+        working-directory: infra/cdk
+        run: cdk diff ${{ steps.sel.outputs.stacks }} ${{ steps.sel.outputs.context }} --no-color
+
+      - name: cdk deploy
+        if: inputs.action == 'deploy'
+        working-directory: infra/cdk
+        run: |
+          cdk deploy ${{ steps.sel.outputs.stacks }} ${{ steps.sel.outputs.context }} \
+            --require-approval never --no-color --outputs-file outputs.json
+          echo "## ${{ inputs.stack }} outputs" >> "$GITHUB_STEP_SUMMARY"
+          echo '```json' >> "$GITHUB_STEP_SUMMARY"
+          cat outputs.json >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          # What comes next differs per half, and saying "run Deploy" after 9a
+          # would be wrong: 9a deliberately leaves the task definition alone, so
+          # there is nothing for a restart to pick up, and the next step is a
+          # WAIT on a conversion that takes tens of minutes.
+          case "${{ inputs.stack }}" in
+            core-9a)
+              {
+                echo "### Next: wait, then 9b"
+                echo "The Multi-AZ conversion runs in the background and takes tens of minutes."
+                echo "Open RDS -> reep-postgres and wait until Multi-AZ reads **Yes** and Status reads **available**."
+                echo "Then run this workflow again with stack \`core-9b\`, action \`deploy\`,"
+                echo "and \`MULTI-AZ IS AVAILABLE\` in the confirm box."
+                echo "Do NOT run the Deploy workflow in between: 9a changes no task definition,"
+                echo "so a restart would pick up nothing."
+              } >> "$GITHUB_STEP_SUMMARY" ;;
+            core-9b)
+              {
+                echo "### Next: the Deploy workflow"
+                echo "9b registered a new api task definition revision and the service is rolling onto it."
+                echo "Run **Deploy** (target \`api-only\`, confirm \`deploy\`) so the image and the new"
+                echo "environment land together, then check:"
+                echo "- SES: a password reset should now send mail rather than log it."
+                echo "- The identity ledger writes its first object at 23:30 IST tonight."
+                echo "- \`IdentityLedgerBucketName\` above is the bucket to look in."
+              } >> "$GITHUB_STEP_SUMMARY" ;;
+            *)
+              echo "Next: run the Deploy workflow so the api restarts and reads these parameters." >> "$GITHUB_STEP_SUMMARY" ;;
+          esac
